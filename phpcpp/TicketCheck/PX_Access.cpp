@@ -126,15 +126,27 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                             response["result_description"]="Already Exited";    
                             response["result"]="antipassback_already_exited";      
                             }
-                        
+                        else
+                            {
+                            response["access_allowed"]="true";		
+                            response["result"]= "allow_access";		
+                            response["result_description"]="Access allowed.whitelist available";
+                            }                                                
                         }
                     else
                         {
-                        if(deviceType==1)
+                        if(deviceType==2)
                             {
                             response["result_description"]="Entry not exists";    
                             response["result"]="antipassback_entry_not_exist";   
-                            }   
+                            }
+                        else
+                            {
+                            response["access_allowed"]="true";		
+                            response["result"]= "allow_access";		
+                            response["result_description"]="Access allowed.whitelist available";
+                            }
+                           
                         
                         }
                     

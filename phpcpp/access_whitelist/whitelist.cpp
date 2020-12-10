@@ -65,7 +65,7 @@ Php::Value insertUpdateWhitelist(Php::Value json)
         string report_id=json["report_id"];
         if(id=="")    
             {            
-            prep_stmt = con->prepareStatement("insert into access_whitelist(facility_number,carpark_number,access_zones,ticket_id,plate_number,tag,tag_serial,tag_tid,country,validity_start_date,validity_expiry_date,customer_name,antipassback_enabled,season_card,wallet_payment,corporate_parker,personalized_message_line1,personalized_message_line2,access_id,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"+to_string(accessId())+",1)");            
+            prep_stmt = con->prepareStatement("insert into access_whitelist(facility_number,carpark_number,access_zones,ticket_id,plate_number,tag,tag_serial,tag_tid,country,validity_start_date,validity_expiry_date,customer_name,antipassback_enabled,season_card,wallet_payment,corporate_parker,personalized_message_line1,personalized_message_line2,access_id,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'"+to_string(accessId())+"',1)");            
             }
         else
             {

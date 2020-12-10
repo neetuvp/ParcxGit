@@ -1293,7 +1293,7 @@ Php::Value UploadContractPrkingsubscriptions(Php::Value request)
                     }
                 else
                     {
-                    query="insert into parcx_server.access_whitelist(facility_number,carpark_number,access_zones,ticket_id,access_id,plate_number,tag,validity_start_date,validity_expiry_date,customer_name,status)values""('"+facility_number+"','"+carpark_number+"','','"+ticket_id+"',"+to_string(accessId())+",'"+plate_number+"','"+tag+"','"+validity_start_date+"','"+validity_end_date+"','"+customer_name+"',1)";                    
+                    query="insert into parcx_server.access_whitelist(facility_number,carpark_number,access_zones,ticket_id,access_id,plate_number,tag,validity_start_date,validity_expiry_date,customer_name,status)values""('"+facility_number+"','"+carpark_number+"','','"+ticket_id+"','"+to_string(accessId())+"','"+plate_number+"','"+tag+"','"+validity_start_date+"','"+validity_end_date+"','"+customer_name+"',1)";                    
                     stmt->executeUpdate(query);   
                     }
                 jsonresponse[i] = id;                
