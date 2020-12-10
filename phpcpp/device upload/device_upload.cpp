@@ -1227,9 +1227,23 @@ Php::Value UploadParkingMovementExceptions(Php::Value request)
        
 }
 
+long accessId()
+	{
+	struct tm tm;
+	string startDate="2020-01-01 00:00:00";			
+			
+	strptime(startDate.c_str(),"%Y-%m-%d %H:%M:%S",&tm);		
+	time_t t=mktime(&tm);
+						
+	time_t now=time(NULL);
+	long seconds=difftime(now,t);
+	return seconds;					
+	}
+
 Php::Value UploadContractPrkingsubscriptions(Php::Value request)
 {
     sql::Statement *stmt;
+    sql::ResultSet *res;
     Php::Value result;
     
     Json::Value jsonresponse;
@@ -1242,7 +1256,7 @@ Php::Value UploadContractPrkingsubscriptions(Php::Value request)
             string device_name = request[i]["device_name"];
             string device_number = request[i]["device_number"];
 
-			string id = request[i]["id"];
+            string id = request[i]["id"];
             string product_id = request[i]["product_id"];    
             string product_name = request[i]["product_name"];    
             string product_price = request[i]["product_price"];    
@@ -1263,13 +1277,27 @@ Php::Value UploadContractPrkingsubscriptions(Php::Value request)
             
 			           
 			
-			query="INSERT into contract_parking_transactions(device_name,device_number,ticket_id,plate_number,tag,date_time,product_id,product_name,product_price,customer_name,company_name,customer_email,customer_mobile,description,validity_days,validity_start_date,validity_end_date,carpark_number,facility_number) VALUES('"+device_name+"','"+device_number+"','"+ticket_id+"','"+plate_number+"','"+tag+"','"+date_time+"','"+product_id+"','"+product_name+"','"+product_price+"','"+customer_name+"','"+company_name+"','"+customer_email+"','"+customer_mobile+"','"+description+"','"+validity_days+"','"+validity_start_date+"','"+validity_end_date+"','"+carpark_number+"','"+facility_number+"')";            
+            query="INSERT into contract_parking_transactions(device_name,device_number,ticket_id,plate_number,tag,date_time,product_id,product_name,product_price,customer_name,company_name,customer_email,customer_mobile,description,validity_days,validity_start_date,validity_end_date,carpark_number,facility_number) VALUES('"+device_name+"','"+device_number+"','"+ticket_id+"','"+plate_number+"','"+tag+"','"+date_time+"','"+product_id+"','"+product_name+"','"+product_price+"','"+customer_name+"','"+company_name+"','"+customer_email+"','"+customer_mobile+"','"+description+"','"+validity_days+"','"+validity_start_date+"','"+validity_end_date+"','"+carpark_number+"','"+facility_number+"')";            
             result = stmt->executeUpdate(query);
            
             if(result==1)
-            {
+                {
+                query="select * from parcx_server.access_whitelist where ticket_id='"+ticket_id+"'";
+                res=stmt->executeQuery(query);
+                if(res->next())//exit renew subscription
+                    {                     
+                    string id=res->getString("access_whitelist_id");                      
+                    query="update parcx_server.access_whitelist set validity_start_date= '"+validity_start_date+"',validity_expiry_date='"+validity_end_date+"' where access_whitelist_id="+id;                               
+                    stmt->executeUpdate(query);                     
+                    delete res;
+                    }
+                else
+                    {
+                    query="insert into parcx_server.access_whitelist(facility_number,carpark_number,access_zones,ticket_id,access_id,plate_number,tag,validity_start_date,validity_expiry_date,customer_name,status)values""('"+facility_number+"','"+carpark_number+"','','"+ticket_id+"',"+to_string(accessId())+",'"+plate_number+"','"+tag+"','"+validity_start_date+"','"+validity_end_date+"','"+customer_name+"',1)";                    
+                    stmt->executeUpdate(query);   
+                    }
                 jsonresponse[i] = id;                
-            }			 		
+                }			 		
 			
             Json::FastWriter fw;
             string res = fw.write(jsonresponse);

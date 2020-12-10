@@ -41,6 +41,18 @@ string ToString(Php::Value param)
 	}
 
 
+long accessId()
+	{
+	struct tm tm;
+	string startDate="2020-01-01 00:00:00";			
+			
+	strptime(startDate.c_str(),"%Y-%m-%d %H:%M:%S",&tm);		
+	time_t t=mktime(&tm);
+						
+	time_t now=time(NULL);
+	long seconds=difftime(now,t);
+	return seconds;					
+	}
 
 
 Php::Value insertUpdateWhitelist(Php::Value json)
@@ -53,7 +65,7 @@ Php::Value insertUpdateWhitelist(Php::Value json)
         string report_id=json["report_id"];
         if(id=="")    
             {            
-            prep_stmt = con->prepareStatement("insert into access_whitelist(facility_number,carpark_number,access_zones,ticket_id,plate_number,tag,tag_serial,tag_tid,country,validity_start_date,validity_expiry_date,customer_name,antipassback_enabled,season_card,wallet_payment,corporate_parker,personalized_message_line1,personalized_message_line2,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)");            
+            prep_stmt = con->prepareStatement("insert into access_whitelist(facility_number,carpark_number,access_zones,ticket_id,plate_number,tag,tag_serial,tag_tid,country,validity_start_date,validity_expiry_date,customer_name,antipassback_enabled,season_card,wallet_payment,corporate_parker,personalized_message_line1,personalized_message_line2,access_id,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"+to_string(accessId())+",1)");            
             }
         else
             {
