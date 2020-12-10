@@ -1,0 +1,181 @@
+/* === tab / content blocks === */
+
+.licenses-page .block-data {
+  margin-bottom: 0;
+}
+
+/* === green info boxes === */
+
+.license-data .license-box:nth-child(5) {
+    padding-right: 0px;
+}
+
+@media (min-width: 1425px) {
+  .license-data .license-box {
+    flex: 0 0 20%;
+    max-width: 20%;
+    padding-right: 20px;
+  }
+}
+
+@media (min-width: 760px) and (max-width: 1425px) {
+  .license-data .license-box {
+    flex: 0 0 20%;
+    max-width: 20%;
+    padding-right: 20px;
+  }
+}
+
+@media (min-width: 0px) and (max-width: 760px) {
+  .license-data .license-box:not(:nth-child(5)) {
+    flex: 0 0 50%;
+    max-width: 50%;
+    margin-bottom: 20px;
+  }
+  .license-data .license-box:nth-child(1) {
+    padding-right: 10px;
+  }
+  .license-data .license-box:nth-child(2) {
+    padding-left: 10px;
+  }
+  .license-data .license-box:nth-child(3) {
+    padding-left: 10px;
+  }
+  .license-data .license-box:nth-child(4) {
+    padding-left: 10px;
+  }
+  .license-data .license-box:nth-child(5) {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  #updateValidator .license-box {
+    margin-bottom: 0;
+  }
+}
+
+#updateValidator .card-table-blue{
+  margin-top: 30px;
+}
+
+/* === license table filter === */
+
+.license-table-filter .row {
+  margin: 0;
+  padding: 15px;
+}
+
+.license-table-filter .menu-item {
+  padding: 0 15px 0px 0px;
+}
+
+.license-table-filter .col {
+  padding: 0;
+}
+
+@media (min-width: 900px) {
+  .license-table-filter .menu-item {
+    width: 220px;
+  }
+}
+
+@media (min-width: 0px) and (max-width: 900px) {
+  .license-table-filter .menu-item {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  .license-table-filter .menu-item:nth-of-type(2) {
+    padding-right: 0;
+  }
+}
+
+/* === form containers === */
+
+.licenses-page .card-form-custom {
+  padding: 30px;
+}
+
+@media (min-width: 800px) {
+  .licenses-page .card-form-custom {
+    max-width: 750px;
+  }
+}
+
+/* === form input === */
+img
+	{
+	max-width:150px;	
+	}
+
+/*
+.files input {
+  outline: 2px dashed #92b0b3;
+  outline-offset: -10px;
+  -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+  transition: outline-offset .15s ease-in-out, background-color .15s linear;
+  padding: 50px 0px 85px 35%;
+  text-align: center !important;
+  margin: 0;
+  width: 100% !important;
+  background-size: cover;
+  font-size: 15px;
+}
+
+.files input:focus {     
+  outline: 2px dashed #92b0b3;  
+  outline-offset: -10px;
+  -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+  transition: outline-offset .15s ease-in-out, background-color .15s linear; 
+  border:1px solid #92b0b3;
+}
+
+.files { 
+  position: relative;
+} 
+
+.color input { 
+  background-color:#f1f1f1;
+}
+
+.files:before {
+  position: absolute;
+  bottom: 10px;
+  left: 0;  
+  pointer-events: none;
+  width: 100%;
+  right: 0;
+  height: 57px;
+  content: " or drag it here";
+  display: block;
+  margin: 0 auto;
+  font-weight: 400;
+  text-align: center;
+  font-size: 15px;
+}*/
+
+/* === readonly form === */
+
+@media (min-width: 0px) and (max-width: 767px) {
+  .form-readonly textarea {
+    line-height: 1;
+  }
+  .form-readonly .form-group,
+  .form-readonly label {
+    margin: 0;
+  }
+  .form-readonly .form-control-plaintext {
+    margin-bottom: 10px;
+  }
+  .form-readonly textarea {
+    margin-top: 8px;
+  }
+}
+
+.multiple-checkboxes,
+.multiple-checkboxes ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.multiple-checkboxes ul {
+  padding-left: 25px;
+}

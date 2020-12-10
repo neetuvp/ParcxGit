@@ -1,0 +1,182 @@
+/* === body === */
+
+* {
+  font-family: "Noto Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+body.admin-login {
+    background: url("../img/parcx-bg.jpg");
+    background-size: cover;
+    background-position: center;
+}
+
+/* === restore Bootstrap 3 "hidden" utility classes === */
+
+@media (max-width: 575px) {
+    .hidden-xs-down, .hidden-sm-down, .hidden-md-down, .hidden-lg-down, .hidden-xl-down, .hidden-xs-up, .hidden-unless-sm, .hidden-unless-md, .hidden-unless-lg, .hidden-unless-xl {
+        display: none !important;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+    .hidden-sm-down, .hidden-md-down, .hidden-lg-down, .hidden-xl-down, .hidden-xs-up, .hidden-sm-up, .hidden-unless-xs, .hidden-unless-md, .hidden-unless-lg, .hidden-unless-xl {
+        display: none !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .hidden-md-down, .hidden-lg-down, .hidden-xl-down, .hidden-xs-up, .hidden-sm-up, .hidden-md-up, .hidden-unless-xs, .hidden-unless-sm, .hidden-unless-lg, .hidden-unless-xl {
+        display: none !important;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .hidden-lg-down, .hidden-xl-down, .hidden-xs-up, .hidden-sm-up, .hidden-md-up, .hidden-lg-up, .hidden-unless-xs, .hidden-unless-sm, .hidden-unless-md, .hidden-unless-xl {
+        display: none !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    .hidden-xl-down, .hidden-xs-up, .hidden-sm-up, .hidden-md-up, .hidden-lg-up, .hidden-xl-up, .hidden-unless-xs, .hidden-unless-sm, .hidden-unless-md, .hidden-unless-lg {
+        display: none !important;
+    }
+}
+
+/* === login container === */
+
+.admin-login .login-container {
+    background: #FFF;
+    position: absolute;
+    left: 51%;
+    top: 51%;
+    transform: translate(-51%, -51%);
+    -webkit-transform: translate(-51%, -51%);
+    width: 820px;
+}
+
+@media (min-width: 500px) and (max-width: 900px) {
+    .admin-login .login-container {
+        width: 400px;
+    }
+}
+
+@media (min-width: 0px) and (max-width: 500px) {
+    .admin-login .login-container {
+        width: 85%;
+    }
+}
+
+/* === logo box === */
+
+/* test if logo is centered */
+/* .admin-login .login-container .logo-box {
+    background-color: gray;
+} */
+
+.admin-login .login-container .logo-box .img-box {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 30;
+    right: 30;
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+/* === login form === */
+
+.admin-login .login-container .login-form {
+    background: #343a40 linear-gradient(180deg,#353232,#343a40) repeat-x !important;
+    padding: 45px 30px;
+    color: white;
+}
+
+.user-login .login-container .login-form {
+    background: #17a2b8 linear-gradient(180deg,#3ab0c3,#17a2b8) repeat-x !important;
+}
+
+.admin-login .login-container .login-form .form-label-group {
+	margin-bottom: 30px;
+}
+
+.admin-login .login-container .login-form label {
+	font-weight: 500;
+}
+
+@media (min-width: 0px) and (max-width: 900px) {
+    .admin-login .login-container .login-form {
+        flex: 100%;
+        max-width: 100%;
+    }
+}
+
+/* === form feedback === */
+
+form {
+    margin-block-end: 0;
+}
+
+form .error.text-danger {
+    font-size: 15px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.user-login form .error.text-danger {
+    /* increase readability on blue bg */
+    color: #bf0000 !important;
+}
+
+/* === mobile logo === */
+
+.login-container .login-form .login-logo img {
+    margin: 0 auto;
+    margin-bottom: 1.5rem;
+    display: none;
+}
+
+@media (min-width: 0px) and (max-width: 900px) {
+    .admin-login:not(.landing-page) .login-container .logo-box {
+        display: none;
+    }
+    .admin-login .login-container .login-logo img {
+        display: block;
+    }
+}
+
+/* === landing page === */
+
+.landing-page .img-fluid {
+    background: white;
+}
+
+.landing-page .logo-box {
+    min-height: 0px;
+}
+
+.landing-page.admin-login .login-container {
+    width: 600px;
+}
+
+@media (max-width: 600px) and (min-width: 0px) {
+    .landing-page.admin-login .login-container {
+        width: 90%;
+    }
+}
+
+/* === login form feedback === */
+
+div#messagebox {
+    margin-top: 7px;
+}
+
+/* === login form icons === */
+
+.login-form .input-group-text {
+    width: 46px;
+}
+
+.login-form .input-group-text span {
+    margin: auto;
+}

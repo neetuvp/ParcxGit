@@ -1,0 +1,103 @@
+/* === validator block === */
+
+.validator-block {
+  padding: 0px 15px;
+}
+
+@media (min-width: 1441px) {
+    .validator-block {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1441px) {
+    .validator-block {
+        flex: 0 0 33%;
+        max-width: 33%;
+    }
+}
+
+@media (min-width: 700px) and (max-width: 1025px) {
+    .validator-block {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (min-width: 600px) and (max-width: 700px) {
+    .validator-block {
+        flex: 0 0 440px;
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 0px) and (max-width: 600px) {
+    .validator-block {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+.validator-block .card-header {
+  background: white;
+  padding: 15px;
+}
+
+.validator-block .validator-icon {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.validator-block .validator-icon .icon-text p {
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.validator-block .validator-icon .icon-text {
+    padding-top: 10%;
+}
+
+.validator-block .card {
+    margin-top: -25px;
+    z-index: 1;
+}
+
+.validator-block .dot-indicator {
+    margin: 12px 0 0 0;
+}
+
+.validator-block .indicator-text {
+    margin-right: 5px;
+    display: block;
+    margin-top: 7px;
+}
+
+/* === info blocks === */
+
+.val-dashboard .small-box-cont {
+    margin-bottom: 5px;
+}
+
+.val-dashboard .small-box-cont .license-box {
+    margin-bottom: 25px;
+    padding: 0px 15px;
+}
+
+.val-dashboard .small-box-cont .license-box h5 {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.val-dashboard .small-box-cont .license-box h6 {
+    margin-bottom: 5px;
+    font-size: 15px;
+}

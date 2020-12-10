@@ -1,0 +1,31 @@
+/* === card form === */
+
+.settings-page .card-form-custom {
+  width: 620px;
+  padding: 30px;
+  margin-bottom: 0;
+}
+
+@media (min-width: 0px) and (max-width: 800px) {
+  .settings-page .card-form-custom {
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
+.settings-page .card-form-custom .form-control-plaintext {
+    color: #727e89;
+}
+
+.settings-page .card-form-custom .form-control-plaintext:focus {
+  outline: none;
+}
+
+.settings-page .card-form-custom .form-group:nth-of-type(1) {
+  margin-bottom: 0;
+}
+
+.settings-page .card-form-custom label,
+.settings-page .card-form-custom .form-control-plaintext {
+    padding: .375rem 0rem;
+}

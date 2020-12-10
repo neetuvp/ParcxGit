@@ -1,0 +1,37 @@
+/* === mobile container alert === */
+
+.mobile-container {
+  padding-top: 1px;
+}
+
+.mobile-container .card {
+  margin: 20px 20px 0px 25px;
+  padding: 20px;
+}
+
+.mobile-container .card h5 {
+  margin-bottom: 10px;
+}
+
+.mobile-container .card p {
+  margin: 0;
+}
+
+/* === show / hide functionality === */
+
+/* tablet breakpoint is 600px */
+/* show alert on mobile devices and hide tablet/desktop content */
+/* show/hide tab links e.g. overview, add validator account */
+
+@media (min-width: 0px) and (max-width: 600px) {
+    .desktop-container,
+    .tab-link-container {
+        display: none !important;
+    }
+}
+
+@media (min-width: 600px) {
+    .mobile-container {
+        display: none !important;
+    }
+}
