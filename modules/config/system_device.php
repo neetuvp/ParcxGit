@@ -546,6 +546,9 @@ $(document).on("click", ".device-edit", function()
     $.post("../../modules/ajax/settings.php",jsondata,function(result){       
       $("#form").trigger('reset');
       $(":checkbox").attr("checked", false);
+      $('.block-data[data-status="overview"]').hide();
+      $('.block-data[data-status="form"]').show();        
+      $('.tab-link').removeClass('active');
       var response=JSON.parse(result);            
       $("#device_category").val(response.device_category);
       $("#device_category").change();
