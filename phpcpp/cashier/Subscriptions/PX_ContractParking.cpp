@@ -2,6 +2,8 @@
 #include "PX_ContractParking.h"
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
+#include <curl/curl.h>
+#include<jsoncpp/json/json.h>
 
 #define ServerDB "parcx_server"
 #define ReportingDB "parcx_reporting"
@@ -37,6 +39,40 @@ inline string toString(Php::Value param)
 	string value=param;
 	return value;
 	}
+
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+	{
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+	}
+
+string callWebService(string jsonstring,string url)
+	{	
+	string response;
+    CURL *curl;
+    CURLcode curl_res;
+	writeLog("callWebService","Request:"+jsonstring);	
+	curl = curl_easy_init();
+	if(curl) {
+		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());		
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonstring.c_str()); 
+		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 20L);            
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);		
+		curl_res=curl_easy_perform(curl);
+		if(curl_res!=CURLE_OK)
+		{
+			response = "error";			
+		}
+		else
+		{
+			curl_easy_cleanup(curl);
+		}
+	}
+	writeLog("callWebService","Response:"+response);	
+	return response;
+	}
+
 
 Php::Value ContractParking::getPuchasedProductDetails(Php::Value json)
     {
@@ -87,40 +123,82 @@ Php::Value ContractParking::getPuchasedProductDetails(Php::Value json)
         res= rStmt->executeQuery(query);   
         i=0;   
         if(res->rowsCount()>0)
+            {
             response["available"]="true";   
+            Php::Value purachase;
+            while(res->next())
+                {            
+                row["id"]=string(res->getString("id"));    
 
-        Php::Value purachase;
-        while(res->next())
-            {            
-            row["id"]=string(res->getString("id"));    
+                row["customer_name"]=string(res->getString("customer_name"));
+                row["customer_mobile"]=string(res->getString("customer_mobile"));
+                row["company_name"]=string(res->getString("company_name"));
+                row["customer_email"]=string(res->getString("customer_email"));
+                row["description"]=string(res->getString("description"));
 
-            row["customer_name"]=string(res->getString("customer_name"));
-            row["customer_mobile"]=string(res->getString("customer_mobile"));
-            row["company_name"]=string(res->getString("company_name"));
-            row["customer_email"]=string(res->getString("customer_email"));
-            row["description"]=string(res->getString("description"));
+                row["ticket_id"]=string(res->getString("ticket_id"));            
+                row["tag"]=string(res->getString("tag"));
+                row["plate_number"]=string(res->getString("plate_number"));
 
-            row["ticket_id"]=string(res->getString("ticket_id"));
-            row["tag"]=string(res->getString("tag"));
-            row["plate_number"]=string(res->getString("plate_number"));
+                row["product_name"]=string(res->getString("product_name"));
+                row["product_price"]=string(res->getString("product_price"));
+                row["validity_days"]=string(res->getString("validity_days"));				
+                row["product_id"]=string(res->getString("product_id"));
+                row["carpark"]=string(res->getString("carpark_number"));
+                row["validity_start_date"]=string(res->getString("validity_start_date"));
+                row["validity_end_date"]=string(res->getString("validity_end_date"));
+                row["purchased_date_time"]=string(res->getString("date_time"));
+                purachase[i]=row;
+                i++;    
+                }
+            delete res;
 
-            row["product_name"]=string(res->getString("product_name"));
-            row["product_price"]=string(res->getString("product_price"));
-            row["validity_days"]=string(res->getString("validity_days"));				
-            row["product_id"]=string(res->getString("product_id"));
-            row["carpark"]=string(res->getString("carpark_number"));
-            row["validity_start_date"]=string(res->getString("validity_start_date"));
-            row["validity_end_date"]=string(res->getString("validity_end_date"));
-            row["purchased_date_time"]=string(res->getString("date_time"));
-            purachase[i]=row;
-            i++;    
+            response["subscription"]=purachase;
             }
+        else
+            {
+            if(ticket_id.length()>0)
+                {
+                con=General.mysqlConnect(ServerDB);  
+                stmt=con->createStatement(); 
+                res=stmt->executeQuery("select setting_value from system_settings where setting_name='cloud_get_details_webservice'");
+                if(res->next())
+                    {
+                    string url=res->getString("setting_value");
+                    Json::Value input;
+                    Json::FastWriter fw;
+                    Json::Reader jsonReader;
+                    Json::Value jsonResponse;	
+                    input["task"]="10";
+                    input["ticket_id"]=ticket_id;  
+                    input["transactionID"]="0000";                  
 
-        response["subscription"]=purachase;
+                    string jsonstring=fw.write(input);
+                    
+                    string webservice_response=callWebService(jsonstring,url);
+                    if(webservice_response=="error")
+                        {
+                        response["user_present"]="false";                        
+                        }
+                    else if (jsonReader.parse(webservice_response,jsonResponse))
+                        {
+                        Json::Value data= jsonResponse["data"];   
+                        
+                        for (auto const& id : data.getMemberNames()) 
+                            {                            
+                            response[id]=data[id].asString();
+                            }
+                        }
+                    else					
+                        writeLog("getPuchasedProductDetails","Could not parse HTTP data as JSON");
 
-        delete rStmt;
-        delete res;       
-        rCon->close();
+                    delete res;
+                    }
+                delete stmt;
+                delete con;
+                }                         
+            }                
+        delete rStmt;    
         delete rCon;
         }
     catch(const std::exception& e)

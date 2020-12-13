@@ -718,7 +718,7 @@ void showDeviceList()
                 Php::out << "<button type='button' class='col btn btn-success device-enable-disable-btn'>Enable</button>"<< std::endl;
             Php::out << "</td>"<< std::endl;
             Php::out << "<td>"<< std::endl;
-            Php::out << "<button type='button' class='col btn btn-info device-edit' data-target='form'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;           
+            Php::out << "<button type='button' class='col btn btn-info device-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;           
             Php::out << "</td>"<< std::endl;
             Php::out<<"</tr>"<<endl;	
             }
