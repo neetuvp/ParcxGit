@@ -50,21 +50,21 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
     try
         {
         sql::Connection *serverCon;
-        sql::Statement *stmt;
-        sql::ResultSet *res;                   
+		sql::Statement *stmt;
+		sql::ResultSet *res;                   
         serverCon=General.mysqlConnect(ServerDB);
         if(serverCon!=NULL)
             {
             if(plateNumber!="")
                 query="select * from access_whitelist where plate_number='"+plateNumber+"'";		                
             else
-                query="select * from access_whitelist where  ticket_id='"+ticketId+"'";
+			    query="select * from access_whitelist where  ticket_id='"+ticketId+"'";
                                 					
             stmt = serverCon->createStatement();
             res=stmt->executeQuery(query);
-            if(res->next())
-                {
-                writeAccessLog("checkAccess","Present in access whitelist");
+		    if(res->next())
+			    {
+			    writeAccessLog("checkAccess","Present in access whitelist");
                 plateNumber=res->getString("plate_number");
                 ticketId=res->getString("ticket_id");
                 response["plate_number"]=string(res->getString("plate_number"));	
@@ -73,9 +73,8 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                 response["tag_tid"]=string(res->getString("tag_tid"));
                 response["ticket_id"]=string(res->getString("ticket_id"));
                 response["whitelist_present"]="true";
-                int cooperate_parker=res->getInt("corporate_parker");
 			
-                string zone=res->getString("access_zones");
+			    string zone=res->getString("access_zones");
                 string expiry_date=res->getString("validity_expiry_date");
                 string start_date=res->getString("validity_start_date");
                 string currentDate=General.currentDateTime(dateFormat);
@@ -115,7 +114,7 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                     {                    
                     query="select * from parcx_reporting.open_transactions where  ticket_id='"+ticketId+"'";
                     res=stmt->executeQuery(query);
-		    if(res->next())
+		            if(res->next())
                         {
                         if(deviceType==1)
                             {
@@ -146,7 +145,9 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                             response["access_allowed"]="true";		
                             response["result"]= "allow_access";		
                             response["result_description"]="Access allowed.whitelist available";
-                            }                                                   
+                            }
+                           
+                        
                         }
                     
                     }              
@@ -154,37 +155,9 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                     {
                     response["access_allowed"]="true";		
                     response["result"]= "allow_access";		
-                    response["result_description"]="Access allowed.whitelist available";
-
-                    if(cooperate_parker>1 && deviceType==1)
-                        {
-                        query="select * from cooperate_users where  user_id="+to_string(cooperate_parker);
-                        res=stmt->executeQuery(query);
-                        if(res->next())
-                            {
-                            int parking_spaces=res->getInt("parking_spaces");
-                            writeAccessLog("checkAccess","Cooperate parker under "+to_string(cooperate_parker)+". Alloted spaces : "+to_string(parking_spaces));
-                            query="SELECT count(*) as count FROM parcx_server.access_whitelist a,parcx_reporting.open_transactions b where a.ticket_id=b.ticket_id  and a.plate_number=b.plate_number and b.entry_type=2 and a.corporate_parker="+to_string(cooperate_parker);
-                            res=stmt->executeQuery(query);
-                            res->next();
-                            int occupied=res->getInt("count");
-                            writeAccessLog("checkAccess","Currently occupied for the cooperate user :"+to_string(occupied));
-                            if(occupied>parking_spaces)
-                                {
-                                query="SELECT setting_value from system_settings where settings_name='entry_type_contract_parking_space_exceeded'";
-                                res=stmt->executeQuery(query);
-                                res->next();
-                                if(res->getInt("setting_value")==1)
-                                    {
-                                    writeAccessLog("checkAccess","short term access after cooperate parking space occupied is enabled");
-                                    response["access_allowed"]="false";		
-                                    response["result"]= "contract_parking_spaces_occupied";		
-                                    response["result_description"]="Contract parking spaces occupied";
-                                    }
-                                }
-                            }                        
-                        }                    			
-                    }                                
+                    response["result_description"]="Access allowed.whitelist available";			
+                    }
+                                
                 }
             else
                 {			

@@ -162,7 +162,9 @@ $(document).on("click", ".facility-edit", function()
     data["task"]="8";            
     var jsondata=JSON.stringify(data);            
     $.post("../../modules/ajax/settings.php",jsondata,function(result){ 
-      console.log(result);
+      $('.block-data[data-status="overview"]').hide();
+      $('.block-data[data-status="form"]').show();        
+      $('.tab-link').removeClass('active');
       var response=JSON.parse(result); 
       $("#facility_name").val(response.facility_name);
       $("#facility_number").val(response.facility_number);

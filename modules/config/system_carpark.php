@@ -229,7 +229,9 @@ $(document).on("click", ".carpark-edit", function()
     data["task"]="9";            
     var jsondata=JSON.stringify(data);            
     $.post("../../modules/ajax/settings.php",jsondata,function(result){ 
-      console.log(result);
+      $('.block-data[data-status="overview"]').hide();
+      $('.block-data[data-status="form"]').show();        
+      $('.tab-link').removeClass('active');
       var response=JSON.parse(result);            
       $("#name").val(response.carpark_name);
       $("#carpark_number").val(response.carpark_number);

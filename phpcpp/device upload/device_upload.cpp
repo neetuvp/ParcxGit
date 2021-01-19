@@ -560,10 +560,10 @@ Php::Value UploadPayments(Php::Value request)
             string authentication_code = request[i]["authentication_code"];
             string entry_plate_number = request[i]["entry_plate_number"];
             string exit_plate_number = request[i]["exit_plate_number"];
-            string central_cashier = request[i]["central_cashier"]; 
+            //string central_cashier = request[i]["central_cashier"]; 
             string wallet_points = request[i]["wallet_points"]; 
-            if(central_cashier!="1")
-                central_cashier="0";                          
+            // if(central_cashier!="1")
+            //     central_cashier="0";                          
 			
 			query="INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,operator_id,operator_name,shift_id,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,lost_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,gross_amount,amount_received,discount_id,discount_category,discount_name,coupon_id,coupon_category,coupon_source,payment_type,validation_value,validation_id,receipt_number,bank_notes,balance_returned,credit_note,authentication_code,entry_plate_number,exit_plate_number,wallet_points)VALUES('"+device_number+"','"+device_name+"',"+carpark_number+",'"+carpark_name+"','"+facility_number+"',"+operator_id+",'"+operator_name+"','"+shift_id+"','"+parking_rate_label+"','"+parking_rate_name+"','"+entry_grace_period+"','"+exit_grace_period+"','"+vat_type+"','"+vat_percentage+"','"+ticket_id+"',"+entry_date_time+",'"+payment_date_time+"',"+max_exit_date_time+",'"+parking_duration+"','"+payment_category+"','"+parking_fee+"','"+vat_amount+"','"+lost_fee+"','"+admin_fixed_charges+"','"+ticket_replacement_fee+"','"+discount_amount+"','"+gross_amount+"','"+amount_received+"','"+discount_id+"','"+discount_category+"','"+discount_name+"','"+coupon_id+"','"+coupon_category+"','"+coupon_source+"','"+payment_type+"','"+validation_value+"','"+validation_id+"','"+receipt_number+"','"+bank_notes+"','"+balance_returned+"','"+credit_note+"','"+authentication_code+"','"+entry_plate_number+"','"+exit_plate_number+"',"+wallet_points+")";
             result = stmt->executeUpdate(query);
@@ -572,16 +572,16 @@ Php::Value UploadPayments(Php::Value request)
             {
                 jsonresponse[i] = id;              
             }
-            if(stoi(central_cashier)==1)
+            //if(stoi(central_cashier)==1)
+                //{
+            if(stof(lost_fee)>0)
                 {
-                if(stof(lost_fee)>0)
-                    {
-                    query="INSERT into open_transactions(carpark_name,movement_type,device_name,device_number,ticket_id,carpark_number,facility_number,entry_date_time,plate_number,chip_utid,operation_mode,entry_grace_period,entry_type) VALUES('"+carpark_name+"',1,'" + device_name + "'," +device_number + ",'" + ticket_id+ "'," + carpark_number + "," +facility_number + ",'" +payment_date_time + "','','','',"+max_exit_date_time+",1)";
-                    result = stmt->executeUpdate(query);
-                    }
-                query="update open_transactions set last_payment_date_time='"+payment_date_time+"',max_exit_date_time="+max_exit_date_time+",total_amount_paid=total_amount_paid+"+gross_amount+",parking_rate='"+parking_rate_name+"' where ticket_id='"+ticket_id+"'";
-                result = stmt->executeUpdate(query);                
+                query="INSERT into open_transactions(carpark_name,movement_type,device_name,device_number,ticket_id,carpark_number,facility_number,entry_date_time,plate_number,chip_utid,operation_mode,entry_grace_period,entry_type) VALUES('"+carpark_name+"',1,'" + device_name + "'," +device_number + ",'" + ticket_id+ "'," + carpark_number + "," +facility_number + ",'" +payment_date_time + "','','','',"+max_exit_date_time+",1)";
+                result = stmt->executeUpdate(query);
                 }
+            query="update open_transactions set last_payment_date_time='"+payment_date_time+"',max_exit_date_time="+max_exit_date_time+",total_amount_paid=total_amount_paid+"+gross_amount+",parking_rate='"+parking_rate_name+"' where ticket_id='"+ticket_id+"'";
+            result = stmt->executeUpdate(query);                
+               // }
             // query="update track_ticket set payment_date_time='"+payment_date_time+"',payment_device_number='"+device_number+"',payment_device_name='"+device_name+"',max_exit_date_time="+max_exit_date_time+",total_amount_paid=total_amount_paid+"+gross_amount+" where ticket_id = '"+ticket_id+"' and entry_type=1 ORDER BY id DESC LIMIT 1";
             // result = stmt->executeUpdate(query);
             Json::FastWriter fw;

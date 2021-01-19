@@ -17,9 +17,6 @@ include('../../../includes/navbar-start.php');
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
-//# App Function Classes
-include('../../../classes/reporting_parking.php');
-$reports=new reporting_parking();
 ?>
 
 

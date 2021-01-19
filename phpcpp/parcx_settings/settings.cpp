@@ -663,7 +663,7 @@ void showFacilityList()
                 Php::out << "<button type='button' class='col btn btn-success facility-enable-disable-btn'>Enable</button>"<< std::endl;
             Php::out << "</td>"<< std::endl;
             Php::out << "<td>"<< std::endl;
-            Php::out << "<button type='button' class='col btn btn-info facility-edit' data-target='form'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;           
+            Php::out << "<button type='button' class='col btn btn-info facility-edit' ><i class='fas fa-edit'></i>Edit</button>"<< std::endl;           
             Php::out << "</td>"<< std::endl;
             Php::out<<"</tr>"<<endl;	
             }
@@ -771,7 +771,7 @@ void showCarparkList()
             Php::out << "</td>"<< std::endl;
 
             Php::out << "<td>"<< std::endl;
-            Php::out << "<button type='button' class='col btn btn-info carpark-edit' data-target='form'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
+            Php::out << "<button type='button' class='col btn btn-info carpark-edit' ><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
             Php::out << "</td>"<< std::endl;
             Php::out<<"</tr>"<<endl;	
             }
@@ -1076,7 +1076,7 @@ void showProductList()
 				else
 					Php::out << "<td><button type='button' class='col btn btn-success product-enable-disable-btn'>Enable</button></td>"<< std::endl;
 
-				Php::out << "<td><button type='button' class='col btn btn-info product-edit' data-target='form'><i class='fas fa-edit'></i>Edit</button></td>"<< std::endl;            	                
+				Php::out << "<td><button type='button' class='col btn btn-info product-edit'><i class='fas fa-edit'></i>Edit</button></td>"<< std::endl;            	                
                 Php::out << "</tr>"<< std::endl;	
 				no++;
 				}

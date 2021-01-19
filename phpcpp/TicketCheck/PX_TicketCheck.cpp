@@ -562,375 +562,378 @@ string secondsToParkingDuration(int n)
 	}
 
 Php::Value openTransactionCheck(int getDetails)
-	{
-	Php::Value response;
-	response["access_allowed"]="false";		
-	try
-		{
-		if(ticketId!="")	
-			{
-			if(ticketId.length()==20)
-				query="SELECT * from open_transactions where ticket_id = '"+ticketId+"' and movement_type=1 order by id desc";   
-			else
-				query="SELECT * from open_transactions where ticket_id like '%"+ticketId+"' and movement_type=1 order by id desc";   			
-			}
-		else			
-			query="SELECT * from open_transactions where plate_number = '"+plateNumber+"' and movement_type=1 order by id desc";
-		
-		res=stmt->executeQuery(query);   
-		if(res->next())
-			{	
-			response["open_transaction_check"]="true";									
-			if(res->getString("plate_captured_id")!="")	
-				response=AnprObj.getEntryPlateDetails(res->getInt("plate_captured_id"));
+    {
+    Php::Value response;
+    response["access_allowed"]="false";		
+    try
+        {
+        if(ticketId!="")	
+            {
+            if(ticketId.length()==20)
+                query="SELECT * from open_transactions where ticket_id = '"+ticketId+"' and movement_type=1 order by id desc";   
+            else
+                query="SELECT * from open_transactions where ticket_id like '%"+ticketId+"' and movement_type=1 order by id desc";   			
+            }
+        else			
+            query="SELECT * from open_transactions where plate_number = '"+plateNumber+"' and movement_type=1 order by id desc";
 
-			
-			
-			ticketId=res->getString("ticket_id");
-			plateNumber=res->getString("plate_number");		
-			entryType=res->getInt("entry_type");	
-			entryDateTime=res->getString("entry_date_time");
-			maxEntryGrace=res->getString("entry_grace_period");							
-			writeLog("openTransactionCheck","Present in open transaction, id:"+res->getString("id"));
-			writeLog("openTransactionCheck","ticketId: "+ticketId);	
-			writeLog("openTransactionCheck","plateNumber: "+plateNumber);	
-			writeLog("openTransactionCheck","entryDateTime: "+entryDateTime);	
-			writeLog("openTransactionCheck","maxEntryGrace: "+maxEntryGrace);
-						
-			response["ticket_id"]=ticketId;
-			response["plate_number"]=plateNumber;			
-			response["entry_grace_period"]=maxEntryGrace;			
-			response["entry_date_time"]=entryDateTime;
-			response["entry_type"]=entryType;	
-			response["carpark_number"]=string(res->getString("carpark_number"));		
-			response["facility_number"]=string(res->getString("facility_number"));		
-			if(getDetails==1)
-				return response;				
-			response["access_allowed"]="false";		
-			currentDateTime=General.currentDateTime(dateTimeFormat);	
-			writeLog("openTransactionCheck","currentDateTime: "+currentDateTime);	
-			if(carparkNumber!=res->getInt("carpark_number"))
-				{
-				response["result"]="invalid_carpark";
-				response["result_description"]="Invalid carpark";
-				}
-			else if(facilityNumber!=res->getInt("facility_number"))
-				{
-				response["result"]="invalid_facility";
-				response["result_description"]="Invalid facility";
-				}
-			else
-				{								
-				loadSystemSettings();	
-				if(deviceType>2 || walletEnabled==1 || paymentExit==1)				
-					{
-					setParkingRateConfiguration();
-					response["parking_rate"]=parking_rate;
-					response["parking_rate_label"]=parking_rate_label;
-					response["entry_grace_period"]=entry_grace_period;
-					response["exit_grace_period"]=exit_grace_period;
-					response["exit_grace_period_minutes"]=exit_grace_period_minuts;
-					response["entry_grace_period_minutes"]=entry_grace_period_minuts;
-					response["parking_fee"]=0;
-					response["net_amount"]=0;
-					response["vat_amount"]=0;
-					response["gross_amount"]=0;
-					response["parking_fee_duration_minutes"]=0;
-					}
-				
-				stmt=reportCon->createStatement();	
-								
-				int *duration=General.differenceDateTime(currentDateTime,entryDateTime,dateTimeFormat);	
-				parkingDuration=duration[0];	
-				writeLog("openTransactionCheck","Parking duration: "+to_string(parkingDuration)+" S");				
-				parking_duration=secondsToParkingDuration(parkingDuration);
-				writeLog("openTransactionCheck","Parking duration: "+parking_duration);						
-				response["parking_duration"]=parking_duration;	
-				if(validationEnabled==1)
-					{						
-					getValidations();
-					validation_value="";
-					response["validation_id"]="";
-					response["validation_hours"]="0";
-					response["validation_percentage"]="0";
-					if(timeValidation>0)
-						{
-						response["validation_id"]=timeValidationId;	
-						response["validation_type"]="Time";
-						response["validation_hours"]=to_string(timeValidation);	
-						validation_value=to_string(timeValidation)+" H";			
-						}	
-					if(percentageValidation>0)
-						{
-						response["validation_percentage"]=to_string(percentageValidation);							
-						response["validation_id"]=(timeValidation>0)?timeValidationId+","+percentageValidationId:percentageValidationId;
-						response["validation_type"]=(timeValidation>0)?"Time,Percentage":"Percentage";
-						validation_value=validation_value+to_string(percentageValidation)+" %";										
-						}
-																
-					validationSeconds=timeValidation*3600;																																												
-					}								
-				response["entry_grace_time_remaining"]="0";	
-				response["exit_grace_time_remaining"]="0";																																			
-				int *timeDiff=General.differenceDateTime(maxEntryGrace,currentDateTime,dateTimeFormat);	
-				writeLog("openTransactionCheck","entry_grace_time_remaining: "+to_string(timeDiff[0]));	
-				if(timeDiff[0]>0)
-					{						
-					response["entry_grace_time_remaining"]=to_string(timeDiff[0]);
-					response["ticketcheck_result"]="within_entry_grace_period";
-					response["result"]="ticketcheck_access_allowed";
-					response["access_allowed"]="true";
-					response["result_description"]="Within entry grace period";
-					return response;
-					}
-				else
-					{					
-					maxExitGrace=res->getString("max_exit_date_time");
-					amountPaid=res->getDouble("total_amount_paid");	
-					if(entryType==1)		
-						{						
-						paymentDateTime=res->getString("last_payment_date_time");
-						response["payment_date_time"]=paymentDateTime;						
-						}
-					if(entryType==2)					
-						{
-						writeLog("openTransactionCheck","Access Entry: accessResult: "+accessResult);	
-						response["result"]=accessResult;	
-						response["result_description"]=accessResultDescription;												
-						if(accessResult=="access_expired")
-							{
-							entryDateTime=accessExpiry+" 23:59:59";	
-							if(maxExitGrace=="")
-								maxExitGrace=accessExpiry+" 23:59:59";
+            res=stmt->executeQuery(query);   
+            if(res->next())
+                {	
+                response["open_transaction_check"]="true";									
+                if(res->getString("plate_captured_id")!="")	
+                        response=AnprObj.getEntryPlateDetails(res->getInt("plate_captured_id"));
 
-							if(amountPaid>0)
-								{
-								response["result"]="access_exit_grace_period_exceeded";	
-								response["result_description"]="Access exit grace period exceeded";									
-								}						
-							}
-						else
-							return response;
-						
-						}
-					if(entryType==3)
-						{
-						writeLog("openTransactionCheck","Reservation Entry: reservationResult: "+reservationResult)	;												
-						if(reservationResult=="reservation_exit_grace_period_exceeded")
-							{
-							entryDateTime=reservationStart;	
-							if(amountPaid==0)
-								{
-								maxExitGrace=reservationExpiry;							
-								amountPaid=reservationFee;
-								}
-							else
-								amountPaid=amountPaid+reservationFee;						
-							}						
-						else
-							return response;
-																		
-						}
-					if(maxExitGrace!="")
-						{								
-						writeLog("openTransactionCheck","maxExitGrace: "+maxExitGrace);	
-						response["max_exit_date_time"]=maxExitGrace;							
-						response["total_amount_paid"]=amountPaid;						
-						writeLog("openTransactionCheck","amountPaid: "+to_string(amountPaid));	
-						int *timeDiff=General.differenceDateTime(maxExitGrace,currentDateTime,dateTimeFormat);
-						writeLog("openTransactionCheck","exit_grace_time_remaining: "+to_string(timeDiff[0]));	
-						if(timeDiff[0]>0)
-							{
-							response["exit_grace_time_remaining"]=to_string(timeDiff[0]);
-							response["ticketcheck_result"]="within_exit_grace_period";
-							response["result"]="ticketcheck_access_allowed";
-							response["access_allowed"]="true";
-							response["result_description"]="Within exit grace period";
-							return response;
-							}
-						else
-							{
-							if(entryType==1)		
-								{
-								response["result_description"]="Exit grace period exceeded";
-								response["result"]="exit_grace_period_exceeded";
-								}
-							if(entryType==2 && deviceType==2)
-								{
-								response["result_description"]="Access expired";    
-                    			response["result"]="access_expired";
-								return response;
-								}							
-							}
-						}
-					else
-						{
-						response["result_description"]="Unpaid";	
-						response["result"]="unpaid";										
-						}
 
-					startparkingFee=calculateParkingFee();
-					response["parking_fee"]=startparkingFee;
-					response["parking_fee_duration_minutes"]=parkingFeeDuration;
-					exitGrace=parkingFeeDuration*60-parkingDuration;	
-					
 
-					if(validationSeconds>0)
-						{
-						parkingDuration=parkingDuration-validationSeconds;	
-						writeLog("openTransactionCheck","Parking duration after validation: "+to_string(parkingDuration)+" S");	
-						writeLog("openTransactionCheck","Parking duration after validation: "+to_string(parkingDuration/3600)+" H "+to_string((parkingDuration%3600)/60)+" M");													
-						}
-					if((validationSeconds>0 &&  parkingDuration<=0) || percentageValidation>=100)
-						{							
-						response["ticketcheck_result"]="within_validation_hours";
-						response["result"]="ticketcheck_access_allowed";
-						response["access_allowed"]="true";
-						response["result_description"]="Validation Applied";														
-						return response;	
-						}
-					else
-						{
-						writeLog("openTransactionCheck","calculate parking fee after validation hours"); 	
-						startparkingFee=calculateParkingFee();						
-						}
-													
+                ticketId=res->getString("ticket_id");
+                plateNumber=res->getString("plate_number");		
+                entryType=res->getInt("entry_type");	
+                entryDateTime=res->getString("entry_date_time");
+                maxEntryGrace=res->getString("entry_grace_period");							
+                writeLog("openTransactionCheck","Present in open transaction, id:"+res->getString("id"));
+                writeLog("openTransactionCheck","ticketId: "+ticketId);	
+                writeLog("openTransactionCheck","plateNumber: "+plateNumber);	
+                writeLog("openTransactionCheck","entryDateTime: "+entryDateTime);	
+                writeLog("openTransactionCheck","maxEntryGrace: "+maxEntryGrace);
 
-					if(deviceType>2 || walletEnabled==1 || paymentExit==1)
-						{
-						calculateAmountToPay();						
-						response["net_amount"]=parkingFee;
-						response["vat_amount"]=vatAmount;
-						response["gross_amount"]=grossAmount;																	
-						}
+                response["ticket_id"]=ticketId;
+                response["plate_number"]=plateNumber;			
+                response["entry_grace_period"]=maxEntryGrace;			
+                response["entry_date_time"]=entryDateTime;
+                response["entry_type"]=entryType;	
+                response["carpark_number"]=string(res->getString("carpark_number"));		
+                response["facility_number"]=string(res->getString("facility_number"));		
+                if(getDetails==1)
+                    return response;				
+                response["access_allowed"]="false";		
+                currentDateTime=General.currentDateTime(dateTimeFormat);	
+                writeLog("openTransactionCheck","currentDateTime: "+currentDateTime);	
+                if(carparkNumber!=res->getInt("carpark_number"))
+                    {
+                    response["result"]="invalid_carpark";
+                    response["result_description"]="Invalid carpark";
+                    }
+                else if(facilityNumber!=res->getInt("facility_number"))
+                    {
+                    response["result"]="invalid_facility";
+                    response["result_description"]="Invalid facility";
+                    }
+                else
+                    {								
+                    loadSystemSettings();	
+                    if(deviceType>2 || walletEnabled==1 || paymentExit==1)				
+                        {
+                        setParkingRateConfiguration();
+                        response["parking_rate"]=parking_rate;
+                        response["parking_rate_label"]=parking_rate_label;
+                        response["entry_grace_period"]=entry_grace_period;
+                        response["exit_grace_period"]=exit_grace_period;
+                        response["exit_grace_period_minutes"]=exit_grace_period_minuts;
+                        response["entry_grace_period_minutes"]=entry_grace_period_minuts;
+                        response["parking_fee"]=0;
+                        response["net_amount"]=0;
+                        response["vat_amount"]=0;
+                        response["gross_amount"]=0;
+                        response["parking_fee_duration_minutes"]=0;
+                        }
 
-					if(grossAmount<=0)
-						{						
-						response["exit_grace_time_remaining"]=to_string(exitGrace);
-						response["ticketcheck_result"]="within_exit_grace_period";
-						response["result"]="ticketcheck_access_allowed";
-						response["access_allowed"]="true";
-						response["result_description"]="Within exit grace period.Amount to pay =0";
-						return response;	
-						}
-						
+                    stmt=reportCon->createStatement();	
 
-					if(toString(response["access_allowed"])=="false" && walletEnabled==1)
-						{
-						if(grossAmount>0)
-							{
-							Php::Value wallet=walletCheck();																									
-							if(deviceType==2)
-								{
-								response["access_allowed"]=toString(wallet["access_allowed"]);																				
-								if(toString(response["access_allowed"])=="true")
-									{
-									response["result"]="ticketcheck_access_allowed";										
-									string amount_in_points=wallet["amount_in_points"];	
-									response["gross_amount_in_points"]=amount_in_points;
-									response["wallet_balance"]=toString(wallet["wallet_balance"]);							
-									response["result_description"]=toString(wallet["result_description"]);																
-									stmt=reportCon->createStatement();
-									string validation_id=response["validation_id"];									
-									string category;
-									if(entryType==1)
-										category="StandardParkingFee";
-									if(entryType==3)
-										category="Reservation";									
-									query="INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,gross_amount,amount_received,payment_type,validation_value,validation_id,entry_plate_number,exit_plate_number,wallet_points)VALUES('"+to_string(deviceNumber)+"','"+deviceName+"',"+to_string(carparkNumber)+",'"+carpakName+"','"+to_string(facilityNumber)+"','"+parking_rate_label+"','"+parking_rate+"','"+entry_grace_period+"','"+exit_grace_period+"','"+vat_type+"','"+to_string(vat_percentage)+"','"+ticketId+"','"+entryDateTime+"',CURRENT_TIMESTAMP ,(now() + INTERVAL "+exit_grace_period_mins+" MINUTE),'"+parking_duration+"','"+category+"','"+to_string(parkingFee)+"','"+to_string(vatAmount)+"','"+to_string(grossAmount)+"','"+to_string(grossAmount)+"','E WALLET','"+validation_value+"','"+validation_id+"','"+plateNumber+"','"+plateNumber+"',"+amount_in_points+")";
-									stmt->executeUpdate(query);																												
-									}
-								else
-									{							
-									response["wallet_result"]=toString(wallet["result"]);
-									response["wallet_result_description"]=toString(wallet["result_description"]);	
-									response["wallet_balance"]=toString(wallet["wallet_balance"]);	
-									response["wallet_expiry_date"]=toString(wallet["wallet_expiry_date"]);				
-									}
-								}
-							else
-								{								
-								if(toString(wallet["wallet_present"])=="true")	
-									{
-									response["user_id"]=toString(wallet["user_id"]);
-									response["user_name"]=toString(wallet["user_name"]);	
-									response["wallet_expiry_date"]=toString(wallet["wallet_expiry_date"]);
-									response["wallet_present"]="true";	
-									response["wallet_usable"]=toString(wallet["wallet_usable"]);																																										
-									response["gross_amount_in_points"]=stod(toString(wallet["gross_amount_in_points"]));							
-									response["wallet_balance"]=stod(toString(wallet["wallet_balance"]));																				
-									response["conversion_rate"]=stod(toString(wallet["conversion_rate"]));																				
-									}
-								else
-									{
-									response["wallet_present"]="false";	
-									response["wallet_usable"]="false";								
-									}
-								response["wallet_result_description"]=toString(wallet["result_description"]);
-								response["wallet_result"]=toString(wallet["result"]);								
-								}
-							}
-						else
-							{
-							response["result_description"]="Amount to pay=0";	
-							}						
-						}						
-					}							
-				}			
-			}
-		else
-			{				
-			response["result"]="already_exited";
-			response["result_description"]="Already exited";
-			}
-		}
-	catch(const std::exception& e)
-		{
-		writeException("openTransactionCheck",e.what());
-		writeException("openTransactionCheck",query);
-		}
-	return response;	
-	}
+                    int *duration=General.differenceDateTime(currentDateTime,entryDateTime,dateTimeFormat);	
+                    parkingDuration=duration[0];	
+                    writeLog("openTransactionCheck","Parking duration: "+to_string(parkingDuration)+" S");				
+                    parking_duration=secondsToParkingDuration(parkingDuration);
+                    writeLog("openTransactionCheck","Parking duration: "+parking_duration);						
+                    response["parking_duration"]=parking_duration;	
+                    if(validationEnabled==1)
+                        {						
+                        getValidations();
+                        validation_value="";
+                        response["validation_id"]="";
+                        response["validation_hours"]="0";
+                        response["validation_percentage"]="0";
+                        if(timeValidation>0)
+                            {
+                            response["validation_id"]=timeValidationId;	
+                            response["validation_type"]="Time";
+                            response["validation_hours"]=to_string(timeValidation);	
+                            validation_value=to_string(timeValidation)+" H";			
+                            }	
+                        if(percentageValidation>0)
+                            {
+                            response["validation_percentage"]=to_string(percentageValidation);							
+                            response["validation_id"]=(timeValidation>0)?timeValidationId+","+percentageValidationId:percentageValidationId;
+                            response["validation_type"]=(timeValidation>0)?"Time,Percentage":"Percentage";
+                            validation_value=validation_value+to_string(percentageValidation)+" %";										
+                            }
+
+                        validationSeconds=timeValidation*3600;																																												
+                        }								
+                    response["entry_grace_time_remaining"]="0";	
+                    response["exit_grace_time_remaining"]="0";																																			
+                    int *timeDiff=General.differenceDateTime(maxEntryGrace,currentDateTime,dateTimeFormat);	
+                    writeLog("openTransactionCheck","entry_grace_time_remaining: "+to_string(timeDiff[0]));	
+                    if(timeDiff[0]>0)
+                        {						
+                        response["entry_grace_time_remaining"]=to_string(timeDiff[0]);
+                        response["ticketcheck_result"]="within_entry_grace_period";
+                        response["result"]="ticketcheck_access_allowed";
+                        response["access_allowed"]="true";
+                        response["result_description"]="Within entry grace period";
+                        return response;
+                        }
+                    else
+                        {					
+                        maxExitGrace=res->getString("max_exit_date_time");
+                        amountPaid=res->getDouble("total_amount_paid");	
+                        if(entryType==1)		
+                            {						
+                            paymentDateTime=res->getString("last_payment_date_time");
+                            response["payment_date_time"]=paymentDateTime;						
+                            }
+                        if(entryType==2)					
+                            {
+                            writeLog("openTransactionCheck","Access Entry: accessResult: "+accessResult);	
+                            response["result"]=accessResult;	
+                            response["result_description"]=accessResultDescription;												
+                            if(accessResult=="access_expired")
+                                {
+                                entryDateTime=accessExpiry+" 23:59:59";	
+                                if(maxExitGrace=="")
+                                    maxExitGrace=accessExpiry+" 23:59:59";
+
+                                if(amountPaid>0)
+                                    {
+                                    response["result"]="access_exit_grace_period_exceeded";	
+                                    response["result_description"]="Access exit grace period exceeded";									
+                                    }						
+                                }
+                            else if(accessResult=="access_allowed")
+                                {
+                                
+                                }
+                            else
+                                return response;
+                            }
+                        if(entryType==3)
+                            {
+                            writeLog("openTransactionCheck","Reservation Entry: reservationResult: "+reservationResult)	;												
+                            if(reservationResult=="reservation_exit_grace_period_exceeded")
+                                {
+                                entryDateTime=reservationStart;	
+                                if(amountPaid==0)
+                                    {
+                                    maxExitGrace=reservationExpiry;							
+                                    amountPaid=reservationFee;
+                                    }
+                                else
+                                    amountPaid=amountPaid+reservationFee;						
+                                }						
+                            else
+                                return response;
+
+                            }
+                        if(maxExitGrace!="")
+                            {								
+                            writeLog("openTransactionCheck","maxExitGrace: "+maxExitGrace);	
+                            response["max_exit_date_time"]=maxExitGrace;							
+                            response["total_amount_paid"]=amountPaid;						
+                            writeLog("openTransactionCheck","amountPaid: "+to_string(amountPaid));	
+                            int *timeDiff=General.differenceDateTime(maxExitGrace,currentDateTime,dateTimeFormat);
+                            writeLog("openTransactionCheck","exit_grace_time_remaining: "+to_string(timeDiff[0]));	
+                            if(timeDiff[0]>0)
+                                {
+                                response["exit_grace_time_remaining"]=to_string(timeDiff[0]);
+                                response["ticketcheck_result"]="within_exit_grace_period";
+                                response["result"]="ticketcheck_access_allowed";
+                                response["access_allowed"]="true";
+                                response["result_description"]="Within exit grace period";
+                                return response;
+                                }
+                            else
+                                {
+                                if(entryType==1)		
+                                    {
+                                    response["result_description"]="Exit grace period exceeded";
+                                    response["result"]="exit_grace_period_exceeded";
+                                    }
+                                if(entryType==2 && deviceType==2)
+                                    {
+                                    response["result_description"]="Access expired";    
+                                    response["result"]="access_expired";
+                                    return response;
+                                    }							
+                                }
+                            }
+                        else
+                            {
+                            response["result_description"]="Unpaid";	
+                            response["result"]="unpaid";										
+                            }
+
+                        startparkingFee=calculateParkingFee();
+                        response["parking_fee"]=startparkingFee;
+                        response["parking_fee_duration_minutes"]=parkingFeeDuration;
+                        exitGrace=parkingFeeDuration*60-parkingDuration;	
+
+
+                        if(validationSeconds>0)
+                            {
+                            parkingDuration=parkingDuration-validationSeconds;	
+                            writeLog("openTransactionCheck","Parking duration after validation: "+to_string(parkingDuration)+" S");	
+                            writeLog("openTransactionCheck","Parking duration after validation: "+to_string(parkingDuration/3600)+" H "+to_string((parkingDuration%3600)/60)+" M");													
+                            }
+                        if((validationSeconds>0 &&  parkingDuration<=0) || percentageValidation>=100)
+                            {							
+                            response["ticketcheck_result"]="within_validation_hours";
+                            response["result"]="ticketcheck_access_allowed";
+                            response["access_allowed"]="true";
+                            response["result_description"]="Validation Applied";														
+                            return response;	
+                            }
+                        else
+                            {
+                            writeLog("openTransactionCheck","calculate parking fee after validation hours"); 	
+                            startparkingFee=calculateParkingFee();						
+                            }
+
+
+                        if(deviceType>2 || walletEnabled==1 || paymentExit==1)
+                            {
+                            calculateAmountToPay();						
+                            response["net_amount"]=parkingFee;
+                            response["vat_amount"]=vatAmount;
+                            response["gross_amount"]=grossAmount;																	
+                            }
+
+                        if(grossAmount<=0)
+                            {						
+                            response["exit_grace_time_remaining"]=to_string(exitGrace);
+                            response["ticketcheck_result"]="within_exit_grace_period";
+                            response["result"]="ticketcheck_access_allowed";
+                            response["access_allowed"]="true";
+                            response["result_description"]="Within exit grace period.Amount to pay =0";
+                            return response;	
+                            }
+
+
+                        if(toString(response["access_allowed"])=="false" && walletEnabled==1)
+                            {
+                            if(grossAmount>0)
+                                {
+                                Php::Value wallet=walletCheck();																									
+                                if(deviceType==2)
+                                    {
+                                    response["access_allowed"]=toString(wallet["access_allowed"]);																				
+                                    if(toString(response["access_allowed"])=="true")
+                                        {
+                                        response["result"]="ticketcheck_access_allowed";										
+                                        string amount_in_points=wallet["amount_in_points"];	
+                                        response["gross_amount_in_points"]=amount_in_points;
+                                        response["wallet_balance"]=toString(wallet["wallet_balance"]);							
+                                        response["result_description"]=toString(wallet["result_description"]);																
+                                        stmt=reportCon->createStatement();
+                                        string validation_id=response["validation_id"];									
+                                        string category;
+                                        if(entryType==1)
+                                                category="StandardParkingFee";
+                                        if(entryType==3)
+                                                category="Reservation";									
+                                        query="INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,gross_amount,amount_received,payment_type,validation_value,validation_id,entry_plate_number,exit_plate_number,wallet_points)VALUES('"+to_string(deviceNumber)+"','"+deviceName+"',"+to_string(carparkNumber)+",'"+carpakName+"','"+to_string(facilityNumber)+"','"+parking_rate_label+"','"+parking_rate+"','"+entry_grace_period+"','"+exit_grace_period+"','"+vat_type+"','"+to_string(vat_percentage)+"','"+ticketId+"','"+entryDateTime+"',CURRENT_TIMESTAMP ,(now() + INTERVAL "+exit_grace_period_mins+" MINUTE),'"+parking_duration+"','"+category+"','"+to_string(parkingFee)+"','"+to_string(vatAmount)+"','"+to_string(grossAmount)+"','"+to_string(grossAmount)+"','E WALLET','"+validation_value+"','"+validation_id+"','"+plateNumber+"','"+plateNumber+"',"+amount_in_points+")";
+                                        stmt->executeUpdate(query);																												
+                                        }
+                                    else
+                                        {							
+                                        response["wallet_result"]=toString(wallet["result"]);
+                                        response["wallet_result_description"]=toString(wallet["result_description"]);	
+                                        response["wallet_balance"]=toString(wallet["wallet_balance"]);	
+                                        response["wallet_expiry_date"]=toString(wallet["wallet_expiry_date"]);				
+                                        }
+                                    }
+                                else
+                                    {								
+                                    if(toString(wallet["wallet_present"])=="true")	
+                                        {
+                                        response["user_id"]=toString(wallet["user_id"]);
+                                        response["user_name"]=toString(wallet["user_name"]);	
+                                        response["wallet_expiry_date"]=toString(wallet["wallet_expiry_date"]);
+                                        response["wallet_present"]="true";	
+                                        response["wallet_usable"]=toString(wallet["wallet_usable"]);																																										
+                                        response["gross_amount_in_points"]=stod(toString(wallet["gross_amount_in_points"]));							
+                                        response["wallet_balance"]=stod(toString(wallet["wallet_balance"]));																				
+                                        response["conversion_rate"]=stod(toString(wallet["conversion_rate"]));																				
+                                        }
+                                    else
+                                        {
+                                        response["wallet_present"]="false";	
+                                        response["wallet_usable"]="false";								
+                                        }
+                                    response["wallet_result_description"]=toString(wallet["result_description"]);
+                                    response["wallet_result"]=toString(wallet["result"]);								
+                                    }
+                                }
+                            else
+                                {
+                                response["result_description"]="Amount to pay=0";	
+                                }						
+                            }						
+                        }							
+                    }			
+                }
+            else
+            {				
+            response["result"]="already_exited";
+            response["result_description"]="Already exited";
+            }
+        }
+    catch(const std::exception& e)
+        {
+        writeException("openTransactionCheck",e.what());
+        writeException("openTransactionCheck",query);
+        }
+    return response;	
+    }
 
 Php::Value exitTicketCheck()
-	{
-	Php::Value response;	
-	try
-		{
-		response["access_allowed"]="false";	
-		reportCon=General.mysqlConnect(ReportingDB);		
-		if(reportCon!=NULL)
-			{	
-			stmt=reportCon->createStatement();			
-			if(ticketId.length()==20)
-				query="SELECT * from parking_blacklist where ticket_id = '"+ticketId+"'";
-			else
-				query="SELECT * from parking_blacklist where ticket_id like '%"+ticketId+"'";
-			res=stmt->executeQuery(query);   
-			if(res->next())
-				{
-				response["result"]="blacklisted";
-				response["result_description"]=string(res->getString("blacklisting_description"));
-				writeLog("exitTicketCheck","Blacklisted");	
-				}
-			else
-				{
-				writeLog("exitTicketCheck","Not blacklisted");
-				serverCon=General.mysqlConnect(ServerDB);		
-				response=openTransactionCheck(0);
-				delete serverCon;
-				}
-			delete res;
-			delete stmt;
-			delete reportCon;								
-			}				
-		}
-	catch(const std::exception& e)
-		{
-		writeException("exitTicketCheck",e.what());
-		}	
-	return response;	
-	}
+    {
+    Php::Value response;	
+    try
+        {
+        response["access_allowed"]="false";	
+        reportCon=General.mysqlConnect(ReportingDB);		
+        if(reportCon!=NULL)
+            {	
+            stmt=reportCon->createStatement();			
+            if(ticketId.length()==20)
+                query="SELECT * from parking_blacklist where ticket_id = '"+ticketId+"'";
+            else
+                query="SELECT * from parking_blacklist where ticket_id like '%"+ticketId+"'";
+            res=stmt->executeQuery(query);   
+            if(res->next())
+                {
+                response["result"]="blacklisted";
+                response["result_description"]=string(res->getString("blacklisting_description"));
+                writeLog("exitTicketCheck","Blacklisted");	
+                }
+            else
+                {
+                writeLog("exitTicketCheck","Not blacklisted");
+                serverCon=General.mysqlConnect(ServerDB);		
+                response=openTransactionCheck(0);
+                delete serverCon;
+                }
+            delete res;
+            delete stmt;
+            delete reportCon;								
+            }				
+        }
+    catch(const std::exception& e)
+        {
+        writeException("exitTicketCheck",e.what());
+        }	
+    return response;	
+    }
 
 Php::Value exitPlateCheck()
 	{
@@ -983,209 +986,204 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
 	Php::Value anprSettings;			
 	writeLog("===========================","===========================");	
 	try
-		{
-		Php::Value json=params[0];		
-		deviceType=json["device_type"];
-		writeLog("deviceType",to_string(deviceType));									
-		carparkNumber=json["carpark_number"];
-		writeLog("carpark",to_string(carparkNumber));
-		facilityNumber=json["facility_number"];	
-		writeLog("facility",to_string(facilityNumber));
-		parkingZone=toString(json["parking_zone"]);	
-		writeLog("parkingZone",parkingZone);		
-		reservationEnabled=json["reservation_enabled"];
-		writeLog("reservationEnabled",to_string(reservationEnabled));	
-		plateCapturedId=json["plate_captured_id"];
-		writeLog("plateCapturedId",to_string(plateCapturedId));	
-		//anprEnabled=json["anpr_check_only"];
-		//writeLog("anprEnabled",to_string(anprEnabled));	
+            {
+            Php::Value json=params[0];		
+            deviceType=json["device_type"];
+            writeLog("deviceType",to_string(deviceType));									
+            carparkNumber=json["carpark_number"];
+            writeLog("carpark",to_string(carparkNumber));
+            facilityNumber=json["facility_number"];	
+            writeLog("facility",to_string(facilityNumber));
+            parkingZone=toString(json["parking_zone"]);	
+            writeLog("parkingZone",parkingZone);		
+            reservationEnabled=json["reservation_enabled"];
+            writeLog("reservationEnabled",to_string(reservationEnabled));	
+            plateCapturedId=json["plate_captured_id"];
+            writeLog("plateCapturedId",to_string(plateCapturedId));				
 
-		if(plateCapturedId>0 || json["anpr_check_only"]==1 || json["anpr_enabled"]==1)
-			anprEnabled=1;
+            if(plateCapturedId>0 || json["anpr_check_only"]==1 || json["anpr_enabled"]==1)
+                anprEnabled=1;
 
-		writeLog("anprEnabled",to_string(anprEnabled));	
-						
-		deviceNumber=json["device_number"];		
-		writeLog("deviceNumber",to_string(deviceNumber));
-		deviceName=toString(json["device_name"]);
-		writeLog("deviceName",deviceName);
-		carpakName=toString(json["carpark_name"]);
-		writeLog("carpakName",carpakName);
-		facilityName=toString(json["facility_name"]);
-		writeLog("facilityName",facilityName);
-		deductMoneyFromWallet=json["deduct_money_from_wallet"];
-		paymentExit=json["payment_enabled_exit"];
+            writeLog("anprEnabled",to_string(anprEnabled));	
 
-		if(json["qrcode_access_enabled"]==1 || json["anpr_access_enabled"]==1 || json["access_enabled"]==1)
-			accessEnabled=1;
-		writeLog("accessEnabled",to_string(accessEnabled));								
-		if(deductMoneyFromWallet==1)
-			{
-			grossAmount=json["amount_to_pay"];
-			userId=toString(json["user_id"]);
-			response=updateWalletPayment();
-			}
-		else
-			{
-			cameraId=json["camera_id"];
-			writeLog("cameraId",to_string(cameraId));				
-			plateCapturedInterval=json["plate_captured_interval"];
-			writeLog("plateCapturedInterval",to_string(plateCapturedInterval));
-			Php::Value plate_details=AnprObj.getPlateDetails(cameraId,plateCapturedInterval,plateCapturedId);			
-			response=plate_details;		
+            deviceNumber=json["device_number"];		
+            writeLog("deviceNumber",to_string(deviceNumber));
+            deviceName=toString(json["device_name"]);
+            writeLog("deviceName",deviceName);
+            carpakName=toString(json["carpark_name"]);
+            writeLog("carpakName",carpakName);
+            facilityName=toString(json["facility_name"]);
+            writeLog("facilityName",facilityName);
+            deductMoneyFromWallet=json["deduct_money_from_wallet"];
+            paymentExit=json["payment_enabled_exit"];
 
-			if(anprEnabled==1)	
-				{
-				ticketId="";										
-				//accessEnabled=1;
-				//writeLog("anprAccessEnabled",to_string(accessEnabled));								
+            if(json["qrcode_access_enabled"]==1 || json["anpr_access_enabled"]==1 || json["access_enabled"]==1)
+                accessEnabled=1;
+            writeLog("accessEnabled",to_string(accessEnabled));								
+            if(deductMoneyFromWallet==1)
+                {
+                grossAmount=json["amount_to_pay"];
+                userId=toString(json["user_id"]);
+                response=updateWalletPayment();
+                }
+            else
+                {
+                cameraId=json["camera_id"];
+                writeLog("cameraId",to_string(cameraId));				
+                plateCapturedInterval=json["plate_captured_interval"];
+                writeLog("plateCapturedInterval",to_string(plateCapturedInterval));
+                Php::Value plate_details=AnprObj.getPlateDetails(cameraId,plateCapturedInterval,plateCapturedId);			
+                response=plate_details;		
 
-				//get ANPR settings	
-				//anprSettings=AnprObj.getAnprSettings(facilityNumber,carparkNumber);			
-				
-				//get Plate details
-							
-				if(toString(plate_details["result"])=="plate_available")
-					{
-					plateNumber=toString(plate_details["plate_number"]);
-					plateArea=toString(plate_details["plate_area"]);;
-					plateCountry=toString(plate_details["plate_country"]);
-					plateType=toString(plate_details["plate_type"]);				
-					}
-				else
-					{				
-					accessEnabled=0;
-					reservationEnabled=0;	
-					plateType="";
-					plateCountry="";
-					plateArea="";
-					plateNumber="";
-					}
-				
-				}
-			else
-				{
-				anprSettings="";	
-				//accessEnabled=json["qrcode_access_enabled"];
-				//writeLog("qrcodeAccessEnabled",to_string(accessEnabled));			
-				ticketId=toString(json["ticket_id"]);
-				writeLog("ticketId",ticketId);
-				plateNumber=toString(json["plate_number"]);
-				writeLog("plateNumber",plateNumber);
-				plateType="";
-				plateCountry="";
-				plateArea="";
-				}
-		
-				
-			response["access_allowed"]="false";
-			response["ticket_id"]=ticketId;
-			response["plate_number"]=plateNumber;
-			response["open_transaction_check"]="false";				
-			if(accessEnabled==1)
-				{
-				writeLog("qrcodeAccessEnabled","Access check");	
-				Php::Value whitelist_details=AccessObj.checkAccess(ticketId,parkingZone,carparkNumber,facilityNumber,deviceType,plateNumber,plateType,plateArea,plateCountry,anprSettings);
-				for (auto &iter : whitelist_details)    				    			        			
-					response[iter.first]=iter.second ;  
-				accessExpiry=toString(whitelist_details["expiry_date"]);
-				accessResult=toString(whitelist_details["result"]);
-				accessResultDescription=toString(whitelist_details["result_description"]);
+                if(anprEnabled==1)	
+                    {
+                    ticketId="";																																
+                    if(toString(plate_details["result"])=="plate_available")
+                        {
+                        plateNumber=toString(plate_details["plate_number"]);
+                        plateArea=toString(plate_details["plate_area"]);;
+                        plateCountry=toString(plate_details["plate_country"]);
+                        plateType=toString(plate_details["plate_type"]);				
+                        }
+                    else
+                        {				
+                        accessEnabled=0;
+                        reservationEnabled=0;	
+                        plateType="";
+                        plateCountry="";
+                        plateArea="";
+                        plateNumber="";
+                        }
+                    }
+                else
+                    {
+                    anprSettings="";								
+                    ticketId=toString(json["ticket_id"]);
+                    writeLog("ticketId",ticketId);
+                    plateNumber=toString(json["plate_number"]);
+                    writeLog("plateNumber",plateNumber);
+                    plateType="";
+                    plateCountry="";
+                    plateArea="";
+                    }
 
-				response["whitelist_result"]=accessResult;
-				response["whitelist_result_description"]=accessResultDescription;
-				}
-			
-			if(toString(response["access_allowed"])=="false" && reservationEnabled==1)
-				{
-				writeLog("reservationEnabled","Reservation check");			
-				entryGrace=json["reservation_entry_grace_period"];
-				exitGrace=json["reservation_exit_grace_period"];					
-				Php::Value reservation_details=ReservationObj.checkReservation(ticketId,entryGrace,exitGrace,carparkNumber,facilityNumber,deviceType,plateNumber,plateType,plateArea,plateCountry,anprSettings);				
-				for (auto &iter : reservation_details)    				    			        			
-					response[iter.first]=iter.second ; 
-				
-				reservationExpiry=toString(reservation_details["max_exit_grace_period"]); 
-				reservationFee=reservation_details["reservation_fee"];
-				reservationResult=toString(reservation_details["result"]);
-				reservationResultDescription=toString(reservation_details["result_description"]);
-				reservationStart=toString(reservation_details["parking_from"]);
 
-				response["reservation_result"]=reservationResult;
-				response["reservation_result_description"]=reservationResultDescription;
-				}
-			if(toString(response["access_allowed"])=="false" && deviceType==1)
-				{
-				response["result"]="shortterm_entry";	
-				response["result_description"]="Shortterm Entry";
-				}
-			if(toString(response["access_allowed"])=="true" && deviceType==3)
-				{
-				reportCon=General.mysqlConnect(ReportingDB);		
-				if(reportCon!=NULL)
-					{	
-					stmt=reportCon->createStatement();										
-					Php::Value entry_details=openTransactionCheck(1);
-					for (auto &iter : entry_details)    				    			        			
-						response[iter.first]=iter.second ; 			
-					}
-				delete res;
-				delete stmt;
-				delete reportCon;
-				}
-			if(toString(response["access_allowed"])=="false" && deviceType!=1)
-				{			
-				if(ticketId!="")//ticket check
-					{
-					writeLog("exitTicketCheck","Exit ticket check: "+ticketId);													
-					Php::Value ticket_details=exitTicketCheck();
-					for (auto &iter : ticket_details)    				    			        									
-						response[iter.first]=iter.second ; 									
-					}
-				else if(plateNumber!="")	//plate check
-					{
-					writeLog("exitPlateCheck","Exit plate check: "+plateNumber);		
-					Php::Value ticket_details=exitPlateCheck();
-					for (auto &iter : ticket_details)    				    			        									
-						response[iter.first]=iter.second ; 				
-					}
+                response["access_allowed"]="false";
+                response["ticket_id"]=ticketId;
+                response["plate_number"]=plateNumber;
+                response["open_transaction_check"]="false";				
+                if(accessEnabled==1)
+                    {
+                    writeLog("qrcodeAccessEnabled","Access check");	
+                    Php::Value whitelist_details=AccessObj.checkAccess(ticketId,parkingZone,carparkNumber,facilityNumber,deviceType,plateNumber,plateType,plateArea,plateCountry,anprSettings);
+                    for (auto &iter : whitelist_details)    				    			        			
+                            response[iter.first]=iter.second ;  
+                    accessExpiry=toString(whitelist_details["expiry_date"]);
+                    accessResult=toString(whitelist_details["result"]);
+                    accessResultDescription=toString(whitelist_details["result_description"]);
 
-				if(toString(response["result"])=="ticketcheck_access_allowed" && deviceType>2)
-					response["result"]=toString(response["ticketcheck_result"]);	
+                    response["whitelist_result"]=accessResult;
+                    response["whitelist_result_description"]=accessResultDescription;
+                    }
+                
+                if(toString(response["access_allowed"])=="true" && deviceType==2)
+                    {
+                    Php::Value ticket_details=exitPlateCheck();
+                    for (auto &iter : ticket_details)    				    			        									
+                        response[iter.first]=iter.second ; 
+                    }
+                
+                if(toString(response["access_allowed"])=="false" && reservationEnabled==1)
+                    {
+                    writeLog("reservationEnabled","Reservation check");			
+                    entryGrace=json["reservation_entry_grace_period"];
+                    exitGrace=json["reservation_exit_grace_period"];					
+                    Php::Value reservation_details=ReservationObj.checkReservation(ticketId,entryGrace,exitGrace,carparkNumber,facilityNumber,deviceType,plateNumber,plateType,plateArea,plateCountry,anprSettings);				
+                    for (auto &iter : reservation_details)    				    			        			
+                            response[iter.first]=iter.second ; 
 
-				if(deviceType==2 && anpr_mismatch_check==1) //anpr plate mismatch
-					{
-					string entry_plate=response["entry_plate_number"];
-					string current_plate=response["current_plate_number"];	
-					writeLog("parcxTicketCheck","Entry plate: "+entry_plate+" Current Plate:"+current_plate); 
+                    reservationExpiry=toString(reservation_details["max_exit_grace_period"]); 
+                    reservationFee=reservation_details["reservation_fee"];
+                    reservationResult=toString(reservation_details["result"]);
+                    reservationResultDescription=toString(reservation_details["result_description"]);
+                    reservationStart=toString(reservation_details["parking_from"]);
 
-					if(entry_plate!=current_plate)
-						insertIntoTicketCheck("plate_msmatch","Plate mismatch");
-					}																			
-				}
-			else
-				writeLog("parcxTicketCheck","No exit ticket check");	
-				}
-		
-							
-		string result=response["result"];
-		string result_description=response["result_description"];
-		insertIntoTicketCheck(result,result_description);
-		writeLog("parcxTicketCheck","Result: "+result+"\tDescription:"+result_description+"\n");
-		}
+                    response["reservation_result"]=reservationResult;
+                    response["reservation_result_description"]=reservationResultDescription;
+                    }
+                
+                if(toString(response["access_allowed"])=="false" && deviceType==1)
+                    {
+                    response["result"]="shortterm_entry";	
+                    response["result_description"]="Shortterm Entry";
+                    }
+                if(toString(response["access_allowed"])=="true" && deviceType==3)
+                    {
+                    reportCon=General.mysqlConnect(ReportingDB);		
+                    if(reportCon!=NULL)
+                        {	
+                        stmt=reportCon->createStatement();										
+                        Php::Value entry_details=openTransactionCheck(1);
+                        for (auto &iter : entry_details)    				    			        			
+                                response[iter.first]=iter.second ; 			
+                        }
+                    delete res;
+                    delete stmt;
+                    delete reportCon;
+                    }
+                if(toString(response["access_allowed"])=="false" && deviceType!=1)
+                    {			
+                    if(ticketId!="")//ticket check
+                        {
+                        writeLog("exitTicketCheck","Exit ticket check: "+ticketId);													
+                        Php::Value ticket_details=exitTicketCheck();
+                        for (auto &iter : ticket_details)    				    			        									
+                            response[iter.first]=iter.second ; 									
+                        }
+                    else if(plateNumber!="")	//plate check
+                        {
+                        writeLog("exitPlateCheck","Exit plate check: "+plateNumber);		
+                        Php::Value ticket_details=exitPlateCheck();
+                        for (auto &iter : ticket_details)    				    			        									
+                                response[iter.first]=iter.second ; 				
+                        }
+
+                    if(toString(response["result"])=="ticketcheck_access_allowed" && deviceType>2)
+                        response["result"]=toString(response["ticketcheck_result"]);	
+
+                    if(deviceType==2 && anpr_mismatch_check==1) //anpr plate mismatch
+                        {
+                        string entry_plate=response["entry_plate_number"];
+                        string current_plate=response["current_plate_number"];	
+                        writeLog("parcxTicketCheck","Entry plate: "+entry_plate+" Current Plate:"+current_plate); 
+
+                        if(entry_plate!=current_plate)
+                            insertIntoTicketCheck("plate_msmatch","Plate mismatch");
+                        }																			
+                    }
+                else
+                    writeLog("parcxTicketCheck","No exit ticket check");	
+                    }
+
+
+            string result=response["result"];
+            string result_description=response["result_description"];
+            insertIntoTicketCheck(result,result_description);
+            writeLog("parcxTicketCheck","Result: "+result+"\tDescription:"+result_description+"\n");
+            }
 	catch(exception &e)
-		{
-		writeException("parcxTicketCheck",e.what());
-		}		
+            {
+            writeException("parcxTicketCheck",e.what());
+            }		
 	return response;
 	}
 	
 extern "C" 
-	{    
+    {    
     PHPCPP_EXPORT void *get_module()
-		{        
-		static Php::Extension extension("PX_TicketCheck", "1.0");
+        {        
+        static Php::Extension extension("PX_TicketCheck", "1.0");
         extension.add<parcxTicketCheck>("parcxTicketCheck");               
         return extension;
-		}
 	}
+    }
