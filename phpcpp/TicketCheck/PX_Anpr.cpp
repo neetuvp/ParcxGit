@@ -87,7 +87,7 @@ Php::Value Anpr::getPlateDetails(int cameraId,int delay,int id)
             else if(delay>0)    
                 query="SELECT * from plates_captured where camera_device_number = '"+to_string(cameraId)+"' and capture_date_time > DATE_ADD(NOW(),INTERVAL -"+to_string(delay)+" SECOND) and capture_date_time < DATE_ADD(NOW(),INTERVAL "+to_string(delay)+" SECOND)  order by id desc limit 1";         
             else
-		        query="SELECT * from plates_captured where camera_device_number = '"+to_string(cameraId)+"' and capture_date_time > DATE_ADD(NOW(),INTERVAL -10 SECOND) and capture_date_time < DATE_ADD(NOW(),INTERVAL 10 SECOND)  order by id desc limit 1";         
+		query="SELECT * from plates_captured where camera_device_number = '"+to_string(cameraId)+"' and capture_date_time > DATE_ADD(NOW(),INTERVAL -10 SECOND) and capture_date_time < DATE_ADD(NOW(),INTERVAL 10 SECOND)  order by id desc limit 1";         
 
             stmt = con->createStatement();
             res=stmt->executeQuery(query);

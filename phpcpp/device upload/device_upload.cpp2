@@ -43,8 +43,7 @@ sql::Driver *driver;
 std::string query;
 bool cloud=false;
 bool flagSet=false;
-int plate_review_confidence_rate=0,entry_type_contract_parking_space_exceeded=2;
-int occupied,parking_spaces,cooperate_parker;
+int plate_review_confidence_rate=0;
 
 string currentTime()
     {
@@ -72,7 +71,7 @@ void WriteToLog(string msg)
     {
     cout<<msg<<endl;
     ofstream myfile;
-    myfile.open("/opt/parcx/Logs/Services/ApplicationLogs/PX-DeviceUpload-"+currentDate()+".log",fstream::app);
+    myfile.open("/opt/parcx/Logs/Services/ExceptionLogs/PX-DeviceUpload-"+currentDate()+".log",fstream::app);
     myfile<<currentTime()+"   "<<msg<<endl;
     myfile.close();
     }
@@ -95,21 +94,24 @@ void setCloudFlag()
             sql::ResultSet *res;
             conn = DBConnection(DATABASE_SERVER);
             stmt = conn->createStatement(); 
-            res=stmt->executeQuery("select setting_name,setting_value from system_settings where setting_name in ('entry_type_contract_parking_space_exceeded','cloud_enabled','plate_review_confidence_rate')");
-            while(res->next())
+            res=stmt->executeQuery("select setting_name,setting_value from system_settings where setting_name in ('cloud_enabled','plate_review_confidence_rate')");
+            if(res->next())
                 { 
                 if(res->getString("setting_name")=="cloud_enabled")                       
                     {
                     if(res->getInt("setting_value")==1)                    
                         cloud=true;                    
                     }
-                if(res->getString("setting_name")=="plate_review_confidence_rate")                    
+                else
+                    {
                     plate_review_confidence_rate=res->getInt("setting_value");
+                    }
                 
-                if(res->getString("setting_name")=="entry_type_contract_parking_space_exceeded")                    
-                    entry_type_contract_parking_space_exceeded=res->getInt("setting_value");
-                                    
-                }            
+                }
+            // if(cloud)    
+            //     WriteToLog("setCloudFlag :true");
+            // else
+            //     WriteToLog("setCloudFlag :false");
             flagSet=true;
             delete stmt;
             delete conn;
@@ -237,18 +239,18 @@ Php::Value UploadParkingMovements(Php::Value request)
 }
 
 Php::Value UploadParkingAccessMovements(Php::Value request)
-    {
+{
     setCloudFlag();   
     sql::Statement *stmt;
     Php::Value result;    
     Json::Value jsonresponse;
     try
-        {
+    {
         conn = DBConnection(DATABASE);
         stmt = conn->createStatement();   
         
         for(int i=0;i<request.size();i++)
-            {
+        {
             string id = request[i]["id"];
             string device_name = request[i]["device_name"];
             string device_number = request[i]["device_number"];
@@ -275,73 +277,30 @@ Php::Value UploadParkingAccessMovements(Php::Value request)
                 plate_captured_id="NULL";
             if(movement_type!="1")
                 movement_type="2";
-            
-            query="INSERT into parking_movements_access(device_name,device_number,movement_type,carpark_number,facility_number,date_time,tag,status_message,tag_serial,tid,epc,epc_list,epc_count,carpark_name,operation_mode,parking_zone,plate_captured_id,ticket_id,plate_number) VALUES('" + device_name + "'," + device_number + "," + movement_type + "," + carpark_number + "," + facility_number + ",'" + date_time + "','" + tag + "','" + status_message + "','" + tag_serial + "','"+tid+"','"+epc+"','"+epc_list+"',"+epc_count+",'"+carpark_name+"','"+operation_mode+"','"+parking_zone+"',"+plate_captured_id+",'"+ticket_id+"','"+plate_number+"')";
+			query="INSERT into parking_movements_access(device_name,device_number,movement_type,carpark_number,facility_number,date_time,tag,status_message,tag_serial,tid,epc,epc_list,epc_count,carpark_name,operation_mode,parking_zone,plate_captured_id,ticket_id,plate_number) VALUES('" + device_name + "'," + device_number + "," + movement_type + "," + carpark_number + "," + facility_number + ",'" + date_time + "','" + tag + "','" + status_message + "','" + tag_serial + "','"+tid+"','"+epc+"','"+epc_list+"',"+epc_count+",'"+carpark_name+"','"+operation_mode+"','"+parking_zone+"',"+plate_captured_id+",'"+ticket_id+"','"+plate_number+"')";
             result = stmt->executeUpdate(query);
 			
             if(result==1)
-                {
+            {
                 jsonresponse[i] = id;               
-                }
+            }
             if(status_message=="Access Allowed")
-                {
+            {
                 if(stoi(movement_type) == 1)                
-                    {
+					{	                        
                     query="INSERT into open_transactions(carpark_name,movement_type,entry_type,device_name,device_number,ticket_id,carpark_number,facility_number,entry_date_time,plate_number,chip_utid,operation_mode,entry_grace_period,plate_captured_id) VALUES('"+carpark_name+"',1,2,'" + device_name + "'," +device_number + ",'" + ticket_id+ "'," + carpark_number + "," +facility_number + ",'" +date_time + "','"+plate_number+"','','"+operation_mode+"',CURRENT_TIMESTAMP,"+plate_captured_id+")";                        
-                    result = stmt->executeUpdate(query);                
-                    }
-                else if(stoi(movement_type) == 2)                
-                    {
+					result = stmt->executeUpdate(query);                
+					}
+            else if(stoi(movement_type) == 2)                
+				{
                     if(cloud==false)                                            
                         query="Delete from open_transactions where ticket_id = '"+ticket_id+"' and entry_type=2"; 
                     else
                         query="update open_transactions set movement_type=2,cloud_upload_status=0 where ticket_id = '"+ticket_id+"' and entry_type=2";
                                                                
                     result = stmt->executeUpdate(query);
-                    if(entry_type_contract_parking_space_exceeded==1)
-                        {
-                        sql::ResultSet *res;
-                        if(plate_number!="")
-                            query="select * from parcx_server.access_whitelist where plate_number='"+plate_number+"'";
-                        else
-                            query="select * from parcx_server.access_whitelist where ticket_id='"+ticket_id+"'";
-                        res=stmt->executeQuery(query);
-                        res->next();
-                        cooperate_parker=res->getInt("corporate_parker");
-                        if(cooperate_parker>1)
-                            {
-                            parking_spaces=0;
-                            occupied=0;
-                            query="select * from parcx_server.cooperate_users where  user_id="+to_string(cooperate_parker);
-                            res=stmt->executeQuery(query);
-                            if(res->next())                            
-                                parking_spaces=res->getInt("parking_spaces");
-                            
-                            query="SELECT count(*) as count FROM parcx_server.access_whitelist a,parcx_reporting.open_transactions b where a.ticket_id=b.ticket_id  and a.plate_number=b.plate_number and b.entry_type=2 and a.corporate_parker="+to_string(cooperate_parker);                            
-                            res=stmt->executeQuery(query);
-                            if(res->next())  
-                                occupied=res->getInt("count");    
-                            
-                            WriteToLog("UploadParkingAccessMovements : ticketId: "+ticket_id+"\tPlate number: "+plate_number+"\tcooperate_parker: "+to_string(cooperate_parker)+"\tparking_spaces: "+to_string(parking_spaces)+"\tOccupiend: "+to_string(occupied));
-                            
-                            if(occupied<parking_spaces)
-                                {
-                                query="SELECT b.id as id,b.ticket_id as ticket_id,b.plate_number as plate_number  FROM parcx_server.access_whitelist a,parcx_reporting.open_transactions b where a.ticket_id=b.ticket_id  and a.plate_number=b.plate_number and b.entry_type=1 and a.corporate_parker="+to_string(cooperate_parker)+" order by b.entry_date_time";
-                                res=stmt->executeQuery(query);
-                                if(res->next())
-                                    {
-                                    id=res->getString("id");
-                                    ticket_id=res->getString("ticket_id");
-                                    plate_number=res->getString("plate_number");
-                                    WriteToLog("UploadParkingAccessMovements : changing entry type of ticket id: "+ticket_id+" plate_number: "+plate_number+" to 2");
-                                    query="update open_transactions set entry_type=2,pay_upto=current_timestamp where id="+id;
-                                    result = stmt->executeUpdate(query); 
-                                    }
-                                }
-                            }
-                        }
-                    }			
-                }                            
+				}			
+            }                            
             Json::FastWriter fw;
             string res = fw.write(jsonresponse);           
             result = res;
@@ -351,13 +310,13 @@ Php::Value UploadParkingAccessMovements(Php::Value request)
         delete conn;  
     }
     catch(sql::SQLException &e)
-        {       
-        WriteToLog("****UploadParkingAccessMovements*****");
-        WriteToLog(e.what());
-	WriteToLog(query);
-        delete conn;  
-        return e.what();
-        }
+    {       
+         WriteToLog("****UploadParkingAccessMovements*****");
+         WriteToLog(e.what());
+		 WriteToLog(query);
+		 delete conn;  
+         return e.what();
+    }
     
     return result;
        

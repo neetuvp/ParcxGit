@@ -74,6 +74,8 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                 response["ticket_id"]=string(res->getString("ticket_id"));
                 response["whitelist_present"]="true";
                 int cooperate_parker=res->getInt("corporate_parker");
+                response["cooperate_parker"]=cooperate_parker;
+                response["entry_type_contract_parking_space_exceeded"]=2;
 			
                 string zone=res->getString("access_zones");
                 string expiry_date=res->getString("validity_expiry_date");
@@ -155,9 +157,22 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                     response["access_allowed"]="true";		
                     response["result"]= "allow_access";		
                     response["result_description"]="Access allowed.whitelist available";
+                    }
+                    
+                writeAccessLog("checkAccess","cooperate_parker : "+to_string(cooperate_parker));
+                
+                string access_allowed=response["access_allowed"];
+                                        
+                if(access_allowed=="true" && cooperate_parker>1)
+                    {
+                    query="SELECT setting_value from system_settings where setting_name='entry_type_contract_parking_space_exceeded'";
+                    res=stmt->executeQuery(query);
+                    res->next();
+                    response["entry_type_contract_parking_space_exceeded"]=int(res->getInt("setting_value"));
+                    writeAccessLog("checkAccess","entry_type_contract_parking_space_exceeded : "+string(res->getString("setting_value")));
 
-                    if(cooperate_parker>1 && deviceType==1)
-                        {
+                    if(res->getInt("setting_value")==1 && deviceType==1)
+                        {        
                         query="select * from cooperate_users where  user_id="+to_string(cooperate_parker);
                         res=stmt->executeQuery(query);
                         if(res->next())
@@ -169,22 +184,16 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                             res->next();
                             int occupied=res->getInt("count");
                             writeAccessLog("checkAccess","Currently occupied for the cooperate user :"+to_string(occupied));
-                            if(occupied>parking_spaces)
-                                {
-                                query="SELECT setting_value from system_settings where settings_name='entry_type_contract_parking_space_exceeded'";
-                                res=stmt->executeQuery(query);
-                                res->next();
-                                if(res->getInt("setting_value")==1)
-                                    {
-                                    writeAccessLog("checkAccess","short term access after cooperate parking space occupied is enabled");
-                                    response["access_allowed"]="false";		
-                                    response["result"]= "contract_parking_spaces_occupied";		
-                                    response["result_description"]="Contract parking spaces occupied";
-                                    }
+                            if(occupied>=parking_spaces)
+                                {                                    
+                                writeAccessLog("checkAccess","short term access after cooperate parking space occupied is enabled");
+                                response["access_allowed"]="false";		
+                                response["result"]= "contract_parking_spaces_occupied";		
+                                response["result_description"]="Contract parking spaces occupied";                                        
                                 }
                             }                        
-                        }                    			
-                    }                                
+                        }   
+                    }                 			                                                    
                 }
             else
                 {			

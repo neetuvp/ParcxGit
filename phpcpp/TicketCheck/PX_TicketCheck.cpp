@@ -500,43 +500,44 @@ Php::Value walletCheck()
 	}
 
 void loadSystemSettings()
-	{
-	try
-		{		
-		writeLog("loadSystemSettings","loadSettings");			
-		query="select setting_name,setting_value from system_settings";
-		stmt=serverCon->createStatement();
-		settings=stmt->executeQuery(query);				
-		while(settings->next())
-			{
-			if(settings->getString("setting_name")=="cloud_wallet_webservice")	
-				wallet_webservice=settings->getString("setting_value");					
-			if(settings->getString("setting_name")=="validation_enabled")	
-				validationEnabled=settings->getInt("setting_value");
-			if(settings->getString("setting_name")=="wallet_enabled")	
-				walletEnabled=settings->getInt("setting_value");
-			if(settings->getString("setting_name")=="vat_type")	
-				vat_type=settings->getString("setting_value");
-			if(settings->getString("setting_name")=="vat_percentage")	
-				vat_percentage=settings->getDouble("setting_value");
-			if(settings->getString("setting_name")=="anpr_mismatch_check")	
-				anpr_mismatch_check=settings->getInt("setting_value");
-			}					
-		delete settings;			
-			
-		writeLog("loadSystemSettings","walletEnabled: "+to_string(walletEnabled));					
-		writeLog("loadSystemSettings","wallet_webservice : "+wallet_webservice);
-		writeLog("loadSystemSettings","validationEnabled: "+to_string(validationEnabled));	
-		writeLog("loadSystemSettings","vat_type: "+vat_type);	
-		writeLog("loadSystemSettings","vat_percentage: "+to_string(vat_percentage));		
-		writeLog("loadSystemSettings","anpr_mismatch_check: "+to_string(anpr_mismatch_check));		
-			
-		}
-	catch(const std::exception& e)
-		{
-		writeException("loadSystemSettings",e.what());
-		}		
-	}
+    {
+    try
+        {		
+        writeLog("loadSystemSettings","loadSettings");			
+        query="select setting_name,setting_value from system_settings";
+        stmt=serverCon->createStatement();
+        settings=stmt->executeQuery(query);				
+        while(settings->next())
+            {
+            if(settings->getString("setting_name")=="cloud_wallet_webservice")	
+                wallet_webservice=settings->getString("setting_value");					
+            if(settings->getString("setting_name")=="validation_enabled")	
+                validationEnabled=settings->getInt("setting_value");
+            if(settings->getString("setting_name")=="wallet_enabled")	
+                walletEnabled=settings->getInt("setting_value");
+            if(settings->getString("setting_name")=="vat_type")	
+                vat_type=settings->getString("setting_value");
+            if(settings->getString("setting_name")=="vat_percentage")	
+                vat_percentage=settings->getDouble("setting_value");
+            if(settings->getString("setting_name")=="anpr_mismatch_check")	
+                anpr_mismatch_check=settings->getInt("setting_value");
+
+            }					
+        delete settings;			
+
+        writeLog("loadSystemSettings","walletEnabled: "+to_string(walletEnabled));					
+        writeLog("loadSystemSettings","wallet_webservice : "+wallet_webservice);
+        writeLog("loadSystemSettings","validationEnabled: "+to_string(validationEnabled));	
+        writeLog("loadSystemSettings","vat_type: "+vat_type);	
+        writeLog("loadSystemSettings","vat_percentage: "+to_string(vat_percentage));		
+        writeLog("loadSystemSettings","anpr_mismatch_check: "+to_string(anpr_mismatch_check));		
+
+        }
+    catch(const std::exception& e)
+        {
+        writeException("loadSystemSettings",e.what());
+        }		
+    }
 
 string secondsToParkingDuration(int n)
 	{
@@ -607,8 +608,7 @@ Php::Value openTransactionCheck(int getDetails)
                 if(getDetails==1)
                     return response;				
                 response["access_allowed"]="false";		
-                currentDateTime=General.currentDateTime(dateTimeFormat);	
-                writeLog("openTransactionCheck","currentDateTime: "+currentDateTime);	
+                	
                 if(carparkNumber!=res->getInt("carpark_number"))
                     {
                     response["result"]="invalid_carpark";
@@ -620,7 +620,24 @@ Php::Value openTransactionCheck(int getDetails)
                     response["result_description"]="Invalid facility";
                     }
                 else
-                    {								
+                    {
+                    if(entryType==2 && accessResult=="allow_access")
+                        {
+                        if(res->getString("pay_upto")!="")
+                            {
+                            currentDateTime=res->getString("pay_upto");
+                            response["entry_type"]=1;
+                            }
+                        else
+                            {
+                            response["access_allowed"]="true";
+                            return response;
+                            }
+                        }
+                    else
+                        currentDateTime=General.currentDateTime(dateTimeFormat);	
+                    writeLog("openTransactionCheck","paymentUpto: "+currentDateTime);
+                    
                     loadSystemSettings();	
                     if(deviceType>2 || walletEnabled==1 || paymentExit==1)				
                         {
@@ -639,7 +656,7 @@ Php::Value openTransactionCheck(int getDetails)
                         }
 
                     stmt=reportCon->createStatement();	
-
+                                   
                     int *duration=General.differenceDateTime(currentDateTime,entryDateTime,dateTimeFormat);	
                     parkingDuration=duration[0];	
                     writeLog("openTransactionCheck","Parking duration: "+to_string(parkingDuration)+" S");				
@@ -671,7 +688,8 @@ Php::Value openTransactionCheck(int getDetails)
                         validationSeconds=timeValidation*3600;																																												
                         }								
                     response["entry_grace_time_remaining"]="0";	
-                    response["exit_grace_time_remaining"]="0";																																			
+                    response["exit_grace_time_remaining"]="0";	
+                    
                     int *timeDiff=General.differenceDateTime(maxEntryGrace,currentDateTime,dateTimeFormat);	
                     writeLog("openTransactionCheck","entry_grace_time_remaining: "+to_string(timeDiff[0]));	
                     if(timeDiff[0]>0)
@@ -709,8 +727,11 @@ Php::Value openTransactionCheck(int getDetails)
                                     response["result_description"]="Access exit grace period exceeded";									
                                     }						
                                 }
-                            else if(accessResult=="access_allowed")
+                            else if(accessResult=="allow_access")
                                 {
+                                if(maxExitGrace!="")                                    
+                                    maxExitGrace=accessExpiry+" 23:59:59";                                    
+                                    
                                 
                                 }
                             else
@@ -1084,14 +1105,20 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
 
                     response["whitelist_result"]=accessResult;
                     response["whitelist_result_description"]=accessResultDescription;
+                    
+                    int cooperate_parker=response["cooperate_parker"];
+                    int type=response["entry_type_contract_parking_space_exceeded"];
+                    
+                    if(toString(response["access_allowed"])=="true" && cooperate_parker>1 && type==1 && deviceType!=1)
+                        {
+                        Php::Value ticket_details=exitPlateCheck();
+                        for (auto &iter : ticket_details)    				    			        									
+                            response[iter.first]=iter.second ; 
+                        }
+                    
                     }
                 
-                if(toString(response["access_allowed"])=="true" && deviceType==2)
-                    {
-                    Php::Value ticket_details=exitPlateCheck();
-                    for (auto &iter : ticket_details)    				    			        									
-                        response[iter.first]=iter.second ; 
-                    }
+                
                 
                 if(toString(response["access_allowed"])=="false" && reservationEnabled==1)
                     {
