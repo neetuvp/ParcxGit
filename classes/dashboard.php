@@ -747,6 +747,7 @@ class dashboard
             $data = mysqli_fetch_assoc($result);
             $_SESSION['dashboard_level']="carparks"; 
             $_SESSION['facility_number']=$data['facility_number'];
+            $_SESSION['facility_name']=$data['carpark_name'];
             $this->OccupancyCarparkCounters($data['facility_number']);            
             }        
         else
@@ -874,44 +875,52 @@ class dashboard
                 $html_data .= ' <div class="col-lg-3 col-sm-6 col-xs-12">';
                 $html_data .= ' <div class="chart-box text-center">';
                 $html_data .= ' <span id="dashboard_level" level="carparks" facility_number="'.$facility_number.'"></span>';
-                $html_data .= '<p class="text-center chart-header" id="gauge1_name">'.$data['carpark_name'].'</p>';
+               
+                $html_data .= '<h1 class="text-left chart-header" id="gauge1_name">'.$data['carpark_name'].'</h1>';
+                 $html_data .='<h5 class="text-left facility-name">'.$_SESSION['facility_name'].' </h5>';
                 $html_data .= ' <input id="carpark'.$i.'" type="hidden" class="knob" data-thickness="0.3" data-angleArc="250" data-angleOffset="-125"
                                 value="'.$gauge_value.'" data-width="250" data-height="150" data-fgColor="'.$color.'" data-readonly="true">';
                 $html_data .= '<p class="gauge-val" id="gauge-value'.$i.'"><span>'.$data['current_level'].'</span>/<span>'.$data['total_spaces'].'</span></p>';         
                 $html_data .= '<div class="card-body">';   
                 
+               // $html_data .= '<div id="row">';
                 $html_data .= '<div id="row">';
-                $html_data .= '<span id="category">ShortTerm</span>';     
-                $html_data .='<span class="count" id="shortterm-count-'.$i.'">'.$data['shortterm_current_level'].'/'.$data['total_shortterm_spaces'].'</span><br/>';        
+                $html_data .= '<div class="col-5 text-left" style="float:left;" id="category">ShortTerm</div>';     
+                $html_data .=' <div class="col text-right" id="shortterm-count-'.$i.'">'.$data['shortterm_current_level'].'/'.$data['total_shortterm_spaces'].'</div>';        
                 $occupancy_percentage=($data['shortterm_current_level']/$data['total_shortterm_spaces'])*100;
+                $html_data .= '</div>';//end row
                 $html_data .= '<div class="progress mb-3">';
                 $html_data .= '<div class="progress-bar bg-'.$this->choose_bg_color($occupancy_percentage,2).'" id="shortterm-progress-'.$i.'" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:'.$occupancy_percentage.'%">';
-                $html_data .= '</div>';//end row
-                $html_data .= '</div>';
-                $html_data .= '</div>';//end row
+                $html_data .= '</div>';//end progress-bar
+                $html_data .= '</div>'; // end progress mb-3
+                //$html_data .= '</div>';//end row
                 
+                //$html_data .= '<div id="row">';
                 $html_data .= '<div id="row">';
-                $html_data .= '<span id="category">Access</span>';     
-                $html_data .='<span class="count" id="access-count-'.$i.'">'.$data['access_current_level'].'/'.$data['total_access_spaces'].'</span><br/>';   
+                $html_data .= '<div class="col-5 text-left" style="float:left;" id="category">Access</div>';     
+                $html_data .='<div class="col text-right" id="access-count-'.$i.'">'.$data['access_current_level'].'/'.$data['total_access_spaces'].'</div>';   
                 $occupancy_percentage=($data['access_current_level']/$data['total_access_spaces'])*100;
+                $html_data .= '</div>';//end row count
                 $html_data .= ' <div class="progress mb-3">';
                 $html_data .= '<div class="progress-bar bg-'.$this->choose_bg_color($occupancy_percentage,2).'" id="access-progress-'.$i.'" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:'.$occupancy_percentage.'%">';
                 $html_data .= '</div>';//end row
                 $html_data .= '</div>';
-                $html_data .= '</div>';//end row
+                //$html_data .= '</div>';//end row
                 
+               // $html_data .= '<div id="row">';
                 $html_data .= '<div id="row">';
-                $html_data .= '<span id="category">Reservation</span>';     
-                $html_data .='<span class="count" id="reservation-count-'.$i.'">'.$data['reservation_current_level'].'/'.$data['total_reservation_spaces'].'</span><br/>';   
+                $html_data .= '<div class="col-5 text-left" style="float:left;" id="category">Reservation</div>';     
+                $html_data .='<div class="col text-right" id="reservation-count-'.$i.'">'.$data['reservation_current_level'].'/'.$data['total_reservation_spaces'].'</div>';   
+                  $html_data .= '</div>';//end row count
                 $html_data .= ' <div class="progress mb-3">';
                 $occupancy_percentage=($data['reservation_current_level']/$data['total_reservation_spaces'])*100;
                 $html_data .= '<div class="progress-bar bg-'.$this->choose_bg_color($occupancy_percentage,2).'" id="reservation-progress-'.$i.'" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:'.$occupancy_percentage.'%">';
                 $html_data .= '</div>';//end row
                 $html_data .= '</div>';
-                $html_data .= '</div>';//end row
+               // $html_data .= '</div>';//end row
                 
                 $html_data .= '</div>';
-                $html_data .= '<button type="button" class="btn btn-block btn-outline-secondary btn-sm" id="ShowCarparkDetail" facility_number="'.$facility_number.'" carpark_number="'.$data['carpark_number'].'">More <i class="fa fa-arrow-circle-right"></i></button>'; 
+                $html_data .= '<button type="button" class="btn btn-block bg-secondary-gradient" id="ShowCarparkDetail" facility_number="'.$facility_number.'" carpark_number="'.$data['carpark_number'].'">More <i class="fa fa-arrow-circle-right"></i></button>'; 
                 $html_data .= '</div>';   
 
                 $html_data .= '</div>';
@@ -968,7 +977,8 @@ class dashboard
         $html_data .= '<div class="container-fluid">';
         $html_data .= '<div class="row mb-2">';
         $html_data .= '<div class="col-sm-6">';
-        $html_data .= '<h1>'.$data['carpark_name'].'</h1>';
+        $html_data .= '<h1 id="gauge1_name">'.$data['carpark_name'].'</h1>';
+        $html_data .= '<h5>'.$_SESSION['facility_name'].'</h5>';
         $html_data .= '</div>';   
         $html_data .= '</div>';
         $html_data .='</div>';    
@@ -976,7 +986,7 @@ class dashboard
         //The Occupancy Gauge - Total 
         $html_data .= '<div class="col-md-4">';
         $html_data .= ' <div class="chart-box text-center">';
-        $html_data .= '<p class="text-center chart-header" id="gauge1_name">'.$data['carpark_name'].'</p>';
+        $html_data .= '<p class="text-center chart-header" id="gauge1_name"></p>';
         $html_data .= ' <input id="carpark" type="hidden" class="knob" data-thickness="0.3" data-angleArc="250" data-angleOffset="-125"
         value="'.$gauge_percentage.'" data-width="250" data-height="150" data-fgColor="'.$this->choose_bg_color($gauge_percentage,1).'" data-readonly="true">';
         $html_data .= '<p class="gauge-val" id="gauge-value"><span>'.$data['current_level'].'</span>/<span>'.$data['total_spaces'].'</span></p>';  
