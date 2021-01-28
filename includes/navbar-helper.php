@@ -231,8 +231,3 @@ include('../../includes/sidebar.php');
 </div>
 <!-- end / tab-link header -->
 
-<script>
-
-    // multiselects are initialized in footer.php
-
-</script>

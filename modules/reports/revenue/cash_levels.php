@@ -16,8 +16,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_revenue.php');
-$reports=new reporting_revenue();
+//include('../../../classes/reporting_revenue.php');
+//$reports=new reporting_revenue();
 ?>
 
 
@@ -32,7 +32,7 @@ $reports=new reporting_revenue();
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php $reports->get_apm_devices();?>
+            <?php echo parcxSettings(array("task"=>"38"));?>
           </select>
         </div>
 
@@ -40,7 +40,7 @@ $reports=new reporting_revenue();
         
         <!-- search -->
         <div class="col-md-1">
-          <button type="button" class="btn btn-block btn-secondary" id="view-report-button">Search</button>
+          <button type="button" class="btn btn-block btn-secondary" id="view-report-button" onclick="cash_levels()">Search</button>
         </div>
 
         <!-- loader -->
@@ -54,9 +54,13 @@ $reports=new reporting_revenue();
   <section class="content">
     <div class="container-wide"> 
       <div class="card">
-        <div class="card-body p-0" id="report-content">
+        <div class="card-body" id="report-content">
           <?php                    
-          $reports->cash_levels([]);
+          //$reports->cash_levels([]);
+			$data["device"]="";	
+			$data["language"] = $_SESSION["language"];
+			$data["task"]=18;                          
+			echo parcxReport($data);
           ?>
 
           </div>
@@ -68,28 +72,49 @@ $reports=new reporting_revenue();
 <?php include('../../../includes/footer.php');?>
 
 <script>
-  $('#view-report-button').click(function (event) { 
+ // $('#view-report-button').click(function (event) { 
+ var load_report=0;
+ function cash_levels(){
 console.log("Button.click");
     var device = $("#deviceNumber").val().toString();
-    
+    language = $("#language").val();
       var data = {        
-        device: device        
+        device: device,
+		task:18,
+		language:language
       };
       var temp = JSON.stringify(data);
-      //alert(temp);
-      $.post("../../ajax/revenue.php?task=16", temp)
+      alert(temp);
+      $.post("../../ajax/reports.php", temp)
         .done(function (result) {
-
+alert(result);
           $("#report-content").html(result);
           reportSuccess();
-
+		  load_report=1;
         }, "json");   
 
     event.preventDefault();
+ }
+  //}); 
 
-  }); 
+ function loadPage()
+  {
+  loadheadingreport("cash_levels");
+  if(load_report==1)
+	  cash_levels(); 
+  }
+$("#language").change(function(){
+  loadPage();
+});
 
-  
+$( document ).ready(function() {
+	loadheadingreport("cash_levels");
+});
+
+$('#export_excel_report').click(function (event) 
+  {  
+  export_to_excel("#report-content", "APM Cash Level Report")
+  }); // end click event function 
   
 </script>
 

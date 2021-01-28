@@ -1,10 +1,11 @@
 /* intialize date range picker */
 
-$('#reservationtime').daterangepicker({
+$('#reservationtime').daterangepicker(
+    {
     timePicker: true,
-    timePickerIncrement: 10,
+    timePickerIncrement: 1,
     format: 'YYYY-MM-DD HH:mm:ss'
-})
+    })
 
 // date range with button ops - not in use
 $('#daterange-btn').daterangepicker({
@@ -41,21 +42,25 @@ var from
 var to
 
 // save from/to values for report
-$('#reservationtime').on('apply.daterangepicker', function (ev, picker) {
+$('#reservationtime').on('apply.daterangepicker', function (ev, picker) 
+    {
+    chooseDateTimePicker();
+    });
 
+function chooseDateTimePicker()
+    {
+    console.log("hai");    
     daterange = $("#reservationtime").val();
 
-    if ($.inArray(pageName, pageList) != -1) {
+    if ($.inArray(pageName, pageList) != -1) 
+        {
         // no time selector
         from = daterange.substring(0, 10);
         to = daterange.substring(13, 32);
-    } else {
+        } 
+   else 
+        {
         from = daterange.substring(0, 19);
         to = daterange.substring(22, 41);
+        }    
     }
-
-    //console.log(daterange);
-    //console.log(from);
-    //console.log(to);
-
-});

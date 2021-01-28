@@ -17,8 +17,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_revenue.php');
-$reports=new reporting_revenue();
+//include('../../../classes/reporting_revenue.php');
+//$reports=new reporting_revenue();
 ?>
 
 <div class="content-wrapper">
@@ -32,7 +32,7 @@ $reports=new reporting_revenue();
         <!-- carparks -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-            <?php $reports->get_carparks();?>
+              <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
@@ -55,13 +55,13 @@ $reports=new reporting_revenue();
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date Range">
+            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_date_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1">
-          <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+          <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="revenue_report()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -112,10 +112,20 @@ $reports=new reporting_revenue();
           </div>
         </div>
       </div>
-
-      <div class="card-body p-0" id="revenue-summary-content">       
+      <br>
+    <div class="card">
+      <div class="card-body" id="report-content">   
+	  <?php
+	  $current_date=date("Y-m-d");    
+	  $data["from"]=$current_date." ".DAY_CLOSURE_START;
+	  $data["to"]=$current_date." ".DAY_CLOSURE_END;           
+	  $data["carpark"]="";    
+	  $data["weekdays"]="";		  
+	  $data["language"] = $_SESSION["language"];
+	  $data["task"]=22; 
+	  echo parcxReport($data); 
+	  ?>
       </div>
-
     </div>
 </div>
 </section>
@@ -129,8 +139,14 @@ $reports=new reporting_revenue();
 //////////////////////////////
 
 var click_count = 0;
-$('#view-report-button').click(function (event) 
-  { 
+var load_report = 0;
+$( document ).ready(function() {
+	loadheadingreport("revenue_report");
+});
+
+//$('#view-report-button').click(function (event) 
+function revenue_report()
+{ 
   if ((!daterange)) 
     {
     alert("choose date range");
@@ -142,14 +158,21 @@ $('#view-report-button').click(function (event)
     data["to"]=to;         
     data["carpark"]=$("#multiselect").val().toString(); 
     data["weekdays"]=$("#days").val().toString();  
-    data["option-type"]=1;   
+    data["option-type"]=1;  
+	data["language"] = $("#language").val();	
+    data["task"]=22;
+	
     var jsondata = JSON.stringify(data);    
-    console.log(jsondata); 
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
+    //console.log(jsondata); 
+   // $.post("../../ajax/reports-ajax.php",jsondata,function(data)
+	$.post("../../ajax/reports.php",jsondata,function(data)
       {		
-      $("#revenue-summary-content").html(data);
+	  //console.log(data);
+      $("#report-content").html(data);
       reportSuccess();
-      createChart();	
+      createChart();
+	  loadTable1();
+	  load_report=1;
       })
     .fail(function(jqxhr,status,error)
       {
@@ -159,6 +182,73 @@ $('#view-report-button').click(function (event)
   } // end if 
 
   event.preventDefault();
+ }
+ 
+//});
+
+function loadTable1()
+{
+      loadDataTable1();
+}
+
+function loadDataTable1()
+{
+	var search_label="";
+	var entries_label = "";
+	var info_label="";
+	if($("#language").val()=="Arabic")
+	{
+		search_label =  'بحث';
+		entries_label = 'عرض الإدخالات _MENU_ ';
+		info_label = 'إظهار _START_ إلى _END_ من _TOTAL_ من الإدخالات';
+		previous_label = 'السابق';
+		next_label = 'التالى';
+		
+	} 
+	else{
+		search_label = "Search";
+		entries_label = 'Show _MENU_ entries';
+		info_label = 'Showing _START_ to _END_ of _TOTAL_ entries';
+		previous_label = 'Previous';
+		next_label = 'Next';
+		
+	}
+  $("table[id^='TABLE']").DataTable(
+	  {
+	  "paging": true,
+	  "lengthChange":true,
+	  "searching": true,
+	  "ordering": true,
+	  "info": true,
+	  "autoWidth": false,
+	  "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+	  "aaSorting": [],
+		"language": {
+			search: search_label,
+		},
+		"oLanguage": {
+			"sLengthMenu": entries_label,
+			"info":info_label,
+			"oPaginate": {
+			"sPrevious": previous_label,
+			"sNext": next_label
+			}
+		},
+		
+	  
+	  
+	  });   
+	
+}
+
+function loadPage()
+{
+  loadheadingreport("revenue_report");
+  if(load_report==1)
+	revenue_report(); 
+}
+$("#language").change(function(){
+  loadPage();
 });
 
   //////////////////////////////
@@ -167,7 +257,7 @@ $('#view-report-button').click(function (event)
 
 $('#export_excel_report').click(function (event) 
   {
-  export_to_excel("#revenue-summary-content", "PMS_Revenue_Summary")  
+  export_to_excel("#report-content", "PMS_Revenue_Summary")  
   }); // end click event function
 
 //////////////////////////////
@@ -192,7 +282,7 @@ var currency;
 
 function createChart() 
   {
-  if($("#revenue-summary-content").find('table').length!=0) 
+  if($("#report-content").find('table').length!=0) 
     {    
     $("#chart_container").removeClass("d-none");
     parking_fee = 0;

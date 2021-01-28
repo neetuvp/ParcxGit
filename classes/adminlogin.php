@@ -70,10 +70,10 @@ function db_connect_config(){
             $_SESSION['userRollName'] = $results[2]; 
             $_SESSION['userRollId'] = $results[1]; 
             $_SESSION['userId'] = $results[4];             
-
+			$_SESSION["language"] = $results[5]; 
             $_SESSION['success']  = "You are now logged in";
             $_SESSION['last_login_timestamp'] = time();
-            return $this->response(200,"admin"); 
+            return $this->response(200,$results[5]); 
 
         }
         else{

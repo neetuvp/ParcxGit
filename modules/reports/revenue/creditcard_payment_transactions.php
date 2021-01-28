@@ -16,8 +16,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_revenue.php');
-$reports=new reporting_revenue();
+//include('../../../classes/reporting_revenue.php');
+//$reports=new reporting_revenue();
 ?>
 
 
@@ -32,14 +32,14 @@ $reports=new reporting_revenue();
         <!-- carparks -->
        <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-            <?php $reports->get_carparks();?>
+              <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php $reports->get_payment_devices();?>
+            <?php echo parcxSettings(array("task"=>"37"));?>
           </select>
         </div>
 
@@ -52,13 +52,13 @@ $reports=new reporting_revenue();
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
             <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-              placeholder="Choose Date and Time Range">
+              placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="creditcard_transactions()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -94,14 +94,16 @@ $reports=new reporting_revenue();
   <section class="content">
     <div class="container-wide">
       <div class="card">
-        <div class="card-body p-0" id="report-content">
+        <div class="card-body" id="report-content">
           <?php                      
           $current_date=date("Y-m-d");    
           $data["from"]=$current_date." ".DAY_CLOSURE_START;
           $data["to"]=$current_date." ".DAY_CLOSURE_END;           
           $data["carpark"]="";    
-          $data["device"]="";	                      
-          $reports->revenue_creditcard_payments_report($data); 
+          $data["device"]="";	 
+		  $data["task"]=21;  
+		  $data["language"]=$_SESSION["language"];
+          echo parcxReport($data); 
           ?>         
         </div>
       </div>
@@ -115,7 +117,9 @@ $reports=new reporting_revenue();
 <?php include('../../../includes/footer.php');?>
 
 <script>
-$('#view-report-button').click(function (event) 
+//$('#view-report-button').click(function (event) 
+var load_report = 0;
+function creditcard_transactions()
   {   
   if ((!daterange)) 
     {
@@ -128,12 +132,14 @@ $('#view-report-button').click(function (event)
     data["to"]=to;         
     data["carpark"]=$("#multiselect").val().toString(); 
     data["device"]=$("#deviceNumber").val().toString();      
-    data["option-type"]=8;   
+	data["language"] = $("#language").val();	
+    data["task"]=21;
     var jsondata = JSON.stringify(data);      
     console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
+    $.post("../../ajax/reports.php",jsondata,function(data)
       {		
       $("#report-content").html(data);
+	  load_report=1;
     reportSuccess();      
       })
   .fail(function(jqxhr,status,error)
@@ -143,8 +149,22 @@ $('#view-report-button').click(function (event)
     } // end if 
 
   event.preventDefault();
+  }
+ // }); // end traffic report by day 
 
-  }); // end traffic report by day 
+function loadPage()
+  {
+  loadheadingreport("creditcard_transactions");
+  if(load_report==1)
+	creditcard_transactions(); 
+  }
+$("#language").change(function(){
+  loadPage();
+});
+
+$( document ).ready(function() {
+	loadheadingreport("creditcard_transactions");
+});
 
 $('#export_excel_report').click(function (event) 
   {  

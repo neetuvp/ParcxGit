@@ -16,8 +16,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_revenue.php');
-$reports=new reporting_revenue();
+//include('../../../classes/reporting_revenue.php');
+//$reports=new reporting_revenue();
 ?>
 
 
@@ -32,7 +32,7 @@ $reports=new reporting_revenue();
         <!-- carparks -->
         <div class="col-md-2">
             <select class="form-control" id="multiselect" multiple="multiple">
-              <?php $reports->get_carparks();?>
+              <?php echo parcxSettings(array("task"=>"12"));?>
             </select>
           </div>
 
@@ -40,7 +40,7 @@ $reports=new reporting_revenue();
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php $reports->get_apm_devices();?>
+            <?php echo parcxSettings(array("task"=>"38"));?>
           </select>
         </div>
 
@@ -53,12 +53,12 @@ $reports=new reporting_revenue();
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
             <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-              placeholder="Choose Date and Time Range">
+              placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
           </div>
         </div>
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="apm_refill_report()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -94,14 +94,17 @@ $reports=new reporting_revenue();
   <section class="content">
     <div class="container-wide"> 
       <div class="card">
-        <div class="card-body p-0" id="report-content">          
+        <div class="card-body" id="report-content">          
           <?php 
             $current_date=date("Y-m-d");    
             $data["from"]=$current_date." ".DAY_CLOSURE_START;
             $data["to"]=$current_date." ".DAY_CLOSURE_END;           
             $data["carpark"]="";    
-            $data["device"]="";	                                  
-            $reports->apm_refill_report($data);
+            $data["device"]="";	
+			$data["language"] = $_SESSION["language"];
+			$data["task"]=17;                          
+			echo parcxReport($data);
+            //$reports->apm_refill_report($data);
           ?>
           </div>
         </div>
@@ -112,8 +115,10 @@ $reports=new reporting_revenue();
 <?php include('../../../includes/footer.php');?>
 
 <script>
-$('#view-report-button').click(function (event) 
-	{     	
+//$('#view-report-button').click(function (event)
+var load_report=0;
+function apm_refill_report() 
+{     	
   if ((!daterange)) 
 		{
 		alert("choose date range");
@@ -125,15 +130,16 @@ $('#view-report-button').click(function (event)
     data["from"]=from;
     data["to"]=to;           
     data["carpark"]=$("#multiselect").val().toString();    
-	  data["device"]=$("#deviceNumber").val().toString();	   
-   
-    data["option-type"]=10;
+	data["device"]=$("#deviceNumber").val().toString();	   
+	data["language"] = $("#language").val();
+    data["task"]=17;
     var jsondata = JSON.stringify(data);  
 	  console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
+    $.post("../../ajax/reports.php",jsondata,function(data)
 		  {
       $("#report-content").html(data);   		
       reportSuccess();
+	  load_report=1;
       })
     .fail(function(jqxhr,status,error)
 		  {
@@ -141,11 +147,25 @@ $('#view-report-button').click(function (event)
       }); 
 		} // end if 
   event.preventDefault();
-	}); 
+}
+//	}); 
+function loadPage()
+  {
+  loadheadingreport("apm_refill_report");
+	if(load_report==1)
+	  apm_refill_report(); 
+  }
+$("#language").change(function(){
+  loadPage();
+});
+
+$( document ).ready(function() {
+	loadheadingreport("apm_refill_report");
+});
 
 $('#export_excel_report').click(function (event) 
   {  
-  export_to_excel("#report-content", "PMS_CreditCard_Payment_transaction")
+  export_to_excel("#report-content", "APM Refill Report")
   }); // end click event function
 </script>
 

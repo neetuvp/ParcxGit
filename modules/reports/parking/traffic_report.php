@@ -17,8 +17,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_parking.php');
-$reports=new reporting_parking();
+//include('../../../classes/reporting_parking.php');
+//$reports=new reporting_parking();
 ?>
 
 <div class="content-wrapper">
@@ -32,7 +32,7 @@ $reports=new reporting_parking();
         <!-- carparks multiselect -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-            <?php $reports->get_carparks();?>
+            <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
@@ -56,13 +56,13 @@ $reports=new reporting_parking();
              <span class="input-group-text"><i class="far fa-clock"></i></span>
            </div>
            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-             placeholder="Choose Date Range">
+             placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_date_range"));?>">
          </div>
        </div>       
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+          <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="traffic_report()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -128,8 +128,70 @@ $reports=new reporting_parking();
   //////////////////////////////
 
   var click_count = 0;
+  var load_report = 0;
+  //$('#view-report-button').click(function (event) {
+function traffic_report()
+{
+   var weekdays=$("#days").val().toString();
+    var carpark = $("#multiselect").val().toString();
+    if ((!daterange)) {
+      alert("choose date range");
+    } else {
+      var data = {
+        toDate: to,
+        fromDate: from,
+        weekdays: weekdays,
+        carpark: carpark,
+		language:$("#language").val(),	
+		task:23
+      };
+      var temp = JSON.stringify(data);
+      $.post("../../ajax/reports.php", temp)
+        .done(function (result) {
 
-  $('#view-report-button').click(function (event) {
+          $("#report-content").html(result);
+          reportSuccess();
+		  loadMultipleDataTable();
+		  load_report=1;
+
+          if (result.indexOf("No records/transactions available for the current search criteria") === -1) {
+
+            // show chart when report first loads
+            $("#chart_container").removeClass("d-none");
+
+            // clear previous array data
+            entries_data = [];
+            exits_data = [];
+
+            getChartData();
+
+            // for first click
+            if (click_count === 0) {
+
+              // load chart
+              // note - chart *must* be visible first
+              trafficSummaryChart();
+
+              click_count += 1;
+
+            } else {
+
+              // for all other clicks
+              updateTrafficSummaryChart()
+
+            }
+
+          } else {
+            $("#chart_container").addClass("d-none");
+          }
+
+        }, "json");
+    } // end if 
+
+    event.preventDefault();
+}
+  //}); // end traffic report by day 
+ /*$('#view-report-button').click(function (event) {
 
    var weekdays=$("#days").val().toString();
     var carpark = $("#multiselect").val().toString();
@@ -140,11 +202,12 @@ $reports=new reporting_parking();
         toDate: to,
         fromDate: from,
         weekdays: weekdays,
-        carpark: carpark
+        carpark: carpark,
+		task:23
       };
       var temp = JSON.stringify(data);
-      // alert(temp);
-      $.post("../../ajax/parking.php?task=4", temp)
+       alert(temp);
+      $.post("../../ajax/reports.php", temp)
         .done(function (result) {
 
           $("#report-content").html(result);
@@ -187,8 +250,68 @@ $reports=new reporting_parking();
 
     event.preventDefault();
 
-  }); // end traffic report by day 
+  }); // end traffic report by day */
+  
 
+function loadMultipleDataTable()
+{
+	var search_label="";
+	var entries_label = "";
+	var info_label="";
+	if($("#language").val()=="Arabic")
+	{
+		search_label =  'بحث';
+		entries_label = 'عرض الإدخالات _MENU_ ';
+		info_label = 'إظهار _START_ إلى _END_ من _TOTAL_ من الإدخالات';
+		previous_label = 'السابق';
+		next_label = 'التالى';
+		
+	} 
+	else{
+		search_label = "Search";
+		entries_label = 'Show _MENU_ entries';
+		info_label = 'Showing _START_ to _END_ of _TOTAL_ entries';
+		previous_label = 'Previous';
+		next_label = 'Next';
+		
+	}
+  $("table[id^='TABLE']").DataTable(
+	  {
+	  "paging": true,
+	  "lengthChange":true,
+	  "searching": true,
+	  "ordering": true,
+	  "info": true,
+	  "autoWidth": false,
+	  "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+	  "aaSorting": [],
+		"language": {
+			search: search_label,
+		},
+		"oLanguage": {
+			"sLengthMenu": entries_label,
+			"info":info_label,
+			"oPaginate": {
+			"sPrevious": previous_label,
+			"sNext": next_label
+			}
+		},
+	  });   
+}
+  
+function loadPage()
+{
+	loadheadingreport("traffic_report");
+	if(load_report==1)
+		traffic_report(); 
+}
+$("#language").change(function(){
+	loadPage();
+}); 
+  
+$( document ).ready(function() {
+	loadheadingreport("traffic_report");
+});
   //////////////////////////////
   // excel export
   //////////////////////////////

@@ -17,8 +17,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_parking.php');
-$reports=new reporting_parking();
+//include('../../../classes/reporting_parking.php');
+//$reports=new reporting_parking();
 ?>
 
 <div class="content-wrapper">
@@ -32,7 +32,7 @@ $reports=new reporting_parking();
         <!-- carparks multiselect -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-            <?php $reports->get_carparks();?>
+           <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 

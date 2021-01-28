@@ -6,18 +6,27 @@ session_start();
 
 $logginTime = $_SESSION['last_login_timestamp'];
 
-if (time() - $logginTime > 900) {
+if (time() - $logginTime > 900) 
+    {
     //subtract new timestamp from the old one
     echo "<script>alert('Your Session Is Expired. Please Login Your Account!')  </script>";
     unset($_SESSION['username'], $_SESSION['password'], $_SESSION['last_login_timestamp']);
-
     session_destroy();
     header("location:" . URL . "index.php"); //redirect to index.php
-
     exit;
-} else {
+    } 
+else 
+    {
     $_SESSION['last_login_timestamp'] = time(); //set new timestamp
-}
+    }
+
+function getLabel($label)
+    {
+    $data["label"]=$label;
+    $data["language"] = $_SESSION["language"];
+    $data["task"]=13; 
+    echo parcxReport($data);
+    }
 
 ?>
 

@@ -18,8 +18,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_revenue.php');
-$reports=new reporting_revenue();
+//include('../../../classes/reporting_revenue.php');
+//$reports=new reporting_revenue();
 
 ?>
 
@@ -31,7 +31,7 @@ $reports=new reporting_revenue();
       <div class="modal-body">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title d-inline">Detailed Shift Information</h3>
+            <h3 class="card-title d-inline" id ="modal_title">Detailed Shift Information</h3>
             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           </div>
           <!-- /.card-header -->
@@ -57,21 +57,21 @@ $reports=new reporting_revenue();
       <!-- carparks multiselect -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-          <?php $reports->get_carparks();?>
+          <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php $reports->get_payment_devices();?>
+            <?php echo parcxSettings(array("task"=>"37"));?>
           </select>
         </div>
 
         <!-- operator -->
         <div class="col-md-2">
           <select class="form-control" id="operatormultiple"  multiple="multiple">
-            <?php $reports->get_operators();?>
+            <?php echo parcxSettings(array("task"=>"36"));?>
           </select>
         </div>
         
@@ -82,13 +82,13 @@ $reports=new reporting_revenue();
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
+            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick ="shift_report()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -124,15 +124,17 @@ $reports=new reporting_revenue();
   <section class="content">
     <div class="container-wide">
       <div class="card">
-        <div class="card-body p-0" id="shift-report-content">
+        <div class="card-body" id="report-content">
           <?php                      
           $current_date=date("Y-m-d");    
           $data["from"]=$current_date." ".DAY_CLOSURE_START;
           $data["to"]=$current_date." ".DAY_CLOSURE_END;           
           $data["carpark"]="";    
           $data["device"]="";	
-          $data["operator"]="";	                
-          $reports->shift_report($data); 
+          $data["operator"]="";	  
+		  $data["language"] = $_SESSION["language"];
+		  $data["task"]=15; 
+          echo parcxReport($data); 
           ?>         
         </div>
       </div>
@@ -146,26 +148,47 @@ $reports=new reporting_revenue();
 <?php include('../../../includes/footer.php');?>
 
 <script>
+var load_report = 0;
+
 $('body').on('click', '#shift_detail', function () 
   {
   var data={};
   data["shift_id"]=$(this).attr('shift_id');
-  data["option-type"]=7;   
+  data["task"]=16;   
+  data["language"] = $("#language").val();
   var jsondata = JSON.stringify(data);      
   console.log(jsondata);
-  $.post("../../ajax/reports-ajax.php",jsondata,function(data)
+  $.post("../../ajax/reports.php",jsondata,function(data)
     {	
-    $("#shift-detail-content").html(data);  
+    $("#shift-detail-content").html(data); 
+		load_report=1;
     })
   .fail(function(jqxhr,status,error)
     {
     alert("Error: "+error);
-    });    
+    }); 
+
+var heading = {};
+	heading["task"]=13;
+	heading["language"]=$("#language").val(); 
+	heading["label"]="detailed_shift";
+	jsondata = JSON.stringify(heading);    
+	$.post("../../ajax/reports.php",jsondata,function(data)
+	  {		
+	$("#modal_title").html(data);
+  })
+.fail(function(jqxhr,status,error)
+	  {
+  alert("Error: "+error);
+  });
+
+	
 
   }); // end click event function 
 
 
-$('#view-report-button').click(function (event) 
+//$('#view-report-button').click(function (event) 
+ function shift_report()
   { 
   if ((!daterange)) 
     {
@@ -178,13 +201,15 @@ $('#view-report-button').click(function (event)
     data["to"]=to;         
     data["carpark"]=$("#multiselect").val().toString(); 
     data["device"]=$("#deviceNumber").val().toString();  
-    data["operator"]=$("#operatormultiple").val().toString();  
-    data["option-type"]=6;   
+    data["operator"]=$("#operatormultiple").val().toString();
+	data["language"] = $("#language").val();
+    data["task"]=15;   
     var jsondata = JSON.stringify(data);      
     console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
+    $.post("../../ajax/reports.php",jsondata,function(data)
       {		
-      $("#shift-report-content").html(data);
+          load_report=1;
+      $("#report-content").html(data);
     reportSuccess();      
       })
   .fail(function(jqxhr,status,error)
@@ -195,13 +220,28 @@ $('#view-report-button').click(function (event)
   } // end if 
 
   event.preventDefault();
+  }
+//}); // end traffic report by day 
 
-}); // end traffic report by day 
+
+function loadPage()
+  {
+  loadheadingreport("shift_report");
+  if(load_report==1)
+	shift_report(); 
+  }
+$("#language").change(function(){
+  loadPage();
+}); 
+
+$( document ).ready(function() {
+	loadheadingreport("shift_report");
+});
 
   /* Excel Export */
 
   $('#export_excel_report').click(function (event) {
-    export_to_excel("#shift-report-content", "PMS_Shift_Report")
+    export_to_excel("#report-content", "PMS_Shift_Report")
   });
 
 </script>

@@ -5,7 +5,6 @@
 $userName=$_SESSION['user'];
 $userRollName=$_SESSION['userRollName'];
 $userRollId=$_SESSION['userRollId'];
-$language="english";
 
 ?>
 

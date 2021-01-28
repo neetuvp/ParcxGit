@@ -6,9 +6,6 @@ include('../../../includes/navbar-start.php');
 </ul>
 
 <div class="header text-dark" id="pdf-report-header">Payment Transactions</div>
-<!-- <input type="checkbox" name="showvoid" value="showvoid" id="showvoid"> 
-Show Void Transactions-->
-
 <?php
 
 include('../../../includes/navbar-end.php');
@@ -23,7 +20,7 @@ include('../../../includes/sidebar.php');
       <div class="modal-body">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title d-inline">Detailed Payment Information</h3>
+            <h3 class="card-title d-inline" id="modal_payment_heading">Detailed Payment Information</h3>
             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           </div>
           <!-- /.card-header -->
@@ -145,13 +142,13 @@ include('../../../includes/sidebar.php');
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
             <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-              placeholder="Choose Date and Time Range">
+              placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_date_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1 mt-3">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="payment_transactions()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -198,7 +195,8 @@ include('../../../includes/sidebar.php');
           $data["payment-type"]="";	
           $data["discount"]="";          
           $data["showvoid"]=0;   
-          $data["task"]=8;            
+          $data["task"]=8;  
+          $data["language"]=$_SESSION["language"];
           echo parcxReport($data);
           ?>
           </div>
@@ -212,28 +210,44 @@ include('../../../includes/sidebar.php');
 <script>
 var id;
 var voidClicked=false;
+var load_report = 0;
 $('body').on('click', '#payment_detail', function () 
-	{
-	if(voidClicked==false)	
-		{
-    var data={};
-    data["payment_id"]=$(this).attr('payment_id');	
-    data["option-type"]=3;	
-	  var jsondata = JSON.stringify(data);      
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
-		  {		
+    {
+    if(voidClicked==false)	
+        {
+        var data={};
+        data["payment_id"]=$(this).attr('payment_id');	
+        data["task"]=24;
+        data["language"]=$("#language").val();  
+        var jsondata = JSON.stringify(data);      
+        $.post("../../ajax/reports.php",jsondata,function(data)
+            {		
         $("#payment-detail-content").html(data);
         $('#detailModal').modal('show');
       })
     .fail(function(jqxhr,status,error)
 		  {
       alert("Error: "+error);
-      }); 		
+      }); 
+
+	var heading = {};
+		heading["task"]=13;
+		heading["language"]=$("#language").val(); 
+		heading["label"]="detailed_payment";
+		jsondata = JSON.stringify(heading);    
+		$.post("../../ajax/reports.php",jsondata,function(data)
+		  {		
+		$("#modal_payment_heading").html(data);
+	  })
+	.fail(function(jqxhr,status,error)
+		  {
+	  alert("Error: "+error);
+	  });
 		}	
   }); // end click event function 
   
-$('#view-report-button').click(function (event) 
-	{     	
+//$('#view-report-button').click(function (event) 
+function payment_transactions(){     	
   if ((!daterange)) 
 		{
 		alert("choose date range");
@@ -254,18 +268,21 @@ $('#view-report-button').click(function (event)
     else
       data["showvoid"]=0;    
     data["task"]=8;
+	data["language"]=$("#language").val();   
     var jsondata = JSON.stringify(data);  	  
     $.post("../../ajax/reports.php",jsondata,function(data)
 		  {      
       loadReport(data);    
+	  load_report=1;
       })
     .fail(function(jqxhr,status,error)
 		  {
       alert("Error: "+error);
       }); 
-		} // end if 
+} // end if 
   event.preventDefault();
-	}); // 
+	}
+	//}); // 
 
 $('#export_excel_report').click(function (event) 
 	{    
@@ -326,25 +343,40 @@ $('body').on('click', '#ok_reason', function ()
 
      
 $('body').on('click', '.btn-show-pdf-reciept', function () 
-	{
-  id = $(this).attr("data-id");   
-	voidClicked=true;
-  var data={};
-  data["payment_id"]= id;   
-  data["option-type"]=5;
-  var jsondata = JSON.stringify(data);  
-  console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
-		  {	
-      $("#pdf-receipt").html(data);  	
-      $('#pdfReceiptModal').modal('show');  
-      })
+    {
+    id = $(this).attr("data-id");   
+    voidClicked=true;
+    var data={};
+    data["payment_id"]= id;   
+    data["task"]=25;
+    data["language"]=$("#language").val();   
+    var jsondata = JSON.stringify(data);      
+    $.post("../../ajax/reports.php",jsondata,function(data)
+        {
+        $("#pdf-receipt").html(data);  	
+        $('#pdfReceiptModal').modal('show');  
+        })
     .fail(function(jqxhr,status,error)
-		  {
-      alert("Error: "+error);
-      });
-	
+        {
+        alert("Error: "+error);
+        });
 			
+    });
+	
+
+
+$("#language").change(function()
+    {	  
+    changeLanguage();    
+    loadheadingreport("payment_transactions");
+    loadMultiselect();
+    if(load_report==1)
+        payment_transactions(); 		
+    }); 
+  
+$( document ).ready(function() 
+    {
+    loadheadingreport("payment_transactions");
     });
   
 </script>

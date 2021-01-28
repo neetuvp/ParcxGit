@@ -16,8 +16,8 @@ include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
 //# App Function Classes
-include('../../../classes/reporting_revenue.php');
-$reports=new reporting_revenue();
+//include('../../../classes/reporting_revenue.php');
+//$reports=new reporting_revenue();
 ?>
 
 
@@ -32,7 +32,7 @@ $reports=new reporting_revenue();
       <!-- carparks -->
       <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-            <?php $reports->get_carparks();?>
+              <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
@@ -40,7 +40,7 @@ $reports=new reporting_revenue();
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php $reports->get_payment_devices();?>
+            <?php echo parcxSettings(array("task"=>"37"));?>
           </select>
         </div>
 
@@ -49,12 +49,7 @@ $reports=new reporting_revenue();
          <!-- options -->
          <div class="col-md-2">
           <select class="form-control" id="exception_option">
-            <option value="0">Select Exceptions</option>
-            <option value="Blacklisted">Blacklisted</option>
-            <option value="Invalid Carpark">Invalid Carpark</option>
-            <option value="Already paid chipcoin">Already paid chipcoin</option>
-			<option value="Invalid Chipcoin">Invalid Chipcoin</option>
-			<option value="Cancelled Transaction">Cancelled Transaction</option>
+            <?php echo parcxSettings(array("task"=>"39"));?>
           </select>
         </div>
 
@@ -64,13 +59,13 @@ $reports=new reporting_revenue();
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
+            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="exception_report()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -105,31 +100,33 @@ $reports=new reporting_revenue();
 
   <section class="content">
     <div class="container-wide">
-
-      <div class="col-md-12 padding-reset">
-        <div class="card" id="page-content">
-          <?php 
+		<div class="card">
+        <div class="card-body" id="report-content">          
+		<?php 
           $current_date=date("Y-m-d");    
           $data["from"]=$current_date." ".DAY_CLOSURE_START;
           $data["to"]=$current_date." ".DAY_CLOSURE_END;           
           $data["carpark"]="";    
           $data["device"]="";	                   
-          $data["exception_option"]=0;             
-          $reports->revenue_payment_exceptions($data);
-		      ?>
+          $data["exception_option"]=0;  
+		  $data["task"]=20;  
+		  $data["language"]=$_SESSION["language"];
+          echo parcxReport($data); 
+		?>
         </div>
       </div>
 
     </div>
-</div>
 </section>
 </div>
 
 <?php include('../../../includes/footer.php');?>
 
 <script>
-$('#view-report-button').click(function (event) 
-	{     	
+//$('#view-report-button').click(function (event) 
+var load_report=0;
+function exception_report()
+{     	
   if ((!daterange)) 
 		{
 		alert("choose date range");
@@ -143,26 +140,41 @@ $('#view-report-button').click(function (event)
     data["carpark"]=$("#multiselect").val().toString();    
 	  data["device"]=$("#deviceNumber").val().toString();	
     data["exception_option"]=$("#exception_option").val();	
-   
-    data["option-type"]=9;
+	data["language"] = $("#language").val();	
+    data["task"]=20;
     var jsondata = JSON.stringify(data);  
 	  console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
-		  {
-      $("#page-content").html(data);   		
+    $.post("../../ajax/reports.php",jsondata,function(data)
+	{
+      $("#report-content").html(data);  
+		load_report=1;
       reportSuccess();
-      })
+    })
     .fail(function(jqxhr,status,error)
 		  {
       alert("Error: "+error);
       }); 
 		} // end if 
   event.preventDefault();
-	}); 
+	}
+//	}); 
 
+function loadPage()
+  {
+  loadheadingreport("payment_transaction_exception");
+  if(load_report==1)
+	  exception_report(); 
+  }
 
+$( document ).ready(function() {
+	loadheadingreport("payment_transaction_exception");
+});  
+  
+$("#language").change(function(){
+  loadPage();
+});
 $('#export_excel_report').click(function (event) 
   {
-  export_to_excel("#page-content", "PMS_Payment_transaction exception")
+  export_to_excel("#report-content", "PMS_Payment_transaction exception")
   }); // end click event function
 </script>

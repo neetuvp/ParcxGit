@@ -47,13 +47,13 @@ include('../../../includes/sidebar.php');
 
         <!-- plate -->
         <div class="col-md-2">
-          <input type="text" id="ticket_id" class="form-control" placeholder="TICKET ID">
+          <input type="text" id="ticket_id" class="form-control" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"ticket_id"));?>">
         </div>        
        
 
         <!-- search -->
         <div class="col-md-1">
-          <button type="button" class="btn  btn-secondary" id="view-report-button">View details</button>
+          <button type="button" class="btn  btn-secondary" id="view-details-button" onclick="ticket_details()">View details</button>
         </div>
 
         <!-- loader -->
@@ -82,7 +82,9 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
-$('#view-report-button').click(function (event) 
+//$('#view-report-button').click(function (event) 
+var load_report = 0;
+function ticket_details()
   { 
   if ($("#ticket_id").val()=="") 
     {
@@ -91,7 +93,8 @@ $('#view-report-button').click(function (event)
   else 
     {
     var data={};            
-    data["ticket_id"]=$("#ticket_id").val();     
+    data["ticket_id"]=$("#ticket_id").val();   
+	data["language"] = $("#language").val();	
     data["task"]=9;
     var temp = JSON.stringify(data);    
     console.log(temp);  
@@ -99,20 +102,33 @@ $('#view-report-button').click(function (event)
       .done(function (result) {        
         $("#page-content").html(result);
         reportSuccess();
+		load_report=1;
 
       }, "json");
     } // end if 
 
     event.preventDefault();
+  }
+  //}); 
 
-  }); 
+function loadPage()
+  {
+  loadheadingreport("ticket_details");
+  if(load_report==1)
+	ticket_details(); 
+  }
+$("#language").change(function(){
+  loadPage();
+}); 
 
 $('#export_excel_report').click(function (event) 
   {
   export_to_excel("#page-content", "PMS_Open_Transaction_Report")
   });
 
-
+$( document ).ready(function() {
+	loadheadingreport("ticket_details");
+});
 $('body').on('click', "[data-target='#image-modal']", function () 
   {
   var name = $(this).data('value');      

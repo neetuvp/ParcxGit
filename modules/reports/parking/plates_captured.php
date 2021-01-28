@@ -52,6 +52,7 @@ $obj=new reporting_parking();
 
                 <div class="col-md-2">                    
                     <input type = "text" class="form-control" id="plate" placeholder="Plate Number" >
+					 <?php echo "<input type = 'hidden' class='form-control' id='imageurl' value=".ImageURL." >" ?>
                 </div>
 
                 <div class="col-md-1">                    
@@ -115,7 +116,7 @@ $obj=new reporting_parking();
 
                 <!-- search -->
                 <div class="col-md-1">
-                <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+                <button type="button" class="btn  btn-secondary" id="view-report-button" onclick = "plates_captured()">View Report</button>
                 </div>
 
                 <!-- loader -->
@@ -124,6 +125,25 @@ $obj=new reporting_parking();
                 </div>
 
             </div>
+			
+			<div class="additional-menu-right">
+			<div id="action-buttons">
+			  <div class="btn-group">
+				<button type="button" class="btn btn-warning">Export</button>
+				<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+				  <span class="caret"></span>
+				  <span class="sr-only">Toggle Dropdown</span>
+				</button>
+				<div class="dropdown-menu" role="menu">
+				  <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
+
+				  <a class="dropdown-item" href="#" id="export_pdf_report">
+					Export to PDF
+				  </a>
+				</div>
+			  </div>
+			</div>
+		  </div>
 
         </div>
     </div>
@@ -134,8 +154,9 @@ $obj=new reporting_parking();
 
             <!-- begin report -->
             <div class="card">
-                <div class="card-body p-0" id="plates-captured-report-content">
-
+                <div class="card-body" id="report-content">
+				<?php	$data["task"]=11;                          
+				echo parcxReport($data);?>
                 </div>
             </div>
             <!-- / end report -->
@@ -149,7 +170,11 @@ $obj=new reporting_parking();
 <?php include('../../../includes/footer.php');?>
 
 <script>
-    $('#view-report-button').click(function (event) {
+//loadheading("plates_captured");
+//loadPage();
+   // $('#view-report-button').click(function (event) {
+	function plates_captured()
+	{
         var device = $("#device").val();
         var daterange = $("#reservationtime").val();
         var from = daterange.substring(0, 19);
@@ -158,48 +183,63 @@ $obj=new reporting_parking();
         var type = $('#plate_type').val();
         var area = $('#plate_area').val();
         var country = $('#plate_country').val();
-
+		var language =$("#language").val();
+		var imageurl = $("#imageurl").val();
         if ((!daterange)) {
             alert("choose date range");
         } else {
             var data = {
                 device: device,
-                toDate: to,
-                fromDate: from,
+                to: to,
+                from: from,
                 plate: plate,
                 type: type,
                 area: area,
-                country: country
+                country: country,
+				language:language,
+				imageurl:imageurl,
+				task:12
             };
             var temp = JSON.stringify(data);
-            //alert(temp);
-            $.post("../../ajax/parking.php?task=10", temp)
+            alert(temp);
+            $.post("../../ajax/reports.php", temp)
                 .done(function (result) {                    
-                    $("#plates-captured-report-content").html(result);
-                    $("#loader").css("visibility","hidden");
+                    //$("#report-content").html(result);
+                    //$("#loader").css("visibility","hidden");
+					loadReport(result);   
                 }, "json");
         } // end if 
 
         event.preventDefault();
-
-    }); // 
+   }
+   // }); // 
 
     $('body').on('click', "[data-target='#image-modal']", function () {
     var id = $(this).data('value');
     var camera_no = $('#camera_no'+id).val();
     var plate_image = $('#plate_image'+id).val();	
     var date = $('#date'+id).val();	
+	var imageurl = $("#imageurl").val();
     var data = {
         camera_no:camera_no,
         plate_image:plate_image,
-        date:date
+        date:date,
+		imageurl:imageurl,
+		task:14
     };
     var json = JSON.stringify(data)    
-    $.post("../../ajax/parking.php?task=9", json)
+    $.post("../../ajax/reports.php", json)
     .done(function (result) {        
     $("#image-content-modal").html(result);
     }, "json");
 });
-
+function loadPage()
+  {
+  loadheadingreport("plates_captured");
+  plates_captured(); 
+  }
+$("#language").change(function(){
+  loadPage();
+}); 
 
 </script>

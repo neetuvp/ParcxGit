@@ -1,24 +1,15 @@
 <?php
 $page_title="Application Home";
-
-//# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
-
 ?>
-
 </ul>
 
 <div class="header text-dark" id="pdf-report-header">VAT Report</div>
-
 <?php
 
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-
-//# App Function Classes
-include('../../../classes/reporting_revenue.php');
-$reports=new reporting_revenue();
 ?>
 
 <!-- Modal -->
@@ -29,7 +20,7 @@ $reports=new reporting_revenue();
       <div class="modal-body">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title d-inline">Detailed Payment Information</h3>
+            <h3 class="card-title d-inline" id="modal_payment_heading">Detailed Payment Information</h3>
             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           </div>
           <!-- /.card-header -->
@@ -43,6 +34,7 @@ $reports=new reporting_revenue();
     </div>
   </div>
 </div>
+
 
 <!-- pdf receipt modal -->
 <div class="modal fade" id="pdfReceiptModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"aria-hidden="true">
@@ -80,14 +72,14 @@ $reports=new reporting_revenue();
         <!-- carparks -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-            <?php $reports->get_carparks();?>
+            <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php $reports->get_payment_devices();?>
+          <?php echo parcxSettings(array("task"=>"14","type"=>"3,4,5"));?>
           </select>
         </div>
 
@@ -115,7 +107,7 @@ $reports=new reporting_revenue();
         <!-- discounts multiple -->
         <div class="col-md-2">
           <select class="form-control" id="discounts" multiple="multiple">
-            <?php $reports->get_discounts();?>
+          <?php echo parcxSettings(array("task"=>"35"));?>
           </select>
         </div>
       
@@ -126,13 +118,13 @@ $reports=new reporting_revenue();
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
             <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-              placeholder="Choose Date and Time Range">
+              placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_date_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1 mt-3">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="payment_transactions()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -168,7 +160,7 @@ $reports=new reporting_revenue();
   <section class="content">
     <div class="container-wide"> 
       <div class="card">
-        <div class="card-body p-0" id="report-content">          
+        <div class="card-body" id="report-content">          
           <?php 
           $current_date=date("Y-m-d");    
           $data["from"]=$current_date." ".DAY_CLOSURE_START;
@@ -178,8 +170,10 @@ $reports=new reporting_revenue();
           $data["payment-category"]=[];	
           $data["payment-type"]="";	
           $data["discount"]="";          
-          $data["showvoid"]=0;         
-          $reports->revenue_vat_report($data);
+          $data["showvoid"]=0;   
+          $data["task"]=8;  
+          $data["language"]=$_SESSION["language"];
+          echo parcxReport($data);
           ?>
           </div>
         </div>
@@ -192,29 +186,44 @@ $reports=new reporting_revenue();
 <script>
 var id;
 var voidClicked=false;
+var load_report = 0;
 $('body').on('click', '#payment_detail', function () 
-	{
-	if(voidClicked==false)	
-		{
-    var data={};
-    data["payment_id"]=$(this).attr('payment_id');	
-    data["option-type"]=3;	
-	  var jsondata = JSON.stringify(data);  
-    console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
-		  {		
+    {
+    if(voidClicked==false)	
+        {
+        var data={};
+        data["payment_id"]=$(this).attr('payment_id');	
+        data["task"]=24;
+        data["language"]=$("#language").val();  
+        var jsondata = JSON.stringify(data);      
+        $.post("../../ajax/reports.php",jsondata,function(data)
+            {		
         $("#payment-detail-content").html(data);
         $('#detailModal').modal('show');
       })
     .fail(function(jqxhr,status,error)
 		  {
       alert("Error: "+error);
-      }); 		
+      }); 
+
+	var heading = {};
+		heading["task"]=13;
+		heading["language"]=$("#language").val(); 
+		heading["label"]="detailed_payment";
+		jsondata = JSON.stringify(heading);    
+		$.post("../../ajax/reports.php",jsondata,function(data)
+		  {		
+		$("#modal_payment_heading").html(data);
+	  })
+	.fail(function(jqxhr,status,error)
+		  {
+	  alert("Error: "+error);
+	  });
 		}	
   }); // end click event function 
   
-$('#view-report-button').click(function (event) 
-	{     	
+//$('#view-report-button').click(function (event) 
+function payment_transactions(){     	
   if ((!daterange)) 
 		{
 		alert("choose date range");
@@ -233,85 +242,65 @@ $('#view-report-button').click(function (event)
     if ($('#showvoid').is(':checked')) 
       data["showvoid"]=1;
     else
-      data["showvoid"]=0;
-    data["option-type"]=12;
-    var jsondata = JSON.stringify(data);  
-	  console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
-		  {
-      $("#report-content").html(data);   		
-      reportSuccess();
+      data["showvoid"]=0;    
+    data["task"]=26;
+	data["language"]=$("#language").val();   
+    var jsondata = JSON.stringify(data);  	  
+    $.post("../../ajax/reports.php",jsondata,function(data)
+		  {      
+      loadReport(data);    
+	  load_report=1;
       })
     .fail(function(jqxhr,status,error)
 		  {
       alert("Error: "+error);
       }); 
-		} // end if 
+} // end if 
   event.preventDefault();
-	}); // end traffic report by day 
+	}
+	//}); // 
 
 $('#export_excel_report').click(function (event) 
 	{    
-  export_to_excel("#report-content", "PMS_VAT_Report");
+  export_to_excel("#report-content", "PMS_Payment_transaction")
 	});
-
-
-
-$('body').on('click', '#ok_reason', function () 
-	{
-  var reason = $('#reason_text').val();
-  if (reason != "") 
-		{
-    var data={};
-    data["id"]= id;
-    data["reason"]=reason; 
-    data["option-type"]=4;
-    var jsondata = JSON.stringify(data);  
-    console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
-		  {		
-      $('#voidReasonModal').modal('hide');
-      $('#reason_text').val("");	
-			  if ((!daterange)) 					
-					{						
-					location.reload();
-					}
-				else
-					$('#view-report-button').click();  
-      })
-    .fail(function(jqxhr,status,error)
-		  {
-      alert("Error: "+error);
-      });
-		} 
-	else 
-		{
-		$('#reasonempty').html("Please enter a valid reason");
-		}
-	});
-
-
-     
-$('body').on('click', '.btn-show-pdf-reciept', function () 
-	{
-  id = $(this).attr("data-id");   
-	voidClicked=true;
-  var data={};
-  data["payment_id"]= id;   
-  data["option-type"]=5;
-  var jsondata = JSON.stringify(data);  
-  console.log(jsondata);
-    $.post("../../ajax/reports-ajax.php",jsondata,function(data)
-		  {	
-      $("#pdf-receipt").html(data);  	
-      $('#pdfReceiptModal').modal('show');  
-      })
-    .fail(function(jqxhr,status,error)
-		  {
-      alert("Error: "+error);
-      });
 	
+
+$('body').on('click', '.btn-show-pdf-reciept', function () 
+    {
+    id = $(this).attr("data-id");   
+    voidClicked=true;
+    var data={};
+    data["payment_id"]= id;   
+    data["task"]=25;
+    data["language"]=$("#language").val();   
+    var jsondata = JSON.stringify(data);      
+    $.post("../../ajax/reports.php",jsondata,function(data)
+        {
+        $("#pdf-receipt").html(data);  	
+        $('#pdfReceiptModal').modal('show');  
+        })
+    .fail(function(jqxhr,status,error)
+        {
+        alert("Error: "+error);
+        });
 			
+    });
+	
+
+
+$("#language").change(function()
+    {	  
+    changeLanguage();    
+    loadheadingreport("vat_report");
+    loadMultiselect();
+    if(load_report==1)
+        payment_transactions(); 		
+    }); 
+  
+$( document ).ready(function() 
+    {
+    loadheadingreport("vat_report");
     });
   
 </script>

@@ -1,8 +1,4 @@
 <?php
-
-$page_title="Application Home";
-
-//# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
 ?>
@@ -40,7 +36,7 @@ include('../../../includes/sidebar.php');
 
         <!-- plate -->
         <div class="col-md-2">
-          <input type="text" id="plate_number" class="form-control" placeholder="PLATE NUMBER/TICKET ID">
+          <input type="text" id="plate_number" class="form-control" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"plate_ticket"));?>">
         </div>
         <!-- date and time -->
         <div class="col-md-3">
@@ -48,13 +44,13 @@ include('../../../includes/sidebar.php');
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
+            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="parking_movement()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -110,8 +106,10 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
-$('#view-report-button').click(function (event) 
-  { 
+//$('#view-report-button').click(function (event) 
+ var load_report = 0;
+function parking_movement()
+{ 
   if ((!daterange)) 
     {
     alert("choose date range");
@@ -123,19 +121,35 @@ $('#view-report-button').click(function (event)
     data["to"]=to;           
     data["carpark"]=$("#multiselect").val().toString();    
 	  data["device"]=$("#deviceNumber").val().toString();	
-    data["plate_number"]=$("#plate_number").val(); 
+    data["plate_number"]=$("#plate_number").val();
+	data["language"] = $("#language").val();
     data["task"]=2;
     var temp = JSON.stringify(data);    
-    console.log(temp);  
+    console.log(temp); 
     $.post("../../ajax/reports.php", temp)
       .done(function (result) {        
         loadReport(result);
+		load_report = 1;
       }, "json");
     } // end if 
 
     event.preventDefault();
+}
+ // }); 
+ 
+function loadPage()
+  {
+  loadheadingreport("parking_movement");
+   if(load_report==1)
+	parking_movement(); 
+  }
+$("#language").change(function(){
+  loadPage();
+}); 
 
-  }); 
+$( document ).ready(function() {
+	loadheadingreport("parking_movement");
+});
 
   $('#export_excel_report').click(function (event) {
     export_to_excel("#report-content", "PMS_Parking_movement_Report")

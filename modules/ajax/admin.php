@@ -46,6 +46,8 @@ switch($case)
         $data=json_decode($json);
         $response=change_password($data->{"id"},$data->{"currentPassword"},$data->{"newPassword"});
         break;
+    case 12:$data=json_decode($json);
+        $response=$data->{"language"};
 }
 
 echo $response;

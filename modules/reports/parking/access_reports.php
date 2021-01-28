@@ -183,7 +183,7 @@ include('../../../includes/sidebar.php');
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="access_movements()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -243,7 +243,8 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
-$('#view-report-button').click(function (event) 
+//$('#view-report-button').click(function (event)
+function access_movements() 
   { 
   if ((!daterange)) 
     {
@@ -260,6 +261,7 @@ $('#view-report-button').click(function (event)
     data["option"]=$("#acces_option").val();
     data["user_role"]=$("#user_role").val();
     data["wiegand"]="1"; 
+	data["language"] = $("#language").val();
     data["task"]=4;
     var temp = JSON.stringify(data);    
     console.log(temp);  
@@ -271,8 +273,18 @@ $('#view-report-button').click(function (event)
     } // end if 
 
     event.preventDefault();
+  }
+  //}); 
 
-  }); 
+function loadPage()
+  {
+  loadheadingreport("access_movements");
+  access_movements(); 
+  }
+$("#language").change(function(){
+  loadPage();
+});
+
 
   $('#export_excel_report').click(function (event) {
     export_to_excel("#report-content", "PMS_Access_Report")

@@ -23,19 +23,20 @@ void writeException(string function,string message)
 
 
 
+
 Php::Value parcxReport(Php::Parameters &params)
-	{
-	Php::Value data=params[0];      
+    {
+    Php::Value data=params[0];      
     int task=data["task"];   
     Php::Value response;
     switch (task)
         {
         case 1:  pObj.openTransactionReport(data);
-		        break;
+		break;
         case 2:  pObj.parkingMovementsReport(data);
-		        break;
+		break;
         case 3:  pObj.validationReport(data);
-		        break;
+		break;
         case 4:pObj.accessReport(data);
                 break;
         case 5:pObj.trackTicket(data);
@@ -48,8 +49,46 @@ Php::Value parcxReport(Php::Parameters &params)
                 break;
         case 9:pObj.ticketDetails(data);
                 break;
-        case 10:  pObj.blacklistReport(data);
-		        break;
+        case 10:pObj.blacklistReport(data);
+		break;
+        case 11:pObj.manualmovementReport(data);
+                break;
+        case 12:pObj.platescapturedReport(data);
+                break;
+        case 13:response = pObj.getApplicationLabel(data);
+                break;
+        case 14:pObj.getanprImage(data);
+                break;
+        case 15:rObj.shiftReport(data);
+                break;
+        case 16:rObj.getshiftDetails(data);
+                        break;
+        case 17:rObj.apmrefillReport(data);
+                        break;
+        case 18:rObj.apmcashlevelsReport(data);
+                        break;
+        case 19:rObj.apmcashpayoutReport(data);
+                        break;
+        case 20:rObj.paymentexceptionReport(data);
+                        break;
+        case 21:rObj.creditcardReport(data);
+                        break;
+        case 22:rObj.revenueReport(data);
+                        break;
+        case 23:pObj.trafficReport(data);
+                        break;
+        case 24:rObj.getPaymentDetails(data);
+                        break;
+        case 25:rObj.getPdfReceipt(data);
+                        break;
+
+        case 26:rObj.vatReport(data);
+                        break;
+        case 27:pObj.watchDogDeviceAlarms(data);
+                        break;
+        case 28:pObj.watchdogNetworkLogs(data);
+                        break;
+        case  29:response=pObj.getApplicationLabels(data);
 	}
 	return response;
 	}

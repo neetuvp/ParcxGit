@@ -65,7 +65,7 @@ include('../../../includes/sidebar.php');
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="validation_report()">View Report</button>
         </div>
 
         
@@ -141,7 +141,8 @@ $(document).ready(function ()
   });
 
 
-$('#view-report-button').click(function (event) 
+//$('#view-report-button').click(function (event) 
+function validation_report()
   { 
   if ((!daterange)) 
     {
@@ -156,6 +157,7 @@ $('#view-report-button').click(function (event)
 	  data["validator"]=$("#validator").val().toString();	
     data["product"]=$("#validation_product").val().toString();	
     data["plate_number"]=$("#plate_number").val(); 
+	data["language"] = $("#language").val();
     data["task"]=3;
     var temp = JSON.stringify(data);    
     console.log(temp);  
@@ -167,9 +169,16 @@ $('#view-report-button').click(function (event)
     } // end if 
 
     event.preventDefault();
-
-  });  
-
+  }
+ // });  
+ function loadPage()
+  {
+  loadheadingreport("validation_report");
+  validation_report(); 
+  }
+$("#language").change(function(){
+  loadPage();
+});
   $('#export_excel_report').click(function (event) {
 
     export_to_excel("#report-content", "PMS_Validation_Report")

@@ -1646,7 +1646,7 @@ echo $html_data;
     
     
     //shows the parking duration report for the whole facility 
-    function show_parking_duration_report($fromdate, $todate, $carpark, $weekdays)
+function show_parking_duration_report($fromdate, $todate, $carpark, $weekdays)
     {
         $count_shortterm = array();
         $count_contract  = array();

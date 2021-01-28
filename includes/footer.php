@@ -1,126 +1,133 @@
-<script>
-  $(document).ready(function () {
+<?php 
 
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["label"]="search,entries_label,info_label,previous,next,all_carparks,select_carparks,all_parking_zone,select_parking_zone,all_devices,select_devices,all_operators,select_operators,all_category,select_category,all_payment,select_payment,all_discount,select_discount,all_days,select_days,daily,select_interval";
+$json=parcxReport($data);
+
+?>
+<script>
+var search_label="<?=$json["search"]?>";
+var entries_label = "<?=$json["entries_label"]?>";
+var info_label="<?=$json["info_label"]?>";
+previous_label = '<?=$json["previous"]?>';
+next_label = '<?=$json["next"]?>';
+$(document).ready(function () 
+    {	    
+    $("#language").val("<?php echo $_SESSION["language"]; ?>");
     // check date is selected
-    $(".applyBtn").click(function () {
-      $(this).data('clicked', true);
-    });
+    $(".applyBtn").click(function () 
+        {
+        $(this).data('clicked', true);
+        });
 
     // view report button click
-    $('#view-report-button').click(function (event) {
-      if ($('.applyBtn').data('clicked')) {
-        // only display loader if button has been clicked
-        $("#loader").css("visibility", "visible");
-      }
-    });
-
-    // initialize multiselect
-
-    // initialize carpark multiselect
-
-    $('#multiselect,#multiselect_carpark').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "All Carparks",
-      nonSelectedText: 'Select Carparks',
-      selectAllNumber: false,
-      allSelectedText: "All Carparks",
-    });
+    $('#view-report-button').click(function (event) 
+        {
+        if ($('.applyBtn').data('clicked')) 
+            {
+            // only display loader if button has been clicked
+            $("#loader").css("visibility", "visible");
+            }
+        });
     
 
-    $('#multiselect_parking_zone').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "All Parking zone",
-      nonSelectedText: 'Select Parking zone',
-      selectAllNumber: false,
-      allSelectedText: "All Parking zone",
-    });
-
-    // initialize payment devices multiselect
-
-    $('#deviceNumber').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "All Devices",
-      nonSelectedText: "Select Devices",
-      selectAllNumber: false,
-      allSelectedText: "All Devices",
-    });
-    
-
-    // initialize Operator multiselect
-
-    $('#operatormultiple').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "All Operators",
-      nonSelectedText: "Select Operators",
-      selectAllNumber: false,
-      allSelectedText: "All Operators",
-    });
-
-    // initialize payment types multiselect
-
-    $('#paymentCategory').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "All  Category",
-      nonSelectedText: "Select  Category",
-      selectAllNumber: false,
-      allSelectedText: "All  Category",
-    });
-
-    // initialize payment types multiselect
-
-    $('#paymentType').multiselect({
-    buttonWidth: '100%',
-    includeSelectAllOption: true,
-    selectAllText: "All Payment Types",
-    nonSelectedText: "Select Payment Types",
-    selectAllNumber: false,
-    allSelectedText: "All Payment Types",
-    });
-
-    // initialize discounts
-
-    $('#discounts').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "All Discounts",
-      nonSelectedText: "Select Discounts",
-      selectAllNumber: false,
-      allSelectedText: "All Discounts",
-    });
-
-    // initialize weekdays
-
-    $('#days').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "All Days of the Week",
-      nonSelectedText: 'Select Day of the Week',
-      selectAllNumber: false,
-      allSelectedText: "All Days of the Week",
-    });
-
-    $('#shedule-interval').multiselect({
-      buttonWidth: '100%',
-      includeSelectAllOption: true,
-      selectAllText: "Daily",
-      nonSelectedText: 'Select Interval',
-      selectAllNumber: false,      
-      allSelectedText: "Daily",
-    });
-    
-    $('#shedule-interval').multiselect("selectAll",false);
-    $('#shedule-interval').multiselect('updateButtonText');
+    loadMultiselect();
     
     if($("#report-content").find('#RecordsTable').length!=0) 
-      loadDataTable();
-    
+        loadDataTable();    
+    });
+             
+    function loadMultiselect()
+        {                        
+        $('#multiselect,#multiselect_carpark').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: "<?=$json["all_carparks"]?>",
+            nonSelectedText: "<?=$json["select_carparks"]?>",
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_carparks"]?>",       
+            });
+        $('#multiselect_parking_zone').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["all_parking_zone"]?>",               
+            nonSelectedText:"<?=$json["select_parking_zone"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_parking_zone"]?>"        
+        });      
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["all_devices"]?>",               
+            nonSelectedText:"<?=$json["select_devices"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_devices"]?>"  
+            });
+        $('#operatormultiple').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["all_operators"]?>",               
+            nonSelectedText:"<?=$json["select_operators"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_operators"]?>"  
+            });      
+        $('#paymentCategory').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["all_category"]?>",               
+            nonSelectedText:"<?=$json["select_category"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_category"]?>"      
+            });       
+        $('#paymentType').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["all_payment"]?>",               
+            nonSelectedText:"<?=$json["select_payment"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_payment"]?>"   
+            });     
+        $('#discounts').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["all_discount"]?>",               
+            nonSelectedText:"<?=$json["select_discount"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_discount"]?>"       
+            });       
+        $('#days').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["all_days"]?>",               
+            nonSelectedText:"<?=$json["select_days"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["all_days"]?>"   
+            });
+        $('#shedule-interval').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: "<?=$json["daily"]?>",               
+            nonSelectedText:"<?=$json["select_interval"]?>",       
+            selectAllNumber: false,
+            allSelectedText: "<?=$json["daily"]?>"       
+            });
 
-  });
+        $('#shedule-interval').multiselect("selectAll",false);
+        $('#shedule-interval').multiselect('updateButtonText');    
+        }
+  
+  
 
   // button ui changes on successful report load
   function loadReport(data)
@@ -148,35 +155,71 @@
       loadDataTable();
     }
 
-  function loadDataTable()
+
+
+function loadDataTable()
+    {    
+    $('#RecordsTable').DataTable(
+        {
+        "paging": true,
+        "lengthChange":true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        "aaSorting": [],
+        "language": {search: search_label,},
+        "oLanguage": 
+                {
+                "sLengthMenu": entries_label,
+                "info":info_label,
+                "oPaginate": 
+                        {
+                        "sPrevious": previous_label,
+                        "sNext": next_label
+                        }
+                },					            
+        });   	  
+    }
+	
+	
+function setLabel(label,element)
     {
-      $('#RecordsTable').DataTable(
-          {
-          "paging": true,
-          "lengthChange":true,
-          "searching": true,
-          "ordering": true,
-          "info": true,
-          "autoWidth": false,
-          "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-          "aaSorting": []
-          
-          });      
+    var data={};
+    data["task"]=13;
+    data["language"]=$("#language").val();
+    data["label"]=label;
+    var json = JSON.stringify(data);
+    $.post("<?=URL?>modules/ajax/reports.php",json,function(data)
+        {		      
+        $("#"+element).html(data);        
+        });     
+    }
+    
+function changeLanguage()
+    { 
+    var data={};    
+    data["language"]=$("#language").val();    
+    var json = JSON.stringify(data);
+    $.post("<?=URL?>modules/ajax/updatelanguage.php",json,function(data)
+        {        
+        console.log(data); 
+        });        
     }
 
 function loadheading(label)
-  {
-  var data={};
-  data["task"]=7;
-  data["language"]=$("#language").val();
-  data["label"]=label;
-  var json = JSON.stringify(data);
-  $.post("../ajax/dashboard-ajax.php",json,function(data)
-			{		      
-      $("#pdf-report-header").html(data);	      
-			}); 
-  }
+    {
+    setLabel(label,"pdf-report-header");
+    }
 
+
+function loadheadingreport(label)
+    {
+    setLabel(label,"pdf-report-header");
+    setLabel("view_report","view-report-button");
+    setLabel("view_details","view-details-button");
+    }
 </script>
 
 </div>
@@ -240,10 +283,6 @@ function loadheading(label)
 <script src="<?=URL?>dist/js/counter.js"></script>
 <script src="<?=URL?>dist/js/validationUsers.js"></script>
 <script src="<?=URL?>dist/js/configuration.js"></script>
-<!--<script src="ist/js/discountsettings.js"></script>
-<script src="dist/js/parkingsettings.js"></script>
-<script src="dist/js/whitelistsettings.js"></script>
-<script src="dist/js/daemonstatus.js"></script> -->
 </body>
 
 </html>

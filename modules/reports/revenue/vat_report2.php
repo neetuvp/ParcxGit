@@ -9,9 +9,7 @@ include('../../../includes/navbar-start.php');
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Payment Transactions</div>
-<!-- <input type="checkbox" name="showvoid" value="showvoid" id="showvoid"> 
-Show Void Transactions-->
+<div class="header text-dark" id="pdf-report-header">VAT Report</div>
 
 <?php
 
@@ -45,31 +43,6 @@ $reports=new reporting_revenue();
     </div>
   </div>
 </div>
-
-<!-- Modal > Void Reason -->
-<div class="modal fade text-dark" id="voidReasonModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document" id="void-reason-content">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Void Reason</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body pt-4 pl-4 pr-4">
-        <p>Reason:</p>
-        <textarea name='reason_text' id='reason_text' class="form-control mb-4"></textarea>
-        <span id="reasonempty"></span>
-      </div>
-      <div class="modal-footer">
-        <button type='button' class='btn btn-info'  id='ok_reason' value='OK'>Ok</button>
-        <button type='button' class='btn btn-info' value='Cancel' data-dismiss="modal">Cancel</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- end / Modal -->
 
 <!-- pdf receipt modal -->
 <div class="modal fade" id="pdfReceiptModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"aria-hidden="true">
@@ -107,7 +80,7 @@ $reports=new reporting_revenue();
         <!-- carparks -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-          <?php echo parcxSettings(array("task"=>"12"));?>
+            <?php $reports->get_carparks();?>
           </select>
         </div>
 
@@ -206,7 +179,7 @@ $reports=new reporting_revenue();
           $data["payment-type"]="";	
           $data["discount"]="";          
           $data["showvoid"]=0;         
-          $reports->revenue_payment_transactions($data);
+          $reports->revenue_vat_report($data);
           ?>
           </div>
         </div>
@@ -261,7 +234,7 @@ $('#view-report-button').click(function (event)
       data["showvoid"]=1;
     else
       data["showvoid"]=0;
-    data["option-type"]=2;
+    data["option-type"]=12;
     var jsondata = JSON.stringify(data);  
 	  console.log(jsondata);
     $.post("../../ajax/reports-ajax.php",jsondata,function(data)
@@ -279,26 +252,10 @@ $('#view-report-button').click(function (event)
 
 $('#export_excel_report').click(function (event) 
 	{    
-  export_to_excel("#report-content", "PMS_Payment_transaction")
+  export_to_excel("#report-content", "PMS_VAT_Report");
 	});
 
-$('body').on('click', '.btn-void-transaction', function (e) 
-	{	
-	voidClicked=true;
-  id = $(this).attr("data-id"); 
-	$('#voidReasonModal').modal('show');  
-	e.preventDefault();	
-	});
-  
-$('#voidReasonModal').on('hide.bs.modal', function (e) 
-	{
-	voidClicked=false;
-	});
-	
-$('#pdfReceiptModal').on('hide.bs.modal', function (e) 
-	{
-	voidClicked=false;
-	});
+
 
 $('body').on('click', '#ok_reason', function () 
 	{

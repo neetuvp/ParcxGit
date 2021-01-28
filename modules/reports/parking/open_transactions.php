@@ -88,7 +88,7 @@ include('../../../includes/sidebar.php');
 
         <!-- search -->
         <div class="col-md-1">
-          <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+          <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="open_transactions()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -145,7 +145,8 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
-$('#view-report-button').click(function (event) 
+//$('#view-report-button').click(function (event) 
+function open_transactions()
   { 
   if ((!daterange)) 
     {
@@ -160,6 +161,7 @@ $('#view-report-button').click(function (event)
 	  data["device"]=$("#deviceNumber").val().toString();	
     data["plate_number"]=$("#plate_number").val(); 
     data["parking_duration"]=$("#parking_duration").val(); 
+	data["language"] = $("#language").val();
     data["task"]=1;
     var temp = JSON.stringify(data);       
     $.post("../../ajax/reports.php", temp)
@@ -170,8 +172,17 @@ $('#view-report-button').click(function (event)
     } // end if 
 
     event.preventDefault();
-
-  }); 
+  }
+ // }); 
+ 
+ function loadPage()
+  {
+  loadheadingreport("open_transactions");
+  open_transactions(); 
+  }
+$("#language").change(function(){
+  loadPage();
+});
 
 $('#export_excel_report').click(function (event) 
   {

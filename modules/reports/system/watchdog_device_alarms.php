@@ -1,22 +1,23 @@
 <?php
-$page_title="Application Home";
-
-//# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["label"]="choose_datetime_range,view_report,export,export_to_excel,export_to_pdf,logout,search,entries_label,info_label,previous,next,watchdog_device_alarms,select_severity,low,high,medium,all_devices,select_devices";
+$json=parcxReport($data);
+
 ?>
-
 </ul>
-
-<div class="header text-dark" id="pdf-report-header">Watchdog Device Alarms</div>
+<input hidden id="labels" value="<?=$data["label"]?>">
+<div class="header text-dark" id="pdf-report-header"><?=$json["watchdog_device_alarms"]?></div>
 
 <?php
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-
-//# App Function Classes
-include('../../../classes/reporting_system.php');
-$reports=new reporting_system();
+$current_date=date("Y-m-d");  
+$datetime=$current_date." ".DAY_CLOSURE_START." - ".$current_date." ".DAY_CLOSURE_END;
 ?>
 
 <div class="content-wrapper">
@@ -26,116 +27,131 @@ $reports=new reporting_system();
     <div class="col d-flex pl-1 align-items-center">
 
       <div class="flex-grow-1 row additional-menu-left">
-      <!-- devices multiselect-->
-      <div class="col-md-2">
+      
+        <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php $reports->get_devices();?>
+            <?php echo parcxSettings(array("task"=>"14","type"=>"1,2,3,4,5"));?>
           </select>
         </div>
 		
-		<div class="col-md-2">
-          <select class="form-control" id="alarm-severity">
-            <option value="0">Select Severity</option>
-			<option value="between 8 and 10">Low</option>
-			<option value="between 4 and 7">Medium</option>
-			<option value="between 1 and 3">High</option>
-          </select>
+        <div class="col-md-2">
+            <select class="form-control" id="alarm-severity">
+                <option id="alarm-severity-select" value="0"><?=$json["select_severity"]?></option>
+		<option id="alarm-severity-low" value="between 8 and 10"><?=$json["low"]?></option>
+		<option id="alarm-severity-medium" value="between 4 and 7"><?=$json["medium"]?></option>
+                <option id="alarm-severity-high" value="between 1 and 3"><?=$json["high"]?></option>
+            </select>
         </div>
-        <!-- date and time -->
-        <div class="col-md-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
-            </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
-          </div>
-        </div>
-
-        <!-- search -->
-        <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- end / additional menu -->
-
-  <section class="content">
-    <div class="container-wide">
-
-      <div class="card">
-        <div class="card-body p-0" id="shift-report-content">
-          <?php 
-                   $current_date=date("Y-m-d");  
-                   $reports->watchdog_device_alarms($current_date." ".DAY_CLOSURE_START,$current_date." ".DAY_CLOSURE_END,"","0");
-                   ?>
-
-        </div>
-      </div>
-
-    </div>
-
-</div>
-</section>
+          
+    <?php include('../../../includes/additional-menu-report.php');?>   
+     
+    <section class="content">
+       <div class="container-wide">      
+         <div class="card">
+           <div class="card-body" id="report-content"> 
+             <?php
+             $data=array();  
+             $data["from"]=$current_date." ".DAY_CLOSURE_START;
+             $data["to"]=$current_date." ".DAY_CLOSURE_END;                          
+             $data["device"]="";	        
+             $data["severity"]="0"; 
+             $data["task"]=27;     
+             $data["language"]=$_SESSION["language"]; 
+             echo parcxReport($data);
+             ?>  
+           </div>
+         </div>   
+       </div>
+     </section>
 </div>
 
 <?php include('../../../includes/footer.php');?>
 
 <script>
-  $('#view-report-button').click(function (event) { // close the home page banner : control button
+from="<?=$current_date." ".DAY_CLOSURE_START?>";
+to="<?=$current_date." ".DAY_CLOSURE_END?>";
 
-    if ((!daterange)) {
-      alert("choose date range");
-    } else {
-      var data = {
-        toDate: to,
-        fromDate: from,
-        deviceNumber:$("#deviceNumber").val().toString(),
-		    severity:$("#alarm-severity").val()
-      };
-      var temp = JSON.stringify(data);
-      //alert(temp);
-      $.post("../../ajax/system.php?task=2", temp)
-        .done(function (result) {
+$(function() {
+   loadReportLabels();
+});
 
-          $("#shift-report-content").html(result);
-          reportSuccess();
-        }, "json");
-    } // end if 
-
-    event.preventDefault();
-
-  }); // end traffic report by day 
-
-  $('#export_excel_report').click(function (event) {
-
+$('#view-report-button').click(function (event) 
+    {     
+    if ((!daterange))         
+        alert("choose date range");        
+    else 
+        callReport();
+        
+    }); // end report
+    
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();
+    data["label"]=$("#labels").val();
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {		              
+        var json=JSON.parse(data);
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);
+        $("#pdf-report-header").html(json.watchdog_device_alarms);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;
+    
+        
+        $("#alarm-severity-select").html(json.select_severity); 
+        $("#alarm-severity-low").html(json.low); 
+        $("#alarm-severity-medium").html(json.medium); 
+        $("#alarm-severity-high").html(json.high);  
+                                        
+        $('#deviceNumber').multiselect('destroy');
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_devices,                                    
+            nonSelectedText:json.select_devices,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_devices             
+            });                                  
+        });    
+    }
+    
+function callReport()
+    {
+    var data={};
+    data["from"]=from;
+    data["to"]=to;           
+    data["severity"]=$("#alarm-severity").val();    
+    data["device"]=$("#deviceNumber").val().toString();	        
+    data["language"] = $("#language").val();
+    data["task"]=27;          
+    var temp = JSON.stringify(data);      
+    $.post("../../ajax/reports.php", temp)
+        .done(function (result) 
+            {
+            loadReport(result);                
+            }, "json");
+    
+    }
+    
+$("#language").change(function()
+    {
+    loadReportLabels();    
+    callReport();
+    });
+    
+$('#export_excel_report').click(function (event) 
+    {
     export_to_excel("#shift-report-content", "PMS_watchdog_device_alarm_Report")
-
-  }); // end click event function
+    }); // end click event function
 </script>

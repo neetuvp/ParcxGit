@@ -22,34 +22,7 @@ include('../../../classes/reporting_parking.php');
 $reports=new reporting_parking();
 ?>
 
-<!-- Modal -->
-<div class="modal fade text-dark" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-body">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"> Detailed Shift Information </h3>
-          </div>
-          <!-- /.card-header -->
-          <div class="card-body p-0">
-            <table class="table table-condensed" id="shift-detail-content">
 
-
-
-            </table>
-          </div>
-          <!-- /.card-body -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Export PDF</button> -->
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="content-wrapper">
 
@@ -62,7 +35,8 @@ $reports=new reporting_parking();
         <!-- carparks -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
-            <?php $reports->get_carparks();?>
+          
+		   <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
@@ -87,7 +61,7 @@ $reports=new reporting_parking();
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="manual_movement()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -124,18 +98,25 @@ $reports=new reporting_parking();
     <div class="container-wide">
 
       <div class="card">
-        <div class="card-body p-0" id="manual-movements-report-content">
+        <div class="card-body" id="report-content">
 
           <?php 
-                  $current_date=date("Y-m-d");  
-                   $reports->get_manual_movements_report($current_date." ".DAY_CLOSURE_START,$current_date." ".DAY_CLOSURE_END,[],[]);?>
+                  //$current_date=date("Y-m-d");  
+                   //$reports->get_manual_movements_report($current_date." ".DAY_CLOSURE_START,$current_date." ".DAY_CLOSURE_END,[],[]);
+				 $current_date=date("Y-m-d");    
+				$data["from"]=$current_date." ".DAY_CLOSURE_START;
+				$data["to"]=$current_date." ".DAY_CLOSURE_END;           
+				$data["carpark"]="";  
+				$data["operation"]="";  
+				$data["task"]=11;                          
+				echo parcxReport($data);
+			?>
+				   
 
         </div>
       </div>
 
     </div>
-
-</div>
 </section>
 </div>
 
@@ -143,37 +124,49 @@ $reports=new reporting_parking();
 
 <script>
 
-  $('#view-report-button').click(function (event) { // close the home page banner : control button
-
-    var carpark = $("#multiselect").val();
+ // $('#view-report-button').click(function (event) { // close the home page banner : control button
+	function manual_movement(){
+    var carpark =$("#multiselect").val().toString(); 
     var operation = $("#operation").val();
-
+	var language =$("#language").val();
     if ((!daterange)) {
       alert("choose date range");
     } else {
       var data = {
         carpark: carpark,
         operation: operation,
-        toDate: to,
-        fromDate: from
+        to: to,
+        from: from,
+		language:language,
+		task:11
       };
-      var temp = JSON.stringify(data);
-      //alert(temp);
-      $.post("../../ajax/parking.php?task=1", temp)
-        .done(function (result) {
-
-          $("#manual-movements-report-content").html(result);
-          reportSuccess()
-        }, "json");
-    } // end if 
-
-    event.preventDefault();
-
-  }); // end traffic report by day 
+      var jsondata = JSON.stringify(data);  	  
+    $.post("../../ajax/reports.php",jsondata,function(data)
+		  {      
+      loadReport(data);   
+		//$("#report-content").html(data);
+      })
+    .fail(function(jqxhr,status,error)
+		  {
+      alert("Error: "+error);
+      }); 
+		} // end if 
+  event.preventDefault();
+	//}); //manual movements-report-content
+	}
 
   $('#export_excel_report').click(function (event) {
 
-    export_to_excel("#manual-movements-report-content", "PMS_Manual_Movements_Report")
+    export_to_excel("#report-content", "PMS_Manual_Movements_Report")
 
   }); // end click event function
+  
+  function loadPage()
+  {
+	loadheadingreport("manual_movement");
+	manual_movement(); 
+  }
+$("#language").change(function(){
+  loadPage();
+}); 
 </script>

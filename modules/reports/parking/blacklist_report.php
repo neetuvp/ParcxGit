@@ -17,6 +17,9 @@ include('../../../includes/navbar-start.php');
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
+//# App Function Classes
+include('../../../classes/reporting_parking.php');
+$reports=new reporting_parking();
 ?>
 
 
@@ -43,13 +46,13 @@ include('../../../includes/sidebar.php');
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="far fa-clock"></i></span>
             </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
+            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
           </div>
         </div>
 
         <!-- search -->
         <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button">View Report</button>
+        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="blacklist_report()">View Report</button>
         </div>
 
         <!-- loader -->
@@ -90,7 +93,8 @@ include('../../../includes/sidebar.php');
         $current_date=date("Y-m-d");    
         $data["from"]=$current_date." ".DAY_CLOSURE_START;
         $data["to"]=$current_date." ".DAY_CLOSURE_END;           
-        $data["carpark"]="";            
+        $data["carpark"]="";   
+		$data["language"]=$_SESSION["language"];   		
         $data["task"]=10;                          
         echo parcxReport($data);
         ?>  
@@ -104,8 +108,10 @@ include('../../../includes/sidebar.php');
 
 <script>
 
-$('#view-report-button').click(function (event) 
-	{     	
+//$('#view-report-button').click(function (event) 
+var load_report = 0;
+function blacklist_report()
+{     	
   if ((!daterange)) 
 		{
 		alert("choose date range");
@@ -116,12 +122,14 @@ $('#view-report-button').click(function (event)
     var data={};
     data["from"]=from;
     data["to"]=to;           
-    data["carpark"]=$("#multiselect").val().toString();    	 
+    data["carpark"]=$("#multiselect").val().toString(); 
+	data["language"] = $("#language").val();
     data["task"]=10;
     var jsondata = JSON.stringify(data);  	  
     $.post("../../ajax/reports.php",jsondata,function(data)
 		  {      
       loadReport(data);    
+	  load_report = 1;
       })
     .fail(function(jqxhr,status,error)
 		  {
@@ -129,7 +137,22 @@ $('#view-report-button').click(function (event)
       }); 
 		} // end if 
   event.preventDefault();
-	}); // 
+}
+
+function loadPage()
+  {
+  loadheadingreport("blacklist_report");
+  if(load_report==1)
+	blacklist_report(); 
+  }
+$("#language").change(function(){
+  loadPage();
+}); 
+
+$( document ).ready(function() {
+	loadheadingreport("blacklist_report");
+});
+	//}); // 
 
   $('#export_excel_report').click(function (event) {
     export_to_excel("#report-content", "PMS_Blacklist_Report")

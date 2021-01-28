@@ -22,47 +22,11 @@ define ("COLUMN","Parktron");
 define("ImageURL","http://".$_SERVER['SERVER_NAME']."/ANPR/Images");
 session_start();
 
-//Database Connection .END -------------------//
-
-//$userName=$_SESSION['user'];
-//$userType=$_SESSION['user_type'];
-     
-//    function isAdmin()
-//    {
-//        if (isset($_SESSION['user']) && $_SESSION['user_type'] == 'admin' ) {
-//
-//                return true;
-//        }
-//        else{
-//                return false;
-//        }
-//    }
-//
-//    if (!isAdmin())
-//    {
-//            $_SESSION['msg'] = "You must log in first";
-//            header("location: index.php");
-//    }
-//
     if (isset($_GET['logout']))
     {
         session_destroy();
         unset($_SESSION['user']);
         header("location: index.php");
     }
-//    
-//
-//    if(time() - $_SESSION['last_login_timestamp'] > 900) { //subtract new timestamp from the old one
-//    echo"<script>alert('15 Minutes over!');</script>";
-//    unset($_SESSION['username'], $_SESSION['password'], $_SESSION['timestamp']);
-//    $_SESSION['logged_in'] = false;
-//    session_destroy();
-//    header("location: index.php"); //redirect to index.php
-//    exit;
-//    } 
-//    else {
-//    $_SESSION['last_login_timestamp'] = time(); //set new timestamp
-//    }
-        
         
 ?>
