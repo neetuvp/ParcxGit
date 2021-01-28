@@ -151,7 +151,20 @@ Php::Value getLabels(string lang,string label)
 Php::Value ParkingReport::getApplicationLabels(Php::Value data)
     {
     string lang=data["language"];  
+    int page=data["page"];                
     string label=data["label"];    
+    if(page>0)
+        {
+        string reportlabels="choose_datetime_range,view_report,export,export_to_excel,export_to_pdf,logout,search,entries_label,info_label,previous,next,";
+        switch(page)
+            {
+            case 1://"watchdog_device_alarms"
+                    label=reportlabels+"watchdog_device_alarms,select_severity,low,high,medium,all_devices,select_devices";
+                    break;
+            case 2 ://payment_transactions
+                label=reportlabels+"payment_transactions,detailed_payment,receipt_details,close,print,tax_invoice,cash,credit_card,parking_fee,lost_ticket,discount,grace_period,product_sales,all_devices,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
+            }
+        }
     return  getLabels(lang,label);
     }
 

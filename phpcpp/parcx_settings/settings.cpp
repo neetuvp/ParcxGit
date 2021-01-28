@@ -355,15 +355,15 @@ Php::Value insertUpdateCarpark(Php::Value json)
             {
             if(ToString(json["id"])=="")    
                 {
-                prep_stmt = con->prepareStatement("insert into system_carparks(facility_number,facility_name,carpark_number,carpark_name,total_spaces ,occupancy_threshold,reservation_spaces,access_spaces,shortterm_spaces,user_id,status) values(?,?,?,?,?,?,?,?,?,?,1)");
-                prep_stmt->setString(10, ToString(json["user_id"]));       
+                prep_stmt = con->prepareStatement("insert into system_carparks(facility_number,facility_name,carpark_number,carpark_name,total_spaces ,occupancy_threshold,reservation_spaces,access_spaces,shortterm_spaces,user_id,rate_type,rate_plan,reservation_rate_plan,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
+                prep_stmt->setString(13, ToString(json["user_id"]));       
                 }
             else
                 {
-                prep_stmt = con->prepareStatement("update system_carparks set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,total_spaces=?,occupancy_threshold=?,reservation_spaces=?,access_spaces=?,shortterm_spaces=? where carpark_id=?");    
-                prep_stmt->setString(10, ToString(json["id"]));       
+                prep_stmt = con->prepareStatement("update system_carparks set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,total_spaces=?,occupancy_threshold=?,reservation_spaces=?,access_spaces=?,shortterm_spaces=?,rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_id=?");    
+                prep_stmt->setString(13, ToString(json["id"]));       
                 }
-                                        
+            
             prep_stmt->setString(1, ToString(json["facility_number"]));
             prep_stmt->setString(2, ToString(json["facility_name"]));               
             prep_stmt->setString(3, ToString(json["carpark_number"]));
@@ -372,7 +372,10 @@ Php::Value insertUpdateCarpark(Php::Value json)
             prep_stmt->setString(6, ToString(json["occupancy_threshold"]));
             prep_stmt->setString(7, ToString(json["reservation_spaces"]));
             prep_stmt->setString(8, ToString(json["access_spaces"]));            
-            prep_stmt->setString(9, ToString(json["shortterm_spaces"]));            
+            prep_stmt->setString(9, ToString(json["shortterm_spaces"]));   
+            prep_stmt->setString(10, ToString(json["rate_type"]));   
+            prep_stmt->setString(11, ToString(json["rate_plan"]));   
+            prep_stmt->setString(12, ToString(json["reservation_rate_plan"]));   
                     
             if (!prep_stmt->execute())
                 {

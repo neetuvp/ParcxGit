@@ -5,12 +5,11 @@ include('../../../includes/navbar-start.php');
 $data=array();
 $data["task"]=29;     
 $data["language"]=$_SESSION["language"];
-$data["label"]="choose_datetime_range,view_report,export,export_to_excel,export_to_pdf,logout,search,entries_label,info_label,previous,next,watchdog_device_alarms,select_severity,low,high,medium,all_devices,select_devices";
+$data["page"]=1;
 $json=parcxReport($data);
 
 ?>
 </ul>
-<input hidden id="labels" value="<?=$data["label"]?>">
 <div class="header text-dark" id="pdf-report-header"><?=$json["watchdog_device_alarms"]?></div>
 
 <?php
@@ -51,8 +50,8 @@ $datetime=$current_date." ".DAY_CLOSURE_START." - ".$current_date." ".DAY_CLOSUR
            <div class="card-body" id="report-content"> 
              <?php
              $data=array();  
-             $data["from"]=$current_date." ".DAY_CLOSURE_START;
-             $data["to"]=$current_date." ".DAY_CLOSURE_END;                          
+             $data["from"]=$current_date;
+             $data["to"]=$current_date;                          
              $data["device"]="";	        
              $data["severity"]="0"; 
              $data["task"]=27;     
@@ -72,7 +71,15 @@ from="<?=$current_date." ".DAY_CLOSURE_START?>";
 to="<?=$current_date." ".DAY_CLOSURE_END?>";
 
 $(function() {
-   loadReportLabels();
+    $('#deviceNumber').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_devices"]?>",               
+        nonSelectedText:"<?=$json["select_devices"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_devices"]?>"  
+        });
 });
 
 $('#view-report-button').click(function (event) 
@@ -88,8 +95,8 @@ function loadReportLabels()
     {
     var data={};
     data["task"]=29;
-    data["language"]=$("#language").val();
-    data["label"]=$("#labels").val();
+    data["language"]=$("#language").val();    
+    data["page"]=1;
     var json = JSON.stringify(data);
     $.post("../../ajax/reports.php",json,function(data)
         {		              
@@ -152,6 +159,6 @@ $("#language").change(function()
     
 $('#export_excel_report').click(function (event) 
     {
-    export_to_excel("#shift-report-content", "PMS_watchdog_device_alarm_Report")
+    export_to_excel("#report-content", "PMS_watchdog_device_alarm_Report")
     }); // end click event function
 </script>

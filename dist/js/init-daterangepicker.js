@@ -44,12 +44,6 @@ var to
 // save from/to values for report
 $('#reservationtime').on('apply.daterangepicker', function (ev, picker) 
     {
-    chooseDateTimePicker();
-    });
-
-function chooseDateTimePicker()
-    {
-    console.log("hai");    
     daterange = $("#reservationtime").val();
 
     if ($.inArray(pageName, pageList) != -1) 
@@ -62,5 +56,5 @@ function chooseDateTimePicker()
         {
         from = daterange.substring(0, 19);
         to = daterange.substring(22, 41);
-        }    
-    }
+        } 
+    });

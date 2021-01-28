@@ -13,6 +13,7 @@ var entries_label = "<?=$json["entries_label"]?>";
 var info_label="<?=$json["info_label"]?>";
 previous_label = '<?=$json["previous"]?>';
 next_label = '<?=$json["next"]?>';
+
 $(document).ready(function () 
     {	    
     $("#language").val("<?php echo $_SESSION["language"]; ?>");
