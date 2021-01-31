@@ -40,6 +40,16 @@ $('#country').on('input', function ()
 
 $(document).ready(function () 
   {
+       $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: "All carparks",
+            nonSelectedText: "Select carparks",
+            selectAllNumber: false,
+            allSelectedText: "Select carparks",       
+            });
+            
     
     $('#whitelist-active-date').daterangepicker({
         timePicker: false,

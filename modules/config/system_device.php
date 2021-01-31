@@ -91,7 +91,7 @@ include('../../includes/sidebar.php');
                 </div> 
               </div>               
               <div class="div-rate div-device">
-              <div class="row">	
+              <!--<div class="row">
                 <div class="col form-group">
                   <label for="">Rate Type</label>
                   <select id="rate_type"> 
@@ -99,21 +99,21 @@ include('../../includes/sidebar.php');
                     <option value="2">Fixed Rate</option>     
                   </select>
                 </div> 
-					      <div class="col form-group">
+                <div class="col form-group">
                   <label for="">Rate Plan</label>
                   <select id="rate_plan">                  
-                    <?php echo parcxSettings(array("task"=>"13"));?>
+                    <?php //echo parcxSettings(array("task"=>"13"));?>
                   </select>
                 </div>                 
-              </div> 
+              </div> -->	
               <div class="row">						     
-                <div class="col form-group">
+<!--                <div class="col form-group">
                   <label for="">Reservation Rate Plan</label>
                   <select id="reservation_rate_plan"> 
                     <option value="">Select Reservation Rate Plan</option>                 
-                    <?php echo parcxSettings(array("task"=>"13"));?>
+                    <?php //echo parcxSettings(array("task"=>"13"));?>
                   </select>
-                </div> 
+                </div> -->
                 <div class="col form-group">
                     <label for="">Server handshake interval</label>
                     <input type="number" class="form-control" id="server_handshake_interval" value="90"  required >                    
@@ -330,7 +330,17 @@ $("#device_category").change(function()
 
 $(document).ready(function () 
   {
-    loadDataTable() ;   
+   $('#RecordsTable').DataTable(
+    {
+    "paging": true,
+    "lengthChange":true,
+    "searching": true,
+    "ordering": true,
+    "info": true,
+    "autoWidth": false,
+    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    "aaSorting": []
+    }); 
   $("#device_category").change();     
   $("* [data-target]").on('click', function () 
     {    
@@ -392,11 +402,11 @@ $(document).ready(function ()
             data["device_number"]=$("#device_number").val(); 
             data["device_name"]=$("#device_name").val(); 
             data["device_ip"]=$("#device_ip").val(); 
-            data["rate_type"]=$("#rate_type").val(); 
-            data["rate_plan"]=$("#rate_plan").val(); 
+//            data["rate_type"]=$("#rate_type").val(); 
+//            data["rate_plan"]=$("#rate_plan").val(); 
             data["camera_id"]=$("#camera_id").val(); 
             data["camera_index"]=$("#camera_index").val(); 
-            data["reservation_rate_plan"]=$("#reservation_rate_plan").val(); 
+//            data["reservation_rate_plan"]=$("#reservation_rate_plan").val(); 
 
             data["server_handshake_interval"]=$("#server_handshake_interval").val(); 
             data["device_function"]=$("#device_function").val(); 
@@ -557,9 +567,9 @@ $(document).on("click", ".device-edit", function()
       $("#device_ip").val(response.device_ip);
       $("#facility").val(response.facility_number);
       $("#multiselect").val(response.carpark_number);      
-      $("#rate_type").val(response.rate_type);
-      $("#rate_plan").val(response.rate_plan);
-      $("#reservation_rate_plan").val(response.reservation_rate_plan);  
+//      $("#rate_type").val(response.rate_type);
+//      $("#rate_plan").val(response.rate_plan);
+//      $("#reservation_rate_plan").val(response.reservation_rate_plan);  
       $("#camera_id").val(response.camera_id);   
       $("#camera_index").val(response.camera_index);
       $("#server_handshake_interval").val(response.server_handshake_interval);

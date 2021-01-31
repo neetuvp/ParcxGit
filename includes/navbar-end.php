@@ -12,7 +12,7 @@
     <li class="nav-item">       
         <a href="<?=URL;?>index.php?logout='1'" class="btn btn-info logout-button">
             <i class="fas fa-sign-out-alt mr-1"></i>
-            <span id="logout"><?=$json["logout"]?></span>
+            <span id="logout"><?= isset($json["logout"])?$json["logout"]:"Logout";?></span>
         </a>
     </li>
 </ul>

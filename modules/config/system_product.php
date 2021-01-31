@@ -213,7 +213,28 @@ function multislect()
 
 $(document).ready(function () 
   {
-    loadDataTable() ;
+    $('#RecordsTable').DataTable(
+        {
+        "paging": true,
+        "lengthChange":true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        "aaSorting": []
+
+        }); 
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "All carparks",
+        nonSelectedText: "Select carparks",
+        selectAllNumber: false,
+        allSelectedText: "Select carparks",       
+        });
+            
     $('#start_date,#expiry_date,#start_date_validation,#expiry_date_validation').daterangepicker({
         timePicker: false,
         timePickerIncrement: 10,

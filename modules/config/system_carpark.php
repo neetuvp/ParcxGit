@@ -135,7 +135,18 @@ include('../../includes/sidebar.php');
     var previous_facility;
     $(document).ready(function ()
     {
-        loadDataTable();
+    $('#RecordsTable').DataTable(
+        {
+        "paging": true,
+        "lengthChange":true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        "aaSorting": []
+
+        });  
         $("* [data-target]").on('click', function ()
         {
             var $target = $(this).data('target');
@@ -196,7 +207,11 @@ include('../../includes/sidebar.php');
                 data["shortterm_spaces"] = $("#shortterm_spaces").val();
                 data["facility_name"] = $("#facility option:selected").text();
                 data["user_id"] = $("#user_id").val();
+                data["rate_type"]=$("#rate_type").val(); 
+                data["rate_plan"]=$("#rate_plan").val();
+                data["reservation_rate_plan"]=$("#reservation_rate_plan").val(); 
                 data["task"] = "6";
+                
                 var jsondata = JSON.stringify(data);
                 console.log(jsondata);
                 $.post("../../modules/ajax/settings.php", jsondata, function (result) {
@@ -264,6 +279,9 @@ include('../../includes/sidebar.php');
             $("#reservation_spaces").val(response.reservation_spaces);
             $("#access_spaces").val(response.access_spaces);
             $("#shortterm_spaces").val(response.shortterm_spaces);
+            $("#rate_type").val(response.rate_type);
+            $("#rate_plan").val(response.rate_plan);
+            $("#reservation_rate_plan").val(response.reservation_rate_plan);  
             $("#add-edit-button").val("Edit");
             previous_carpark = response.carpark_number;
             previous_facility = response.facility_number;

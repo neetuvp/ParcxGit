@@ -216,21 +216,7 @@ Php::Value insertUpdateMaintenanceSettings(Php::Value json)
     string msg = "Failed";    
     try
         {
-        con= General.mysqlConnect(ServerDB);
-        if(ToString(json["id"])=="")
-            {
-            prep_stmt = con->prepareStatement("select * from device_maintenance where setting_label=?");                
-            prep_stmt->setString(1, ToString(json["setting_name"]));
-            res=prep_stmt->executeQuery();
-            if(res->next())
-                {
-                msg = "Settings already exist";   
-                delete prep_stmt;
-                delete res; 
-                delete con;  
-                return msg;
-                }
-            }                
+        con= General.mysqlConnect(ServerDB);                   
         if(ToString(json["id"])=="")    
             {
             prep_stmt = con->prepareStatement("insert into device_maintenance(setting_value,setting_name,enabled) values(?,?,1)");                
@@ -268,14 +254,12 @@ Php::Value updateCloudUploadSettings(Php::Value json)
         {
         con= General.mysqlConnect(ServerDB);
                        
-		prep_stmt = con->prepareStatement("update pxcloud_upload_settings set day_closure=?,time_interval=?,upload_row_limit=?,task=? where id=?");
-		prep_stmt->setString(5, ToString(json["id"]));
-            
-        
+        prep_stmt = con->prepareStatement("update pxcloud_upload_settings set day_closure=?,time_interval=?,upload_row_limit=? where id=?");        
+
         prep_stmt->setString(1, ToString(json["dc"]));   
-		prep_stmt->setString(2, ToString(json["interval"]));   
-		prep_stmt->setString(3, ToString(json["limit"]));   
-		prep_stmt->setString(4, ToString(json["cloudtask"]));           
+        prep_stmt->setString(2, ToString(json["interval"]));   
+        prep_stmt->setString(3, ToString(json["limit"]));   		
+        prep_stmt->setString(4, ToString(json["id"]));
         
         if (!prep_stmt->execute())
             {
@@ -301,14 +285,12 @@ Php::Value updateCloudDownloadSettings(Php::Value json)
         {
         con= General.mysqlConnect(ServerDB);
                        
-		prep_stmt = con->prepareStatement("update pxcloud_download_settings set day_closure=?,time_interval=?,download_row_limit=?,task=? where id=?");
-		prep_stmt->setString(5, ToString(json["id"]));
-            
+	prep_stmt = con->prepareStatement("update pxcloud_download_settings set day_closure=?,time_interval=?,download_row_limit=? where id=?");	            
         
         prep_stmt->setString(1, ToString(json["dc"]));   
-		prep_stmt->setString(2, ToString(json["interval"]));   
-		prep_stmt->setString(3, ToString(json["limit"]));   
-		prep_stmt->setString(4, ToString(json["cloudtask"]));           
+	prep_stmt->setString(2, ToString(json["interval"]));   
+	prep_stmt->setString(3, ToString(json["limit"]));   		      
+        prep_stmt->setString(4, ToString(json["id"]));
         
         if (!prep_stmt->execute())
             {
@@ -332,58 +314,82 @@ Php::Value insertUpdateCarpark(Php::Value json)
     string msg = "Failed";    
     try
         {
+        string id=json["id"];
+        int facility_number=json["facility_number"];
+        int carpark_number=json["carpark_number"];        
+        string user_id=json["user_id"];
+        string facility_name=json["facility_name"];
+        string carpark_name=json["carpark_name"];
+        string total_spaces=json["total_spaces"];
+        string occupancy_threshold=json["occupancy_threshold"];
+        string reservation_spaces=json["reservation_spaces"];
+        string access_spaces=json["access_spaces"];
+        string shortterm_spaces=json["shortterm_spaces"];
+        string rate_type=json["rate_type"];
+        string rate_plan=json["rate_plan"];
+        string reservation_rate_plan=json["reservation_rate_plan"];
+        
         
         con= General.mysqlConnect(ServerDB);
-        if(ToString(json["id"])=="")
+        if(id=="")
             prep_stmt = con->prepareStatement("select * from system_carparks where facility_number=? and carpark_number=?");
         else
             {
             prep_stmt = con->prepareStatement("select * from system_carparks where facility_number=? and carpark_number=? and carpark_id!=?");
-            prep_stmt->setString(3, ToString(json["id"])); 
+            prep_stmt->setString(3, id); 
             }
         
-        prep_stmt->setString(1, ToString(json["facility_number"]));
-        prep_stmt->setString(2, ToString(json["carpark_number"]));
+        prep_stmt->setInt(1, facility_number);
+        prep_stmt->setInt(2, carpark_number);
         res=prep_stmt->executeQuery();
         if(res->next())
             {
-            msg = "Carpark number already exist in "+ToString(json["facility_name"])+".Try with another carpark number";   
+            msg = "Carpark number already exist in "+facility_name+".Try with another carpark number";   
             delete prep_stmt;
             delete res;             
             }
         else
             {
-            if(ToString(json["id"])=="")    
+            if(id=="")    
                 {
                 prep_stmt = con->prepareStatement("insert into system_carparks(facility_number,facility_name,carpark_number,carpark_name,total_spaces ,occupancy_threshold,reservation_spaces,access_spaces,shortterm_spaces,user_id,rate_type,rate_plan,reservation_rate_plan,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
-                prep_stmt->setString(13, ToString(json["user_id"]));       
+                prep_stmt->setString(13, user_id);       
                 }
             else
                 {
                 prep_stmt = con->prepareStatement("update system_carparks set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,total_spaces=?,occupancy_threshold=?,reservation_spaces=?,access_spaces=?,shortterm_spaces=?,rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_id=?");    
-                prep_stmt->setString(13, ToString(json["id"]));       
+                prep_stmt->setString(13, id);       
                 }
             
-            prep_stmt->setString(1, ToString(json["facility_number"]));
-            prep_stmt->setString(2, ToString(json["facility_name"]));               
-            prep_stmt->setString(3, ToString(json["carpark_number"]));
-            prep_stmt->setString(4, ToString(json["carpark_name"]));
-            prep_stmt->setString(5, ToString(json["total_spaces"]));
-            prep_stmt->setString(6, ToString(json["occupancy_threshold"]));
-            prep_stmt->setString(7, ToString(json["reservation_spaces"]));
-            prep_stmt->setString(8, ToString(json["access_spaces"]));            
-            prep_stmt->setString(9, ToString(json["shortterm_spaces"]));   
-            prep_stmt->setString(10, ToString(json["rate_type"]));   
-            prep_stmt->setString(11, ToString(json["rate_plan"]));   
-            prep_stmt->setString(12, ToString(json["reservation_rate_plan"]));   
+            prep_stmt->setInt(1, facility_number);
+            prep_stmt->setString(2, facility_name);               
+            prep_stmt->setInt(3, carpark_number);
+            prep_stmt->setString(4, carpark_name);
+            prep_stmt->setString(5, total_spaces);
+            prep_stmt->setString(6, occupancy_threshold);
+            prep_stmt->setString(7, reservation_spaces);
+            prep_stmt->setString(8, access_spaces);            
+            prep_stmt->setString(9, shortterm_spaces);   
+            prep_stmt->setString(10, rate_type);   
+            prep_stmt->setString(11, rate_plan);   
+            prep_stmt->setString(12, reservation_rate_plan);   
                     
             if (!prep_stmt->execute())
                 {
                 msg = "Successfull";
+                
+                prep_stmt = con->prepareStatement("update system_devices set rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_number=? and facility-number=?");
+                prep_stmt->setString(1, rate_type);   
+                prep_stmt->setString(2, rate_plan);   
+                prep_stmt->setString(3, reservation_rate_plan);   
+                prep_stmt->setInt(4, carpark_number);  
+                prep_stmt->setInt(5, facility_number);  
+                prep_stmt->executeUpdate();
+                delete prep_stmt;
+            
                 facilityFlag=false;
-                carparkFlag=false;	
-                carpark_number=json["carpark_number"];
-                facility_number=json["facility_number"];
+                carparkFlag=false;	                               
+                
                 dcon=General.mysqlConnect(DashboardDB);
                 prep_stmt = dcon->prepareStatement("select * from counters where facility_number="+ToString(json["previous_facility"]));
                 res=prep_stmt->executeQuery();
@@ -399,7 +405,7 @@ Php::Value insertUpdateCarpark(Php::Value json)
                 if(carparkFlag==false)
                     {
                     prep_stmt = dcon->prepareStatement("insert into counters(facility_number,carpark_number,carpark_name,total_spaces,occupancy_threshold,total_reservation_spaces,total_access_spaces,total_shortterm_spaces,dashboard_order,counter_type)values(?,?,?,?,?,?,?,?,?,1)");                    
-                    prep_stmt->setString(9, ToString(json["carpark_number"]));
+                    prep_stmt->setInt(9, carpark_number);
                     }
                 else
                     {
@@ -407,14 +413,14 @@ Php::Value insertUpdateCarpark(Php::Value json)
                     prep_stmt->setString(9, ToString(json["previous_carpark"]));
                     prep_stmt->setString(10, ToString(json["previous_facility"]));
                     }
-                prep_stmt->setString(1, ToString(json["facility_number"]));                             
-                prep_stmt->setString(2, ToString(json["carpark_number"]));
-                prep_stmt->setString(3, ToString(json["carpark_name"]));
-                prep_stmt->setString(4, ToString(json["total_spaces"]));
-                prep_stmt->setString(5, ToString(json["occupancy_threshold"]));
-                prep_stmt->setString(6, ToString(json["reservation_spaces"]));
-                prep_stmt->setString(7, ToString(json["access_spaces"]));            
-                prep_stmt->setString(8, ToString(json["shortterm_spaces"]));                 
+                prep_stmt->setInt(1, facility_number);                             
+                prep_stmt->setInt(2, carpark_number);
+                prep_stmt->setString(3, carpark_name);
+                prep_stmt->setString(4, total_spaces);
+                prep_stmt->setString(5, occupancy_threshold);
+                prep_stmt->setString(6, reservation_spaces);
+                prep_stmt->setString(7, access_spaces);            
+                prep_stmt->setString(8, shortterm_spaces);                 
                 prep_stmt->executeUpdate();
 
                 delete prep_stmt;
@@ -427,15 +433,15 @@ Php::Value insertUpdateCarpark(Php::Value json)
                     if(facilityFlag==false)
                         {
                         prep_stmt = dcon->prepareStatement("insert into counters(facility_number,carpark_name,total_spaces,total_reservation_spaces,total_access_spaces,total_shortterm_spaces,dashboard_order,counter_type)values(?,?,?,?,?,?,?,0)");                    
-                        prep_stmt->setString(7, ToString(json["facility_number"]));
+                        prep_stmt->setInt(7, facility_number);
                         }
                     else
                         {
                         prep_stmt = dcon->prepareStatement("update counters set facility_number=?,carpark_name=?,total_spaces=?,total_reservation_spaces=?,total_access_spaces=?,total_shortterm_spaces=? where facility_number=? and counter_type=0");                                               
                         prep_stmt->setString(7, ToString(json["previous_facility"]));
                         }
-                    prep_stmt->setString(1, ToString(json["facility_number"]));
-                    prep_stmt->setString(2, ToString(json["facility_name"]));                               
+                    prep_stmt->setInt(1, facility_number);
+                    prep_stmt->setString(2, facility_name);                               
                     prep_stmt->setString(3, res->getString("total_spaces"));
                     prep_stmt->setString(4, res->getString("reservation_spaces"));
                     prep_stmt->setString(5, res->getString("access_spaces"));
@@ -489,13 +495,23 @@ Php::Value insertUpdateDevice(Php::Value json)
             {
             if(id=="")    
                 {
-                prep_stmt = con->prepareStatement("insert into system_devices(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_category,device_category_name,device_ip,rate_plan,reservation_rate_plan,rate_type,camera_id,customer_receipt_mandatory,shift_receipt_mandatory,shift_physical_cash_count_required,synch_whitelist_flag,issue_lost,camera_index,anpr_enabled, wiegand_enabled, access_enabled, reservation_enabled, review_mode, device_function, barrier_open_time_limit,duration_hold_barrier_open, display_anpr_image, barrier_open_status_type, bms_status_enabled, barrier_status_monitoring, wiegand2_enabled, server_handshake_interval, plate_capturing_wait_delay, quick_barrier_close, payment_enabled_exit,user_id,device_enabled) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
+                prep_stmt = con->prepareStatement("select * from system_carparks where facility_number=? and carpark_number=?");
+                prep_stmt->setInt(1, facility_number);
+                prep_stmt->setInt(2, carpark_number);    
+                res=prep_stmt->executeQuery();
+                res->next();
+                
+                prep_stmt = con->prepareStatement("insert into system_devices(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_category,device_category_name,device_ip,camera_id,customer_receipt_mandatory,shift_receipt_mandatory,shift_physical_cash_count_required,synch_whitelist_flag,issue_lost,camera_index,anpr_enabled, wiegand_enabled, access_enabled, reservation_enabled, review_mode, device_function, barrier_open_time_limit,duration_hold_barrier_open, display_anpr_image, barrier_open_status_type, bms_status_enabled, barrier_status_monitoring, wiegand2_enabled, server_handshake_interval, plate_capturing_wait_delay, quick_barrier_close, payment_enabled_exit,rate_plan,reservation_rate_plan,rate_type,user_id,device_enabled) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
+                prep_stmt->setString(34, res->getString("rate_plan"));
+                prep_stmt->setString(35,res->getString("reservation_rate_plan"));
+                prep_stmt->setString(36, res->getString("rate_type"));
                 prep_stmt->setString(37, ToString(json["user_id"]));       
+                delete res;
                 }
             else
                 {
-                prep_stmt = con->prepareStatement("update system_devices set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_category=?,device_category_name=?,device_ip=?,rate_plan=?,reservation_rate_plan=?,rate_type=?,camera_id=?,customer_receipt_mandatory=?,shift_receipt_mandatory=?,shift_physical_cash_count_required=?,synch_whitelist_flag=?,issue_lost=?,camera_index=?,anpr_enabled=?, wiegand_enabled=?, access_enabled=?, reservation_enabled=?, review_mode=?, device_function=?, barrier_open_time_limit=?,duration_hold_barrier_open=?, display_anpr_image=?, barrier_open_status_type=?, bms_status_enabled=?, barrier_status_monitoring=?, wiegand2_enabled=?, server_handshake_interval=?, plate_capturing_wait_delay=?,quick_barrier_close=?, payment_enabled_exit=? where id=?");    
-                prep_stmt->setString(37,id);       
+                prep_stmt = con->prepareStatement("update system_devices set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_category=?,device_category_name=?,device_ip=?,camera_id=?,customer_receipt_mandatory=?,shift_receipt_mandatory=?,shift_physical_cash_count_required=?,synch_whitelist_flag=?,issue_lost=?,camera_index=?,anpr_enabled=?, wiegand_enabled=?, access_enabled=?, reservation_enabled=?, review_mode=?, device_function=?, barrier_open_time_limit=?,duration_hold_barrier_open=?, display_anpr_image=?, barrier_open_status_type=?, bms_status_enabled=?, barrier_status_monitoring=?, wiegand2_enabled=?, server_handshake_interval=?, plate_capturing_wait_delay=?,quick_barrier_close=?, payment_enabled_exit=? where id=?");    
+                prep_stmt->setString(34,id);       
                 }
                                         
             prep_stmt->setString(1, ToString(json["facility_number"]));
@@ -507,33 +523,31 @@ Php::Value insertUpdateDevice(Php::Value json)
             prep_stmt->setString(7, ToString(json["device_category"]));
             prep_stmt->setString(8, ToString(json["device_category_name"]));            
             prep_stmt->setString(9, ToString(json["device_ip"]));
-            prep_stmt->setString(10, ToString(json["rate_plan"]));
-            prep_stmt->setString(11, ToString(json["reservation_rate_plan"]));
-            prep_stmt->setString(12, ToString(json["rate_type"]));
-            prep_stmt->setString(13, ToString(json["camera_id"]));
-            prep_stmt->setString(14, ToString(json["customer_receipt_mandatory"]));
-            prep_stmt->setString(15, ToString(json["shift_receipt_mandatory"]));
-            prep_stmt->setString(16, ToString(json["physical_cash_count"]));
-            prep_stmt->setString(17, ToString(json["synch_whitelist"]));
-            prep_stmt->setString(18, ToString(json["issue_lost"]));
-            prep_stmt->setString(19, ToString(json["camera_index"]));
-            prep_stmt->setString(20, ToString(json["anpr_enabled"]));
-            prep_stmt->setString(21, ToString(json["wiegand_enabled"]));
-            prep_stmt->setString(22, ToString(json["access_enabled"]));
-            prep_stmt->setString(23, ToString(json["reservation_enabled"]));
-            prep_stmt->setString(24, ToString(json["review_mode"]));
-            prep_stmt->setString(25, ToString(json["device_function"]));
-            prep_stmt->setString(26, ToString(json["barrier_open_time_limit"]));
-            prep_stmt->setString(27, ToString(json["duration_hold_barrier_open"]));
-            prep_stmt->setString(28, ToString(json["display_anpr_image"]));
-            prep_stmt->setString(29, ToString(json["barrier_open_status_type"]));
-            prep_stmt->setString(30, ToString(json["bms_status_enabled"]));
-            prep_stmt->setString(31, ToString(json["barrier_status_monitoring"]));
-            prep_stmt->setString(32, ToString(json["wiegand2_enabled"]));
-            prep_stmt->setString(33, ToString(json["server_handshake_interval"]));
-            prep_stmt->setString(34, ToString(json["plate_capturing_wait_delay"]));
-            prep_stmt->setString(35, ToString(json["quick_barrier_close"]));
-            prep_stmt->setString(36, ToString(json["payment_enabled_exit"]));
+            prep_stmt->setString(10, ToString(json["camera_id"]));
+            prep_stmt->setString(11, ToString(json["customer_receipt_mandatory"]));
+            prep_stmt->setString(12, ToString(json["shift_receipt_mandatory"]));
+            prep_stmt->setString(13, ToString(json["physical_cash_count"]));
+            prep_stmt->setString(14, ToString(json["synch_whitelist"]));
+            prep_stmt->setString(15, ToString(json["issue_lost"]));
+            prep_stmt->setString(16, ToString(json["camera_index"]));
+            prep_stmt->setString(17, ToString(json["anpr_enabled"]));
+            prep_stmt->setString(18, ToString(json["wiegand_enabled"]));
+            prep_stmt->setString(19, ToString(json["access_enabled"]));
+            prep_stmt->setString(20, ToString(json["reservation_enabled"]));
+            prep_stmt->setString(21, ToString(json["review_mode"]));
+            prep_stmt->setString(22, ToString(json["device_function"]));
+            prep_stmt->setString(23, ToString(json["barrier_open_time_limit"]));
+            prep_stmt->setString(24, ToString(json["duration_hold_barrier_open"]));
+            prep_stmt->setString(25, ToString(json["display_anpr_image"]));
+            prep_stmt->setString(26, ToString(json["barrier_open_status_type"]));
+            prep_stmt->setString(27, ToString(json["bms_status_enabled"]));
+            prep_stmt->setString(28, ToString(json["barrier_status_monitoring"]));
+            prep_stmt->setString(29, ToString(json["wiegand2_enabled"]));
+            prep_stmt->setString(30, ToString(json["server_handshake_interval"]));
+            prep_stmt->setString(31, ToString(json["plate_capturing_wait_delay"]));
+            prep_stmt->setString(32, ToString(json["quick_barrier_close"]));
+            prep_stmt->setString(33, ToString(json["payment_enabled_exit"]));
+            
                     
             if (!prep_stmt->execute())
                 {
@@ -850,39 +864,39 @@ void showMaintenanceSettingsList()
         res=stmt->executeQuery("select * from device_maintenance");
         if(res->rowsCount()>0)
             {
-            //Php::out<<"<table class='table table-blue'>"<<endl;
+            
             Php::out << "<thead>" << std::endl;
-			Php::out<<"<tr>"<<endl;
+            Php::out<<"<tr>"<<endl;
             Php::out<<"<th>No</th>"<<endl;
             Php::out<<"<th>Setting Name</th>"<<endl;
             Php::out<<"<th>Setting value</th>"<<endl;                   
             Php::out<<"<th></th>"<<endl;		           
             Php::out<<"<th></th>"<<endl;		           
-			Php::out<<"</tr>"<<endl;	
+            Php::out<<"</tr>"<<endl;	
             Php::out << "</thead>" << std::endl;		
             
-			while(res->next())
-				{
-				id = res->getString("id");
-				Php::out<<"<tr data-id='"<<res->getString("id")<<"' data-name='"<<res->getString("setting_name")<<"'>"<<endl;                       
-				Php::out<<"<td>"+res->getString("id")+"</td>"<<endl;           
-				Php::out<<"<td>"+res->getString("setting_label")+"</td>"<<endl;           
-				Php::out<<"<td>"+res->getString("setting_value")+"</td>"<<endl;    				
-				Php::out << "<td><button type='button' class='col btn btn-danger maintenance-setting-cancel-btn' id='cancelbtn"+id+"' style='display:none' >Cancel</button></td>"<< std::endl;								
-				Php::out << "<td>"<< std::endl;
-				Php::out << "<button type='button' class='col btn btn-info maintenance-setting-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
-				Php::out << "</td>"<< std::endl;
-				Php::out<<"</tr>"<<endl;	
-				}
-			//Php::out << "</table>" << std::endl;	
-			}
+            while(res->next())
+                {
+                id = res->getString("id");
+                Php::out<<"<tr data-id='"<<res->getString("id")<<"'>"<<endl;                       
+                Php::out<<"<td>"+res->getString("id")+"</td>"<<endl;           
+                Php::out<<"<td>"+res->getString("setting_label")+"</td>"<<endl;           
+                Php::out<<"<td>"+res->getString("setting_value")+"</td>"<<endl;    				
+                Php::out << "<td><button type='button' class='col btn btn-danger maintenance-setting-cancel-btn' id='cancelbtn"+id+"' style='display:none' >Cancel</button></td>"<< std::endl;								
+                Php::out << "<td>"<< std::endl;
+                Php::out << "<button type='button' class='col btn btn-info maintenance-setting-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
+                Php::out << "</td>"<< std::endl;
+                Php::out<<"</tr>"<<endl;	
+                }
+            //Php::out << "</table>" << std::endl;	
+            }
         delete res;    
         delete stmt;
 		delete con;  
         }
     catch(const std::exception& e)
         {
-        writeException("showSettingList",e.what());
+        writeException("showMaintenanceSettingsList",e.what());
         }    
     }
 	
@@ -898,50 +912,50 @@ void showCloudUploadSettings()
         {
             //Php::out<<"<table class='table table-blue'>"<<endl;
             Php::out << "<thead>" << std::endl;
-			Php::out<<"<tr>"<<endl;
+            Php::out<<"<tr>"<<endl;
             Php::out<<"<th>No</th>"<<endl;
             Php::out<<"<th>Table</th>"<<endl;
             Php::out<<"<th>Dayclosure</th>"<<endl;                   
-            Php::out<<"<th>Task</th>"<<endl;	
+           // Php::out<<"<th>Task</th>"<<endl;	
             Php::out<<"<th>Upload Limit</th>"<<endl;	
-			Php::out<<"<th>Time Interval</th>"<<endl;				
-			Php::out<<"<th>Cloud Upload Date</th>"<<endl;
-			Php::out<<"<th></th><th></th>"<<endl;	
-			Php::out<<"</tr>"<<endl;	
+            Php::out<<"<th>Time Interval</th>"<<endl;				
+            Php::out<<"<th>Cloud Upload Date</th>"<<endl;
+            Php::out<<"<th></th><th></th>"<<endl;	
+            Php::out<<"</tr>"<<endl;	
             Php::out << "</thead>" << std::endl;		
             
-			while(res->next())
-				{
-				id = res->getString("id");
-				Php::out<<"<tr data-id='"<<res->getString("id")<<"' data-name='"<<res->getString("id")<<"'>"<<endl;  
-				Php::out<<"<td>"+res->getString("id")+"</td>"<<endl;                      	
-				Php::out<<"<td>"+res->getString("table_name")+"</td>"<<endl;           
-				//Php::out<<"<td>"+res->getString("day_closure")+"</td>"<<endl;  
-				if(res->getString("day_closure")=="1")
-				{
-					dc = "checked";
-				}
-				else{
-					dc = "";
-				}
-				Php::out<<"<td><input type='checkbox' id='dc"+id+"'  "+dc+" onclick='return false;'></td>";		
-				Php::out<<"<td id='task"+id+"'>"+res->getString("task")+"</td>"<<endl;  
-				Php::out<<"<td id='limit"+id+"'>"+res->getString("upload_row_limit")+"</td>"<<endl;  
-				Php::out<<"<td id='interval"+id+"'>"+res->getString("time_interval")+"</td>"<<endl;  
-				Php::out<<"<td>"+res->getString("cloud_upload_date_time")+"</td>"<<endl; 
-				Php::out << "<td>"<< std::endl;
-				if(res->getInt("enabled")==1)
-					Php::out << "<button type='button' class='col btn btn-danger upload-setting-enable-disable-btn'>Disable</button>"<< std::endl;
-				else
-					Php::out << "<button type='button' class='col btn btn-success upload-setting-enable-disable-btn'>Enable</button>"<< std::endl;
-				Php::out << "</td>"<< std::endl;
+            while(res->next())
+                    {
+                    id = res->getString("id");
+                    Php::out<<"<tr data-id='"<<id<<"' >"<<endl;  
+                    Php::out<<"<td>"+res->getString("id")+"</td>"<<endl;                      	
+                    Php::out<<"<td>"+res->getString("label")+"</td>"<<endl;           
+                    //Php::out<<"<td>"+res->getString("day_closure")+"</td>"<<endl;  
+                    if(res->getString("day_closure")=="1")
+                    {
+                            dc = "checked";
+                    }
+                    else{
+                            dc = "";
+                    }
+                    Php::out<<"<td><input type='checkbox' id='dc"+id+"'  "+dc+" onclick='return false;'></td>";		
+                    //Php::out<<"<td id='task"+id+"'>"+res->getString("task")+"</td>"<<endl;  
+                    Php::out<<"<td id='limit"+id+"'>"+res->getString("upload_row_limit")+"</td>"<<endl;  
+                    Php::out<<"<td id='interval"+id+"'>"+res->getString("time_interval")+"</td>"<<endl;  
+                    Php::out<<"<td>"+res->getString("cloud_upload_date_time")+"</td>"<<endl; 
+                    Php::out << "<td>"<< std::endl;
+                    if(res->getInt("enabled")==1)
+                            Php::out << "<button type='button' class='col btn btn-danger upload-setting-enable-disable-btn'>Disable</button>"<< std::endl;
+                    else
+                            Php::out << "<button type='button' class='col btn btn-success upload-setting-enable-disable-btn'>Enable</button>"<< std::endl;
+                    Php::out << "</td>"<< std::endl;
 
-				Php::out << "<td>"<< std::endl;
-				Php::out << "<button type='button' class='col btn btn-info upload-setting-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
-				Php::out << "</td>"<< std::endl;
-				Php::out<<"</tr>"<<endl;	
-				}
-			//Php::out << "</table>" << std::endl;	
+                    Php::out << "<td>"<< std::endl;
+                    Php::out << "<button type='button' class='col btn btn-info upload-setting-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
+                    Php::out << "</td>"<< std::endl;
+                    Php::out<<"</tr>"<<endl;	
+                    }
+            //Php::out << "</table>" << std::endl;	
 		}
         delete res;    
         delete stmt;
@@ -965,51 +979,51 @@ void showCloudDownloadSettings()
         {
             //Php::out<<"<table class='table table-blue'>"<<endl;
             Php::out << "<thead>" << std::endl;
-			Php::out<<"<tr>"<<endl;
+            Php::out<<"<tr>"<<endl;
             Php::out<<"<th>No</th>"<<endl;
             Php::out<<"<th>Table</th>"<<endl;
             Php::out<<"<th>Dayclosure</th>"<<endl;                   
-            Php::out<<"<th>Task</th>"<<endl;	
+           // Php::out<<"<th>Task</th>"<<endl;	
             Php::out<<"<th>Download Limit</th>"<<endl;	
-			Php::out<<"<th>Time Interval</th>"<<endl;				
-			Php::out<<"<th>Cloud Download Date</th>"<<endl;
-			Php::out<<"<th></th><th></th>"<<endl;	
-			Php::out<<"</tr>"<<endl;	
+            Php::out<<"<th>Time Interval</th>"<<endl;				
+            Php::out<<"<th>Cloud Download Date</th>"<<endl;
+            Php::out<<"<th></th><th></th>"<<endl;	
+            Php::out<<"</tr>"<<endl;	
             Php::out << "</thead>" << std::endl;		
             
-			while(res->next())
-				{
-					id = res->getString("id");
-				Php::out<<"<tr data-id='"<<res->getString("id")<<"' data-name='"<<res->getString("id")<<"'>"<<endl;  
-				Php::out<<"<td>"+res->getString("id")+"</td>"<<endl;                      	
-				Php::out<<"<td>"+res->getString("table_name")+"</td>"<<endl;           
-				//Php::out<<"<td>"+res->getString("day_closure")+"</td>"<<endl;  
-				if(res->getString("day_closure")=="1")
-				{
-					dc = "checked";
-				}
-				else{
-					dc = "";
-				}
-				Php::out<<"<td><input type='checkbox' id='dc"+id+"'  "+dc+" onclick='return false;'></td>";		
-				Php::out<<"<td id='task"+id+"'>"+res->getString("task")+"</td>"<<endl;  
-				Php::out<<"<td id='limit"+id+"'>"+res->getString("download_row_limit")+"</td>"<<endl;  
-				Php::out<<"<td id='interval"+id+"'>"+res->getString("time_interval")+"</td>"<<endl;  
-				Php::out<<"<td>"+res->getString("cloud_download_date_time")+"</td>"<<endl; 
-				Php::out << "<td>"<< std::endl;
-				if(res->getInt("enabled")==1)
-					Php::out << "<button type='button' class='col btn btn-danger download-setting-enable-disable-btn'>Disable</button>"<< std::endl;
-				else
-					Php::out << "<button type='button' class='col btn btn-success download-setting-enable-disable-btn'>Enable</button>"<< std::endl;
-				Php::out << "</td>"<< std::endl;
+            while(res->next())
+                {
+                        id = res->getString("id");
+                Php::out<<"<tr data-id='"<<res->getString("id")<<"'>"<<endl;  
+                Php::out<<"<td>"+res->getString("id")+"</td>"<<endl;                      	
+                Php::out<<"<td>"+res->getString("label")+"</td>"<<endl;           
+                //Php::out<<"<td>"+res->getString("day_closure")+"</td>"<<endl;  
+                if(res->getString("day_closure")=="1")
+                {
+                        dc = "checked";
+                }
+                else{
+                        dc = "";
+                }
+                Php::out<<"<td><input type='checkbox' id='dc"+id+"'  "+dc+" onclick='return false;'></td>";		
+               // Php::out<<"<td id='task"+id+"'>"+res->getString("task")+"</td>"<<endl;  
+                Php::out<<"<td id='limit"+id+"'>"+res->getString("download_row_limit")+"</td>"<<endl;  
+                Php::out<<"<td id='interval"+id+"'>"+res->getString("time_interval")+"</td>"<<endl;  
+                Php::out<<"<td>"+res->getString("cloud_download_date_time")+"</td>"<<endl; 
+                Php::out << "<td>"<< std::endl;
+                if(res->getInt("enabled")==1)
+                        Php::out << "<button type='button' class='col btn btn-danger download-setting-enable-disable-btn'>Disable</button>"<< std::endl;
+                else
+                        Php::out << "<button type='button' class='col btn btn-success download-setting-enable-disable-btn'>Enable</button>"<< std::endl;
+                Php::out << "</td>"<< std::endl;
 
-				Php::out << "<td>"<< std::endl;
-				Php::out << "<button type='button' class='col btn btn-info download-setting-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
-				Php::out << "</td>"<< std::endl;
-				Php::out<<"</tr>"<<endl;	
-				}
+                Php::out << "<td>"<< std::endl;
+                Php::out << "<button type='button' class='col btn btn-info download-setting-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
+                Php::out << "</td>"<< std::endl;
+                Php::out<<"</tr>"<<endl;	
+                }
 			///Php::out << "</table>" << std::endl;	
-		}
+            }
         delete res;    
         delete stmt;
 		delete con;  
@@ -1383,24 +1397,24 @@ Php::Value parcxSettings(Php::Parameters &params)
             break;
         case 21:validationProductDropdown();
             break;
-		case 22:showMaintenanceSettingsList();
-			break;
-		case 23:response=insertUpdateMaintenanceSettings(data); 
-			break;
-		case 24:response=enableDisable("device_maintenance","id","enabled",data);
-			break;
-		case 25:showCloudUploadSettings();
-			break;
-		case 26:response=updateCloudUploadSettings(data); 
-			break;
-		case 27:response=enableDisable("pxcloud_upload_settings","id","enabled",data);
-			break;
-		case 28:showCloudDownloadSettings();
-			break;
-		case 29:response=updateCloudDownloadSettings(data); 
-			break;
-		case 30:response=enableDisable("pxcloud_download_settings","id","enabled",data);
-			break;
+        case 22:showMaintenanceSettingsList();
+                break;
+        case 23:response=insertUpdateMaintenanceSettings(data); 
+                break;
+        case 24:response=enableDisable("device_maintenance","id","enabled",data);
+                break;
+        case 25:showCloudUploadSettings();
+                break;
+        case 26:response=updateCloudUploadSettings(data); 
+                break;
+        case 27:response=enableDisable("pxcloud_upload_settings","id","enabled",data);
+                break;
+        case 28:showCloudDownloadSettings();
+                break;
+        case 29:response=updateCloudDownloadSettings(data); 
+                break;
+        case 30:response=enableDisable("pxcloud_download_settings","id","enabled",data);
+                break;
         case 31:showProductList();
             break;
         case 32:response=enableDisable("system_products","product_id","status",data);
