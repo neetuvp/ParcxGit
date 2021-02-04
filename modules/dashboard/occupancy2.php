@@ -288,6 +288,38 @@ $('body').on('click', '#ShowCarparks', function ()
     event.preventDefault();
 	}); // end .Get Carparks corresponding to the facility
 
+$('body').on('click', '#ShowCarparkDetail', function () 
+    {    
+    var carpark_number = $(this).attr('carpark_number');
+    var facility_number=$(this).attr('facility_number');
+    var temp = JSON.stringify({carpark_number: carpark_number,facility_number:facility_number}); 
+      
+    $.ajax(
+        {     
+        type: "post",
+        url: "../ajax/dashboard.php?task=2",
+        cache: false,
+        data: temp,
+        contentType: "application/json",
+        success: function (data) 
+            {                   
+            $("#occupancy_content").html(data);        
+            LoadKnob();
+            facility=$("#dashboard_level").attr('facility_number');
+            carpark=$("#dashboard_level").attr('carpark_number');
+            current_level="carpark_detail";                
+            $("#HourlyOccupancyGraph").show();
+            hourlyOccupancy();
+            },
+        error: function (jqXHR, textStatus, errorThrown) 
+            {
+            alert(textStatus);
+            alert(errorThrown);
+            } //end of error
+        }); //end of ajax            
+    event.preventDefault();
+	}); // end .Get Carparks corresponding to the facility
+
 
 function hourlyOccupancy() 
     {

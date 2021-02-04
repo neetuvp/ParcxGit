@@ -18,7 +18,7 @@
 #	are automatically generated
 #
 
-NAME				=	PX_UserManagement
+NAME				=	PX_AdminLogin
 
 
 #
@@ -87,7 +87,7 @@ LINKER				=	g++
 
 COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic -I/opt/lampp/include -o
 LINKER_FLAGS		=	-shared
-LINKER_DEPENDENCIES	=	-lphpcpp -lmysqlcppconn -L/opt/parcx/lib
+LINKER_DEPENDENCIES	=	-lphpcpp -lmysqlclient -lmysqlcppconn -L/opt/parcx/lib
 
 
 #

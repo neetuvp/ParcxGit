@@ -1,13 +1,5 @@
-<!--<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="/resources/demos/style.css">
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
+
 <?php 
-
-//Copy jquery-ui.css file into dist/css folder
-//Add <link rel="stylesheet" in header.php
-$page_title="VMS Config";
-
 include('../../includes/header.php');
 ?>
 
@@ -121,14 +113,8 @@ include('../../includes/sidebar.php');
 <!-- add VMS -->
 <div class="content-wrapper block-data" data-status="add_vms" style="display:none;">
   <section class="content">
-    <div class="container-wide">
-      <div class="row mb-3">
-        <div class="col-sm-6">
-          <h4 class="text-dark" id = "page_title">Add VMS</h4>
-        </div><!-- /.col -->
-      </div><!-- /.row -->
-
-      <div class="card card-primary mb-8" id="add-vms-div">
+    <div class="container-wide">    
+      <div class="card card-primary col-md-6" id="add-vms-div">
         <div class="card-body">
         <div class="row">
 						<div class="col form-group">

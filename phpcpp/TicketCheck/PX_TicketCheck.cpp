@@ -21,7 +21,7 @@ Anpr AnprObj;
 int paymentExit,deductMoneyFromWallet,carparkNumber,facilityNumber,deviceNumber,deviceType,task,entryGrace,exitGrace,reservationEnabled,accessEnabled,deviceFunction,seconds,anprEnabled,cameraId,plateCapturedInterval,plateCapturedId,validationEnabled,walletEnabled,entryType;
 string deviceName,carpakName,facilityName,ticketId,plateNumber,parkingZone,query,entryDateTime,maxEntryGrace,maxExitGrace,currentDateTime,plateType,plateArea,plateCountry;
 string timeValidationId,percentageValidationId,validationDuration,userId,accessExpiry,reservationExpiry,paymentDateTime,accessResult,accessResultDescription,reservationResult,reservationStart,reservationResultDescription;
-int timeValidation,percentageValidation,parkingDuration,validationSeconds,validationHours,rate_type=0;
+int offlineTimeValidation,offlinePercentageValidation,timeValidation,percentageValidation,parkingDuration,validationSeconds,validationHours,rate_type=0;
 double startparkingFee,parkingFee,vat_percentage=0,amountPaid=0,grossAmount,vatAmount,reservationFee,walletBalance;
 sql::Connection *reportCon,*serverCon;
 sql::Statement *stmt,*serverStmt;
@@ -58,33 +58,33 @@ string toString(Php::Value param)
 void getValidations()
 	{
 	try
-		{
-		timeValidation=0;
-		percentageValidation=0;
-		timeValidationId="";
-		percentageValidationId="";
+            {
+            timeValidation=0;
+            percentageValidation=0;
+            timeValidationId="";
+            percentageValidationId="";
 
-		query="SELECT GROUP_CONCAT(DISTINCT id SEPARATOR ',') AS id,sum(validation_value) as validation_value,validation_type FROM parking_validation where ticket_id='"+ticketId+"' and date_time> '"+entryDateTime+"' GROUP by validation_type";
-		validation=stmt->executeQuery(query); 		
-		while(validation->next())
-			{
-			if(validation->getString("validation_type")=="Time Value")
-				{
-				timeValidation=	validation->getInt("validation_value");
-				timeValidationId=validation->getString("id");
-				writeLog("getValidations","Validation Hours:"+to_string(timeValidation));
-				writeLog("getValidations","Time Validation id:"+timeValidationId);
-				}
-			if(validation->getString("validation_type")=="Percentage Value")
-				{
-				percentageValidation=validation->getInt("validation_value");
-				percentageValidationId=validation->getString("id");
-				writeLog("getValidations","Validation Percentage:"+to_string(percentageValidation));
-				writeLog("getValidations","Percentage Validation id:"+percentageValidationId);
-				}			
-			}
-		delete validation;
-		}
+            query="SELECT GROUP_CONCAT(DISTINCT id SEPARATOR ',') AS id,sum(validation_value) as validation_value,validation_type FROM parking_validation where ticket_id='"+ticketId+"' and date_time> '"+entryDateTime+"' GROUP by validation_type";
+            validation=stmt->executeQuery(query); 		
+            while(validation->next())
+                    {
+                    if(validation->getString("validation_type")=="Time Value")
+                            {
+                            timeValidation=	validation->getInt("validation_value");
+                            timeValidationId=validation->getString("id");
+                            writeLog("getValidations","Validation Hours:"+to_string(timeValidation));
+                            writeLog("getValidations","Time Validation id:"+timeValidationId);
+                            }
+                    if(validation->getString("validation_type")=="Percentage Value")
+                            {
+                            percentageValidation=validation->getInt("validation_value");
+                            percentageValidationId=validation->getString("id");
+                            writeLog("getValidations","Validation Percentage:"+to_string(percentageValidation));
+                            writeLog("getValidations","Percentage Validation id:"+percentageValidationId);
+                            }			
+                    }
+            delete validation;
+            }
 	catch(const std::exception& e)
 		{
 		writeException("getValidations",e.what());
@@ -670,6 +670,13 @@ Php::Value openTransactionCheck(int getDetails)
                         response["validation_id"]="";
                         response["validation_hours"]="0";
                         response["validation_percentage"]="0";
+                        timeValidation=timeValidation+offlineTimeValidation;
+                        percentageValidation=percentageValidation+offlinePercentageValidation;
+                        writeLog("openTransactionCheck","Offline Validation Hours:"+to_string(offlineTimeValidation));
+                        writeLog("openTransactionCheck","Offline Validation Percentage:"+to_string(offlinePercentageValidation));
+                        
+                        writeLog("openTransactionCheck","Total Validation Hours:"+to_string(timeValidation));
+                        writeLog("openTransactionCheck","Total Validation Percentage:"+to_string(percentageValidation));
                         if(timeValidation>0)
                             {
                             response["validation_id"]=timeValidationId;	
@@ -1159,7 +1166,13 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
                     delete reportCon;
                     }
                 if(toString(response["access_allowed"])=="false" && deviceType!=1)
-                    {			
+                    {
+                    offlinePercentageValidation=json["offline_validation_percentage"];
+                    offlineTimeValidation=json["offline_validation_hours"];
+                    
+                    writeLog("offlinePercentageValidation",to_string(offlinePercentageValidation));
+                    writeLog("offlineTimeValidation",to_string(offlineTimeValidation));
+                    
                     if(ticketId!="")//ticket check
                         {
                         writeLog("exitTicketCheck","Exit ticket check: "+ticketId);													

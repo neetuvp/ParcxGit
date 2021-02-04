@@ -4,7 +4,6 @@
 //for compile
 #include<phpcpp.h>
 #include<iostream>
-#include<mysql.h>
 #include<sstream>
 #include<string>
 #include <stdlib.h>

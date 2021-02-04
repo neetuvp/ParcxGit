@@ -520,10 +520,10 @@ class dashboard
                 switch ($data["device_type"]) 
                     {
                     case 1:
-                        $category = "Entry";
+                        $category = "Entry Column";
                         break;
                     case 2:
-                        $category = "Exit";
+                        $category = "Exit Column";
                         break;
                     case 3:
                         $category = "Cashier POS";
@@ -642,10 +642,10 @@ class dashboard
             switch ($data["device_type"]) 
                 {
                 case 1:
-                    $category = "Entry";
+                    $category = "Entry Column";
                     break;
                 case 2:
-                    $category = "Exit";
+                    $category = "Exit Column";
                     break;
                 case 3:
                     $category = "Cashier POS";

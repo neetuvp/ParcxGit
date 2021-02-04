@@ -55,7 +55,7 @@ switch($task)
         $dashboard->live_revenue();
         break;
 
-    case 11:
+    case '.$data["device_number"].':
         $valet->get_valet_counters();
         break;
 
@@ -68,6 +68,17 @@ switch($task)
         $data=json_decode($json,TRUE);         
         if($data["device_category"]=="APM")
             $revenue->cash_levels($data["device_number"]);	
+        if($data["device_category"]=="Entry" || $data["device_category"]=="Exit")
+            {
+            $html='<div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="col"><input type="submit" class="btn btn-outline-info btn-open-barrier btn-block" value="Open Barrier" id="'.$data["device_number"].'"></div>
+            <div class="col"><input type="submit" class="btn btn-outline-info btn-close-barrier btn-block" value="Close Barrier" id="'.$data["device_number"].'"></div>
+            <div class="col"><input type="submit" class="btn btn-outline-info btn-close-lane btn-block" value="Lane Closed Mode" id="'.$data["device_number"].'"></div>
+            <div class="col"><input type="submit" class="btn btn-outline-info btn-free-passage btn-block" value="Free Passage Mode" id="'.$data["device_number"].'"></div>
+            <div class="col"><input type="submit" class="btn btn-outline-info btn-standard-operation btn-block" value="Standard Operation Mode" id="'.$data["device_number"].'"></div>
+            </div>';
+            echo $html;
+            }
         $dashboard->getAlarmList($data["device_number"]);
         break;
     case 14:

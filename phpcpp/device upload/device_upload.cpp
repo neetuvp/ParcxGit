@@ -504,7 +504,13 @@ Php::Value UploadParkingValidations(Php::Value request)
             string validation_type = request[i]["validation_type"];
             string validation_provider = request[i]["validation_provider"];      
             string date_time = request[i]["date_time"];
-			query="INSERT into parking_validation(carpark_number,carpark_name,facility_number,ticket_id,validation_value,validation_type,validator_id,date_time)VALUES("+carpark_number+",'"+carpark_name+"',"+facility_number+","+ticket_id+","+validation_value+",'"+validation_type+"','"+validation_provider+"','"+date_time+"')";
+            if(validation_type=="1")
+                validation_type="Time Value";
+            if(validation_type=="2")
+                validation_type="Percentage Value";
+                        
+            
+            query="INSERT into parking_validation(product_name,carpark_number,carpark_name,facility_number,ticket_id,validation_value,validation_type,validator_id,date_time)VALUES('Offline',"+carpark_number+",'"+carpark_name+"',"+facility_number+",'"+ticket_id+"',"+validation_value+",'"+validation_type+"','"+validation_provider+"','"+date_time+"')";
             result = stmt->executeUpdate(query);
            
             if(result==1)
@@ -1328,13 +1334,13 @@ Php::Value UploadContractPrkingsubscriptions(Php::Value request)
                 if(res->next())//exit renew subscription
                     {                     
                     string id=res->getString("access_whitelist_id");                      
-                    query="update parcx_server.access_whitelist set validity_start_date= '"+validity_start_date+"',validity_expiry_date='"+validity_end_date+"' where access_whitelist_id="+id;                               
+                    query="update parcx_server.access_whitelist set cloud_upload_status=0,validity_start_date= '"+validity_start_date+"',validity_expiry_date='"+validity_end_date+"' where access_whitelist_id="+id;                               
                     stmt->executeUpdate(query);                     
                     delete res;
                     }
                 else
                     {
-                    query="insert into parcx_server.access_whitelist(facility_number,carpark_number,access_zones,ticket_id,access_id,plate_number,tag,validity_start_date,validity_expiry_date,customer_name,status)values""('"+facility_number+"','"+carpark_number+"','','"+ticket_id+"','"+to_string(accessId())+"','"+plate_number+"','"+tag+"','"+validity_start_date+"','"+validity_end_date+"','"+customer_name+"',1)";                    
+                    query="insert into parcx_server.access_whitelist(facility_number,carpark_number,access_zones,ticket_id,access_id,plate_number,tag,validity_start_date,validity_expiry_date,customer_name,status,cloud_upload_status)values""('"+facility_number+"','"+carpark_number+"','','"+ticket_id+"','"+to_string(accessId())+"','"+plate_number+"','"+tag+"','"+validity_start_date+"','"+validity_end_date+"','"+customer_name+"',1,0)";                    
                     stmt->executeUpdate(query);   
                     }
                 jsonresponse[i] = id;                

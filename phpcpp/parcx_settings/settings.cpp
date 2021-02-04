@@ -378,7 +378,7 @@ Php::Value insertUpdateCarpark(Php::Value json)
                 {
                 msg = "Successfull";
                 
-                prep_stmt = con->prepareStatement("update system_devices set rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_number=? and facility-number=?");
+                prep_stmt = con->prepareStatement("update system_devices set rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_number=? and facility_number=?");
                 prep_stmt->setString(1, rate_type);   
                 prep_stmt->setString(2, rate_plan);   
                 prep_stmt->setString(3, reservation_rate_plan);   

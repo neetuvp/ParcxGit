@@ -91,29 +91,16 @@ include('../../includes/sidebar.php');
                 </div> 
               </div>               
               <div class="div-rate div-device">
-              <!--<div class="row">
-                <div class="col form-group">
-                  <label for="">Rate Type</label>
-                  <select id="rate_type"> 
-                    <option value="1">Variable Rate</option>
-                    <option value="2">Fixed Rate</option>     
-                  </select>
-                </div> 
-                <div class="col form-group">
-                  <label for="">Rate Plan</label>
-                  <select id="rate_plan">                  
-                    <?php //echo parcxSettings(array("task"=>"13"));?>
-                  </select>
-                </div>                 
-              </div> -->	
+          	
               <div class="row">						     
-<!--                <div class="col form-group">
-                  <label for="">Reservation Rate Plan</label>
-                  <select id="reservation_rate_plan"> 
-                    <option value="">Select Reservation Rate Plan</option>                 
-                    <?php //echo parcxSettings(array("task"=>"13"));?>
-                  </select>
-                </div> -->
+                 <div class="col form-group">
+                    <label >Device function</label>
+                    <select id="device_function"> 
+                      <option value="1">QR Code</option>
+                      <option value="2">Chipcoin</option>
+                      <option value="3">Ticketless</option>
+                    </select>
+                  </div> 
                 <div class="col form-group">
                     <label for="">Server handshake interval</label>
                     <input type="number" class="form-control" id="server_handshake_interval" value="90"  required >                    
@@ -129,24 +116,17 @@ include('../../includes/sidebar.php');
                       <?php echo parcxSettings(array("task"=>"14","type"=>"8"));?>
                     </select>
                   </div> 
-                  <div class="col form-group div-device div-entry">
-                    <label for="">Plate capturing wait delay</label>
-                    <input type="number" class="form-control" id="plate_capturing_wait_delay" value="7"  required >
-                    <small class="form-text text-muted">Wait to get plate number in seconds for entry ticket</small>
-                  </div>   
+                    <div class="col form-group">
+                    <label for="">Barrier open hold duration</label>
+                    <input type="number" class="form-control" id="duration_hold_barrier_open" value="100"  required >
+                    <small class="form-text text-muted">Wait to open barrier for ticketless entry in milliseconds</small>
+                  </div>
+                    
+                  
 
                 </div> 
 
-                <div class="row ">						     
-                  <div class="col form-group">
-                    <label >Device function</label>
-                    <select id="device_function"> 
-                      <option value="1">QR Code</option>
-                      <option value="2">Chipcoin</option>
-                      <option value="3">Ticketless</option>
-                    </select>
-                  </div> 
-
+                <div class="row ">						                      
                   <div class="col form-group">
                     <label >Barrier open status type</label>
                     <select id="barrier_open_status_type"> 
@@ -154,20 +134,20 @@ include('../../includes/sidebar.php');
                       <option value="1">NC Barrier Open</option>                      
                     </select>
                   </div> 
-
-                </div> 
-
-                <div class="row">
-                  <div class="col form-group">
+                <div class="col form-group">
                     <label for="">Barrier open time limit</label>
                     <input type="number" class="form-control" id="barrier_open_time_limit" value="10"  required >
                     <small class="form-text text-muted">Time limit in seconds for barrier to stay open </small>
                   </div>
-                  <div class="col form-group">
-                    <label for="">Barrier open hold duration</label>
-                    <input type="number" class="form-control" id="duration_hold_barrier_open" value="100"  required >
-                    <small class="form-text text-muted">Wait to open barrier for ticketless entry in milliseconds</small>
-                  </div>
+                </div> 
+
+                <div class="row">
+                 <div class="col form-group div-device div-entry">
+                    <label for="">Plate capturing wait delay</label>
+                    <input type="number" class="form-control" id="plate_capturing_wait_delay" value="7"  required >
+                    <small class="form-text text-muted">Wait to get plate number in seconds for entry ticket</small>
+                  </div>   
+                  
                 </div>
                         
                 <div class="row">	
