@@ -10,11 +10,7 @@ include('../../includes/navbar-start.php');
 
 </ul>
 <div class="header text-dark" id="pdf-report-header">Export Settings</div>
-<div class="row">
-  <div class="col tab-header d-flex justify-content-center">
-    <div class="tab-link active" data-target="active_parking">Export</div>
-  </div>
-</div>
+
 
 <?php 
 ini_set("display_errors",1);
@@ -25,16 +21,7 @@ include('../../includes/sidebar.php');
 <!-- Active Parking-->
 <div class="content-wrapper block-data" data-status="active_parking">
 
-  <!-- additional menu -->
-  <div class="additional-menu row m-0 bg-white border-bottom">
-    <div class="col d-flex pl-1 align-items-center">
-
-      <!-- <div class="flex-grow-1 row additional-menu-left nav-button-group">
-      </div> -->
-
-    </div>
-  </div>
-  <!-- end / additional menu -->
+ 
 
   <section class="content">
     <div class="container-wide">

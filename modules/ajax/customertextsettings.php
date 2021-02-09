@@ -8,9 +8,7 @@ switch($case)
     case 1:  
     {
         $id = "";
-        $data = json_decode($json,true);
-        //$type = $data -> {'type'};
-        //$response = GetCustomerMessagesText($type);
+        $data = json_decode($json,true);       
         $response = GetMessageTextByLanguage($data);
         break;
     }

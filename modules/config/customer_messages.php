@@ -1,7 +1,5 @@
 
 <?php
-$page_title = "Device Dashboard";
-
 include('../../includes/header.php');
 ?>
 
@@ -25,6 +23,7 @@ include('../../includes/header.php');
 ini_set("display_errors", 1);
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
+$result = GetMessageLanguages();
 ?>
 
 <!-- Modal > Void Reason -->
@@ -39,7 +38,7 @@ include('../../includes/sidebar.php');
                 </button>
             </div>
             <div class="modal-body pt-4 pl-4 pr-4">
-                <img id = 'imgmodal' src='' alt='Img' style="width: 650px; height: 550px;" >
+                <img id = 'imgmodal' src='' alt='Img'  >
                 <br>
                 <br>
                 <p>Change Image:</p>               
@@ -60,45 +59,60 @@ include('../../includes/sidebar.php');
 <div class="content-wrapper block-data" data-status="add_messages" style="display:none;">
     <section class="content">
         <div class="container-wide">    
-
-            <div class="card card-primary mb-8 col-md-6" id="add-discount-div">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group">
-
-                                <form name = "form" method = "post" action = "">
-                                    <table border=0>               				
-                                        <tr><td style = "width:50%">Device Type</td><td>
-                                                <select name = "device_type" id = "device_type" class="form-control"><option value = "1">Entry</option><option value = "2">Exit</option><option value = "3">Cashier</option><option value = "4">APM</option><option value = "5">Handheld</option></select>
-                                            </td></tr>
-
-                                        <tr><td>Message</td><td>
-                                                <input type= "text" class="form-control" name="message" id ="message"  value = ""/></td></tr>
-                                        </td></tr>
-                                        <?php
-                                        $result = GetMessageLanguages();
-                                        for ($i = 0; $i < sizeof($result); $i++) {
-                                            echo '<tr><td>' . ucfirst($result[$i]) . ' Line 1</td><td>';
-                                            echo '<input type= "text" class="form-control" name="' . $result[$i] . '_line1" id ="' . $result[$i] . '_line1"  value = ""/></td></tr>';
-                                            echo '</td></tr>';
-                                            echo '<tr><td>' . ucfirst($result[$i]) . ' Line 2</td><td>';
-                                            echo '<input type= "text" class="form-control" name="' . $result[$i] . '_line2" id ="' . $result[$i] . '_line2"  value = ""/></td></tr>';
-                                            echo '</td></tr>';
-                                            echo '<tr><td>' . ucfirst($result[$i]) . ' Line 3</td><td>';
-                                            echo '<input type= "text" class="form-control" name="' . $result[$i] . '_line3" id ="' . $result[$i] . '_line3"  value = ""/></td></tr>';
-                                            echo '</td></tr>';
-                                        }
-                                        ?>
-                                        <tr><td>Upload Image</td><td>
-                                                <input type='file' id='image_file' name='image_file' accept='image/*'>
-                                            </td></tr>      
-                                        <tr><td><button type='submit' class='btn btn-primary' id='add_message_btn' onclick = 'AddMessage(".json_encode($result).")'>Add Message</button></td></tr>
-                                    </table>
-
+            <div class="card card-primary mb-8 col-md-8" id="add-discount-div">
+                <div class="card-body">                    
+                    <form name = "form" method = "post" action = "">
+                        <div class="row">
+                            <div class="col form-group">
+                                <label for="">Device Category</label>
+                                <select name = "device_type" id = "device_type" class="form-control">
+                                    <option value = "1">Entry</option>
+                                    <option value = "2">Exit</option>
+                                    <option value = "3">Cashier</option>
+                                    <option value = "4">APM</option>
+                                    <option value = "5">Handheld</option>
+                                </select>
                             </div>
-                        </div>                        
-                    </div><!--row-->
+                        </div>
+                        <div class="row">
+                            <div class="col form-group">
+                                <label for="">Message</label>
+                                <input type= "text" class="form-control" name="message" id ="message"  value = ""/>
+                            </div>
+                        </div>
+                        
+                       
+                            <?php
+                            
+                            for ($i = 0; $i < sizeof($result); $i++) {
+                                echo '<h4>'. ucfirst($result[$i]) .'</h4>
+                                    <div class="row">
+                                        <div class="col form-group">
+                                            <label for="">Line 1</label>
+                                            <input type= "text" class="form-control" name="' . $result[$i] . '_line1" id ="' . $result[$i] . '_line1"  value = ""/>
+                                        </div>
+                                        <div class="col form-group">
+                                            <label for="">Line 2</label>
+                                            <input type= "text" class="form-control" name="' . $result[$i] . '_line2" id ="' . $result[$i] . '_line2"  value = ""/>
+                                        </div>
+                                        <div class="col form-group">
+                                            <label for="">Line 3</label>
+                                            <input type= "text" class="form-control" name="' . $result[$i] . '_line3" id ="' . $result[$i] . '_line3"  value = ""/>
+                                        </div>
+                                    </div>';
+                            }
+                            ?>
+                        <div class="row">
+                            <div class="col form-group">
+                                <label for="">Upload Image</label>
+                                <input type='file' id='image_file' name='image_file' accept='image/*'>
+                            </div>
+                        </div>
+                           
+                        <button type='submit' class='btn btn-primary btn-lg' id='add_message_btn' onclick = 'AddMessage(<?=json_encode($result);?>)'>Add Message</button>
+                           
+                    </form>
+
 
                 </div><!--card body-->
             </div>
@@ -137,7 +151,7 @@ include('../../includes/sidebar.php');
     <!-- end / additional menu -->
 
     <section class="content">
-        <div class="container-wide">
+        <div class="container-wide">            
             <div id = "messagedata">
             </div> 
         </div>

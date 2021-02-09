@@ -1031,7 +1031,9 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
 
             if(plateCapturedId>0 || json["anpr_check_only"]==1 || json["anpr_enabled"]==1)
                 anprEnabled=1;
-
+            else
+                anprEnabled=0;
+                        
             writeLog("anprEnabled",to_string(anprEnabled));	
 
             deviceNumber=json["device_number"];		
@@ -1060,12 +1062,13 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
                 writeLog("cameraId",to_string(cameraId));				
                 plateCapturedInterval=json["plate_captured_interval"];
                 writeLog("plateCapturedInterval",to_string(plateCapturedInterval));
-                Php::Value plate_details=AnprObj.getPlateDetails(cameraId,plateCapturedInterval,plateCapturedId);			
-                response=plate_details;		
+                		
 
                 if(anprEnabled==1)	
                     {
-                    ticketId="";																																
+                    ticketId="";
+                    Php::Value plate_details=AnprObj.getPlateDetails(cameraId,plateCapturedInterval,plateCapturedId);			
+                    response=plate_details;																																
                     if(toString(plate_details["result"])=="plate_available")
                         {
                         plateNumber=toString(plate_details["plate_number"]);

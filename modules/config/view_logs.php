@@ -18,6 +18,33 @@ include('../../includes/navbar-start.php');
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
+<style>
+    .modal-body{
+  word-break: break-all;
+  overflow-y:auto;
+  height:550px;
+}
+</style>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-2" id="modal-body">
+       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-download-modal">Download</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Active Text Messages-->
 <div class="content-wrapper">
@@ -138,22 +165,24 @@ $(document).on("click", ".btn-sub", function()
 $(document).on("click", ".btn-view", function() 
     { 
     getfolders();    
-    var newWindow = window.open();    
+   // var newWindow = window.open();    
     var data = {};
     data["task"]=3;
-	  data["main_folder"]=main_folder;
-	  data["sub_folder"] = sub_folder;
+    data["main_folder"]=main_folder;
+    data["sub_folder"] = sub_folder;
     data["file_name"] = $(this).parent('td').siblings(":eq( 1 )").text();	      
-
+    $("#exampleModalLabel").html(data["file_name"]);
     var jsondata = JSON.stringify(data);  
     console.log(jsondata);	
     $.post("../../modules/ajax/view_logs.php",jsondata,function(data){           
-        newWindow.document.write(data);   	
+        //newWindow.document.write(data);   	
+        $("#modal-body").html(data);
+        $('#exampleModal').modal('show');
     })
     .fail(function(jqxhr,status,error){
         alert("Error: "+error);
     });
-    newWindow.stop();  
+    //newWindow.stop();  
 
     });
 
@@ -167,25 +196,33 @@ function download(text)
 	document.body.removeChild(element); 
   }
 
+$(document).on("click", ".btn-download-modal", function() 
+    {
+    getfolders();  
+    file_name=$("#exampleModalLabel").html();
+    downloadFile();
+    });
 $(document).on("click", ".btn-download", function() 
     {
     getfolders();   
     file_name=$(this).parent('td').siblings(":eq( 1 )").text();	 
+    downloadFile();    
+    });
     
+function downloadFile()
+    {
     var data = {};
     data["task"]=3;
-	  data["main_folder"]=main_folder;
-	  data["sub_folder"] = sub_folder;
+    data["main_folder"]=main_folder;
+    data["sub_folder"] = sub_folder;
     data["file_name"] = file_name;      
 
     var jsondata = JSON.stringify(data);  
     console.log(jsondata);	
     $.post("../../modules/ajax/view_logs.php",jsondata,function(data){           
           download(data)	
-    })
-    .fail(function(jqxhr,status,error){
-        alert("Error: "+error);
-    });   
     });
+    
+    }
 
 </script>
