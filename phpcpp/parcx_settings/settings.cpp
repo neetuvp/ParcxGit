@@ -352,7 +352,7 @@ Php::Value insertUpdateCarpark(Php::Value json)
             {
             if(id=="")    
                 {
-                prep_stmt = con->prepareStatement("insert into system_carparks(facility_number,facility_name,carpark_number,carpark_name,total_spaces ,occupancy_threshold,reservation_spaces,access_spaces,shortterm_spaces,user_id,rate_type,rate_plan,reservation_rate_plan,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
+                prep_stmt = con->prepareStatement("insert into system_carparks(facility_number,facility_name,carpark_number,carpark_name,total_spaces ,occupancy_threshold,reservation_spaces,access_spaces,shortterm_spaces,rate_type,rate_plan,reservation_rate_plan,user_id,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
                 prep_stmt->setString(13, user_id);       
                 }
             else

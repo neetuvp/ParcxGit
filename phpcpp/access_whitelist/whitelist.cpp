@@ -69,7 +69,7 @@ Php::Value insertUpdateWhitelist(Php::Value json)
             }
         else
             {
-            prep_stmt = con->prepareStatement("update access_whitelist set facility_number=?,carpark_number=?,access_zones=?,ticket_id=?,plate_number=?,tag=?,tag_serial=?,tag_tid=?,country=?,validity_start_date=?,validity_expiry_date=?,customer_name=?,antipassback_enabled=?,season_card=?,wallet_payment=?,corporate_parker=?,personalized_message_line1=?,personalized_message_line2=? where access_whitelist_id=?");    
+            prep_stmt = con->prepareStatement("update access_whitelist set cloud_upload_status=0,facility_number=?,carpark_number=?,access_zones=?,ticket_id=?,plate_number=?,tag=?,tag_serial=?,tag_tid=?,country=?,validity_start_date=?,validity_expiry_date=?,customer_name=?,antipassback_enabled=?,season_card=?,wallet_payment=?,corporate_parker=?,personalized_message_line1=?,personalized_message_line2=? where access_whitelist_id=?");    
             prep_stmt->setString(19, id);       
             }
                                     
