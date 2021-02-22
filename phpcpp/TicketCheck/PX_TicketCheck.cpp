@@ -1117,19 +1117,24 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
                     response["whitelist_result_description"]=accessResultDescription;
                     
                     int cooperate_parker=response["cooperate_parker"];
-                    int type=response["entry_type_contract_parking_space_exceeded"];
+                    int type=response["short_term_entry_after_contract_parking_space_exceeded"];
                     
                     if(toString(response["access_allowed"])=="true" && cooperate_parker>1 && type==1 && deviceType!=1)
                         {
                         Php::Value ticket_details=exitPlateCheck();
                         for (auto &iter : ticket_details)    				    			        									
                             response[iter.first]=iter.second ; 
+                        
+                        string result=response["result"];
+                        string result_description=response["result_description"];
+                        insertIntoTicketCheck(result,result_description);
+                        writeLog("parcxTicketCheck","Result: "+result+"\tDescription:"+result_description+"\n");
+                        return response;
                         }
                     
                     }
                 
-                
-                
+                                
                 if(toString(response["access_allowed"])=="false" && reservationEnabled==1)
                     {
                     writeLog("reservationEnabled","Reservation check");			

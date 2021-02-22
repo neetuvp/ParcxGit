@@ -43,7 +43,7 @@ sql::Driver *driver;
 std::string query;
 bool cloud=false;
 bool flagSet=false;
-int plate_review_confidence_rate=0,entry_type_contract_parking_space_exceeded=2;
+int plate_review_confidence_rate=0,short_term_entry_after_contract_parking_space_exceeded=0,full_payment_after_contract_parking_space_exceeded=1;
 int occupied,parking_spaces,cooperate_parker;
 
 string currentTime()
@@ -95,7 +95,7 @@ void setCloudFlag()
             sql::ResultSet *res;
             conn = DBConnection(DATABASE_SERVER);
             stmt = conn->createStatement(); 
-            res=stmt->executeQuery("select setting_name,setting_value from system_settings where setting_name in ('entry_type_contract_parking_space_exceeded','cloud_enabled','plate_review_confidence_rate')");
+            res=stmt->executeQuery("select setting_name,setting_value from system_settings where setting_name in ('full_payment_after_contract_parking_space_exceeded','short_term_entry_after_contract_parking_space_exceeded','cloud_enabled','plate_review_confidence_rate')");
             while(res->next())
                 { 
                 if(res->getString("setting_name")=="cloud_enabled")                       
@@ -106,9 +106,11 @@ void setCloudFlag()
                 if(res->getString("setting_name")=="plate_review_confidence_rate")                    
                     plate_review_confidence_rate=res->getInt("setting_value");
                 
-                if(res->getString("setting_name")=="entry_type_contract_parking_space_exceeded")                    
-                    entry_type_contract_parking_space_exceeded=res->getInt("setting_value");
-                                    
+                if(res->getString("setting_name")=="short_term_entry_after_contract_parking_space_exceeded")                    
+                    short_term_entry_after_contract_parking_space_exceeded=res->getInt("setting_value");
+                
+                if(res->getString("setting_name")=="full_payment_after_contract_parking_space_exceeded")                    
+                    full_payment_after_contract_parking_space_exceeded=res->getInt("setting_value");                                                    
                 }            
             flagSet=true;
             delete stmt;
@@ -298,7 +300,7 @@ Php::Value UploadParkingAccessMovements(Php::Value request)
                         query="update open_transactions set movement_type=2,cloud_upload_status=0 where ticket_id = '"+ticket_id+"' and entry_type=2";
                                                                
                     result = stmt->executeUpdate(query);
-                    if(entry_type_contract_parking_space_exceeded==1)
+                    if(short_term_entry_after_contract_parking_space_exceeded==1 && full_payment_after_contract_parking_space_exceeded==0)
                         {
                         sql::ResultSet *res;
                         if(plate_number!="")

@@ -165,11 +165,11 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                                         
                 if(access_allowed=="true" && cooperate_parker>1)
                     {
-                    query="SELECT setting_value from system_settings where setting_name='entry_type_contract_parking_space_exceeded'";
+                    query="SELECT setting_value from system_settings where setting_name='short_term_entry_after_contract_parking_space_exceeded'";
                     res=stmt->executeQuery(query);
                     res->next();
-                    response["entry_type_contract_parking_space_exceeded"]=int(res->getInt("setting_value"));
-                    writeAccessLog("checkAccess","entry_type_contract_parking_space_exceeded : "+string(res->getString("setting_value")));
+                    response["short_term_entry_after_contract_parking_space_exceeded"]=int(res->getInt("setting_value"));
+                    writeAccessLog("checkAccess","short_term_entry_after_contract_parking_space_exceeded : "+string(res->getString("setting_value")));
 
                     if(res->getInt("setting_value")==1 && deviceType==1)
                         {        
