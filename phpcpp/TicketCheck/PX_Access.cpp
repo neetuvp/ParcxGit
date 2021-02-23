@@ -160,6 +160,7 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                     }
                     
                 writeAccessLog("checkAccess","cooperate_parker : "+to_string(cooperate_parker));
+                response["short_term_entry_after_contract_parking_space_exceeded"]=0;
                 
                 string access_allowed=response["access_allowed"];
                                         

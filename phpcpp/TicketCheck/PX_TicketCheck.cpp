@@ -36,6 +36,8 @@ string validation_value,parking_rate="",parking_rate_label="",entry_grace_period
 int entry_grace_period_minuts,exit_grace_period_minuts;
 int parkingFeeDuration=0;
 int anpr_mismatch_check=0;
+int cooperate_parker=0;
+int short_term_entry_after_contract_parking_space_exceeded=0;
 
 
 void writeLog(string function,string message)
@@ -795,8 +797,24 @@ Php::Value openTransactionCheck(int getDetails)
                                 }
                             }
                         else
-                            {
-                            response["result_description"]="Unpaid";	
+                            {                            
+                            if(accessResult=="allow_access")
+                                {
+                                if(cooperate_parker>1 && short_term_entry_after_contract_parking_space_exceeded==1)
+                                    {
+                                    response["result_description"]="Unpaid.Corporate user enterd as shortterm user";
+                                    response["whitelist_result"]="access_denied";
+                                    response["whitelist_result_description"]="Corporate user enterd as shortterm user";
+                                    }
+                                else
+                                    {
+                                    response["result_description"]="Unpaid.Antipassback.Access user entered as shortterm";
+                                    response["whitelist_result"]="access_denied";
+                                    response["whitelist_result_description"]="Antipassback.Access user entered as shortterm";
+                                    }
+                                }
+                            else
+                                response["result_description"]="Unpaid";
                             response["result"]="unpaid";										
                             }
 
@@ -1105,6 +1123,8 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
                 response["open_transaction_check"]="false";				
                 if(accessEnabled==1)
                     {
+                    cooperate_parker=0;
+                    short_term_entry_after_contract_parking_space_exceeded=0;
                     writeLog("qrcodeAccessEnabled","Access check");	
                     Php::Value whitelist_details=AccessObj.checkAccess(ticketId,parkingZone,carparkNumber,facilityNumber,deviceType,plateNumber,plateType,plateArea,plateCountry,anprSettings);
                     for (auto &iter : whitelist_details)    				    			        			
@@ -1116,11 +1136,12 @@ Php::Value parcxTicketCheck(Php::Parameters &params)
                     response["whitelist_result"]=accessResult;
                     response["whitelist_result_description"]=accessResultDescription;
                     
-                    int cooperate_parker=response["cooperate_parker"];
-                    int type=response["short_term_entry_after_contract_parking_space_exceeded"];
+                    cooperate_parker=response["cooperate_parker"];
+                    short_term_entry_after_contract_parking_space_exceeded=response["short_term_entry_after_contract_parking_space_exceeded"];                    
+                    //if(toString(response["access_allowed"])=="true" && cooperate_parker>1 && short_term_entry_after_contract_parking_space_exceeded==1 && deviceType!=1)
                     
-                    if(toString(response["access_allowed"])=="true" && cooperate_parker>1 && type==1 && deviceType!=1)
-                        {
+                    if(toString(response["access_allowed"])=="true" && deviceType!=1)
+                        {                        
                         Php::Value ticket_details=exitPlateCheck();
                         for (auto &iter : ticket_details)    				    			        									
                             response[iter.first]=iter.second ; 
