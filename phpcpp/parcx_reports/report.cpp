@@ -9,7 +9,6 @@ GeneralOperations General;
 ParkingReport pObj;
 RevenueReport rObj;
 
-
 void writeLog(string function,string message)
     {
     General.writeLog("WebApplication/ApplicationLogs/PX-Report-"+General.currentDateTime("%Y-%m-%d"),function,message);    
@@ -20,9 +19,6 @@ void writeException(string function,string message)
     General.writeLog("WebApplication/ExceptionLogs/PX-Report-"+General.currentDateTime("%Y-%m-%d"),function,message); 
 	writeLog(function,"Exception: "+message);   
     }
-
-
-
 
 Php::Value parcxReport(Php::Parameters &params)
     {

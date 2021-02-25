@@ -623,6 +623,20 @@ Php::Value openTransactionCheck(int getDetails)
                     }
                 else
                     {
+                    if(entryType==1 && accessResult=="allow_access")
+                        {
+                        if(cooperate_parker>1 && short_term_entry_after_contract_parking_space_exceeded==1)
+                            {                            
+                            response["whitelist_result"]="access_denied";
+                            response["whitelist_result_description"]="Corporate user enterd as shortterm user";
+                            }
+                        else
+                            {                            
+                            response["whitelist_result"]="access_denied";
+                            response["whitelist_result_description"]="Antipassback.Access user entered as shortterm";
+                            }
+                        }
+
                     if(entryType==2 && accessResult=="allow_access")
                         {
                         if(res->getString("pay_upto")!="")
@@ -740,8 +754,7 @@ Php::Value openTransactionCheck(int getDetails)
                                 {
                                 if(maxExitGrace!="")                                    
                                     maxExitGrace=accessExpiry+" 23:59:59";                                    
-                                    
-                                
+                                                                    
                                 }
                             else
                                 return response;
@@ -800,18 +813,10 @@ Php::Value openTransactionCheck(int getDetails)
                             {                            
                             if(accessResult=="allow_access")
                                 {
-                                if(cooperate_parker>1 && short_term_entry_after_contract_parking_space_exceeded==1)
-                                    {
-                                    response["result_description"]="Unpaid.Corporate user enterd as shortterm user";
-                                    response["whitelist_result"]="access_denied";
-                                    response["whitelist_result_description"]="Corporate user enterd as shortterm user";
-                                    }
-                                else
-                                    {
-                                    response["result_description"]="Unpaid.Antipassback.Access user entered as shortterm";
-                                    response["whitelist_result"]="access_denied";
-                                    response["whitelist_result_description"]="Antipassback.Access user entered as shortterm";
-                                    }
+                                if(cooperate_parker>1 && short_term_entry_after_contract_parking_space_exceeded==1)                                    
+                                    response["result_description"]="Unpaid.Corporate user enterd as shortterm user";                                                                    
+                                else                                    
+                                    response["result_description"]="Unpaid.Antipassback.Access user entered as shortterm";                                                                        
                                 }
                             else
                                 response["result_description"]="Unpaid";
