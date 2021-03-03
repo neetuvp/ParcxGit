@@ -18,7 +18,7 @@
 #	are automatically generated
 #
 
-NAME				=	PX_UserManagement
+NAME				=	PX_AdminLogin
 
 
 #

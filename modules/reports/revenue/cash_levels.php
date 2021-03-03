@@ -5,11 +5,18 @@ $page_title="Application Home";
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
 
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=8;
+$json=parcxReport($data);
+
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">APM Cash Level</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["cash_levels"]?></div>
 <?php
 
 include('../../../includes/navbar-end.php');
@@ -32,7 +39,7 @@ include('../../../includes/sidebar.php');
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php echo parcxSettings(array("task"=>"38"));?>
+            <?php echo parcxSettings(array("task"=>"14","type"=>"4"));?>
           </select>
         </div>
 
@@ -40,7 +47,7 @@ include('../../../includes/sidebar.php');
         
         <!-- search -->
         <div class="col-md-1">
-          <button type="button" class="btn btn-block btn-secondary" id="view-report-button" onclick="cash_levels()">Search</button>
+          <button type="button" class="btn btn-block btn-secondary" id="view-report-button" onclick="cash_levels()"><?=$json["view_report"]?></button>
         </div>
 
         <!-- loader -->
@@ -57,10 +64,10 @@ include('../../../includes/sidebar.php');
         <div class="card-body" id="report-content">
           <?php                    
           //$reports->cash_levels([]);
-			$data["device"]="";	
-			$data["language"] = $_SESSION["language"];
-			$data["task"]=18;                          
-			echo parcxReport($data);
+            $data["device"]="";	
+            $data["language"] = $_SESSION["language"];
+            $data["task"]=18;                          
+            echo parcxReport($data);
           ?>
 
           </div>
@@ -74,6 +81,21 @@ include('../../../includes/sidebar.php');
 <script>
  // $('#view-report-button').click(function (event) { 
  var load_report=0;
+ 
+ $(function() 
+    {
+    $('#deviceNumber').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_devices"]?>",               
+        nonSelectedText:"<?=$json["select_devices"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_devices"]?>"  
+        });
+ });
+ 
+ 
  function cash_levels(){
 console.log("Button.click");
     var device = $("#deviceNumber").val().toString();
@@ -84,10 +106,10 @@ console.log("Button.click");
 		language:language
       };
       var temp = JSON.stringify(data);
-      alert(temp);
+      //alert(temp);
       $.post("../../ajax/reports.php", temp)
         .done(function (result) {
-alert(result);
+//alert(result);
           $("#report-content").html(result);
           reportSuccess();
 		  load_report=1;
@@ -97,24 +119,61 @@ alert(result);
  }
   //}); 
 
- function loadPage()
-  {
-  loadheadingreport("cash_levels");
-  if(load_report==1)
-	  cash_levels(); 
-  }
-$("#language").change(function(){
-  loadPage();
-});
-
-$( document ).ready(function() {
-	loadheadingreport("cash_levels");
-});
-
+ 
 $('#export_excel_report').click(function (event) 
-  {  
-  export_to_excel("#report-content", "APM Cash Level Report")
-  }); // end click event function 
+    {    
+    export_to_excel("#report-content", "PMS_Payment_transaction")
+    });
+
+
+
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=8;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {		              
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.cash_levels);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+
+
+        
+                                        
+        $('#deviceNumber').multiselect('destroy');
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_devices,                                    
+            nonSelectedText:json.select_devices,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_devices             
+            });  
+            
+        
+        });    
+    }
+
+$("#language").change(function()
+    {	  
+    loadReportLabels();    
+    cash_levels();		
+    });  
   
 </script>
 

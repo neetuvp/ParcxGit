@@ -79,51 +79,6 @@ class webservice
             } 
         $this->log("Output:".json_encode($response));
         echo json_encode($response);
-        }
-
-        function checkAntiPassback2($json)
-        {        
-        $data=json_decode($json);
-        $this->log("Input:".$json);
-        $tag_serial=$data->{'tag_serial'};
-        $response["tag_serial"]=$tag_serial;
-        $response["status"]=400;        
-        $con=$this->db_connect();
-        if($con)
-            {            
-            $movement_type=$data->{'movement_type'};           
-            $facility_number=$data->{'facility_number'};
-            $carpark_number=$data->{'carpark_number'};            
-            $query_string="select * from parking_movements_access where carpark_number='$carpark_number' and
-            facility_number='$facility_number' and tag_serial='$tag_serial' order by date_time desc limit 1";
-            //echo $query_string;
-            $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
-            if ($data = mysqli_fetch_assoc($result))                
-                {
-                    if(($movement_type==1 && $data['movement_type']==2)||($movement_type==2 && $data['movement_type']==1))
-                        {
-                            $response["status"]=200;  
-                            $response["message"]="Success";
-                        }
-                    if($movement_type==1 && $data['movement_type']==1)
-                        $response["message"]="Entry Exists";
-                    if($movement_type==2 && $data['movement_type']==2)
-                        $response["message"]="Exit Exists";
-                   
-                }
-            else
-                {
-                    if($movement_type==1)
-                        {
-                            $response["status"]=200;
-                            $response["message"]="Success";
-                        }
-                    else
-                        $response["message"]="Entry not Exists";
-                }
-            } 
-        $this->log("Output:".json_encode($response));
-        echo json_encode($response);
-        }
+        }       
     }
 ?>

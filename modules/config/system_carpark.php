@@ -78,8 +78,7 @@ include('../../includes/sidebar.php');
                 <div class="row">	
                     <div class="col form-group">
                         <label>Total Spaces</label>
-                        <h3 id="total_spaces">0</h3>
-                        <!-- <input type="number" class="form-control" id="total_spaces" value="0"> -->
+                        <h3 id="total_spaces">0</h3>                       
 
                     </div>                  
                 </div>
@@ -190,7 +189,7 @@ include('../../includes/sidebar.php');
                 {
                     data["id"] = "";
                     data["previous_facility"] = $("#facility").val();
-                    data["previous_carpark"] = $("#name").val();
+                    data["previous_carpark"] =$("#carpark_number").val();
                 } else
                 {
                     data["id"] = id;
@@ -219,11 +218,7 @@ include('../../includes/sidebar.php');
                         location.reload();
                     else
                         alert(result);
-                })
-                        .fail(function (jqxhr, status, error) {
-                            alert("Error: " + error);
-
-                        });
+                });                        
             }
         });
 
@@ -251,11 +246,7 @@ include('../../includes/sidebar.php');
                 location.reload();
             else
                 alert(result);
-        })
-                .fail(function (jqxhr, status, error) {
-                    alert("Error: " + error);
-
-                });
+        });
     });
 
     /*=====edit======*/
@@ -285,11 +276,8 @@ include('../../includes/sidebar.php');
             $("#add-edit-button").val("Edit");
             previous_carpark = response.carpark_number;
             previous_facility = response.facility_number;
-        })
-                .fail(function (jqxhr, status, error) {
-                    alert("Error: " + error);
-
-                });
+        });
+                
     });
 
 </script>

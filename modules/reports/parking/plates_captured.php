@@ -5,17 +5,21 @@ $page_title="Application";
 //# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=20;
+$json=parcxReport($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Plates Captured</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["plates_captured"]?></div>
 
 <?php
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-include('../../../classes/reporting_parking.php');
-$obj=new reporting_parking();
 ?>
 <!-- Modal -->
 <div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -23,7 +27,7 @@ $obj=new reporting_parking();
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ANPR Image</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?=$json["anpr_image"]?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -44,43 +48,44 @@ $obj=new reporting_parking();
 
             <div class="flex-grow-1 row additional-menu-left">
 
-                <div class="col-md-2">
-                    <select class="form-control" id="device">
-                        <?php $obj->get_camera_devices() ?>
+                <div class="col-md-2 mb-4">
+                    <select class="form-control" id="deviceNumber" multiple="multiple">
+                        <?php echo parcxSettings(array("task"=>"14","type"=>"8"));?>
                     </select>
                 </div>
 
                 <div class="col-md-2">                    
-                    <input type = "text" class="form-control" id="plate" placeholder="Plate Number" >
-					 <?php echo "<input type = 'hidden' class='form-control' id='imageurl' value=".ImageURL." >" ?>
+                    <input type = "text" class="form-control" id="plate" placeholder="<?=$json["plate_number"]?>" >
+		    <?php echo "<input type = 'hidden' class='form-control' id='imageurl' value=".ImageURL." >" ?>
                 </div>
 
-                <div class="col-md-1">                    
-                    <select class="form-control" id="plate_type" placeholder="Plate Type" >
-                       <option value=''>Type</option>  
-					   <option value='Police'>Police</option>
-                       <option value='Transport'>Transport</option>  
-                       <option value='Commercial'>Commercial</option>
-                       <option value='Private'>Private</option>
-                       <option value='Learning'>Learning</option>
-                       <option value='CD_Diplomat'>CD_Diplomat</option>					   
-					   <option value='CC_Diplomat'>CC_Diplomat</option>  
-					   <option value='Protocol'>Protocol</option>
-                       <option value='Government'>Government</option>  
-                       <option value='Export'>Export</option>
-                       <option value='Taxi'>Taxi</option>
-                       <option value='Testing'>Testing</option>
-                       <option value='Transfer'>Transfer</option>					   
-					   <option value='truck'>Truck</option>
-                       <option value='Bus'>Bus</option>
-                       <option value='PublicTransport'>Public Transport</option>
-                       <option value='PrivateTransport'>Private Transport</option>                                    
+                
+                <div class="col-md-2">                    
+                    <select class="form-control" id="plate_type" placeholder="<?=$json["plate_type"]?>" >
+                       <option value='' id = 'type'><?=$json["plate_type"]?></option>  
+			<option value='Police' id='police'><?=$json["police"]?></option>
+                       <option value='Transport' id='transport'><?=$json["transport"]?></option>  
+                       <option value='Commercial' id='commercial'><?=$json["commercial"]?></option>
+                       <option value='Private' id='private'><?=$json["private"]?></option>
+                       <option value='Learning' id='learning'><?=$json["learning"]?></option>
+                       <option value='CD_Diplomat' id='cddiplomat'><?=$json["cddiplomat"]?></option>					   
+                       <option value='CC_Diplomat' id='ccdiplomat'><?=$json["ccdiplomat"]?></option>  
+                       <option value='Protocol' id='protocol'><?=$json["protocol"]?></option>
+                       <option value='Government' id='government'><?=$json["government"]?></option>  
+                       <option value='Export' id='export_type'><?=$json["export"]?></option>
+                       <option value='Taxi' id='taxi'><?=$json["taxi"]?></option>
+                       <option value='Testing' id='testing'><?=$json["testing"]?></option>
+                       <option value='Transfer' id='transfer'><?=$json["transfer"]?></option>					   
+                       <option value='truck' id='truck'><?=$json["truck"]?></option>
+                       <option value='Bus' id='bus'><?=$json["bus"]?></option>
+                       <option value='PublicTransport' id='publictransport'><?=$json["publictransport"]?></option>
+                       <option value='PrivateTransport' id='privatetransport'><?=$json["privatetransport"]?></option>                                    
                     </select>
                 </div>
-                <div class="col-md-1">                    
-                    <select class="form-control" id="plate_area" placeholder="Plate Area" >
-                       <option value=''>Area</option>
-					   <option value='AUH'>AUH</option>
+                <div class="col-md-2">                    
+                    <select class="form-control" id="plate_area" placeholder="<?=$json["plate_area"]?>" >
+                       <option value='' id="area"><?=$json["plate_area"]?></option>
+		       <option value='AUH'>AUH</option>
                        <option value='DUB'>DUB</option>
                        <option value='SHJ'>SHJ</option>  
                        <option value='AJ'>AJ</option>
@@ -90,63 +95,20 @@ $obj=new reporting_parking();
                     </select>
                 </div>
 
-                <div class="col-md-1">                    
+                <div class="col-md-2">                    
                     <select class="form-control" id="plate_country" placeholder="Plate Country" >
-                       <option value=''>Country</option>  
-                       <option value='UnitedArabEmirates'>United Arab Emirates</option> 
-                       <option value='Kuwait'>Kuwait</option> 
-                       <option value='Saudi Arabia'>Saudi Arabia</option> 
-                       <option value='Oman'>Oman</option> 
-                       <option value='Qatar'>Qatar</option> 
-                       <option value='Bahrain'>Bahrain</option> 
+                       <option value='' id="select_country"><?=$json["select_country"]?></option>  
+                       <option value='UnitedArabEmirates' id='uae'><?=$json["uae"]?></option> 
+                       <option value='Kuwait' id='kuwait'><?=$json["kuwait"]?></option> 
+                       <option value='Saudi Arabia' id='saudi'><?=$json["saudi"]?></option> 
+                       <option value='Oman' id='oman'><?=$json["oman"]?></option> 
+                       <option value='Qatar' id='qatar'><?=$json["qatar"]?></option> 
+                       <option value='Bahrain' id='bahrain'><?=$json["bahrain"]?></option> 
                                     
                     </select>
                 </div>
 
-                <!-- date and time -->
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="far fa-clock"></i></span>
-                        </div>
-                        <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-                            placeholder="Choose Date and Time Range">
-                    </div>
-                </div>
-
-                <!-- search -->
-                <div class="col-md-1">
-                <button type="button" class="btn  btn-secondary" id="view-report-button" onclick = "plates_captured()">View Report</button>
-                </div>
-
-                <!-- loader -->
-                <div class='col-1' id='loader'>
-                    <img src='../../../dist/img/loading.gif'>
-                </div>
-
-            </div>
-			
-			<div class="additional-menu-right">
-			<div id="action-buttons">
-			  <div class="btn-group">
-				<button type="button" class="btn btn-warning">Export</button>
-				<button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-				  <span class="caret"></span>
-				  <span class="sr-only">Toggle Dropdown</span>
-				</button>
-				<div class="dropdown-menu" role="menu">
-				  <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-				  <a class="dropdown-item" href="#" id="export_pdf_report">
-					Export to PDF
-				  </a>
-				</div>
-			  </div>
-			</div>
-		  </div>
-
-        </div>
-    </div>
+                <?php include('../../../includes/additional-menu-report.php');?>           
     <!-- end / additional menu -->
 
     <section class="content">
@@ -155,8 +117,11 @@ $obj=new reporting_parking();
             <!-- begin report -->
             <div class="card">
                 <div class="card-body" id="report-content">
-				<?php	$data["task"]=11;                          
-				echo parcxReport($data);?>
+                <?php
+                    $data["task"]=12;
+                    $data["language"]=$_SESSION["language"];  
+                    echo parcxReport($data);
+                ?>
                 </div>
             </div>
             <!-- / end report -->
@@ -170,76 +135,166 @@ $obj=new reporting_parking();
 <?php include('../../../includes/footer.php');?>
 
 <script>
-//loadheading("plates_captured");
-//loadPage();
-   // $('#view-report-button').click(function (event) {
-	function plates_captured()
-	{
-        var device = $("#device").val();
-        var daterange = $("#reservationtime").val();
-        var from = daterange.substring(0, 19);
-        var to = daterange.substring(22, 41);
-        var plate = $('#plate').val();
-        var type = $('#plate_type').val();
-        var area = $('#plate_area').val();
-        var country = $('#plate_country').val();
-		var language =$("#language").val();
-		var imageurl = $("#imageurl").val();
-        if ((!daterange)) {
-            alert("choose date range");
-        } else {
-            var data = {
-                device: device,
-                to: to,
-                from: from,
-                plate: plate,
-                type: type,
-                area: area,
-                country: country,
-				language:language,
-				imageurl:imageurl,
-				task:12
-            };
-            var temp = JSON.stringify(data);
-            alert(temp);
-            $.post("../../ajax/reports.php", temp)
-                .done(function (result) {                    
-                    //$("#report-content").html(result);
-                    //$("#loader").css("visibility","hidden");
-					loadReport(result);   
-                }, "json");
-        } // end if 
+$(function() 
+    {
+    $('#deviceNumber').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_devices"]?>",               
+        nonSelectedText:"<?=$json["select_devices"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_devices"]?>"  
+        });
+        
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>",       
+        });    
+ });
+function callReport()
+{  
+    var device = $("#device").val();
+    var daterange = $("#reservationtime").val();
+    var from = daterange.substring(0, 19);
+    var to = daterange.substring(22, 41);
+    var plate = $('#plate').val();
+    var type = $('#plate_type').val();
+    var area = $('#plate_area').val();
+    var country = $('#plate_country').val();
+    var language =$("#language").val();
+    var imageurl = $("#imageurl").val();
 
-        event.preventDefault();
-   }
-   // }); // 
-
-    $('body').on('click', "[data-target='#image-modal']", function () {
-    var id = $(this).data('value');
-    var camera_no = $('#camera_no'+id).val();
-    var plate_image = $('#plate_image'+id).val();	
-    var date = $('#date'+id).val();	
-	var imageurl = $("#imageurl").val();
     var data = {
-        camera_no:camera_no,
-        plate_image:plate_image,
-        date:date,
-		imageurl:imageurl,
-		task:14
+        device: device,
+        to: to,
+        from: from,
+        plate: plate,
+        type: type,
+        area: area,
+        country: country,
+        language:language,
+        imageurl:imageurl,
+        task:12
     };
-    var json = JSON.stringify(data)    
-    $.post("../../ajax/reports.php", json)
-    .done(function (result) {        
-    $("#image-content-modal").html(result);
-    }, "json");
+    var temp = JSON.stringify(data);
+    $.post("../../ajax/reports.php", temp)
+        .done(function (result) {                    
+            //$("#report-content").html(result);
+            //$("#loader").css("visibility","hidden");
+                                loadReport(result);   
+        }, "json");
+
+    event.preventDefault();
+}
+   // }); // 
+   
+$('#view-report-button').click(function (event) 
+{ 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+        callReport();	    
 });
-function loadPage()
-  {
-  loadheadingreport("plates_captured");
-  plates_captured(); 
-  }
-$("#language").change(function(){
-  loadPage();
-}); 
+
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=20;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {	
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.plates_captured);   
+        $("#view-report-button").html(json.view_report); 
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next; 
+        $("#type").html(json.plate_type);
+        $("#police").html(json.police);
+        $("#transport").html(json.transport);
+        $("#commercial").html(json.commercial);
+        $("#private").html(json.private);
+        $("#learning").html(json.learning);
+        $("#cddiplomat").html(json.cddiplomat);
+        $("#ccdiplomat").html(json.ccdiplomat);
+        $("#protocol").html(json.protocol);
+        $("#government").html(json.government);
+        $("#export_type").html(json.export);
+        $("#taxi").html(json.taxi);
+        $("#testing").html(json.testing);
+        $("#transfer").html(json.transfer);
+        $("#truck").html(json.truck);
+        $("#bus").html(json.bus);
+        $("#taxi").html(json.taxi);
+        $("#publictransport").html(json.publictransport);
+        $("#privatetransport").html(json.privatetransport);
+        $("#uae").html(json.uae);
+        $("#bahrain").html(json.bahrain);
+        $("#qatar").html(json.qatar);
+        $("#oman").html(json.oman);
+        $("#saudi").html(json.saudi);
+        $("#kuwait").html(json.kuwait);
+        $("#select_country").html(json.select_country);
+        $("#area").html(json.plate_area);
+        
+        
+        $("#plate").attr('placeholder',json.plate_number);
+        $('#deviceNumber').multiselect('destroy');
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_devices,                                    
+            nonSelectedText:json.select_devices,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_devices             
+            });     
+        
+        });    
+    }
+
+$("#language").change(function()
+    {	  
+    loadReportLabels();    
+    callReport();		
+    });       
+
+
+$('body').on('click', "[data-target='#image-modal']", function () {
+var id = $(this).data('value');
+var camera_no = $('#camera_no'+id).val();
+var plate_image = $('#plate_image'+id).val();	
+var date = $('#date'+id).val();	
+    var imageurl = $("#imageurl").val();
+var data = {
+    camera_no:camera_no,
+    plate_image:plate_image,
+    date:date,
+            imageurl:imageurl,
+            task:14
+};
+var json = JSON.stringify(data)    
+$.post("../../ajax/reports.php", json)
+.done(function (result) {        
+$("#image-content-modal").html(result);
+}, "json");
+});
+
 
 </script>

@@ -12,7 +12,7 @@
             </div>
 
             <!-- search -->
-            <div class="col-md-1">
+            <div class="col-md-2">
                 <button type="button" class="btn btn-block btn-secondary" id="view-report-button"><?=$json["view_report"]?></button>
             </div>
 

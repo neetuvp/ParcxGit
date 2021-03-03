@@ -5,11 +5,17 @@ $page_title="Application Home";
 //# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=14;
+$json=parcxReport($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Track ticket</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["ticket_details"]?></div>
 
 <?php
 include('../../../includes/navbar-end.php');
@@ -47,13 +53,13 @@ include('../../../includes/sidebar.php');
 
         <!-- plate -->
         <div class="col-md-2">
-          <input type="text" id="ticket_id" class="form-control" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"ticket_id"));?>">
+          <input type="text" id="ticket_id" class="form-control" placeholder="<?=$json["ticket_id"]?>">
         </div>        
        
 
         <!-- search -->
         <div class="col-md-1">
-          <button type="button" class="btn  btn-secondary" id="view-details-button" onclick="ticket_details()">View details</button>
+          <button type="button" class="btn  btn-secondary" id="view-details-button" onclick="callReport()">View details</button>
         </div>
 
         <!-- loader -->
@@ -84,14 +90,9 @@ include('../../../includes/sidebar.php');
 <script>
 //$('#view-report-button').click(function (event) 
 var load_report = 0;
-function ticket_details()
-  { 
-  if ($("#ticket_id").val()=="") 
-    {
-    alert("choose ticket id");
-    } 
-  else 
-    {
+function callReport()
+{ 
+
     var data={};            
     data["ticket_id"]=$("#ticket_id").val();   
 	data["language"] = $("#language").val();	
@@ -105,25 +106,52 @@ function ticket_details()
 		load_report=1;
 
       }, "json");
-    } // end if 
+
 
     event.preventDefault();
   }
   //}); 
 
-function loadPage()
-  {
-  loadheadingreport("ticket_details");
-  if(load_report==1)
-	ticket_details(); 
-  }
-$("#language").change(function(){
-  loadPage();
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=14;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {		
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.ticket_details);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        $("#view-details-button").html(json.view_details);
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;    
+        $("#ticket_id").attr('placeholder',json.ticket_id);  
+        }); 
+        
+        
+    }
+
+
+$("#language").change(function()
+{	  
+    loadReportLabels();    
+    callReport();		
 }); 
 
 $('#export_excel_report').click(function (event) 
   {
-  export_to_excel("#page-content", "PMS_Open_Transaction_Report")
+  export_to_excel("#page-content", "Ticket_Details")
   });
 
 $( document ).ready(function() {

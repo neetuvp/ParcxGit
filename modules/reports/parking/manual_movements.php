@@ -1,172 +1,188 @@
 <?php
-
-$page_title="Application";
+$page_title = "Application";
 
 //# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
-
+$data = array();
+$data["task"] = 29;
+$data["language"] = $_SESSION["language"];
+$data["page"] = 18;
+$json = parcxReport($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Manual Movements</div>
+<div class="header text-dark" id="pdf-report-header"><?= $json["manual_movement"] ?></div>
 
 <?php
-
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-
-//# App Function Classes
-include('../../../classes/reporting_parking.php');
-$reports=new reporting_parking();
 ?>
 
 
 
 <div class="content-wrapper">
 
-  <!-- additional menu -->
-  <div class="additional-menu row m-0 bg-white border-bottom">
-    <div class="col d-flex pl-1 align-items-center">
+    <!-- additional menu -->
+    <div class="additional-menu row m-0 bg-white border-bottom">
+        <div class="col d-flex pl-1 align-items-center">
 
-      <div class="flex-grow-1 row additional-menu-left">
+            <div class="flex-grow-1 row additional-menu-left">
 
-        <!-- carparks -->
-        <div class="col-md-2">
-          <select class="form-control" id="multiselect" multiple="multiple">
-          
-		   <?php echo parcxSettings(array("task"=>"12"));?>
-          </select>
-        </div>
+                <!-- carparks -->
+                <div class="col-md-2">
+                    <select class="form-control" id="multiselect" multiple="multiple">
 
-        <!-- operation methods -->
-        <div class="col-md-2">
-          <select class="form-control" id="operation">
-            <option value="0">All Operation Methods</option>
-            <option value="cashier">Manual Open from Cashier</option>
-            <option value="pushbutton">Remote/Push Button Open</option>
-          </select>
-        </div>
+<?php echo parcxSettings(array("task" => "12")); ?>
+                    </select>
+                </div>
 
-        <!-- date and time -->
-        <div class="col-md-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
+                <!-- operation methods -->
+                <div class="col-md-2">
+                    <select class="form-control" id="operation">
+                        <option value="0" id="all_operation_methods" ><?= $json["all_operation_methods"] ?></option>
+                        <option value="cashier" id="manual_open_from_cashier"><?= $json["manual_open_from_cashier"] ?></option>
+                        <option value="pushbutton" id="remote_pushbutton_open"><?= $json["remote_pushbutton_open"] ?></option>
+                    </select>
+                </div>
+
+<?php include('../../../includes/additional-menu-report.php'); ?>       
+                <!-- end / additional menu -->
+
+
+                <section class="content">
+                    <div class="container-wide">
+                        <div class="card">
+                            <div class="card-body" id="report-content">          
+                            <?php
+                            $current_date = date("Y-m-d");
+                            $data["from"] = $current_date . " " . DAY_CLOSURE_START;
+                            $data["to"] = $current_date . " " . DAY_CLOSURE_END;
+                            $data["carpark"] = "";
+                            $data["operation"] = "";
+                            $data["language"] = $_SESSION["language"];
+                            $data["task"] = 11;
+                            echo parcxReport($data);
+                            ?>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
-          </div>
-        </div>
 
-        <!-- search -->
-        <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="manual_movement()">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- end / additional menu -->
-
-  <section class="content">
-    <div class="container-wide">
-
-      <div class="card">
-        <div class="card-body" id="report-content">
-
-          <?php 
-                  //$current_date=date("Y-m-d");  
-                   //$reports->get_manual_movements_report($current_date." ".DAY_CLOSURE_START,$current_date." ".DAY_CLOSURE_END,[],[]);
-				 $current_date=date("Y-m-d");    
-				$data["from"]=$current_date." ".DAY_CLOSURE_START;
-				$data["to"]=$current_date." ".DAY_CLOSURE_END;           
-				$data["carpark"]="";  
-				$data["operation"]="";  
-				$data["task"]=11;                          
-				echo parcxReport($data);
-			?>
-				   
-
-        </div>
-      </div>
-
-    </div>
-</section>
-</div>
 
 <?php include('../../../includes/footer.php'); ?>
 
 <script>
+    var date_range_message = "choose date range";
+    from = "<?= $current_date . " " . DAY_CLOSURE_START ?>";
+    to = "<?= $current_date . " " . DAY_CLOSURE_END ?>";
 
- // $('#view-report-button').click(function (event) { // close the home page banner : control button
-	function manual_movement(){
-    var carpark =$("#multiselect").val().toString(); 
-    var operation = $("#operation").val();
-	var language =$("#language").val();
-    if ((!daterange)) {
-      alert("choose date range");
-    } else {
-      var data = {
-        carpark: carpark,
-        operation: operation,
-        to: to,
-        from: from,
-		language:language,
-		task:11
-      };
-      var jsondata = JSON.stringify(data);  	  
-    $.post("../../ajax/reports.php",jsondata,function(data)
-		  {      
-      loadReport(data);   
-		//$("#report-content").html(data);
-      })
-    .fail(function(jqxhr,status,error)
-		  {
-      alert("Error: "+error);
-      }); 
-		} // end if 
-  event.preventDefault();
-	//}); //manual movements-report-content
-	}
+    $(function ()
+    {
+        $('#multiselect').multiselect(
+                {
+                    buttonWidth: '100%',
+                    includeSelectAllOption: true,
+                    selectAllText: "<?= $json["all_carparks"] ?>",
+                    nonSelectedText: "<?= $json["select_carparks"] ?>",
+                    selectAllNumber: false,
+                    allSelectedText: "<?= $json["all_carparks"] ?>",
+                });
+    });
+    function callReport()
+    {
+        var carpark = $("#multiselect").val().toString();
+        var operation = $("#operation").val();
+        var language = $("#language").val();
 
-  $('#export_excel_report').click(function (event) {
+        var data = {
+            carpark: carpark,
+            operation: operation,
+            to: to,
+            from: from,
+            language: language,
+            task: 11
+        };
+        var jsondata = JSON.stringify(data);
+        console.log(jsondata);
+        $.post("../../ajax/reports.php", jsondata, function (data)
+        {
+            console.log(data);
+            loadReport(data);
+            //$("#report-content").html(data);
+        })
+                .fail(function (jqxhr, status, error)
+                {
+                    alert("Error: " + error);
+                });
+        event.preventDefault();
+        //}); //manual movements-report-content
+    }
 
-    export_to_excel("#report-content", "PMS_Manual_Movements_Report")
 
-  }); // end click event function
-  
-  function loadPage()
-  {
-	loadheadingreport("manual_movement");
-	manual_movement(); 
-  }
-$("#language").change(function(){
-  loadPage();
-}); 
+    $('#view-report-button').click(function (event)
+    {
+        if (!daterange)
+            alert(date_range_message);
+        else
+            callReport();
+    });
+
+    function loadReportLabels()
+    {
+        var data = {};
+        data["task"] = 29;
+        data["language"] = $("#language").val();
+        data["page"] = 18;
+        var json = JSON.stringify(data);
+        $.post("../../ajax/reports.php", json, function (data)
+        {
+            var json = JSON.parse(data);
+            date_range_message = json.choose_datetime_range;
+            $("#reservationtime").attr('placeholder', json.choose_datetime_range);
+            $("#pdf-report-header").html(json.manual_movement);
+            $("#view-report-button").html(json.view_report);
+            $("#export").html(json.export);
+            $("#export_excel_report").html(json.export_to_excel);
+            $("#export_pdf_report").html(json.export_to_pdf);
+            $("#logout").html(json.logout);
+            search_label = json.search;
+            entries_label = json.entries_label;
+            info_label = json.info_label;
+            previous_label = json.previous;
+            next_label = json.next;
+            $("#all_operation_methods").html(json.all_operation_methods);
+            $("#manual_open_from_cashier").html(json.manual_open_from_cashier);
+            $("#remote_pushbutton_open").html(json.remote_pushbutton_open);
+
+            $('#multiselect').multiselect('destroy');
+            $('#multiselect').multiselect(
+                    {
+                        buttonWidth: '100%',
+                        includeSelectAllOption: true,
+                        selectAllText: json.all_carparks,
+                        nonSelectedText: json.select_carparks,
+                        selectAllNumber: false,
+                        allSelectedText: json.all_carparks
+                    });
+        });
+    }
+
+    $("#language").change(function ()
+    {
+        loadReportLabels();
+        callReport();
+    });
+
+
+
+    $('#export_excel_report').click(function (event) {
+
+        export_to_excel("#report-content", "PMS_Manual_Movements_Report")
+
+    }); // end click event function
+
+
 </script>

@@ -16,9 +16,6 @@ include('../../../includes/navbar-start.php');
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
 
-//# App Function Classes
-include('../../../classes/reporting_valet.php');
-$reports=new reporting_valet();
 ?>
 
 <!-- Modal -->
@@ -62,7 +59,7 @@ $reports=new reporting_valet();
         <div class="col-md-2">
           <select class="form-control" id="carpark">
             <option value="0">All Carparks</option>
-            <?php $reports->get_carparks()?>
+            <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 

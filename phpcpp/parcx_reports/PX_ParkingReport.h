@@ -17,12 +17,12 @@ class ParkingReport
     void blacklistReport(Php::Value json);
     void manualmovementReport(Php::Value json);   
     void platescapturedReport(Php::Value json); 
-    string getApplicationLabel(Php::Value json);
-    Php::Value getApplicationLabels(Php::Value json);
+    string getApplicationLabel(Php::Value json);   
     void getanprImage(Php::Value json);
     void trafficReport(Php::Value json);
     void watchDogDeviceAlarms(Php::Value json);
-    void watchdogNetworkLogs(Php::Value json);        
+    void watchdogNetworkLogs(Php::Value json);     
+    void parkingDuration(Php::Value json);
     };
 
 #endif    

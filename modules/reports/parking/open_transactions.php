@@ -5,11 +5,17 @@ $page_title="Application Home";
 //# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=19;
+$json=parcxReport($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Open Transactions</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["open_transactions"]?></div>
 
 <?php
 include('../../../includes/navbar-end.php');
@@ -24,7 +30,7 @@ include('../../../includes/sidebar.php');
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ANPR Image</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?=$json["anpr_image"]?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -43,7 +49,7 @@ include('../../../includes/sidebar.php');
     <div class="col d-flex pl-1 align-items-center">
 
       <div class="flex-grow-1 row additional-menu-left">
-        <!-- carparks multiselect -->
+        <!-- carparks -->
         <div class="col-md-2">
           <select class="form-control" id="multiselect" multiple="multiple">
           <?php echo parcxSettings(array("task"=>"12"));?>
@@ -59,66 +65,24 @@ include('../../../includes/sidebar.php');
         <!--parking duration-->
         <div class="col-md-2">
           <select class="form-control" id="parking_duration">          
-          <option value="">Select Parking Duration</option>
-          <option value="0">Less than 1 Day</option>
-          <option value="1">Greater than 1 Day</option>
-          <option value="2">Greater than 2 Day</option>
-          <option value="3">Greater than 3 Day</option>
-          <option value="4">Greater than 4 Day</option>
-          <option value="5">Greater than 5 Day</option>
-          <option value="6">Greater than 6 Day</option>
-          <option value="7">Greater than 7 Day</option>          
+          <option value="" id="sel_duration"><?=$json["sel_duration"]?></option>
+          <option value="0" id="less_1_day"><?=$json["less_1_day"]?></option>
+          <option value="1" id="greater_1_day"><?=$json["greater_1_day"]?></option>
+          <option value="2" id="greater_2_day"><?=$json["greater_2_day"]?></option>
+          <option value="3" id="greater_3_day"><?=$json["greater_3_day"]?></option>
+          <option value="4" id="greater_4_day"><?=$json["greater_4_day"]?></option>
+          <option value="5" id="greater_5_day"><?=$json["greater_5_day"]?></option>
+          <option value="6" id="greater_6_day"><?=$json["greater_6_day"]?></option>
+          <option value="7" id="greater_7_day"><?=$json["greater_7_day"]?></option>          
           </select>
         </div>
 
 
         <!-- plate -->
         <div class="col-md-2">
-          <input type="text" id="plate_number" class="form-control" placeholder="PLATE NUMBER/TICKET ID">
+          <input type="text" id="plate_number" class="form-control" placeholder="<?=$json["plate_ticket"]?>">
         </div>        
-        <!-- date and time -->
-        <div class="col-md-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
-            </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
-          </div>
-        </div>
-
-        <!-- search -->
-        <div class="col-md-1">
-          <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="open_transactions()">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+        <?php include('../../../includes/additional-menu-report.php');?>           
   <!-- end / additional menu -->
 
   <section class="content">
@@ -133,6 +97,7 @@ include('../../../includes/sidebar.php');
         $data["device"]="";	        
         $data["plate_number"]="";
         $data["parking_duration"]=""; 
+        $data["language"]=$_SESSION["language"];  
         $data["task"]=1;                          
         echo parcxReport($data);
         ?>   
@@ -146,22 +111,38 @@ include('../../../includes/sidebar.php');
 
 <script>
 //$('#view-report-button').click(function (event) 
-function open_transactions()
-  { 
-  if ((!daterange)) 
+$(function() 
     {
-    alert("choose date range");
-    } 
-  else 
-    {
+    $('#deviceNumber').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_devices"]?>",               
+        nonSelectedText:"<?=$json["select_devices"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_devices"]?>"  
+        });
+        
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>",       
+        });    
+ });
+function callReport()
+{    	
     var data={};
     data["from"]=from;
     data["to"]=to;           
     data["carpark"]=$("#multiselect").val().toString();    
-	  data["device"]=$("#deviceNumber").val().toString();	
+    data["device"]=$("#deviceNumber").val().toString();	
     data["plate_number"]=$("#plate_number").val(); 
     data["parking_duration"]=$("#parking_duration").val(); 
-	data["language"] = $("#language").val();
+    data["language"] = $("#language").val();
     data["task"]=1;
     var temp = JSON.stringify(data);       
     $.post("../../ajax/reports.php", temp)
@@ -169,20 +150,83 @@ function open_transactions()
         loadReport(result);
 
       }, "json");
-    } // end if 
-
     event.preventDefault();
   }
  // }); 
  
- function loadPage()
-  {
-  loadheadingreport("open_transactions");
-  open_transactions(); 
-  }
-$("#language").change(function(){
-  loadPage();
+ $('#view-report-button').click(function (event) 
+{ 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+        callReport();	    
 });
+
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=19;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {	
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.open_transactions);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+        $("#sel_duration").html(json.sel_duration);
+        $("#less_1_day").html(json.less_1_day);
+        $("#greater_1_day").html(json.greater_1_day);
+        $("#greater_2_day").html(json.greater_2_day);
+        $("#greater_3_day").html(json.greater_3_day);
+        $("#greater_4_day").html(json.greater_4_day);
+        $("#greater_5_day").html(json.greater_5_day);
+        $("#greater_6_day").html(json.greater_6_day);
+        $("#greater_7_day").html(json.greater_7_day);
+        $("#exampleModalLabel").html(json.anpr_image);
+        $("#plate_number").attr('placeholder',json.plate_ticket);
+        $('#deviceNumber').multiselect('destroy');
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_devices,                                    
+            nonSelectedText:json.select_devices,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_devices             
+            });  
+            
+        $('#multiselect').multiselect('destroy');
+        $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: json.all_carparks,
+            nonSelectedText: json.select_carparks,
+            selectAllNumber: false,
+            allSelectedText: json.all_carparks
+            }); 
+    
+        
+        });    
+    }
+
+$("#language").change(function()
+    {	  
+    loadReportLabels();    
+    callReport();		
+    });       
 
 $('#export_excel_report').click(function (event) 
   {
@@ -193,7 +237,8 @@ $('#export_excel_report').click(function (event)
 $('body').on('click', "[data-target='#image-modal']", function () 
   {
   var name = $(this).data('value');      
-  var image="<img src='http://localhost/ANPR/Images/Scene/"+name+"' width='1000' height='700'>";    
+  var url = "<?php echo ImageURL; ?>";
+  var image="<img src='"+url+"/Scene/"+name+"' width='800' height='700'>";    
   $("#image-content-modal").html(image);      
   });
 

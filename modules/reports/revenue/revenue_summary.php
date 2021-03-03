@@ -1,24 +1,28 @@
 <?php
 $page_title="Application Home";
 
+
 //# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
 
+
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=3;
+$json=parcxReport($data);
+
 ?>
 
 </ul>
-
-<div class="header text-dark" id="pdf-report-header">Revenue Summary</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["revenue_report"]?></div>
 
 <?php
 
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-
-//# App Function Classes
-//include('../../../classes/reporting_revenue.php');
-//$reports=new reporting_revenue();
 ?>
 
 <div class="content-wrapper">
@@ -38,62 +42,17 @@ include('../../../includes/sidebar.php');
 
         <!--weekdays -->
         <div class="col-md-2">
-          <select id="days" multiple="multiple" class="weekdays">
-            <option value="'Sunday'">Sunday</option>
-            <option value="'Monday'">Monday</option>
-            <option value="'Tuesday'">Tuesday</option>
-            <option value="'Wednesday'">Wednesday</option>
-            <option value="'Thursday'">Thursday</option>
-            <option value="'Friday'">Friday</option>
-            <option value="'Saturday'">Saturday</option>
+          <select id="days" multiple="multiple" class="form-control">
+            <option value="'Sunday'" id = "sunday"><?=$json["sunday"]?></option>
+            <option value="'Monday'" id = "monday"><?=$json["monday"]?></option>
+            <option value="'Tuesday'" id = "tuesday"><?=$json["tuesday"]?></option>
+            <option value="'Wednesday'" id = "wednesday"><?=$json["wednesday"]?></option>
+            <option value="'Thursday'" id="thursday"><?=$json["thursday"]?></option>
+            <option value="'Friday'" id="friday"><?=$json["friday"]?></option>
+            <option value="'Saturday'" id="saturday"><?=$json["saturday"]?></option>
           </select>
-        </div>
-
-         <!-- date and time -->
-         <div class="col-md-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
-            </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_date_range"));?>">
-          </div>
-        </div>
-
-        <!-- search -->
-        <div class="col-md-1">
-          <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="revenue_report()">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- end / additional menu -->
-
+        </div>                              
+<?php include('../../../includes/additional-menu-report.php');?>       
   <section class="content">
     <div class="container-wide">
 
@@ -103,7 +62,7 @@ include('../../../includes/sidebar.php');
           <div class="col-lg-6 pl-0">
             <div class="card barchart-box mt-0">
               <p class="text-center chart-header text-dark justify-content-middle">
-                Earnings
+                <?=$json["earnings"]?>
               </p>
               <div class="position-relative">
                 <div><canvas id="revenue-chart" height="300"></canvas></div>
@@ -137,82 +96,84 @@ include('../../../includes/sidebar.php');
 //////////////////////////////
 // load report data
 //////////////////////////////
+var id;
+var date_range_message="choose date range";
+from="<?=$current_date." ".DAY_CLOSURE_START?>";
+to="<?=$current_date." ".DAY_CLOSURE_END?>";
 
 var click_count = 0;
 var load_report = 0;
-$( document ).ready(function() {
-	loadheadingreport("revenue_report");
+var search_label="";
+var entries_label = "";
+var info_label="";
+var next_label="";
+var previous_label="";
+$(function() 
+{
+    search_label="<?=$json["search"]?>";
+    entries_label = "<?=$json["entries_label"]?>";
+    info_label="<?=$json["info_label"]?>";
+    next_label="<?=$json["next"]?>"; 
+    previous_label = "<?=$json["previous"]?>"; 
+    
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>",       
+        });    
+    $('#days').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_days"]?>",               
+        nonSelectedText:"<?=$json["select_days"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_days"]?>"      
+        }); 
 });
 
 //$('#view-report-button').click(function (event) 
-function revenue_report()
-{ 
-  if ((!daterange)) 
-    {
-    alert("choose date range");
-    } 
-  else 
-    {
+function callReport()
+{
+  
     var data={};
     data["from"]=from;
     data["to"]=to;         
     data["carpark"]=$("#multiselect").val().toString(); 
     data["weekdays"]=$("#days").val().toString();  
     data["option-type"]=1;  
-	data["language"] = $("#language").val();	
+    data["language"] = $("#language").val();	
     data["task"]=22;
 	
-    var jsondata = JSON.stringify(data);    
-    //console.log(jsondata); 
-   // $.post("../../ajax/reports-ajax.php",jsondata,function(data)
+    var jsondata = JSON.stringify(data);     
 	$.post("../../ajax/reports.php",jsondata,function(data)
       {		
-	  //console.log(data);
+	
       $("#report-content").html(data);
       reportSuccess();
       createChart();
-	  loadTable1();
+	  loadDataTable1();
 	  load_report=1;
       })
     .fail(function(jqxhr,status,error)
       {
       alert("Error: "+error);
       });  
-    
-  } // end if 
+
 
   event.preventDefault();
  }
  
 //});
 
-function loadTable1()
-{
-      loadDataTable1();
-}
 
 function loadDataTable1()
 {
-	var search_label="";
-	var entries_label = "";
-	var info_label="";
-	if($("#language").val()=="Arabic")
-	{
-		search_label =  'بحث';
-		entries_label = 'عرض الإدخالات _MENU_ ';
-		info_label = 'إظهار _START_ إلى _END_ من _TOTAL_ من الإدخالات';
-		previous_label = 'السابق';
-		next_label = 'التالى';
-		
-	} 
-	else{
-		search_label = "Search";
-		entries_label = 'Show _MENU_ entries';
-		info_label = 'Showing _START_ to _END_ of _TOTAL_ entries';
-		previous_label = 'Previous';
-		next_label = 'Next';
-		
-	}
+	
   $("table[id^='TABLE']").DataTable(
 	  {
 	  "paging": true,
@@ -221,7 +182,7 @@ function loadDataTable1()
 	  "ordering": true,
 	  "info": true,
 	  "autoWidth": false,
-	  "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+	  "lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
 	  "aaSorting": [],
 		"language": {
 			search: search_label,
@@ -241,7 +202,16 @@ function loadDataTable1()
 	
 }
 
-function loadPage()
+$('#view-report-button').click(function (event) 
+    { 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+	callReport();	    
+    });
+
+
+/*function loadPage()
 {
   loadheadingreport("revenue_report");
   if(load_report==1)
@@ -249,8 +219,77 @@ function loadPage()
 }
 $("#language").change(function(){
   loadPage();
-});
+});*/
 
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=3;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {		
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.revenue_report);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+
+        $("#sunday").html(json.sunday);
+        $("#monday").html(json.monday);
+        $("#tuesday").html(json.tuesday);
+        $("#wednesday").html(json.wednesday);
+        $("#thursday").html(json.thursday);
+        $("#friday").html(json.friday);
+        $("#saturday").html(json.saturday);
+        $(".chart-header").html(json.earnings);
+        
+        
+        
+        $('#multiselect').multiselect('destroy');
+        $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: json.all_carparks,
+            nonSelectedText: json.select_carparks,
+            selectAllNumber: false,
+            allSelectedText: json.all_carparks
+            }); 
+            
+        $('#days').multiselect('destroy');
+        $('#days').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_days,
+            nonSelectedText:json.select_days,
+            selectAllNumber: false,
+            allSelectedText: json.all_days
+            });      
+            
+            
+        }); 
+        
+        
+    }
+
+
+$("#language").change(function()
+{	  
+    loadReportLabels();    
+    callReport();		
+}); 
   //////////////////////////////
   // excel export
   //////////////////////////////

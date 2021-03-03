@@ -6,19 +6,21 @@ $page_title="Application Home";
 //# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=13;
+$json=parcxReport($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Traffic Summary</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["traffic_report"]?></div>
 
 <?php
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-
-//# App Function Classes
-//include('../../../classes/reporting_parking.php');
-//$reports=new reporting_parking();
 ?>
 
 <div class="content-wrapper">
@@ -37,62 +39,20 @@ include('../../../includes/sidebar.php');
         </div>
 
          <!--weekdays -->
-         <div class="col-md-2">
-          <select id="days" multiple="multiple" class="weekdays">
-          <option value="'Sunday'">Sunday</option>
-            <option value="'Monday'">Monday</option>
-            <option value="'Tuesday'">Tuesday</option>
-            <option value="'Wednesday'">Wednesday</option>
-            <option value="'Thursday'">Thursday</option>
-            <option value="'Friday'">Friday</option>
-            <option value="'Saturday'">Saturday</option>
+        <div class="col-md-2">
+          <select id="days" multiple="multiple" class="form-control">
+            <option value="'Sunday'" id = "sunday"><?=$json["sunday"]?></option>
+            <option value="'Monday'" id = "monday"><?=$json["monday"]?></option>
+            <option value="'Tuesday'" id = "tuesday"><?=$json["tuesday"]?></option>
+            <option value="'Wednesday'" id = "wednesday"><?=$json["wednesday"]?></option>
+            <option value="'Thursday'" id="thursday"><?=$json["thursday"]?></option>
+            <option value="'Friday'" id="friday"><?=$json["friday"]?></option>
+            <option value="'Saturday'" id="saturday"><?=$json["saturday"]?></option>
           </select>
         </div>
 
-       <!-- date and time -->
-       <div class="col-md-3">
-         <div class="input-group">
-           <div class="input-group-prepend">
-             <span class="input-group-text"><i class="far fa-clock"></i></span>
-           </div>
-           <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-             placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_date_range"));?>">
-         </div>
-       </div>       
-
-        <!-- search -->
-        <div class="col-md-1">
-          <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="traffic_report()">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+           
+<?php include('../../../includes/additional-menu-report.php');?>    
   <!-- end / additional menu -->
 
   <section class="content">
@@ -127,16 +87,49 @@ include('../../../includes/sidebar.php');
   // load report data
   //////////////////////////////
 
-  var click_count = 0;
-  var load_report = 0;
-  //$('#view-report-button').click(function (event) {
-function traffic_report()
+  var id;
+var date_range_message="choose date range";
+from="<?=$current_date." ".DAY_CLOSURE_START?>";
+to="<?=$current_date." ".DAY_CLOSURE_END?>";
+
+var click_count = 0;
+var load_report = 0;
+
+search_label="<?=$json["search"]?>";
+entries_label = "<?=$json["entries_label"]?>";
+info_label="<?=$json["info_label"]?>";
+next_label="<?=$json["next"]?>"; 
+previous_label = "<?=$json["previous"]?>"; 
+    
+
+$(function() 
+{
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>",       
+        });    
+    $('#days').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_days"]?>",               
+        nonSelectedText:"<?=$json["select_days"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_days"]?>"      
+        }); 
+});
+
+//$('#view-report-button').click(function (event) 
+function callReport()
 {
    var weekdays=$("#days").val().toString();
     var carpark = $("#multiselect").val().toString();
-    if ((!daterange)) {
-      alert("choose date range");
-    } else {
+    
       var data = {
         toDate: to,
         fromDate: from,
@@ -186,7 +179,7 @@ function traffic_report()
           }
 
         }, "json");
-    } // end if 
+    
 
     event.preventDefault();
 }
@@ -255,7 +248,7 @@ function traffic_report()
 
 function loadMultipleDataTable()
 {
-	var search_label="";
+	/*var search_label="";
 	var entries_label = "";
 	var info_label="";
 	if($("#language").val()=="Arabic")
@@ -274,7 +267,7 @@ function loadMultipleDataTable()
 		previous_label = 'Previous';
 		next_label = 'Next';
 		
-	}
+	}*/
   $("table[id^='TABLE']").DataTable(
 	  {
 	  "paging": true,
@@ -299,19 +292,93 @@ function loadMultipleDataTable()
 	  });   
 }
   
-function loadPage()
+$('#view-report-button').click(function (event) 
+    { 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+	callReport();	    
+    });
+
+
+/*function loadPage()
 {
-	loadheadingreport("traffic_report");
-	if(load_report==1)
-		traffic_report(); 
+  loadheadingreport("revenue_report");
+  if(load_report==1)
+	revenue_report(); 
 }
 $("#language").change(function(){
-	loadPage();
+  loadPage();
+});*/
+
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=13;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {		
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.traffic_report);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+
+        $("#sunday").html(json.sunday);
+        $("#monday").html(json.monday);
+        $("#tuesday").html(json.tuesday);
+        $("#wednesday").html(json.wednesday);
+        $("#thursday").html(json.thursday);
+        $("#friday").html(json.friday);
+        $("#saturday").html(json.saturday);
+        
+        
+        
+        $('#multiselect').multiselect('destroy');
+        $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: json.all_carparks,
+            nonSelectedText: json.select_carparks,
+            selectAllNumber: false,
+            allSelectedText: json.all_carparks
+            }); 
+            
+        $('#days').multiselect('destroy');
+        $('#days').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_days,
+            nonSelectedText:json.select_days,
+            selectAllNumber: false,
+            allSelectedText: json.all_days
+            });      
+            
+            
+        }); 
+        
+        
+    }
+
+
+$("#language").change(function()
+{	  
+    loadReportLabels();    
+    callReport();		
 }); 
-  
-$( document ).ready(function() {
-	loadheadingreport("traffic_report");
-});
   //////////////////////////////
   // excel export
   //////////////////////////////

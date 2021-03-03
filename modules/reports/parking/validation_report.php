@@ -6,11 +6,17 @@ $page_title="Application";
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
 
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=21;
+$json=parcxReport($data);
+
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Validation Report</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["validation_report"]?></div>
 
 <?php
 
@@ -28,14 +34,14 @@ include('../../../includes/sidebar.php');
 
       <div class="flex-grow-1 row additional-menu-left">
         <!-- carparks multiselect -->
-        <div class="col-md-2">
+        <div class="col-md-3 mb-4">
           <select class="form-control" id="multiselect" multiple="multiple">
           <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
         </div>
 
         <!-- Validators -->
-        <div class="col-md-2">
+        <div class="col-md-3">
           <select class="form-control" id="validator" multiple="multiple">          
           <?php echo parcxSettings(array("task"=>"20"));?>
           </select>
@@ -50,49 +56,10 @@ include('../../../includes/sidebar.php');
 
         <!-- Ticket number -->
         <div class="col-md-2">
-            <input type="text" id="plate_number" class="form-control" placeholder="PLATE NUMBER/TICKET ID">
+            <input type="text" id="plate_number" class="form-control" placeholder="<?=$json["plate_ticket"]?>">
         </div>
 
-        <!-- date and time -->
-        <div class="col-md-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
-            </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="Choose Date and Time Range">
-          </div>
-        </div>
-
-        <!-- search -->
-        <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="validation_report()">View Report</button>
-        </div>
-
-        
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+        <?php include('../../../includes/additional-menu-report.php');?>      
   <!-- end / additional menu -->
 
   <section class="content">
@@ -107,6 +74,7 @@ include('../../../includes/sidebar.php');
         $data["validator"]="";	        
         $data["product"]="";	        
         $data["plate_number"]=""; 
+        $data["language"]=$_SESSION["language"];   	
         $data["task"]=3;                          
         echo parcxReport($data);
         ?>  
@@ -119,45 +87,50 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php'); ?>
 
 <script>
-$(document).ready(function () 
-  {
+$(function() 
+{
+   $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>"       
+        });      
+      
   $('#validator').multiselect({
         buttonWidth: '100%',
         includeSelectAllOption: true,
-        selectAllText: "All Validators",
-        nonSelectedText: 'Select Validator',
+        selectAllText: "<?=$json["all_validators"]?>",
+        nonSelectedText: "<?=$json["select_validator"]?>",
         selectAllNumber: false,
-        allSelectedText: "All Validators",
+        allSelectedText: "<?=$json["all_validators"]?>"
       });
+      
 
     $('#validation_product').multiselect({
       buttonWidth: '100%',
       includeSelectAllOption: true,
-      selectAllText: "All Products",
-      nonSelectedText: 'Select Product',
+      selectAllText: "<?=$json["all_products"]?>",
+      nonSelectedText: "<?=$json["select_product"]?>",
       selectAllNumber: false,
-      allSelectedText: "All Products",
+      allSelectedText: "<?=$json["all_products"]?>"
     });
   });
 
 
 //$('#view-report-button').click(function (event) 
-function validation_report()
-  { 
-  if ((!daterange)) 
-    {
-    alert("choose date range");
-    } 
-  else 
-    {
+function callReport()
+{ 
     var data={};
     data["from"]=from;
     data["to"]=to;           
     data["carpark"]=$("#multiselect").val().toString();    
-	  data["validator"]=$("#validator").val().toString();	
+    data["validator"]=$("#validator").val().toString();	
     data["product"]=$("#validation_product").val().toString();	
     data["plate_number"]=$("#plate_number").val(); 
-	data["language"] = $("#language").val();
+    data["language"] = $("#language").val();
     data["task"]=3;
     var temp = JSON.stringify(data);    
     console.log(temp);  
@@ -166,19 +139,86 @@ function validation_report()
         loadReport(result);    
 
       }, "json");
-    } // end if 
-
+ 
     event.preventDefault();
   }
- // });  
- function loadPage()
-  {
-  loadheadingreport("validation_report");
-  validation_report(); 
-  }
-$("#language").change(function(){
-  loadPage();
+ 
+ $('#view-report-button').click(function (event) 
+{ 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+        callReport();	    
 });
+
+ function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=21;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {	
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.validation_report);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        $("#plate_number").attr('placeholder',json.plate_ticket); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+ 
+        $('#validation_product').multiselect('destroy');
+        $('#validation_product').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_products,                                    
+            nonSelectedText:json.select_product,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_products             
+            });  
+            
+        $('#validator').multiselect('destroy');
+        $('#validator').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_validators,                                    
+            nonSelectedText:json.select_validator,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_validators             
+            }); 
+            
+        $('#multiselect').multiselect('destroy');
+        $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: json.all_carparks,
+            nonSelectedText: json.select_carparks,
+            selectAllNumber: false,
+            allSelectedText: json.all_carparks
+            }); 
+    
+        
+        });    
+    }
+
+$("#language").change(function()
+    {	  
+    loadReportLabels();    
+    callReport();		
+    });   
+ 
   $('#export_excel_report').click(function (event) {
 
     export_to_excel("#report-content", "PMS_Validation_Report")

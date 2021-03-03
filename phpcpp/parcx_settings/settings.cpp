@@ -17,9 +17,8 @@ sql::Statement *stmt;
 sql::ResultSet *res;
 sql::PreparedStatement *prep_stmt;
 string query;
-string previousData;
-bool facilityFlag,carparkFlag,deviceFlag;
-int carpark_number,facility_number,device_number,device_type;
+
+bool facilityFlag,carparkFlag;
 
 void writeLog(string function,string message)
     {
@@ -30,7 +29,7 @@ void writeException(string function,string message)
     {
     General.writeLog("WebApplication/ExceptionLogs/PX-Settings-"+General.currentDateTime("%Y-%m-%d"),function,message); 
     Php::out<<message<<endl;
-	writeLog(function,"Exception: "+message);   
+    writeLog(function,"Exception: "+message);   
     }
 
 string ToString(Php::Value param)
@@ -130,7 +129,7 @@ Php::Value insertUpdateSettings(Php::Value json)
             msg = "Successfull";
             if(ToString(json["id"])!="" && ToString(json["setting_name"])=="facility_number")  
                 {
-                facility_number= json["setting_value"];   
+                int facility_number= json["setting_value"];   
                 
                 prep_stmt = con->prepareStatement("update system_carparks set facility_number=?");
                 prep_stmt->setInt(1,facility_number);
@@ -332,15 +331,13 @@ Php::Value insertUpdateCarpark(Php::Value json)
         
         con= General.mysqlConnect(ServerDB);
         if(id=="")
-            prep_stmt = con->prepareStatement("select * from system_carparks where facility_number=? and carpark_number=?");
+            prep_stmt = con->prepareStatement("select * from system_carparks where carpark_number=?");
         else
             {
-            prep_stmt = con->prepareStatement("select * from system_carparks where facility_number=? and carpark_number=? and carpark_id!=?");
-            prep_stmt->setString(3, id); 
-            }
-        
-        prep_stmt->setInt(1, facility_number);
-        prep_stmt->setInt(2, carpark_number);
+            prep_stmt = con->prepareStatement("select * from system_carparks where carpark_number=? and carpark_id!=?");
+            prep_stmt->setString(2, id); 
+            }               
+        prep_stmt->setInt(1, carpark_number);
         res=prep_stmt->executeQuery();
         if(res->next())
             {
@@ -352,105 +349,165 @@ Php::Value insertUpdateCarpark(Php::Value json)
             {
             if(id=="")    
                 {
-                prep_stmt = con->prepareStatement("insert into system_carparks(facility_number,facility_name,carpark_number,carpark_name,total_spaces ,occupancy_threshold,reservation_spaces,access_spaces,shortterm_spaces,rate_type,rate_plan,reservation_rate_plan,user_id,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
+                prep_stmt = con->prepareStatement("insert into system_carparks(carpark_number,carpark_name,total_spaces ,occupancy_threshold,reservation_spaces,access_spaces,shortterm_spaces,rate_type,rate_plan,reservation_rate_plan,facility_number,facility_name,user_id,status) values(?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
+                prep_stmt->setInt(11, facility_number);
+                prep_stmt->setString(12, facility_name);   
                 prep_stmt->setString(13, user_id);       
                 }
             else
                 {
-                prep_stmt = con->prepareStatement("update system_carparks set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,total_spaces=?,occupancy_threshold=?,reservation_spaces=?,access_spaces=?,shortterm_spaces=?,rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_id=?");    
-                prep_stmt->setString(13, id);       
-                }
-            
-            prep_stmt->setInt(1, facility_number);
-            prep_stmt->setString(2, facility_name);               
-            prep_stmt->setInt(3, carpark_number);
-            prep_stmt->setString(4, carpark_name);
-            prep_stmt->setString(5, total_spaces);
-            prep_stmt->setString(6, occupancy_threshold);
-            prep_stmt->setString(7, reservation_spaces);
-            prep_stmt->setString(8, access_spaces);            
-            prep_stmt->setString(9, shortterm_spaces);   
-            prep_stmt->setString(10, rate_type);   
-            prep_stmt->setString(11, rate_plan);   
-            prep_stmt->setString(12, reservation_rate_plan);   
+                prep_stmt = con->prepareStatement("update system_carparks set carpark_number=?,carpark_name=?,total_spaces=?,occupancy_threshold=?,reservation_spaces=?,access_spaces=?,shortterm_spaces=?,rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_id=?");    
+                prep_stmt->setString(11, id);       
+                }                                    
+            prep_stmt->setInt(1, carpark_number);
+            prep_stmt->setString(2, carpark_name);
+            prep_stmt->setString(3, total_spaces);
+            prep_stmt->setString(4, occupancy_threshold);
+            prep_stmt->setString(5, reservation_spaces);
+            prep_stmt->setString(6, access_spaces);            
+            prep_stmt->setString(7, shortterm_spaces);   
+            prep_stmt->setString(8, rate_type);   
+            prep_stmt->setString(9, rate_plan);   
+            prep_stmt->setString(10, reservation_rate_plan);   
                     
             if (!prep_stmt->execute())
-                {
-                msg = "Successfull";
+                {                
+                msg = "Successfull";                                
                 
-                prep_stmt = con->prepareStatement("update system_devices set rate_type=?,rate_plan=?,reservation_rate_plan=? where carpark_number=? and facility_number=?");
+                int previous_carpark=json["previous_carpark"];                
+                
+                //system devices
+                prep_stmt = con->prepareStatement("update system_devices set rate_type=?,rate_plan=?,reservation_rate_plan=?,carpark_number=?,carpark_name=? where carpark_number=?");
                 prep_stmt->setString(1, rate_type);   
                 prep_stmt->setString(2, rate_plan);   
                 prep_stmt->setString(3, reservation_rate_plan);   
-                prep_stmt->setInt(4, carpark_number);  
-                prep_stmt->setInt(5, facility_number);  
+                prep_stmt->setInt(4, carpark_number);                  
+                prep_stmt->setString(5, carpark_name);                
+                prep_stmt->setInt(6, previous_carpark);                  
                 prep_stmt->executeUpdate();
-                delete prep_stmt;
+                delete prep_stmt;                               
             
                 facilityFlag=false;
                 carparkFlag=false;	                               
                 
                 dcon=General.mysqlConnect(DashboardDB);
-                prep_stmt = dcon->prepareStatement("select * from counters where facility_number="+ToString(json["previous_facility"]));
+                if(id!="")
+                    {
+                    //parking_revenue
+                    prep_stmt = dcon->prepareStatement("update parking_revenue set carpark_number=?,carpark_name=?,facility_number=? where carpark_number=?");
+                    prep_stmt->setInt(1, carpark_number);
+                    prep_stmt->setString(2, carpark_name);
+                    prep_stmt->setInt(3, facility_number);
+                    prep_stmt->setInt(4, previous_carpark);      
+                    prep_stmt->executeUpdate();                                        
+                    
+                    //watchdog_device_status
+                    prep_stmt = dcon->prepareStatement("update watchdog_device_status set carpark_number=?,carpark_name=?,facility_number=?,facility_name=? where carpark_number=?");
+                    prep_stmt->setInt(1, carpark_number);
+                    prep_stmt->setString(2, carpark_name);
+                    prep_stmt->setInt(3, facility_number);
+                    prep_stmt->setString(4, facility_name);
+                    prep_stmt->setInt(5, previous_carpark);      
+                    prep_stmt->executeUpdate();                        
+                    }
+                
+                int minId=0;
+                int maxId=0;
+                prep_stmt = dcon->prepareStatement("select id,type from hourly_occupancy where carpark_number=? and data='realtime'");
+                prep_stmt->setInt(1, previous_carpark);
                 res=prep_stmt->executeQuery();
                 while(res->next())
                     {
-                    if(res->getInt("count_category")==0 && res->getInt("counter_type")==0 && res->getInt("facility_number")==facility_number) 
+                    if(res->getString("type")=="Max")
+                       maxId=res->getInt("id");
+                    if(res->getString("type")=="Min")
+                       minId=res->getInt("id");
+                    }
+                delete res;                                
+                //hourly occupancy
+                if(minId==0)                                        
+                    prep_stmt = dcon->prepareStatement("insert into hourly_occupancy(facility_number,facility_name,carpark_number,carpark_name,type,data)values(?,?,?,?,'Min','realtime')");
+                else
+                    {
+                    prep_stmt = dcon->prepareStatement("update hourly_occupancy set facility_number=?,facility_name=?,carpark_number=?,carpark_name=? where id=?");
+                    prep_stmt->setInt(5, minId);
+                    }
+                prep_stmt->setInt(1, facility_number);
+                prep_stmt->setString(2, facility_name);
+                prep_stmt->setInt(3, carpark_number);
+                prep_stmt->setString(4, carpark_name);
+                prep_stmt->executeUpdate();               
+                               
+                if(maxId==0)                                        
+                    prep_stmt = dcon->prepareStatement("insert into hourly_occupancy(facility_number,facility_name,carpark_number,carpark_name,type,data)values(?,?,?,?,'Max','realtime')");
+                else
+                    {
+                    prep_stmt = dcon->prepareStatement("update hourly_occupancy set facility_number=?,facility_name=?,carpark_number=?,carpark_name=? where id=?");
+                    prep_stmt->setInt(5, maxId);
+                    }
+                prep_stmt->setInt(1, facility_number);
+                prep_stmt->setString(2, facility_name);
+                prep_stmt->setInt(3, carpark_number);
+                prep_stmt->setString(4, carpark_name);
+                prep_stmt->executeUpdate();
+                                
+                                                    
+                //counters
+                prep_stmt = dcon->prepareStatement("select count_category,counter_type,carpark_number from counters");
+                res=prep_stmt->executeQuery();
+                while(res->next())
+                    {
+                    if(res->getInt("count_category")==0 && res->getInt("counter_type")==0) 
                        facilityFlag=true;    
-                    if(res->getInt("count_category")==0 && res->getInt("counter_type")==1 && res->getInt("carpark_number")==carpark_number) 
+                    if(res->getInt("count_category")==0 && res->getInt("counter_type")==1 && res->getInt("carpark_number")==previous_carpark) 
                         carparkFlag=true;
                     }
                 delete res;
                 delete prep_stmt;               
                 if(carparkFlag==false)
                     {
-                    prep_stmt = dcon->prepareStatement("insert into counters(facility_number,carpark_number,carpark_name,total_spaces,occupancy_threshold,total_reservation_spaces,total_access_spaces,total_shortterm_spaces,dashboard_order,counter_type)values(?,?,?,?,?,?,?,?,?,1)");                    
-                    prep_stmt->setInt(9, carpark_number);
+                    prep_stmt = dcon->prepareStatement("insert into counters(carpark_number,carpark_name,total_spaces,occupancy_threshold,total_reservation_spaces,total_access_spaces,total_shortterm_spaces,dashboard_order,facility_number,counter_type)values(?,?,?,?,?,?,?,?,?,1)");                    
+                    prep_stmt->setInt(8, carpark_number);
+                    prep_stmt->setInt(9, facility_number);
                     }
                 else
                     {
-                    prep_stmt = dcon->prepareStatement("update counters set facility_number=?,carpark_number=?,carpark_name=?,total_spaces=?,occupancy_threshold=?,total_reservation_spaces=?,total_access_spaces=?,total_shortterm_spaces=? where carpark_number=? and facility_number=? and counter_type=1");                            
-                    prep_stmt->setString(9, ToString(json["previous_carpark"]));
-                    prep_stmt->setString(10, ToString(json["previous_facility"]));
-                    }
-                prep_stmt->setInt(1, facility_number);                             
-                prep_stmt->setInt(2, carpark_number);
-                prep_stmt->setString(3, carpark_name);
-                prep_stmt->setString(4, total_spaces);
-                prep_stmt->setString(5, occupancy_threshold);
-                prep_stmt->setString(6, reservation_spaces);
-                prep_stmt->setString(7, access_spaces);            
-                prep_stmt->setString(8, shortterm_spaces);                 
-                prep_stmt->executeUpdate();
+                    prep_stmt = dcon->prepareStatement("update counters set carpark_number=?,carpark_name=?,total_spaces=?,occupancy_threshold=?,total_reservation_spaces=?,total_access_spaces=?,total_shortterm_spaces=? where carpark_number=? and counter_type=1");                                               
+                    prep_stmt->setInt(8, previous_carpark);                      
+                    }                                    
+                prep_stmt->setInt(1, carpark_number);
+                prep_stmt->setString(2, carpark_name);
+                prep_stmt->setString(3, total_spaces);
+                prep_stmt->setString(4, occupancy_threshold);
+                prep_stmt->setString(5, reservation_spaces);
+                prep_stmt->setString(6, access_spaces);            
+                prep_stmt->setString(7, shortterm_spaces);                 
+                prep_stmt->executeUpdate();                                
 
                 delete prep_stmt;
-                prep_stmt = con->prepareStatement("SELECT sum(total_spaces) as total_spaces,sum(reservation_spaces) as reservation_spaces,sum(access_spaces) as access_spaces,sum(shortterm_spaces) as shortterm_spaces FROM system_carparks where facility_number=?");
-                prep_stmt->setString(1, ToString(json["previous_facility"]));                
+                prep_stmt = con->prepareStatement("SELECT sum(total_spaces) as total_spaces,sum(reservation_spaces) as reservation_spaces,sum(access_spaces) as access_spaces,sum(shortterm_spaces) as shortterm_spaces FROM system_carparks");                
                 res=prep_stmt->executeQuery();
                 if(res->next())
                     {                        
                     delete prep_stmt;              
-                    if(facilityFlag==false)
+                    if(facilityFlag==false)                                                
                         {
-                        prep_stmt = dcon->prepareStatement("insert into counters(facility_number,carpark_name,total_spaces,total_reservation_spaces,total_access_spaces,total_shortterm_spaces,dashboard_order,counter_type)values(?,?,?,?,?,?,?,0)");                    
+                        prep_stmt = dcon->prepareStatement("insert into counters(total_spaces,total_reservation_spaces,total_access_spaces,total_shortterm_spaces,facility_number,carpark_name,dashboard_order,counter_type)values(?,?,?,?,?,?,?,0)"); 
                         prep_stmt->setInt(7, facility_number);
                         }
-                    else
-                        {
-                        prep_stmt = dcon->prepareStatement("update counters set facility_number=?,carpark_name=?,total_spaces=?,total_reservation_spaces=?,total_access_spaces=?,total_shortterm_spaces=? where facility_number=? and counter_type=0");                                               
-                        prep_stmt->setString(7, ToString(json["previous_facility"]));
-                        }
-                    prep_stmt->setInt(1, facility_number);
-                    prep_stmt->setString(2, facility_name);                               
-                    prep_stmt->setString(3, res->getString("total_spaces"));
-                    prep_stmt->setString(4, res->getString("reservation_spaces"));
-                    prep_stmt->setString(5, res->getString("access_spaces"));
-                    prep_stmt->setString(6, res->getString("shortterm_spaces"));
-                    prep_stmt->executeUpdate();
+                    else                        
+                        prep_stmt = dcon->prepareStatement("update counters set total_spaces=?,total_reservation_spaces=?,total_access_spaces=?,total_shortterm_spaces=?,facility_number=?,carpark_name=? where counter_type=0"); 
+                    prep_stmt->setString(1, res->getString("total_spaces"));
+                    prep_stmt->setString(2, res->getString("reservation_spaces"));
+                    prep_stmt->setString(3, res->getString("access_spaces"));
+                    prep_stmt->setString(4, res->getString("shortterm_spaces"));
+                    prep_stmt->setInt(5, facility_number);
+                    prep_stmt->setString(6, facility_name);  
+                    prep_stmt->executeUpdate();                                        
                     
                     delete prep_stmt;
                     delete res;                
-                    }
+                    }                
                 }            
             }
 		delete con;       
@@ -468,61 +525,60 @@ Php::Value insertUpdateDevice(Php::Value json)
     try
         {
         string id=json["id"];
-        carpark_number=json["carpark_number"];
-        facility_number=json["facility_number"];
-        device_number=json["device_number"];
-        device_type=json["device_category"];
-
+        int carpark_number=json["carpark_number"];
+        int facility_number=json["facility_number"];
+        int device_number=json["device_number"];
+        int device_type=json["device_category"];
+        string facility_name=json["facility_name"];
+        string carpark_name=json["carpark_name"];
+        string device_name=json["device_name"];
+        string device_ip=json["device_ip"];
+        
         con= General.mysqlConnect(ServerDB);
         if(id=="")
-            prep_stmt = con->prepareStatement("select * from system_devices where facility_number=? and device_number=?");
+            prep_stmt = con->prepareStatement("select * from system_devices where carpark_number=? and device_number=?");
         else
             {
-            prep_stmt = con->prepareStatement("select * from system_devices where facility_number=? and device_number=? and id!=?");
+            prep_stmt = con->prepareStatement("select * from system_devices where carpark_number=? and device_number=? and id!=?");
             prep_stmt->setString(3, id); 
             }
         
-        prep_stmt->setInt(1, facility_number);
+        prep_stmt->setInt(1, carpark_number);
         prep_stmt->setInt(2, device_number);       
         res=prep_stmt->executeQuery();
         if(res->next())
             {
-            msg = "Device number already exist in facility-"+ToString(json["facility_name"])+".Try with another device number";   
+            msg = "Device number already exist in carpark.Try with another device number";   
             delete prep_stmt;
             delete res;             
             }
         else
             {
-            if(id=="")    
-                {
-                prep_stmt = con->prepareStatement("select * from system_carparks where facility_number=? and carpark_number=?");
-                prep_stmt->setInt(1, facility_number);
-                prep_stmt->setInt(2, carpark_number);    
-                res=prep_stmt->executeQuery();
-                res->next();
+            prep_stmt = con->prepareStatement("select * from system_carparks where carpark_number=?");                
+            prep_stmt->setInt(1, carpark_number);    
+            res=prep_stmt->executeQuery();
+            res->next();
                 
-                prep_stmt = con->prepareStatement("insert into system_devices(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_category,device_category_name,device_ip,camera_id,customer_receipt_mandatory,shift_receipt_mandatory,shift_physical_cash_count_required,synch_whitelist_flag,issue_lost,camera_index,anpr_enabled, wiegand_enabled, access_enabled, reservation_enabled, review_mode, device_function, barrier_open_time_limit,duration_hold_barrier_open, display_anpr_image, barrier_open_status_type, bms_status_enabled, barrier_status_monitoring, wiegand2_enabled, server_handshake_interval, plate_capturing_wait_delay, quick_barrier_close, payment_enabled_exit,rate_plan,reservation_rate_plan,rate_type,user_id,device_enabled) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)");
-                prep_stmt->setString(34, res->getString("rate_plan"));
-                prep_stmt->setString(35,res->getString("reservation_rate_plan"));
-                prep_stmt->setString(36, res->getString("rate_type"));
-                prep_stmt->setString(37, ToString(json["user_id"]));       
-                delete res;
+            if(id=="")    
+                {                                
+                prep_stmt = con->prepareStatement("insert into system_devices(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_category,device_category_name,device_ip,camera_id,customer_receipt_mandatory,shift_receipt_mandatory,shift_physical_cash_count_required,synch_whitelist_flag,issue_lost,camera_index,anpr_enabled, wiegand_enabled, access_enabled, reservation_enabled, review_mode, device_function, barrier_open_time_limit,duration_hold_barrier_open, display_anpr_image, barrier_open_status_type, bms_status_enabled, barrier_status_monitoring, wiegand2_enabled, server_handshake_interval, plate_capturing_wait_delay, quick_barrier_close, payment_enabled_exit,rate_plan,reservation_rate_plan,rate_type,user_id,device_enabled) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)");                                     
+                prep_stmt->setString(37, ToString(json["user_id"])); 
                 }
             else
                 {
-                prep_stmt = con->prepareStatement("update system_devices set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_category=?,device_category_name=?,device_ip=?,camera_id=?,customer_receipt_mandatory=?,shift_receipt_mandatory=?,shift_physical_cash_count_required=?,synch_whitelist_flag=?,issue_lost=?,camera_index=?,anpr_enabled=?, wiegand_enabled=?, access_enabled=?, reservation_enabled=?, review_mode=?, device_function=?, barrier_open_time_limit=?,duration_hold_barrier_open=?, display_anpr_image=?, barrier_open_status_type=?, bms_status_enabled=?, barrier_status_monitoring=?, wiegand2_enabled=?, server_handshake_interval=?, plate_capturing_wait_delay=?,quick_barrier_close=?, payment_enabled_exit=? where id=?");    
-                prep_stmt->setString(34,id);       
+                prep_stmt = con->prepareStatement("update system_devices set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_category=?,device_category_name=?,device_ip=?,camera_id=?,customer_receipt_mandatory=?,shift_receipt_mandatory=?,shift_physical_cash_count_required=?,synch_whitelist_flag=?,issue_lost=?,camera_index=?,anpr_enabled=?, wiegand_enabled=?, access_enabled=?, reservation_enabled=?, review_mode=?, device_function=?, barrier_open_time_limit=?,duration_hold_barrier_open=?, display_anpr_image=?, barrier_open_status_type=?, bms_status_enabled=?, barrier_status_monitoring=?, wiegand2_enabled=?, server_handshake_interval=?, plate_capturing_wait_delay=?,quick_barrier_close=?, payment_enabled_exit=?,rate_plan=?,reservation_rate_plan=?,rate_type=? where id=?");    
+                prep_stmt->setString(37,id);       
                 }
                                         
-            prep_stmt->setString(1, ToString(json["facility_number"]));
-            prep_stmt->setString(2, ToString(json["facility_name"]));               
-            prep_stmt->setString(3, ToString(json["carpark_number"]));
-            prep_stmt->setString(4, ToString(json["carpark_name"]));
-            prep_stmt->setString(5, ToString(json["device_number"]));
-            prep_stmt->setString(6, ToString(json["device_name"]));
-            prep_stmt->setString(7, ToString(json["device_category"]));
+            prep_stmt->setInt(1, facility_number);
+            prep_stmt->setString(2, facility_name);               
+            prep_stmt->setInt(3, carpark_number);
+            prep_stmt->setString(4, carpark_name);
+            prep_stmt->setInt(5,device_number);
+            prep_stmt->setString(6, device_name);
+            prep_stmt->setInt(7, device_type);
             prep_stmt->setString(8, ToString(json["device_category_name"]));            
-            prep_stmt->setString(9, ToString(json["device_ip"]));
+            prep_stmt->setString(9, device_ip);
             prep_stmt->setString(10, ToString(json["camera_id"]));
             prep_stmt->setString(11, ToString(json["customer_receipt_mandatory"]));
             prep_stmt->setString(12, ToString(json["shift_receipt_mandatory"]));
@@ -547,72 +603,71 @@ Php::Value insertUpdateDevice(Php::Value json)
             prep_stmt->setString(31, ToString(json["plate_capturing_wait_delay"]));
             prep_stmt->setString(32, ToString(json["quick_barrier_close"]));
             prep_stmt->setString(33, ToString(json["payment_enabled_exit"]));
+            prep_stmt->setString(34, res->getString("rate_plan"));
+            prep_stmt->setString(35,res->getString("reservation_rate_plan"));
+            prep_stmt->setString(36, res->getString("rate_type"));
+             
             
-                    
+            delete res;        
             if (!prep_stmt->execute())
                 {
-                msg = "Successfull";               	
-                deviceFlag=false;                
+                msg = "Successfull";               	                
+                
+                string previous_carpark=json["previous_carpark"];
+                string previous_device=json["previous_device"];  
+                
                 dcon=General.mysqlConnect(DashboardDB);
-                prep_stmt = dcon->prepareStatement("select * from watchdog_device_status where facility_number="+ToString(json["previous_facility"])+" and carpark_number="+ToString(json["previous_carpark"])+" and device_number="+ToString(json["previous_device"]));
+                prep_stmt = dcon->prepareStatement("select id from watchdog_device_status where carpark_number="+previous_carpark+" and device_number="+previous_device);
                 res=prep_stmt->executeQuery();
+                delete prep_stmt;   
                 if(res->next())                    
-                    deviceFlag=true;
-               
-                delete res;
-                delete prep_stmt;               
-                if(deviceFlag==false)
-                    {                    
-                    prep_stmt = dcon->prepareStatement("insert into watchdog_device_status(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_ip,device_type)values(?,?,?,?,?,?,?,?)");                                        
+                    {
+                    id=res->getString("id");
+                    prep_stmt = dcon->prepareStatement("update watchdog_device_status set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_ip=?,device_type=? where id=?");                            
+                    prep_stmt->setString(9, id);    
                     }
                 else
                     {
-                    prep_stmt = dcon->prepareStatement("update watchdog_device_status set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_ip=?,device_type=? where carpark_number=? and facility_number=? and device_number=?");                            
-                    prep_stmt->setString(9, ToString(json["previous_carpark"]));
-                    prep_stmt->setString(10, ToString(json["previous_facility"]));
-                    prep_stmt->setString(11, ToString(json["previous_device"]));
-                    }
-                prep_stmt->setString(1, ToString(json["facility_number"]));
-                prep_stmt->setString(2, ToString(json["facility_name"]));
-                prep_stmt->setString(3, ToString(json["carpark_number"]));
-                prep_stmt->setString(4, ToString(json["carpark_name"]));
-                prep_stmt->setString(5, ToString(json["device_number"]));
-                prep_stmt->setString(6, ToString(json["device_name"]));
-                prep_stmt->setString(7, ToString(json["device_ip"]));
-                prep_stmt->setString(8, ToString(json["device_category"]));                            
+                    prep_stmt = dcon->prepareStatement("insert into watchdog_device_status(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_ip,device_type)values(?,?,?,?,?,?,?,?)");                                        
+                    }                               
+                prep_stmt->setInt(1, facility_number);
+                prep_stmt->setString(2, facility_name);
+                prep_stmt->setInt(3, carpark_number);
+                prep_stmt->setString(4, carpark_name);
+                prep_stmt->setInt(5,device_number);
+                prep_stmt->setString(6, device_name);
+                prep_stmt->setString(7, device_ip);
+                prep_stmt->setInt(8, device_type);                            
                 prep_stmt->executeUpdate();
 
+                delete res;
                 delete prep_stmt;
+                
                 if(device_type==3||device_type==4||device_type==5)
-                    {
-                    deviceFlag=false;    
-                    prep_stmt = dcon->prepareStatement("select * from parking_revenue where facility_number="+ToString(json["previous_facility"])+" and carpark_number="+ToString(json["previous_carpark"])+" and device_number="+ToString(json["previous_device"]));
-                    res=prep_stmt->executeQuery();                    
+                    {                       
+                    prep_stmt = dcon->prepareStatement("select id from parking_revenue where carpark_number="+previous_carpark+" and device_number="+previous_device);
+                    res=prep_stmt->executeQuery(); 
+                    delete prep_stmt;     
                     if(res->next())
-                        deviceFlag=true;                       
-                    delete res;
-                    delete prep_stmt;              
-
-                    if(deviceFlag==false)
                         {
-                        prep_stmt = dcon->prepareStatement("insert into parking_revenue(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_type)values(?,?,?,?,?,?,?)");                                           
+                        id=res->getString("id");  
+                        prep_stmt = dcon->prepareStatement("update parking_revenue set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_type=? where id=?");                            
+                        prep_stmt->setString(8, id);                                                
                         }
-                     else
+                    else
                         {
-                        prep_stmt = dcon->prepareStatement("update parking_revenue set facility_number=?,facility_name=?,carpark_number=?,carpark_name=?,device_number=?,device_name=?,device_type=? where carpark_number=? and facility_number=? and device_number=?");                            
-                        prep_stmt->setString(8, ToString(json["previous_carpark"]));
-                        prep_stmt->setString(9, ToString(json["previous_facility"]));
-                        prep_stmt->setString(10, ToString(json["previous_device"]));
-                        }
-                    prep_stmt->setString(1, ToString(json["facility_number"]));
-                    prep_stmt->setString(2, ToString(json["facility_name"]));
-                    prep_stmt->setString(3, ToString(json["carpark_number"]));
-                    prep_stmt->setString(4, ToString(json["carpark_name"]));
-                    prep_stmt->setString(5, ToString(json["device_number"]));
-                    prep_stmt->setString(6, ToString(json["device_name"]));                    
-                    prep_stmt->setString(7, ToString(json["device_category"]));                            
+                        prep_stmt = dcon->prepareStatement("insert into parking_revenue(facility_number,facility_name,carpark_number,carpark_name,device_number,device_name,device_type)values(?,?,?,?,?,?,?)"); 
+                        }                                                                    
+                    prep_stmt->setInt(1, facility_number);
+                    prep_stmt->setString(2, facility_name);
+                    prep_stmt->setInt(3, carpark_number);
+                    prep_stmt->setString(4, carpark_name);
+                    prep_stmt->setInt(5, device_number);
+                    prep_stmt->setString(6, device_name);                    
+                    prep_stmt->setInt(7, device_type);                            
                     prep_stmt->executeUpdate();
                     
+                    delete res;
                     delete prep_stmt;                                                     
                     }
                 }            

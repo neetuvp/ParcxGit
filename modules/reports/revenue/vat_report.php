@@ -2,10 +2,20 @@
 $page_title="Application Home";
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
+
+
+
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=5;
+$json=parcxReport($data);
+
 ?>
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">VAT Report</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["vat_report"]?></div>
 <?php
 
 include('../../../includes/navbar-end.php');
@@ -20,7 +30,7 @@ include('../../../includes/sidebar.php');
       <div class="modal-body">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title d-inline" id="modal_payment_heading">Detailed Payment Information</h3>
+            <h3 class="card-title d-inline" id="modal_payment_heading"><?=$json["detailed_payment"]?></h3>
             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
           </div>
           <!-- /.card-header -->
@@ -42,20 +52,20 @@ include('../../../includes/sidebar.php');
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">
-          Receipt Details
+          <?=$json["receipt_details"]?>
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>
         </button>
       </div>
       <div class="modal-body">
-        <h5 class="modal-title">Tax Invoice</h5>
+        <h5 class="modal-title" id="tax-invoice"><?=$json["tax_invoice"]?></h5>
         <div id="pdf-receipt">         
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="print-pdf-receipt">Print</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="pdf-modal-close"><?=$json["close"]?></button>
+        <button type="button" class="btn btn-primary" id="print-pdf-receipt"><?=$json["print"]?></button>
       </div>
     </div>
   </div>
@@ -70,7 +80,7 @@ include('../../../includes/sidebar.php');
       <div class="flex-grow-1 row additional-menu-left">
 
         <!-- carparks -->
-        <div class="col-md-2">
+        <div class="col-md-2 mb-4">
           <select class="form-control" id="multiselect" multiple="multiple">
             <?php echo parcxSettings(array("task"=>"12"));?>
           </select>
@@ -87,8 +97,8 @@ include('../../../includes/sidebar.php');
         <div class="col-md-2">
           <select class="form-control" id="paymentType" multiple="multiple">
             <!-- <option value=0>All Payment Types</option> -->
-            <option value="'Cash'">Cash</option>
-            <option value="'CreditCard'">Credit Card</option>             
+            <option value="'Cash'" id="paymentTypeCash"><?=$json["cash"]?></option>
+            <option value="'CreditCard'" id="paymentTypeCreditCard"><?=$json["credit_card"]?></option>             
           </select>
         </div>
 
@@ -96,14 +106,14 @@ include('../../../includes/sidebar.php');
         <div class="col-md-2">
           <select class="form-control" id="paymentCategory" multiple="multiple">
             <!-- <option value=0>All Payment Types</option> -->
-            <option value=1>Parking Fee</option>
-            <option value=2>Lost </option>
-            <option value=3>Discount</option>
-            <option value=4>Grace Period</option>
-            <option value=5>Product Sale</option>
+            <option value=1 id="paymentCategory1"><?=$json["parking_fee"]?></option>
+            <option value=2 id="paymentCategory2"><?=$json["lost_ticket"]?></option>
+            <option value=3 id="paymentCategory3"><?=$json["discount"]?></option>
+            <option value=4 id="paymentCategory4"><?=$json["grace_period"]?></option>
+            <option value=5 id="paymentCategory5"><?=$json["product_sales"]?></option>
           </select>
         </div>
-
+               
         <!-- discounts multiple -->
         <div class="col-md-2">
           <select class="form-control" id="discounts" multiple="multiple">
@@ -111,51 +121,7 @@ include('../../../includes/sidebar.php');
           </select>
         </div>
       
-        <!-- date and time -->
-        <div class="col-md-3 mt-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
-            </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off"
-              placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_date_range"));?>">
-          </div>
-        </div>
-
-        <!-- search -->
-        <div class="col-md-1 mt-3">
-        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="payment_transactions()">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- end / additional menu -->
+    <?php include('../../../includes/additional-menu-report.php');?>       
 
   <section class="content">
     <div class="container-wide"> 
@@ -163,15 +129,15 @@ include('../../../includes/sidebar.php');
         <div class="card-body" id="report-content">          
           <?php 
           $current_date=date("Y-m-d");    
-          $data["from"]=$current_date." ".DAY_CLOSURE_START;
-          $data["to"]=$current_date." ".DAY_CLOSURE_END;           
+          $data["from"]=$current_date;
+          $data["to"]=$current_date;           
           $data["carpark"]="";    
           $data["device"]="";	
           $data["payment-category"]=[];	
           $data["payment-type"]="";	
           $data["discount"]="";          
           $data["showvoid"]=0;   
-          $data["task"]=8;  
+          $data["task"]=26;  
           $data["language"]=$_SESSION["language"];
           echo parcxReport($data);
           ?>
@@ -185,52 +151,76 @@ include('../../../includes/sidebar.php');
 
 <script>
 var id;
-var voidClicked=false;
-var load_report = 0;
-$('body').on('click', '#payment_detail', function () 
+var date_range_message="choose date range";
+from="<?=$current_date." ".DAY_CLOSURE_START?>";
+to="<?=$current_date." ".DAY_CLOSURE_END?>";
+
+$(function() 
     {
-    if(voidClicked==false)	
+    $('#deviceNumber').multiselect(
         {
-        var data={};
-        data["payment_id"]=$(this).attr('payment_id');	
-        data["task"]=24;
-        data["language"]=$("#language").val();  
-        var jsondata = JSON.stringify(data);      
-        $.post("../../ajax/reports.php",jsondata,function(data)
-            {		
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_devices"]?>",               
+        nonSelectedText:"<?=$json["select_devices"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_devices"]?>"  
+        });
+        
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>",       
+        });    
+    $('#paymentCategory').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_category"]?>",               
+        nonSelectedText:"<?=$json["select_category"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_category"]?>"      
+        });       
+    $('#paymentType').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_payment"]?>",               
+        nonSelectedText:"<?=$json["select_payment"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_payment"]?>"   
+        });     
+    $('#discounts').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_discount"]?>",               
+        nonSelectedText:"<?=$json["select_discount"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_discount"]?>"       
+        }); 
+    });
+
+$('body').on('click', '#payment_detail', function () 
+    {    
+    var data={};
+    data["payment_id"]=$(this).attr('payment_id');	
+    data["task"]=24;
+    data["language"]=$("#language").val();  
+    var jsondata = JSON.stringify(data);      
+    $.post("../../ajax/reports.php",jsondata,function(data)
+        {		
         $("#payment-detail-content").html(data);
         $('#detailModal').modal('show');
-      })
-    .fail(function(jqxhr,status,error)
-		  {
-      alert("Error: "+error);
-      }); 
-
-	var heading = {};
-		heading["task"]=13;
-		heading["language"]=$("#language").val(); 
-		heading["label"]="detailed_payment";
-		jsondata = JSON.stringify(heading);    
-		$.post("../../ajax/reports.php",jsondata,function(data)
-		  {		
-		$("#modal_payment_heading").html(data);
-	  })
-	.fail(function(jqxhr,status,error)
-		  {
-	  alert("Error: "+error);
-	  });
-		}	
-  }); // end click event function 
-  
-//$('#view-report-button').click(function (event) 
-function payment_transactions(){     	
-  if ((!daterange)) 
-		{
-		alert("choose date range");
-    return ;
-		} 
-	else 
-		{
+      });              
+    }); // end click event function 
+    
+function callReport()
+    {
     var data={};
     data["from"]=from;
     data["to"]=to;           
@@ -244,32 +234,33 @@ function payment_transactions(){
     else
       data["showvoid"]=0;    
     data["task"]=26;
-	data["language"]=$("#language").val();   
+    data["language"]=$("#language").val();   
     var jsondata = JSON.stringify(data);  	  
-    $.post("../../ajax/reports.php",jsondata,function(data)
-		  {      
-      loadReport(data);    
-	  load_report=1;
-      })
-    .fail(function(jqxhr,status,error)
-		  {
-      alert("Error: "+error);
-      }); 
-} // end if 
-  event.preventDefault();
-	}
-	//}); // 
+    $.post("../../ajax/reports.php",jsondata,function(data) 
+        {      
+        loadReport(data);    	 
+        });
+        
+    }
+  
+$('#view-report-button').click(function (event) 
+    { 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+	callReport();	    
+    });
+
 
 $('#export_excel_report').click(function (event) 
-	{    
-  export_to_excel("#report-content", "PMS_Payment_transaction")
-	});
-	
+    {    
+    export_to_excel("#report-content", "PMS_Payment_transaction")
+    });
 
+     
 $('body').on('click', '.btn-show-pdf-reciept', function () 
     {
-    id = $(this).attr("data-id");   
-    voidClicked=true;
+    id = $(this).attr("data-id");       
     var data={};
     data["payment_id"]= id;   
     data["task"]=25;
@@ -279,28 +270,108 @@ $('body').on('click', '.btn-show-pdf-reciept', function ()
         {
         $("#pdf-receipt").html(data);  	
         $('#pdfReceiptModal').modal('show');  
-        })
-    .fail(function(jqxhr,status,error)
-        {
-        alert("Error: "+error);
-        });
-			
+        });    			
     });
 	
-
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=5;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {		
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.vat_report);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+        
+        $("#modal_payment_heading").html(json.detailed_payment); 
+        $("#exampleModalLabel").html(json.receipt_details); 
+        $("#print-pdf-receipt").html(json.print); 
+        $("#pdf-modal-close").html(json.close);  
+        $("#tax-invoice").html(json.tax_invoice);
+        $("#paymentTypeCash").html(json.cash);
+        $("#paymentTypeCreditCard").html(json.credit_card);
+        $("#paymentCategory1").html(json.parking_fee);
+        $("#paymentCategory2").html(json.lost_ticket);
+        $("#paymentCategory3").html(json.discount);
+        $("#paymentCategory4").html(json.grace_period);
+        $("#paymentCategory5").html(json.product_sales);
+        
+                                        
+        $('#deviceNumber').multiselect('destroy');
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_devices,                                    
+            nonSelectedText:json.select_devices,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_devices             
+            });  
+            
+        $('#multiselect').multiselect('destroy');
+        $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: json.all_carparks,
+            nonSelectedText: json.select_carparks,
+            selectAllNumber: false,
+            allSelectedText: json.all_carparks
+            }); 
+    
+        $('#paymentCategory').multiselect('destroy');
+        $('#paymentCategory').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_category,
+            nonSelectedText:json.select_category,
+            selectAllNumber: false,
+            allSelectedText: json.all_category
+            });   
+            
+        $('#paymentType').multiselect('destroy');
+        $('#paymentType').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_payment,
+            nonSelectedText:json.select_payment,
+            selectAllNumber: false,
+            allSelectedText:json.all_payment 
+            }); 
+            
+        $('#discounts').multiselect('destroy');
+        $('#discounts').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_discount,
+            nonSelectedText:json.select_discount,
+            selectAllNumber: false,
+            allSelectedText: json.all_discount
+            }); 
+        });    
+    }
 
 $("#language").change(function()
     {	  
-    changeLanguage();    
-    loadheadingreport("vat_report");
-    loadMultiselect();
-    if(load_report==1)
-        payment_transactions(); 		
+    loadReportLabels();    
+    callReport();		
     }); 
-  
-$( document ).ready(function() 
-    {
-    loadheadingreport("vat_report");
-    });
   
 </script>

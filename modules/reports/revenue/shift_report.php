@@ -6,21 +6,23 @@ $page_title="Application Home";
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
 
+
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=4;
+$json=parcxReport($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Shift Report</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["shift_report"]?></div>
 
 <?php
 
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-
-//# App Function Classes
-//include('../../../classes/reporting_revenue.php');
-//$reports=new reporting_revenue();
-
 ?>
 
 <!-- Modal -->
@@ -64,7 +66,7 @@ include('../../../includes/sidebar.php');
         <!-- payment devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber" multiple="multiple">
-            <?php echo parcxSettings(array("task"=>"37"));?>
+            <?php echo parcxSettings(array("task"=>"14","type"=>"3,4,5"));?>
           </select>
         </div>
 
@@ -75,52 +77,7 @@ include('../../../includes/sidebar.php');
           </select>
         </div>
         
-
-        <!-- date and time -->
-        <div class="col-md-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
-            </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
-          </div>
-        </div>
-
-        <!-- search -->
-        <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick ="shift_report()">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-  <!-- end / additional menu -->
-
+<?php include('../../../includes/additional-menu-report.php');?>       
   <section class="content">
     <div class="container-wide">
       <div class="card">
@@ -132,8 +89,8 @@ include('../../../includes/sidebar.php');
           $data["carpark"]="";    
           $data["device"]="";	
           $data["operator"]="";	  
-		  $data["language"] = $_SESSION["language"];
-		  $data["task"]=15; 
+          $data["language"] = $_SESSION["language"];
+        $data["task"]=15; 
           echo parcxReport($data); 
           ?>         
         </div>
@@ -148,7 +105,10 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
-var load_report = 0;
+var id;
+var date_range_message="choose date range";
+from="<?=$current_date." ".DAY_CLOSURE_START?>";
+to="<?=$current_date." ".DAY_CLOSURE_END?>";
 
 $('body').on('click', '#shift_detail', function () 
   {
@@ -186,62 +146,145 @@ var heading = {};
 
   }); // end click event function 
 
-
+$(function() 
+{
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>",       
+        });    
+    $('#operatormultiple').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_operators"]?>",               
+        nonSelectedText:"<?=$json["select_operators"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_operators"]?>"      
+        }); 
+    $('#deviceNumber').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_devices"]?>",               
+        nonSelectedText:"<?=$json["select_devices"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_devices"]?>"  
+        });
+});
 //$('#view-report-button').click(function (event) 
- function shift_report()
+ function callReport()
   { 
-  if ((!daterange)) 
-    {
-    alert("choose date range");
-    } 
-  else 
-    {
     var data={};
     data["from"]=from;
     data["to"]=to;         
     data["carpark"]=$("#multiselect").val().toString(); 
     data["device"]=$("#deviceNumber").val().toString();  
     data["operator"]=$("#operatormultiple").val().toString();
-	data["language"] = $("#language").val();
+    data["language"] = $("#language").val();
     data["task"]=15;   
     var jsondata = JSON.stringify(data);      
     console.log(jsondata);
     $.post("../../ajax/reports.php",jsondata,function(data)
       {		
-          load_report=1;
-      $("#report-content").html(data);
-    reportSuccess();      
+        load_report=1;
+        $("#report-content").html(data);
+        reportSuccess();      
       })
   .fail(function(jqxhr,status,error)
       {
-      alert("Error: "+error);
+        alert("Error: "+error);
       }); 
-    
-  } // end if 
-
   event.preventDefault();
   }
 //}); // end traffic report by day 
 
+$('#view-report-button').click(function (event) 
+    { 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+	callReport();	    
+    });
 
-function loadPage()
-  {
-  loadheadingreport("shift_report");
-  if(load_report==1)
-	shift_report(); 
-  }
-$("#language").change(function(){
-  loadPage();
-}); 
-
-$( document ).ready(function() {
-	loadheadingreport("shift_report");
-});
 
   /* Excel Export */
 
   $('#export_excel_report').click(function (event) {
     export_to_excel("#report-content", "PMS_Shift_Report")
   });
+  
+  
+  function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=4;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {		              
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.shift_report);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+      
+        
+                                        
+        $('#deviceNumber').multiselect('destroy');
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_devices,                                    
+            nonSelectedText:json.select_devices,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_devices             
+            });  
+            
+        $('#multiselect').multiselect('destroy');
+        $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: json.all_carparks,
+            nonSelectedText: json.select_carparks,
+            selectAllNumber: false,
+            allSelectedText: json.all_carparks
+            }); 
+    
+        $('#operatormultiple').multiselect('destroy');
+        $('#operatormultiple').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_operators,
+            nonSelectedText:json.select_operators,
+            selectAllNumber: false,
+            allSelectedText: json.all_operators
+            });   
+        
+        });    
+    }
+
+$("#language").change(function()
+    {	  
+    loadReportLabels();    
+    callReport();		
+    }); 
 
 </script>

@@ -47,7 +47,7 @@ include('../../../includes/sidebar.php');
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">
-          <?=$json["payment_transactions"]?>
+          <?=$json["receipt_details"]?>
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">×</span>

@@ -13,7 +13,7 @@
 
 using namespace std;
 extern GeneralOperations General;
-extern string query; 
+string sql_query; 
 extern sql::ResultSet *res,*res2;  
 extern sql::Connection *rCon,*con;
 extern sql::Statement *rStmt,*stmt;
@@ -28,7 +28,7 @@ void writeRevenueReportLog(string function,string message)
 void writeRevenueReportException(string function,string message)
     {
     Php::out<<message<<endl;   
-    Php::out<<query<<endl;     
+    Php::out<<sql_query<<endl;     
     General.writeLog("WebApplication/ExceptionLogs/PX-RevenueReport-"+General.currentDateTime("%Y-%m-%d"),function,message);        
     }
 
@@ -44,9 +44,9 @@ string getLabelRevenue(string label,string lang)
         {
 		con = General.mysqlConnect(ServerDB);
 		stmt = con->createStatement();
-        query= "select "+lang+" from web_application_labels where message='"+label+"'";
-		//writeRevenueReportLog("",query);
-        res2=stmt->executeQuery(query);
+        sql_query= "select "+lang+" from web_application_labels where message='"+label+"'";
+		//writeRevenueReportLog("",sql_query);
+        res2=stmt->executeQuery(sql_query);
         if(res2->next())
             label=res2->getString(lang);
         delete res2;
@@ -187,51 +187,55 @@ void RevenueReport::paymentTransactions(Php::Value json)
         string discount=json["discount"];   
         int showvoid=json["showvoid"]; 
         string payment_category;
-		string lang = json["language"];
+	string lang = json["language"];
+
+        string labels="total_revenue,transactions,ticket_id,device_name,payment_date_time,duration,category,payment_type,discount_name,discount_amount,gross_amount,no_records";
+        Php::Value label=General.getLabels(lang,labels);
+
 
         rCon=General.mysqlConnect(ReportingDB);
         rStmt=rCon->createStatement();
-        query="select * from revenue_payments where payment_date_time between '"+startdate+"' AND '"+enddate+"'"; 
+        sql_query="select * from revenue_payments where payment_date_time between '"+startdate+"' AND '"+enddate+"'"; 
         if(showvoid ==0)    
-            query=query+" and (void is null or void='')";      
+            sql_query=sql_query+" and (void is null or void='')";      
         else      
-            query=query+" and void is not null";
+            sql_query=sql_query+" and void is not null";
 
         if(carpark.length()>0)
-            query=query+" AND carpark_number in("+carpark+")";
+            sql_query=sql_query+" AND carpark_number in("+carpark+")";
         if(device.length()>0)
-            query=query+" AND device_number in("+device+")";
+            sql_query=sql_query+" AND device_number in("+device+")";
 
         if(type.length()>0)	           
-           query=query+" AND payment_type IN("+type+")";
+           sql_query=sql_query+" AND payment_type IN("+type+")";
 
         if(discount.length()>0)	  		           
-             query=query+ " AND discount_id IN("+discount+")";
+             sql_query=sql_query+ " AND discount_id IN("+discount+")";
         
         if(category.length()>0)
             {
             for (auto &iter : category)
                 {                                
                 if(iter.first==0)
-                    query=query+" and (";        
+                    sql_query=sql_query+" and (";        
                 else
-                    query=query+" Or ";
+                    sql_query=sql_query+" Or ";
                 if(iter.second==1)
-                    query=query+" (parking_fee>0 and lost_fee=0 and discount_amount=0)";
+                    sql_query=sql_query+" (parking_fee>0 and lost_fee=0 and discount_amount=0)";
                 if(iter.second==2)
-                    query=query+" lost_fee>0";
+                    sql_query=sql_query+" lost_fee>0";
                 if(iter.second==3)
-                    query=query+" discount_amount>0";
+                    sql_query=sql_query+" discount_amount>0";
                 if(iter.second==4)
-                    query=query+" (discount_amount=0 AND gross_amount=0)";
+                    sql_query=sql_query+" (discount_amount=0 AND gross_amount=0)";
                 if(iter.second==5)  
-                    query=query+" payment_category='ProductSale'";              
+                    sql_query=sql_query+" payment_category='ProductSale'";              
                 }
-            query=query+" )";                
+            sql_query=sql_query+" )";                
             }
 
-        query=query+" ORDER BY  payment_date_time desc";        
-        res= rStmt->executeQuery(query);
+        sql_query=sql_query+" ORDER BY  payment_date_time desc";        
+        res= rStmt->executeQuery(sql_query);
         if(res->rowsCount()>0)
             {
             float total=0;
@@ -244,7 +248,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
             Php::out<<"<div class='small-box bg-success'>"<<endl;
             Php::out<<"<div class='inner'>"<<endl;
             Php::out<<"<h3>"<<total<<"</h3>"<<endl;
-            Php::out<<"<h6>"+getLabelRevenue("total_revenue",lang)+"</h6>"<<endl;
+            Php::out<<"<h6>"+toString(label["total_revenue"])+"</h6>"<<endl;
             Php::out<<"</div>"<<endl;            
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
@@ -253,7 +257,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
             Php::out<<"<div class='small-box bg-success'>"<<endl;
             Php::out<<"<div class='inner'>"<<endl;
             Php::out<<"<h3>"<<res->rowsCount()<<"</h3>"<<endl;
-            Php::out<<"<h6>"+getLabelRevenue("transactions",lang)+"</h6>"<<endl;
+            Php::out<<"<h6>"+toString(label["transactions"])+"</h6>"<<endl;
             Php::out<<"</div>"<<endl;            
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
@@ -263,15 +267,15 @@ void RevenueReport::paymentTransactions(Php::Value json)
             Php::out<<"<thead>"<<endl; 
             Php::out<<"<tr>"<<endl; 
             Php::out<<"<th>#</th>"<<endl; 
-            Php::out<<"<th>"+getLabelRevenue("ticket_id",lang)+"</th>"<<endl; 
-            Php::out<<"<th>"+getLabelRevenue("device_name",lang)+"</th>"<<endl;        
-            Php::out<<"<th>"+getLabelRevenue("payment_date_time",lang)+"</th>"<<endl;  
-            Php::out<<"<th>"+getLabelRevenue("duration",lang)+"</th>"<<endl;  
-            Php::out<<"<th>"+getLabelRevenue("category",lang)+"</th>"<<endl;    
-            Php::out<<"<th>"+getLabelRevenue("payment_type",lang)+"</th>"<<endl;  
-            Php::out<<"<th>"+getLabelRevenue("discount_name",lang)+"</th>"<<endl;                                               
-            Php::out<<"<th>"+getLabelRevenue("discount_amount",lang)+"</th>"<<endl; 
-            Php::out<<"<th>"+getLabelRevenue("gross_amount",lang)+"</th>"<<endl;                                                        
+            Php::out<<"<th>"+toString(label["ticket_id"])+"</th>"<<endl; 
+            Php::out<<"<th>"+toString(label["device_name"])+"</th>"<<endl;        
+            Php::out<<"<th>"+toString(label["payment_date_time"])+"</th>"<<endl;  
+            Php::out<<"<th>"+toString(label["duration"])+"</th>"<<endl;  
+            Php::out<<"<th>"+toString(label["category"])+"</th>"<<endl;    
+            Php::out<<"<th>"+toString(label["payment_type"])+"</th>"<<endl;  
+            Php::out<<"<th>"+toString(label["discount_name"])+"</th>"<<endl;                                               
+            Php::out<<"<th>"+toString(label["discount_amount"])+"</th>"<<endl; 
+            Php::out<<"<th>"+toString(label["gross_amount"])+"</th>"<<endl;                                                        
             
             Php::out<<"</tr>"<<endl; 
             Php::out<<"</thead><tbody>"<<endl; 
@@ -322,7 +326,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
             }
         else                
             {
-            Php::out<<"<div class='p-0'>"+getLabelRevenue("no_records",lang)+"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"+toString(label["no_records"])+"</div>"<<endl;
             }
         delete rStmt;
         delete res;       
@@ -349,51 +353,57 @@ void RevenueReport::vatReport(Php::Value json)
         string discount=json["discount"];   
         int showvoid=json["showvoid"]; 
         string payment_category;
-		string lang = json["language"];
+	string lang = json["language"];
+
+
+        string labels="total_revenue,total_vat,transactions,ticket_id,device_name,payment_date_time,duration,category,payment_type,discount_name,vat_amount,discount_amount,gross_amount,no_records";
+        Php::Value label=General.getLabels(lang,labels);
+   
+        
 
         rCon=General.mysqlConnect(ReportingDB);
         rStmt=rCon->createStatement();
-        query="select * from revenue_payments where payment_date_time between '"+startdate+"' AND '"+enddate+"'"; 
+        sql_query="select * from revenue_payments where payment_date_time between '"+startdate+"' AND '"+enddate+"'"; 
         if(showvoid ==0)    
-            query=query+" and (void is null or void='')";      
+            sql_query=sql_query+" and (void is null or void='')";      
         else      
-            query=query+" and void is not null";
+            sql_query=sql_query+" and void is not null";
 
         if(carpark.length()>0)
-            query=query+" AND carpark_number in("+carpark+")";
+            sql_query=sql_query+" AND carpark_number in("+carpark+")";
         if(device.length()>0)
-            query=query+" AND device_number in("+device+")";
+            sql_query=sql_query+" AND device_number in("+device+")";
 
         if(type.length()>0)	           
-           query=query+" AND payment_type IN("+type+")";
+           sql_query=sql_query+" AND payment_type IN("+type+")";
 
         if(discount.length()>0)	  		           
-             query=query+ " AND discount_id IN("+discount+")";
+             sql_query=sql_query+ " AND discount_id IN("+discount+")";
         
         if(category.length()>0)
             {
             for (auto &iter : category)
                 {                                
                 if(iter.first==0)
-                    query=query+" and (";        
+                    sql_query=sql_query+" and (";        
                 else
-                    query=query+" Or ";
+                    sql_query=sql_query+" Or ";
                 if(iter.second==1)
-                    query=query+" (parking_fee>0 and lost_fee=0 and discount_amount=0)";
+                    sql_query=sql_query+" (parking_fee>0 and lost_fee=0 and discount_amount=0)";
                 if(iter.second==2)
-                    query=query+" lost_fee>0";
+                    sql_query=sql_query+" lost_fee>0";
                 if(iter.second==3)
-                    query=query+" discount_amount>0";
+                    sql_query=sql_query+" discount_amount>0";
                 if(iter.second==4)
-                    query=query+" (discount_amount=0 AND gross_amount=0)";
+                    sql_query=sql_query+" (discount_amount=0 AND gross_amount=0)";
                 if(iter.second==5)  
-                    query=query+" payment_category='ProductSale'";              
+                    sql_query=sql_query+" payment_category='ProductSale'";              
                 }
-            query=query+" )";                
+            sql_query=sql_query+" )";                
             }
 
-        query=query+" ORDER BY  payment_date_time desc";        
-        res= rStmt->executeQuery(query);
+        sql_query=sql_query+" ORDER BY  payment_date_time desc";        
+        res= rStmt->executeQuery(sql_query);
         if(res->rowsCount()>0)
             {
             float total=0;
@@ -408,7 +418,7 @@ void RevenueReport::vatReport(Php::Value json)
             Php::out<<"<div class='small-box bg-success'>"<<endl;
             Php::out<<"<div class='inner'>"<<endl;
             Php::out<<"<h3>"<<total<<"</h3>"<<endl;
-            Php::out<<"<h6>"+getLabelRevenue("total_revenue",lang)+"</h6>"<<endl;
+            Php::out<<"<h6>"+toString(label["total_revenue"])+"</h6>"<<endl;
             Php::out<<"</div>"<<endl;            
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
@@ -417,7 +427,7 @@ void RevenueReport::vatReport(Php::Value json)
             Php::out<<"<div class='small-box bg-success'>"<<endl;
             Php::out<<"<div class='inner'>"<<endl;
             Php::out<<"<h3>"<<vat<<"</h3>"<<endl;
-            Php::out<<"<h6>"+getLabelRevenue("total_vat",lang)+"</h6>"<<endl;
+            Php::out<<"<h6>"+toString(label["total_vat"])+"</h6>"<<endl;
             Php::out<<"</div>"<<endl;            
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
@@ -427,7 +437,7 @@ void RevenueReport::vatReport(Php::Value json)
             Php::out<<"<div class='small-box bg-success'>"<<endl;
             Php::out<<"<div class='inner'>"<<endl;
             Php::out<<"<h3>"<<res->rowsCount()<<"</h3>"<<endl;
-            Php::out<<"<h6>"+getLabelRevenue("transactions",lang)+"</h6>"<<endl;
+            Php::out<<"<h6>"+toString(label["transactions"])+"</h6>"<<endl;
             Php::out<<"</div>"<<endl;            
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
@@ -437,16 +447,16 @@ void RevenueReport::vatReport(Php::Value json)
             Php::out<<"<thead>"<<endl; 
             Php::out<<"<tr>"<<endl; 
             Php::out<<"<th>#</th>"<<endl; 
-            Php::out<<"<th>"+getLabelRevenue("ticket_id",lang)+"</th>"<<endl; 
-            Php::out<<"<th>"+getLabelRevenue("device_name",lang)+"</th>"<<endl;        
-            Php::out<<"<th>"+getLabelRevenue("payment_date_time",lang)+"</th>"<<endl;  
-            Php::out<<"<th>"+getLabelRevenue("duration",lang)+"</th>"<<endl;  
-            Php::out<<"<th>"+getLabelRevenue("category",lang)+"</th>"<<endl;    
-            Php::out<<"<th>"+getLabelRevenue("payment_type",lang)+"</th>"<<endl;  
-            Php::out<<"<th>"+getLabelRevenue("discount_name",lang)+"</th>"<<endl;    
-            Php::out<<"<th>"+getLabelRevenue("vat_amount",lang)+"</th>"<<endl; 
-            Php::out<<"<th>"+getLabelRevenue("discount_amount",lang)+"</th>"<<endl; 
-            Php::out<<"<th>"+getLabelRevenue("gross_amount",lang)+"</th>"<<endl;                                                        
+            Php::out<<"<th>"+toString(label["ticket_id"])+"</th>"<<endl; 
+            Php::out<<"<th>"+toString(label["device_name"])+"</th>"<<endl;        
+            Php::out<<"<th>"+toString(label["payment_date_time"])+"</th>"<<endl;  
+            Php::out<<"<th>"+toString(label["duration"])+"</th>"<<endl;  
+            Php::out<<"<th>"+toString(label["category"])+"</th>"<<endl;    
+            Php::out<<"<th>"+toString(label["payment_type"])+"</th>"<<endl;  
+            Php::out<<"<th>"+toString(label["discount_name"])+"</th>"<<endl;    
+            Php::out<<"<th>"+toString(label["vat_amount"])+"</th>"<<endl; 
+            Php::out<<"<th>"+toString(label["discount_amount"])+"</th>"<<endl; 
+            Php::out<<"<th>"+toString(label["gross_amount"])+"</th>"<<endl;                                                                                                             
             
             Php::out<<"</tr>"<<endl; 
             Php::out<<"</thead><tbody>"<<endl; 
@@ -498,7 +508,7 @@ void RevenueReport::vatReport(Php::Value json)
             }
         else                
             {
-            Php::out<<"<div class='p-0'>"+getLabelRevenue("no_records",lang)+"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"+toString(label["no_records"])+"</div>"<<endl;
             }
         delete rStmt;
         delete res;       
@@ -569,43 +579,48 @@ void RevenueReport::getPaymentDetails(Php::Value json)
 		string lang = json["language"];
 		arr = getFacilityfeatures();
 		string html_data = "";
+
+        string labels="ticket_id,device_name,parking_rate,entry_grace_period,exit_grace_period,vat,entry_date_time,no_records,payment_date_time,maximum_exit_date_time,duration,category,validations,parking_fee,lost_fee,discounts,discount_name,gross_amount,validation_hours,amount_received,balance_returned,credit_note,banknotes,pdf_receipt";
+        Php::Value label=General.getLabels(lang,labels);
+
+
 		rCon=General.mysqlConnect(ReportingDB);
         rStmt=rCon->createStatement();
-        query="select * from revenue_payments where id= '"+id+"'"; 
-        res= rStmt->executeQuery(query);
+        sql_query="select * from revenue_payments where id= '"+id+"'"; 
+        res= rStmt->executeQuery(sql_query);
 		arr = getFacilityfeatures();
         if(res->next())
         {
-            html_data+="<tr><td>"+getLabelRevenue("ticket_id",lang)+"</td><td> "+res->getString("ticket_id")+" </td></tr>";  
-			html_data+="<tr><td>"+getLabelRevenue("device_name",lang)+"</td><td> "+res->getString("device_name")+" </td></tr>";  
-			html_data+="<tr><td>"+getLabelRevenue("parking_rate",lang)+"</td><td>"+res->getString("parking_rate_label")+"("+res->getString("parking_rate_name")+")</td></tr>";    
-			html_data+="<tr><td>"+getLabelRevenue("entry_grace_period",lang)+"</td><td>"+res->getString("entry_grace_period")+"</td></tr>";
-			html_data+="<tr><td>"+getLabelRevenue("exit_grace_period",lang)+"</td><td>"+res->getString("exit_grace_period")+"</td></tr>";
+            html_data+="<tr><td>"+toString(label["ticket_id"])+"</td><td> "+res->getString("ticket_id")+" </td></tr>";  
+			html_data+="<tr><td>"+toString(label["device_name"])+"</td><td> "+res->getString("device_name")+" </td></tr>";  
+			html_data+="<tr><td>"+toString(label["parking_rate"])+"</td><td>"+res->getString("parking_rate_label")+"("+res->getString("parking_rate_name")+")</td></tr>";    
+			html_data+="<tr><td>"+toString(label["entry_grace_period"])+"</td><td>"+res->getString("entry_grace_period")+"</td></tr>";
+			html_data+="<tr><td>"+toString(label["exit_grace_period"])+"</td><td>"+res->getString("exit_grace_period")+"</td></tr>";
 			if(stoi(vat)!=0)
-				html_data+="<tr><td>"+getLabelRevenue("vat",lang)+"</td><td>"+res->getString("vat_percentage")+"% "+res->getString("vat_type")+"</td></tr>";
-			html_data+="<tr><td>"+getLabelRevenue("entry_date_time",lang)+"</td><td>"+res->getString("entry_date_time")+"</td></tr>";        
-			html_data+="<tr><td>"+getLabelRevenue("payment_date_time",lang)+"</td><td>"+res->getString("payment_date_time")+"</td></tr>";
-			html_data+="<tr><td>"+getLabelRevenue("maximum_exit_date_time",lang)+"</td><td>"+res->getString("max_exit_date_time")+"</td></tr>";        
-			html_data+="<tr><td>"+getLabelRevenue("duration",lang)+"</td><td>"+res->getString("parking_duration")+"</td></tr>";
-			html_data+="<tr><td>"+getLabelRevenue("category",lang)+"</td><td>"+res->getString("payment_category")+"</td></tr>"; 
+				html_data+="<tr><td>"+toString(label["vat"])+"</td><td>"+res->getString("vat_percentage")+"% "+res->getString("vat_type")+"</td></tr>";
+			html_data+="<tr><td>"+toString(label["entry_date_time"])+"</td><td>"+res->getString("entry_date_time")+"</td></tr>";        
+			html_data+="<tr><td>"+toString(label["payment_date_time"])+"</td><td>"+res->getString("payment_date_time")+"</td></tr>";
+			html_data+="<tr><td>"+toString(label["maximum_exit_date_time"])+"</td><td>"+res->getString("max_exit_date_time")+"</td></tr>";        
+			html_data+="<tr><td>"+toString(label["duration"])+"</td><td>"+res->getString("parking_duration")+"</td></tr>";
+			html_data+="<tr><td>"+toString(label["category"])+"</td><td>"+res->getString("payment_category")+"</td></tr>"; 
 			
 			if(res->getString("validation_id")!="")
 			{
 				std::vector<std::string> outputArr = split (res->getString("validation_value"),','); 
 				//html_data+="<tr><td>Validations</td><td>";           
-				html_data+="<tr><td>"+getLabelRevenue("validations",lang)+"</td><td>"+outputArr[0]+" Hour "+outputArr[1]+" %</td></tr>";                  
+				html_data+="<tr><td>"+toString(label["validations"])+"</td><td>"+outputArr[0]+" Hour "+outputArr[1]+" %</td></tr>";                  
 			}
-			html_data+="<tr><td>"+getLabelRevenue("parking_fee",lang)+"</td><td>"+SetDoublePrecision(res->getDouble("parking_fee"))+" "+currency+"</td></tr>";  
-			html_data+="<tr><td>"+getLabelRevenue("lost_fee",lang)+"</td><td>"+SetDoublePrecision(res->getDouble("lost_fee"))+" "+currency+"</td></tr>"; 
+			html_data+="<tr><td>"+toString(label["parking_fee"])+"</td><td>"+SetDoublePrecision(res->getDouble("parking_fee"))+" "+currency+"</td></tr>";  
+			html_data+="<tr><td>"+toString(label["lost_fee"])+"</td><td>"+SetDoublePrecision(res->getDouble("lost_fee"))+" "+currency+"</td></tr>"; 
 			if(stoi(vat)!=0) 
-				html_data+="<tr><td>"+getLabelRevenue("vat",lang)+"</td><td>"+SetDoublePrecision(res->getDouble("vat_amount"))+" "+currency+"</td></tr>"; 
+				html_data+="<tr><td>"+toString(label["vat"])+"</td><td>"+SetDoublePrecision(res->getDouble("vat_amount"))+" "+currency+"</td></tr>"; 
 
-			html_data+="<tr><td>"+getLabelRevenue("discounts",lang)+"</td><td>"+SetDoublePrecision(res->getDouble("discount_amount"))+" "+currency+"</td></tr>"; 		
+			html_data+="<tr><td>"+toString(label["discounts"])+"</td><td>"+SetDoublePrecision(res->getDouble("discount_amount"))+" "+currency+"</td></tr>"; 		
 			if(res->getDouble("discount_amount")>0)
-				html_data+="<tr><td>"+getLabelRevenue("discount_name",lang)+"</td><td>"+res->getString("discount_name")+"</td></tr>";
-			html_data+="<tr><td>"+getLabelRevenue("gross_amount",lang)+"</td><td class='font-weight-bold'>"+SetDoublePrecision(res->getDouble("gross_amount"))+" "+currency+"</td></tr>";          
+				html_data+="<tr><td>"+toString(label["discount_name"])+"</td><td>"+res->getString("discount_name")+"</td></tr>";
+			html_data+="<tr><td>"+toString(label["gross_amount"])+"</td><td class='font-weight-bold'>"+SetDoublePrecision(res->getDouble("gross_amount"))+" "+currency+"</td></tr>";          
 			if(stoi(res->getString("validation_hours"))>0)
-				html_data+="<tr><td>"+getLabelRevenue("validation_hours",lang)+"</td><td>"+res->getString("validation_hours")+"</td></tr>";                                
+				html_data+="<tr><td>"+toString(label["validation_hours"])+"</td><td>"+res->getString("validation_hours")+"</td></tr>";                                
 									
 			/*notes=data['bank_notes'];
 			total=0;
@@ -645,12 +660,12 @@ void RevenueReport::getPaymentDetails(Php::Value json)
 			}
 			
 			if(notes!="")    
-				html_data+="<tr><td>"+getLabelRevenue("amount_received",lang)+"</td><td>"+to_string(total)+"  "+currency+"</td></tr>";		
-			html_data+="<tr><td>"+getLabelRevenue("balance_returned",lang)+"</td><td>"+SetDoublePrecision(res->getDouble("balance_returned"))+" "+currency+" </td></tr>";
-			html_data+="<tr><td>"+getLabelRevenue("credit_note",lang)+"</td><td>"+SetDoublePrecision(res->getDouble("credit_note"))+" "+currency+" </td></tr>";		
+				html_data+="<tr><td>"+toString(label["amount_received"])+"</td><td>"+to_string(total)+"  "+currency+"</td></tr>";		
+			html_data+="<tr><td>"+toString(label["balance_returned"])+"</td><td>"+SetDoublePrecision(res->getDouble("balance_returned"))+" "+currency+" </td></tr>";
+			html_data+="<tr><td>"+toString(label["credit_note"])+"</td><td>"+SetDoublePrecision(res->getDouble("credit_note"))+" "+currency+" </td></tr>";		
 			if(notes!="")
-				html_data+="<tr><td>"+getLabelRevenue("banknotes",lang)+"</td><td>"+notes+"</td></tr>";
-			html_data+= "<tr><td><input class='btn btn-info btn-show-pdf-reciept' value='"+getLabelRevenue("pdf_receipt",lang)+"' type='button' data-id='"+res->getString("id")+"'></td></tr>";
+				html_data+="<tr><td>"+toString(label["banknotes"])+"</td><td>"+notes+"</td></tr>";
+			html_data+= "<tr><td><input class='btn btn-info btn-show-pdf-reciept' value='"+toString(label["pdf_receipt"])+"' type='button' data-id='"+res->getString("id")+"'></td></tr>";
 			
 			Php::out<<html_data<<endl;
 		}
@@ -674,10 +689,15 @@ void RevenueReport::getPdfReceipt(Php::Value json)
 		string lang = json["language"];
 		arr = getFacilityfeatures();
 		string html_data = "";
+
+        string labels="trn_no,device_name,operator_name,payment_type,ticket_id,vat,entry_date_time,payment_date_time,duration,parking_duration,validations,parking_fee,payment_date_time,maximum_exit_date_time,duration,category,validations,parking_fee,lost_fee,discounts,discount_name,gross_amount,validation_hours,amount_received,balance_returned,credit_note,banknotes,pdf_receipt";
+        Php::Value label=General.getLabels(lang,labels);
+
+
 		rCon=General.mysqlConnect(ReportingDB);
         rStmt=rCon->createStatement();
-        query="select * from revenue_payments where id= '"+id+"'"; 
-        res= rStmt->executeQuery(query);
+        sql_query="select * from revenue_payments where id= '"+id+"'"; 
+        res= rStmt->executeQuery(sql_query);
 		arr = getFacilityfeatures();
         if(res->next())
         {
@@ -686,54 +706,54 @@ void RevenueReport::getPdfReceipt(Php::Value json)
 			html_data+="<div>"+toString(arr["address_line1"])+"</div>"; 
 			html_data+="<div>"+toString(arr["address_line2"])+"</div>"; 
 			if(vat!="0")
-				html_data+="<div>"+getLabelRevenue("trn_no",lang)+" "+toString(arr["vat_id"])+"</div>";                    
+				html_data+="<div>"+toString(label["trn_no"])+" "+toString(arr["vat_id"])+"</div>";                    
 			
-			html_data+="<hr><div>"+getLabelRevenue("device_name",lang)+": "+res->getString("device_name")+"</div>";
-			html_data+="<div>"+getLabelRevenue("operator_name",lang)+": "+res->getString("operator_name")+"</span></div>";
-			html_data+="<div>"+getLabelRevenue("payment_type",lang)+": "+res->getString("payment_type")+"</div></div></div>";
+			html_data+="<hr><div>"+toString(label["device_name"])+": "+res->getString("device_name")+"</div>";
+			html_data+="<div>"+toString(label["operator_name"])+": "+res->getString("operator_name")+"</span></div>";
+			html_data+="<div>"+toString(label["payment_type"])+": "+res->getString("payment_type")+"</div></div></div>";
 			html_data+="<div class='table-responsive-sm'>";
 			html_data+="<table class='table table-striped table-receipt'>";
 			html_data+="<thead><tr><th></th><th></th><th></th></tr></thead>";
 			html_data+="<tbody><tr><td></td><td>";    
 			html_data+="<div>"+res->getString("payment_category")+"</div>";
-			html_data+="<span>"+getLabelRevenue("ticket_id",lang)+": "+res->getString("ticket_id")+"</span>";
-			html_data+="<span>"+getLabelRevenue("entry_date_time",lang)+": "+res->getString("entry_date_time")+"</span>";
-			html_data+="<span>"+getLabelRevenue("payment_date_time",lang)+": "+res->getString("payment_date_time")+"</span> ";   
+			html_data+="<span>"+toString(label["ticket_id"])+": "+res->getString("ticket_id")+"</span>";
+			html_data+="<span>"+toString(label["entry_date_time"])+": "+res->getString("entry_date_time")+"</span>";
+			html_data+="<span>"+toString(label["payment_date_time"])+": "+res->getString("payment_date_time")+"</span> ";   
 			html_data+="</td>";
 			html_data+="<td></td></tr>";
 			html_data+="<tr><td></td>";
-			html_data+="<td><strong>"+getLabelRevenue("duration",lang)+"</strong></td>";
+			html_data+="<td><strong>"+toString(label["duration"])+"</strong></td>";
 			html_data+="<td><span>"+res->getString("parking_duration")+"</span></td></tr>";
 			
 			if(res->getString("validation_id")!="")
 			{
 				std::vector<std::string> outputArr = split (res->getString("validation_value"),','); 
 				html_data+="<tr><td></td>";           
-				html_data+="<td><strong>"+getLabelRevenue("validations",lang)+"</strong></td>";
+				html_data+="<td><strong>"+toString(label["validations"])+"</strong></td>";
 				html_data+="<td><span>"+outputArr[0]+" H "+outputArr[1]+" %</span></td></tr>";              
 			}
 			html_data+="<tr><td></td>";
-			html_data+="<td><strong>"+getLabelRevenue("parking_fee",lang)+"</strong></td>";
+			html_data+="<td><strong>"+toString(label["parking_fee"])+"</strong></td>";
 			html_data+="<td><span>"+currency+" "+SetDoublePrecision(res->getDouble("parking_fee"))+"</span></td></tr>";
 			if(res->getDouble("discount_amount")>0)
 			{
 				html_data+="<tr><td></td>";
-				html_data+="<td><strong>"+getLabelRevenue("discount_amount",lang)+"</strong><span>"+to_string(res->getDouble("discount_name"))+"</span></td>";
+				html_data+="<td><strong>"+toString(label["discount_amount"])+"</strong><span>"+to_string(res->getDouble("discount_name"))+"</span></td>";
 				html_data+="<td><span>"+currency+" "+SetDoublePrecision(res->getDouble("discount_amount"))+"</span></td></tr>";
 			}
 			html_data+="<tr><td></td>";
-			html_data+="<td><strong>"+getLabelRevenue("net_amount",lang)+"</strong></td>";
+			html_data+="<td><strong>"+toString(label["net_amount"])+"</strong></td>";
 			double net=res->getDouble("gross_amount")-res->getDouble("vat_amount");
 			html_data+="<td><span>"+currency+" "+SetDoublePrecision(net)+"</span></td></tr>";
 			if(vat!="0")
 			{
 				html_data+="<tr><td></td>";
-				html_data+="<td><strong>"+getLabelRevenue("vat",lang)+" ("+vat+"%)</strong></td>";
+				html_data+="<td><strong>"+toString(label["vat"])+" ("+vat+"%)</strong></td>";
 				html_data+="<td><span>"+currency+" "+SetDoublePrecision(res->getDouble("vat_amount"))+"</span></td></tr>";
 			}
 			
 			html_data+="<tr><td></td>";
-			html_data+="<td><strong>"+getLabelRevenue("gross_amount",lang)+"</strong></td>";
+			html_data+="<td><strong>"+toString(label["gross_amount"])+"</strong></td>";
 			html_data+="<td><span>"+currency+" "+SetDoublePrecision(res->getDouble("gross_amount"))+"</span></td></tr>";
 			html_data+="</tbody></table> ";
 			
@@ -759,22 +779,26 @@ void RevenueReport::shiftReport(Php::Value json)
         string operator_id=json["operator"];
         string lang = json["language"];
 
+        string labels="transactions,device_name,operator_name,shift_number,shift_start,shift_end,shift_earnings,over_short,last_updated,status,no_records";
+        Php::Value label=General.getLabels(lang,labels);
+
+
         rCon=General.mysqlConnect(ReportingDB);
         rStmt=rCon->createStatement();
-        query="select * from revenue_shifts where login_time between '"+startdate+"' AND '"+enddate+"'"; 
+        sql_query="select * from revenue_shifts where login_time between '"+startdate+"' AND '"+enddate+"'"; 
 
         if(carpark.length()>0)
-            query=query+" AND carpark_number in("+carpark+")";
+            sql_query=sql_query+" AND carpark_number in("+carpark+")";
         if(device.length()>0)
-            query=query+" AND device_number in("+device+")";
+            sql_query=sql_query+" AND device_number in("+device+")";
 		if(operator_id.length()>0)
-            query=query+" AND operator_id in("+operator_id+")";
+            sql_query=sql_query+" AND operator_id in("+operator_id+")";
 
         
 
-        query=query+" ORDER BY  device_number ASC"; 
+        sql_query=sql_query+" ORDER BY  device_number ASC"; 
 			
-        res= rStmt->executeQuery(query);
+        res= rStmt->executeQuery(sql_query);
         if(res->rowsCount()>0)
             {
             difference="";
@@ -784,7 +808,7 @@ void RevenueReport::shiftReport(Php::Value json)
             Php::out<<"<div class='small-box bg-success'>"<<endl;
             Php::out<<"<div class='inner'>"<<endl;
             Php::out<<"<h3>"<<res->rowsCount()<<"</h3>"<<endl;
-            Php::out<<"<h6>"<<getLabelRevenue("transactions",lang)<<"</h6>"<<endl;
+            Php::out<<"<h6>"<<toString(label["transactions"])<<"</h6>"<<endl;
             Php::out<<"</div>"<<endl;            
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
@@ -794,15 +818,15 @@ void RevenueReport::shiftReport(Php::Value json)
             Php::out<<"<thead>"<<endl; 
             Php::out<<"<tr>"<<endl; 
             Php::out<<"<th>#</th>"<<endl; 
-            Php::out<<"<th>"<<getLabelRevenue("shift_number",lang)<<"</th>"<<endl; 
-            Php::out<<"<th>"<<getLabelRevenue("device_name",lang)<<"</th>"<<endl;        
-            Php::out<<"<th>"<<getLabelRevenue("operator_name",lang)<<"</th>"<<endl;  
-            Php::out<<"<th>"<<getLabelRevenue("shift_start",lang)<<"</th>"<<endl;  
-            Php::out<<"<th>"<<getLabelRevenue("shift_end",lang)<<"</th>"<<endl;    
-            Php::out<<"<th>"<<getLabelRevenue("shift_earnings",lang)<<"</th>"<<endl;  
-            Php::out<<"<th>"<<getLabelRevenue("over_short",lang)<<"</th>"<<endl;                                               
-            Php::out<<"<th>"<<getLabelRevenue("last_updated",lang)<<"</th>"<<endl; 
-            Php::out<<"<th>"<<getLabelRevenue("status",lang)<<"</th>"<<endl;                                                        
+            Php::out<<"<th>"<<toString(label["shift_number"])<<"</th>"<<endl; 
+            Php::out<<"<th>"<<toString(label["device_name"])<<"</th>"<<endl;        
+            Php::out<<"<th>"<<toString(label["operator_name"])<<"</th>"<<endl;  
+            Php::out<<"<th>"<<toString(label["shift_start"])<<"</th>"<<endl;  
+            Php::out<<"<th>"<<toString(label["shift_end"])<<"</th>"<<endl;    
+            Php::out<<"<th>"<<toString(label["shift_earnings"])<<"</th>"<<endl;  
+            Php::out<<"<th>"<<toString(label["over_short"])<<"</th>"<<endl;                                               
+            Php::out<<"<th>"<<toString(label["last_updated"])<<"</th>"<<endl; 
+            Php::out<<"<th>"<<toString(label["status"])<<"</th>"<<endl;                                                        
             
             Php::out<<"</tr>"<<endl; 
             Php::out<<"</thead><tbody>"<<endl; 
@@ -838,7 +862,7 @@ void RevenueReport::shiftReport(Php::Value json)
             }
         else                
             {
-            Php::out<<"<div class='p-0'>"<<getLabelRevenue("no_records",lang)<<"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"<<toString(label["no_records"])<<"</div>"<<endl;
             }
         delete rStmt;
         delete res;       
@@ -859,33 +883,36 @@ void RevenueReport::getshiftDetails(Php::Value json)
 	{        
 		string shift_id=json["shift_id"];
 		string lang=json["language"];
+                
+                string labels="device_name,operator_name,shift_start,shift_end,open_amount,close_amount,payin_amount,payout_amount,duration,parking_fee,lost_fee,vat,physical_cash,shift_earnings,over_short";
+                Php::Value label=General.getLabels(lang,labels);
 
 		rCon=General.mysqlConnect(ReportingDB);
 		rStmt=rCon->createStatement();
-		query="select * from revenue_shifts where shift_id='"+shift_id+"'";
-		res= rStmt->executeQuery(query);
+		sql_query="select * from revenue_shifts where shift_id='"+shift_id+"'";
+		res= rStmt->executeQuery(sql_query);
 		
 		if(res->next())
         {
-			Php::out<<"<tr><td>"<<getLabelRevenue("device_name",lang)<<"</td><td> "+res->getString("device_name")+" </td></tr>"<<endl;  
-			Php::out<<"<tr><td>"<<getLabelRevenue("operator_name",lang)<<"</td><td>"+res->getString("operator_name")+"</td></tr>"<<endl;    
-			Php::out<<"<tr><td>"<<getLabelRevenue("shift_start",lang)<<"</td><td>"+res->getString("login_time")+"</td></tr>"<<endl;
-			Php::out<<"<tr><td>"<<getLabelRevenue("shift_end",lang)<<"</td><td>"+res->getString("logout_time")+"</td></tr>"<<endl;
-			Php::out<<"<tr><td>"<<getLabelRevenue("open_amount",lang)<<"</td><td>"+res->getString("shift_opening_amount")+"</td></tr>"<<endl;        
-			Php::out<<"<tr><td>"<<getLabelRevenue("close_amount",lang)<<"</td><td>"+res->getString("shift_closing_amount")+"</td></tr>"<<endl;
-			Php::out<<"<tr><td>"<<getLabelRevenue("payin_amount",lang)<<"</td><td>"+res->getString("payin_amount")+"</td></tr>"<<endl;        
-			Php::out<<"<tr><td>"<<getLabelRevenue("payout_amount",lang)<<"</td><td>"+res->getString("payout_amount")+"</td></tr>"<<endl;
-			Php::out<<"<tr><td>"<<getLabelRevenue("duration",lang)<<"</td><td>"+res->getString("shift_duration")+"</td></tr>"<<endl;                   
-			Php::out<<"<tr><td>"<<getLabelRevenue("parking_fee",lang)<<"</td><td>"+res->getString("parking_fees")+"</td></tr>"<<endl;  
-			Php::out<<"<tr><td>"<<getLabelRevenue("lost_fee",lang)<<"</td><td>"+res->getString("lost_fee")+"</td></tr>"<<endl;  
-			Php::out<<"<tr><td>"<<getLabelRevenue("vat",lang)<<"</td><td>"+res->getString("vat_amount")+"</td></tr>"<<endl;               
-			Php::out<<"<tr><td>"<<getLabelRevenue("shift_earnings",lang)<<"</td><td class='font-weight-bold'>"+res->getString("shift_earnings")+"</td></tr>"<<endl;          
-			Php::out<<"<tr><td>"<<getLabelRevenue("physical_cash",lang)<<"</td><td class='font-weight-bold'>"+res->getString("physical_cash_collected")+"</td></tr>"<<endl;       
+			Php::out<<"<tr><td>"<<label["device_name"]<<"</td><td> "+res->getString("device_name")+" </td></tr>"<<endl;  
+			Php::out<<"<tr><td>"<<label["operator_name"]<<"</td><td>"+res->getString("operator_name")+"</td></tr>"<<endl;    
+			Php::out<<"<tr><td>"<<label["shift_start"]<<"</td><td>"+res->getString("login_time")+"</td></tr>"<<endl;
+			Php::out<<"<tr><td>"<<label["shift_end"]<<"</td><td>"+res->getString("logout_time")+"</td></tr>"<<endl;
+			Php::out<<"<tr><td>"<<label["open_amount"]<<"</td><td>"+res->getString("shift_opening_amount")+"</td></tr>"<<endl;        
+			Php::out<<"<tr><td>"<<label["close_amount"]<<"</td><td>"+res->getString("shift_closing_amount")+"</td></tr>"<<endl;
+			Php::out<<"<tr><td>"<<label["payin_amount"]<<"</td><td>"+res->getString("payin_amount")+"</td></tr>"<<endl;        
+			Php::out<<"<tr><td>"<<label["payout_amount"]<<"</td><td>"+res->getString("payout_amount")+"</td></tr>"<<endl;
+			Php::out<<"<tr><td>"<<label["duration"]<<"</td><td>"+res->getString("shift_duration")+"</td></tr>"<<endl;                   
+			Php::out<<"<tr><td>"<<label["parking_fee"]<<"</td><td>"+res->getString("parking_fees")+"</td></tr>"<<endl;  
+			Php::out<<"<tr><td>"<<label["lost_fee"]<<"</td><td>"+res->getString("lost_fee")+"</td></tr>"<<endl;  
+			Php::out<<"<tr><td>"<<label["vat"]<<"</td><td>"+res->getString("vat_amount")+"</td></tr>"<<endl;               
+			Php::out<<"<tr><td>"<<label["shift_earnings"]<<"</td><td class='font-weight-bold'>"+res->getString("shift_earnings")+"</td></tr>"<<endl;          
+			Php::out<<"<tr><td>"<<label["physical_cash"]<<"</td><td class='font-weight-bold'>"+res->getString("physical_cash_collected")+"</td></tr>"<<endl;       
 			if(res->getDouble("physical_cash_collected")>0)                      
 				difference=to_string(res->getDouble("physical_cash_collected")-res->getDouble("shift_earnings"));                
 			else            
 				difference="-";               
-			Php::out<<"<tr><td>"<<getLabelRevenue("over_short",lang)<<"</td><td class='font-weight-bold'>"+difference+"</td></tr>"<<endl;
+			Php::out<<"<tr><td>"<<label["over_short"]<<"</td><td class='font-weight-bold'>"+difference+"</td></tr>"<<endl;
 			Php::out<<"</div>";
 		}
 		
@@ -903,10 +930,6 @@ void RevenueReport::getshiftDetails(Php::Value json)
 
 
 
-
-
-
-
 void RevenueReport::apmrefillReport(Php::Value json)
 {
 	string str_array,a,b,sum,currency;
@@ -919,16 +942,21 @@ void RevenueReport::apmrefillReport(Php::Value json)
 		string carpark = json["carpark"];
 		string lang=json["language"];
 		string notes="";
+                
+                string labels="device_name,date_time,operator_name,banknote,amount,transactions,total_amount_refilled,no_records";
+                Php::Value label=General.getLabels(lang,labels);
+
+                
 		currency = getCurrency();
 		rCon=General.mysqlConnect(ReportingDB);
 		rStmt=rCon->createStatement();
-		query="select * from revenue_apm_cash_refill where datetime between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select * from revenue_apm_cash_refill where datetime between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (device_number.length() > 0) 		           
-            query += " AND device_number IN("+device_number+")";  
-		res= rStmt->executeQuery(query);
+            sql_query += " AND device_number IN("+device_number+")";  
+		res= rStmt->executeQuery(sql_query);
 		string data="";
 		string summary="";
 		if(res->rowsCount()>0)
@@ -937,11 +965,11 @@ void RevenueReport::apmrefillReport(Php::Value json)
             data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-            data+="<th>"+getLabelRevenue("device_name",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("date_time",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("operator_name",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("banknote",lang)+"</th>";    
-            data+="<th>"+getLabelRevenue("amount",lang)+"</th>";  
+            data+="<th>"+toString(label["device_name"])+"</th>";        
+            data+="<th>"+toString(label["date_time"])+"</th>";  
+            data+="<th>"+toString(label["operator_name"])+"</th>";  
+            data+="<th>"+toString(label["banknote"])+"</th>";    
+            data+="<th>"+toString(label["amount"])+"</th>";  
             
             data+="</tr>"; 
             data+="</thead><tbody>"; 
@@ -980,7 +1008,7 @@ void RevenueReport::apmrefillReport(Php::Value json)
             summary+="<div class='small-box bg-success'>";
             summary+="<div class='inner'>";
             summary+="<h3>"+to_string(res->rowsCount())+"</h3>";
-            summary+="<h6>"+getLabelRevenue("transactions",lang)+"</h6>";
+            summary+="<h6>"+toString(label["transactions"])+"</h6>";
             summary+="</div>";            
             summary+="</div>";
             summary+="</div>";
@@ -989,7 +1017,7 @@ void RevenueReport::apmrefillReport(Php::Value json)
             summary+="<div class='small-box bg-success'>";
             summary+="<div class='inner'>";
             summary+="<h3>"+to_string(total)+" "+currency+"</h3>";
-            summary+="<h6>"+getLabelRevenue("total_amount_refilled",lang)+"</h6>";
+            summary+="<h6>"+toString(label["total_amount_refilled"])+"</h6>";
             summary+="</div>";            
             summary+="</div>";
             summary+="</div>";
@@ -998,7 +1026,7 @@ void RevenueReport::apmrefillReport(Php::Value json)
 			Php::out<<summary+data<<endl;
 		}
 		else{
-            Php::out<<"<div class='p-0'>"<<getLabelRevenue("no_records",lang)<<"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"<<toString(label["no_records"])<<"</div>"<<endl;
 		}
 		
 		delete rStmt;
@@ -1023,25 +1051,29 @@ void RevenueReport::apmcashlevelsReport(Php::Value json)
 	{        
 		string device_number = json["device"];
 		string lang=json["language"];
+
+                string labels="banknotes,recycler_level,cashbox_level,total,no_records";
+                Php::Value label=General.getLabels(lang,labels);
+
 		rCon=General.mysqlConnect(DashboardDB);
 		rStmt=rCon->createStatement();
-		query="SELECT a.device_number,a.device_name,a.denomination,a.current_level as recycler_current_level,b.current_level as cashbox_current_level FROM apm_recycle_levels as a join apm_cashbox_levels as b on a.denomination=b.denomination and a.device_number=b.device_number";
+		sql_query="SELECT a.device_number,a.device_name,a.denomination,a.current_level as recycler_current_level,b.current_level as cashbox_current_level FROM apm_recycle_levels as a join apm_cashbox_levels as b on a.denomination=b.denomination and a.device_number=b.device_number";
 		
         if (device_number.length() > 0) 		           
-            query += " AND device_number IN("+device_number+")";  
+            sql_query += " AND a.device_number IN("+device_number+")";  
 		
-		query += " order by denomination asc";
-		res= rStmt->executeQuery(query);
+		sql_query += " order by denomination asc";
+		res= rStmt->executeQuery(sql_query);
 		string data="";
 		if(res->rowsCount()>0)
 		{
             data = "<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>";
             data = data+"<thead>";
             data = data+"<tr>"; 
-            data = data+ "<th>"+getLabelRevenue("banknotes",lang)+"</th>";        
-            data = data+ "<th>"+getLabelRevenue("recycler_level",lang)+"</th>";  
-            data = data+ "<th>"+getLabelRevenue("cashbox_level",lang)+"</th>";  
-            data = data+ "<th>"+getLabelRevenue("total",lang)+"</th>";               
+            data = data+ "<th>"+toString(label["banknotes"])+"</th>";        
+            data = data+ "<th>"+toString(label["recycler_level"])+"</th>";  
+            data = data+ "<th>"+toString(label["cashbox_level"])+"</th>";  
+            data = data+ "<th>"+toString(label["total"])+"</th>";               
             data = data+ "</tr>"; 
             data = data+ "</thead><tbody>"; 
 			i=0;
@@ -1051,7 +1083,7 @@ void RevenueReport::apmcashlevelsReport(Php::Value json)
 					{
 					if(device_number!="")
 						{
-						data+="<tr><td></td><td></td><td><h3>"+getLabelRevenue("total",lang)+"</h3></td><td><h3>"+to_string(apm_total)+"</h3></td></tr>";
+						data+="<tr><td></td><td></td><td><h3>"+toString(label["total"])+"</h3></td><td><h3>"+to_string(apm_total)+"</h3></td></tr>";
 						apm_total=0;   
 						}    
 					data+="<tr><td>"+res->getString("device_name")+"</td><td></td><td></td><td></td></tr>";
@@ -1069,11 +1101,11 @@ void RevenueReport::apmcashlevelsReport(Php::Value json)
 			          
 			}  
 			if(data!="")
-           data+="<tr><td></td><td></td><td><h3>"+getLabelRevenue("total",lang)+"</h3></td><td><h3>"+to_string(apm_total)+"</h3></td></tr>";
+           data+="<tr><td></td><td></td><td><h3>"+toString(label["total"])+"</h3></td><td><h3>"+to_string(apm_total)+"</h3></td></tr>";
            Php::out<<data<<endl;
 		}
 		else{
-            Php::out<<"<div class='p-0'>"<<getLabelRevenue("no_records",lang)<<"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"<<toString(label["no_records"])<<"</div>"<<endl;
 		}
 		
 		delete rStmt;
@@ -1100,17 +1132,22 @@ void RevenueReport::apmcashpayoutReport(Php::Value json)
 		string device_number = json["device"];
 		string carpark = json["carpark"];
 		string lang=json["language"];
+                
+                string labels="device_name,operation,date_time,operator,banknotes,amount,transactions,total_payout,no_records";
+                Php::Value label=General.getLabels(lang,labels);
+
+                
 		rCon=General.mysqlConnect(ReportingDB);
 		rStmt=rCon->createStatement();
-		query="select * from revenue_apm_cash_payout where datetime between '"+startdate+"' AND '"+enddate+"'";
+		sql_query="select * from revenue_apm_cash_payout where datetime between '"+startdate+"' AND '"+enddate+"'";
 		
         if (device_number.length() > 0) 		           
-            query += " AND device_number IN("+device_number+")";  
+            sql_query += " AND device_number IN("+device_number+")";  
 		
 		if (carpark.length() > 0) 		           
-            query += " AND device_number IN("+device_number+")";  
+            sql_query += " AND device_number IN("+device_number+")";  
 
-		res= rStmt->executeQuery(query);
+		res= rStmt->executeQuery(sql_query);
 		string data="";
 		string summary="";
 		if(res->rowsCount()>0)
@@ -1121,12 +1158,12 @@ void RevenueReport::apmcashpayoutReport(Php::Value json)
             data = "<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>";
             data = data+"<thead>";
             data = data+"<tr>"; 
-            data = data+ "<th>"+getLabelRevenue("device_name",lang)+"</th>";        
-            data = data+ "<th>"+getLabelRevenue("operation",lang)+"</th>";  
-            data = data+ "<th>"+getLabelRevenue("date_time",lang)+"</th>";  
-            data = data+ "<th>"+getLabelRevenue("operator",lang)+"</th>";
-            data = data+ "<th>"+getLabelRevenue("banknotes",lang)+"</th>";  
-            data = data+ "<th>"+getLabelRevenue("amount",lang)+"</th>";               
+            data = data+ "<th>"+toString(label["device_name"])+"</th>";        
+            data = data+ "<th>"+toString(label["operation"])+"</th>";  
+            data = data+ "<th>"+toString(label["date_time"])+"</th>";  
+            data = data+ "<th>"+toString(label["operator"])+"</th>";
+            data = data+ "<th>"+toString(label["banknotes"])+"</th>";  
+            data = data+ "<th>"+toString(label["amount"])+"</th>";               
             data = data+ "</tr>"; 
             data = data+ "</thead><tbody>"; 
 			i=0;
@@ -1161,7 +1198,7 @@ void RevenueReport::apmcashpayoutReport(Php::Value json)
             summary+="<div class='small-box bg-success'>";
             summary+="<div class='inner'>";
             summary+="<h3>"+to_string(res->rowsCount())+"</h3>";
-            summary+="<h6>"+getLabelRevenue("transactions",lang)+"</h6>";
+            summary+="<h6>"+toString(label["transactions"])+"</h6>";
             summary+="</div>";            
             summary+="</div>";
             summary+="</div>";
@@ -1170,7 +1207,7 @@ void RevenueReport::apmcashpayoutReport(Php::Value json)
             summary+="<div class='small-box bg-success'>";
             summary+="<div class='inner'>";
             summary+="<h3>"+to_string(total)+"</h3>";
-            summary+="<h6>"+getLabelRevenue("total_payout",lang)+"</h6>";
+            summary+="<h6>"+toString(label["total_payout"])+"</h6>";
             summary+="</div>";            
             summary+="</div>";
             summary+="</div>";
@@ -1179,7 +1216,7 @@ void RevenueReport::apmcashpayoutReport(Php::Value json)
            Php::out<<summary + data<<endl;
 		}
 		else{
-            Php::out<<"<div class='p-0'>"<<getLabelRevenue("no_records",lang)<<"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"<<toString(label["no_records"])<<"</div>"<<endl;
 		}
 		
 		delete rStmt;
@@ -1207,19 +1244,24 @@ void RevenueReport::paymentexceptionReport(Php::Value json)
 		string ex_option = json["exception_option"];
 		string notes="";
 		currency = getCurrency();
+
+                string labels="date_time,device_name,ticket_id,exception,amount_received,balance_returned,credit_note,banknotes,transactions,no_records";
+                Php::Value label=General.getLabels(lang,labels);
+
+
+
 		rCon=General.mysqlConnect(ReportingDB);
 		rStmt=rCon->createStatement();
-		query="select * from revenue_payment_exceptions where date_time between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select * from revenue_payment_exceptions where date_time between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (device_number.length() > 0) 		           
-            query += " AND device_number IN("+device_number+")"; 
+            sql_query += " AND device_number IN("+device_number+")"; 
 
 		if (ex_option !="0") 
-            query += " AND exception LIKE '"+ex_option+"%'";
-
-		res= rStmt->executeQuery(query);
+            sql_query += " AND exception LIKE '"+ex_option+"%'";
+		res= rStmt->executeQuery(sql_query);
 		string data="";
 		string summary="";
 		if(res->rowsCount()>0)
@@ -1228,14 +1270,14 @@ void RevenueReport::paymentexceptionReport(Php::Value json)
             data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-			data+="<th>"+getLabelRevenue("date_time",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("device_name",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("ticket_id",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("exception",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("amount_received",lang)+"</th>";    
-            data+="<th>"+getLabelRevenue("balance_returned",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("credit_note",lang)+"</th>";    
-            data+="<th>"+getLabelRevenue("banknotes",lang)+"</th>";  
+			data+="<th>"+toString(label["date_time"])+"</th>"; 
+            data+="<th>"+toString(label["device_name"])+"</th>";        
+            data+="<th>"+toString(label["ticket_id"])+"</th>";  
+            data+="<th>"+toString(label["exception"])+"</th>";  
+            data+="<th>"+toString(label["amount_received"])+"</th>";    
+            data+="<th>"+toString(label["balance_returned"])+"</th>";  
+            data+="<th>"+toString(label["credit_note"])+"</th>";    
+            data+="<th>"+toString(label["banknotes"])+"</th>";  
             data+="</tr>"; 
             data+="</thead><tbody>"; 
 			i=0;
@@ -1275,7 +1317,7 @@ void RevenueReport::paymentexceptionReport(Php::Value json)
             summary+="<div class='small-box bg-success'>";
             summary+="<div class='inner'>";
             summary+="<h3>"+to_string(res->rowsCount())+"</h3>";
-            summary+="<h6>"+getLabelRevenue("transactions",lang)+"</h6>";
+            summary+="<h6>"+toString(label["transactions"])+"</h6>";
             summary+="</div>";            
             summary+="</div>";
             summary+="</div>";
@@ -1284,7 +1326,7 @@ void RevenueReport::paymentexceptionReport(Php::Value json)
 			Php::out<<summary+data<<endl;
 		}
 		else{
-            Php::out<<"<div class='p-0'>"<<getLabelRevenue("no_records",lang)<<"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"<<toString(label["no_records"])<<"</div>"<<endl;
 		}
 		
 		delete rStmt;
@@ -1313,17 +1355,21 @@ void RevenueReport::creditcardReport(Php::Value json)
 		string lang=json["language"];
 		string notes="";
 		currency = getCurrency();
+
+                string labels="date_time,device_name,merchant_id,terminal_id,ticket_id,comment,card_type,amount,authentication_code,reference_number,status,transactions,total_revenue,no_records";
+                Php::Value label=General.getLabels(lang,labels);
+
+
 		rCon=General.mysqlConnect(ReportingDB);
 		rStmt=rCon->createStatement();
-		query="select * from revenue_creditcard_payments where  date_time between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select * from revenue_creditcard_payments where  date_time between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (device_number.length() > 0) 		           
-            query += " AND device_number IN("+device_number+")"; 
+            sql_query += " AND device_number IN("+device_number+")"; 
 
-
-		res= rStmt->executeQuery(query);
+		res= rStmt->executeQuery(sql_query);
 		string data="";
 		string summary="";
 		if(res->rowsCount()>0)
@@ -1332,17 +1378,17 @@ void RevenueReport::creditcardReport(Php::Value json)
             data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-			data+="<th>"+getLabelRevenue("date_time",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("device_name",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("merchant_id",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("terminal_id",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("ticket_id",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("comment",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("card_type",lang)+"</th>";    
-            data+="<th>"+getLabelRevenue("amount",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("authentication_code",lang)+"</th>";    
-            data+="<th>"+getLabelRevenue("reference_number",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("status",lang)+"</th>";  
+			data+="<th>"+toString(label["date_time"])+"</th>"; 
+            data+="<th>"+toString(label["device_name"])+"</th>";        
+            data+="<th>"+toString(label["merchant_id"])+"</th>";  
+            data+="<th>"+toString(label["terminal_id"])+"</th>";  
+            data+="<th>"+toString(label["ticket_id"])+"</th>";  
+            data+="<th>"+toString(label["comment"])+"</th>";  
+            data+="<th>"+toString(label["card_type"])+"</th>";    
+            data+="<th>"+toString(label["amount"])+"</th>";  
+            data+="<th>"+toString(label["authentication_code"])+"</th>";    
+            data+="<th>"+toString(label["reference_number"])+"</th>";  
+            data+="<th>"+toString(label["status"])+"</th>";  
             data+="</tr>"; 
             data+="</thead><tbody>"; 
 			i=0;
@@ -1374,7 +1420,7 @@ void RevenueReport::creditcardReport(Php::Value json)
             summary+="<div class='small-box bg-success'>";
             summary+="<div class='inner'>";
             summary+="<h3>"+to_string(res->rowsCount())+"</h3>";
-            summary+="<h6>"+getLabelRevenue("transactions",lang)+"</h6>";
+            summary+="<h6>"+toString(label["transactions"])+"</h6>";
             summary+="</div>";            
             summary+="</div>";
             summary+="</div>";
@@ -1383,7 +1429,7 @@ void RevenueReport::creditcardReport(Php::Value json)
             summary+="<div class='small-box bg-success'>";
             summary+="<div class='inner'>";
             summary+="<h3>"+SetDoublePrecision(total)+"</h3>";
-            summary+="<h6>"+getLabelRevenue("total_revenue",lang)+"</h6>";
+            summary+="<h6>"+toString(label["total_revenue"])+"</h6>";
             summary+="</div>";            
             summary+="</div>";
             summary+="</div>";
@@ -1392,7 +1438,7 @@ void RevenueReport::creditcardReport(Php::Value json)
 			Php::out<<summary+data<<endl;
 		}
 		else{
-            Php::out<<"<div class='p-0'>"<<getLabelRevenue("no_records",lang)<<"</div>"<<endl;
+            Php::out<<"<div class='p-0'>"<<toString(label["no_records"])<<"</div>"<<endl;
 		}
 		
 		delete rStmt;
@@ -1408,7 +1454,7 @@ void RevenueReport::creditcardReport(Php::Value json)
 }
 
 
-string revenuesummaryReport(string startdate,string enddate,string weekdays,string carpark,string lang)
+string revenuesummaryReport(string startdate,string enddate,string weekdays,string carpark,string lang,Php::Value label)
 {
 	string str_array,a,b,sum,currency,paid;
 	string data="";
@@ -1421,17 +1467,18 @@ try
 		currency = getCurrency();
 		conn=General.mysqlConnect(ReportingDB);
 		stmt=conn->createStatement();
-		query="select sum(parking_fee) as parking_fee,sum(lost_ticket_fee) as lost_fee,sum(gross_amount) as earnings,sum(vat_amount) as vat,sum(product_sale_amount) as product_sale,sum(discount_amount) as discount_amount from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select sum(parking_fee) as parking_fee,sum(lost_ticket_fee) as lost_fee,sum(gross_amount) as earnings,sum(vat_amount) as vat,sum(product_sale_amount) as product_sale,sum(discount_amount) as discount_amount from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (weekdays.length() > 0) 		           
-            query += " AND dayname(report_date) IN("+weekdays+")"; 
+            sql_query += " AND dayname(report_date) IN("+weekdays+")"; 
 
-		query += " AND device_number > 0 ORDER BY device_number ASC";
-		rs= stmt->executeQuery(query);
+		sql_query += " AND device_number > 0 ORDER BY device_number ASC";
+		rs= stmt->executeQuery(sql_query);
 		while(rs->next())
 		{
+
 			data+="<span id='chart-data' class='d-none' data-currency="+currency+" data-parking-fee='"+SetDoublePrecision(rs->getDouble("parking_fee"))+"' data-lost-ticket='"+SetDoublePrecision(rs->getDouble("lost_fee"))+"' data-product-sale='"+SetDoublePrecision(rs->getDouble("product_sale"))+"' data-vat='"+SetDoublePrecision(rs->getDouble("vat"))+"'></span>";
 
 			data+="<div class='row mb-4 jspdf-graph'>";
@@ -1439,7 +1486,7 @@ try
 			data+="<div class='small-box bg-success'>";
 			data+="<div class='inner'>";
 			data+="<h3>"+currency+" "+SetDoublePrecision(rs->getDouble("earnings"))+"</h3>";
-			data+="<p>"+getLabelRevenue("total_revenue",lang)+"</p>";
+			data+="<p>"+toString(label["total_revenue"])+"</p>";
 			data+="</div>";
 			data+="<div class='icon'>";
 			data+="<i class='ion ion-stats-bars'></i>";
@@ -1451,7 +1498,7 @@ try
 			data+="<div class='small-box box-color-parking-fee'>";
 			data+="<div class='inner'>";
 			data+="<h3>"+currency+" "+SetDoublePrecision(rs->getDouble("parking_fee"))+"</h3>";
-			data+="<p>"+getLabelRevenue("parking_fee",lang)+"</p>";
+			data+="<p>"+toString(label["parking_fee"])+"</p>";
 			data+="</div>";
 			data+="<div class='icon'>";
 			data+="<i class='ion ion-stats-bars'></i>";
@@ -1463,7 +1510,7 @@ try
 			data+="<div class='small-box box-color-lost-fee'>";
 			data+="<div class='inner'>";
 			data+="<h3>"+currency+" "+SetDoublePrecision(rs->getDouble("lost_fee"))+"</h3>";
-			data+="<p>"+getLabelRevenue("lost_fee",lang)+"</p>";
+			data+="<p>"+toString(label["lost_fee"])+"</p>";
 			data+="</div>";
 			data+="<div class='icon'>";
 			data+="<i class='ion ion-stats-bars'></i>";
@@ -1475,7 +1522,7 @@ try
 			data+="<div class='small-box box-color-product-fee'>";
 			data+="<div class='inner'>";
 			data+="<h3>"+currency+" "+SetDoublePrecision(rs->getDouble("product_sale"))+"</h3>";
-			data+="<p>"+getLabelRevenue("product_sale_amount",lang)+"</p>";
+			data+="<p>"+toString(label["product_sale_amount"])+"</p>";
 			data+="</div>";
 			data+="<div class='icon'>";
 			data+="<i class='ion ion-stats-bars'></i>";
@@ -1503,7 +1550,7 @@ try
 			data+="<div class='small-box box-color-discount-fee'>";
 			data+="<div class='inner'>";
 			data+="<h3>"+currency+" "+SetDoublePrecision(rs->getDouble("discount_amount"))+"</h3>";
-			data+="<p>"+getLabelRevenue("discount_amount",lang)+"</p>";
+			data+="<p>"+toString(label["discount_amount"])+"</p>";
 			data+="</div>";
 			data+="<div class='icon'>";
 			data+="<i class='ion ion-stats-bars'></i>";
@@ -1529,7 +1576,7 @@ try
 
 }
 
-string revenuedayclosurecomment(string startdate,string enddate,string weekdays,string carpark,string lang)
+string revenuedayclosurecomment(string startdate,string enddate,string weekdays,string carpark,string lang,Php::Value label)
 {
 	string str_array,a,b,sum,currency,paid;
 	string data="";
@@ -1542,26 +1589,26 @@ try
 		currency = getCurrency();
 		conn=General.mysqlConnect(ReportingDB);
 		stmt=conn->createStatement();
-		query="select dayname(report_date) as day,report_date,comments,carpark_name,device_name from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select dayname(report_date) as day,report_date,comments,carpark_name,device_name from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (weekdays.length() > 0) 		           
-            query += " AND dayname(report_date) IN("+weekdays+")"; 
+            sql_query += " AND dayname(report_date) IN("+weekdays+")"; 
 
-		query += " AND reproccessing_flag=1 ORDER BY device_number ASC";
-		rs= stmt->executeQuery(query);
+		sql_query += " AND reproccessing_flag=1 ORDER BY device_number ASC";
+		rs= stmt->executeQuery(sql_query);
 		if(rs->rowsCount()>0)
 		{
-			data+="<div class='header pl-0 mt-4 mb-3'>"+getLabelRevenue("notifications",lang)+"</div>";
+			data+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["notifications"])+"</div>";
             data+="<table id='TABLE_1' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>"; 
             data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-			data+="<th>"+getLabelRevenue("report_date",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("device_name",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("carpark_number",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("comment",lang)+"</th>";  
+			data+="<th>"+toString(label["report_date"])+"</th>"; 
+            data+="<th>"+toString(label["device_name"])+"</th>";        
+            data+="<th>"+toString(label["carpark_number"])+"</th>";  
+            data+="<th>"+toString(label["comment"])+"</th>";  
             data+="</tr>"; 
             data+="</thead><tbody>"; 
 			i=0;
@@ -1597,7 +1644,7 @@ try
 
 
 
-string revenuesummaryReportbydate(string startdate,string enddate,string weekdays,string carpark,string lang)
+string revenuesummaryReportbydate(string startdate,string enddate,string weekdays,string carpark,string lang,Php::Value label)
 {
 	string str_array,a,b,sum,currency,paid;
 	string data="";
@@ -1611,36 +1658,36 @@ try
 		currency = getCurrency();
 		conn=General.mysqlConnect(ReportingDB);
 		stmt=conn->createStatement();
-		query="select report_date,dayname(report_date) as day,sum(gross_amount) as gross_amount,sum(parking_fee) as parking_fee,sum(lost_ticket_fee) as lost_ticket_fee,sum(vat_amount) as vat_amount,sum(product_sale_amount) as product_sale_amount,sum(discount_amount) as discount_amount,sum(payable_entries_count) as payable_entries_count,sum(lost_ticket_count) as lost_ticket_count,sum(discount_count) as discount_count,sum(creditcard_payment_count) as creditcard_count,sum(sms_payment_count) as sms_count,sum(creditcard_payment_amount) as creditcard_amount,sum(gross_amount-creditcard_payment_amount) as cash_amount,sum(sms_payment_amount) as sms_amount,sum(product_sale_count) as product_sale_count from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select report_date,dayname(report_date) as day,sum(gross_amount) as gross_amount,sum(parking_fee) as parking_fee,sum(lost_ticket_fee) as lost_ticket_fee,sum(vat_amount) as vat_amount,sum(product_sale_amount) as product_sale_amount,sum(discount_amount) as discount_amount,sum(payable_entries_count) as payable_entries_count,sum(lost_ticket_count) as lost_ticket_count,sum(discount_count) as discount_count,sum(creditcard_payment_count) as creditcard_count,sum(sms_payment_count) as sms_count,sum(creditcard_payment_amount) as creditcard_amount,sum(gross_amount-creditcard_payment_amount) as cash_amount,sum(sms_payment_amount) as sms_amount,sum(product_sale_count) as product_sale_count from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (weekdays.length() > 0) 		           
-            query += " AND dayname(report_date) IN("+weekdays+")"; 
+            sql_query += " AND dayname(report_date) IN("+weekdays+")"; 
 
-		query += " GROUP BY report_date ORDER BY report_date DESC";
-		rs= stmt->executeQuery(query);
+		sql_query += " GROUP BY report_date ORDER BY report_date DESC";
+		rs= stmt->executeQuery(sql_query);
 		if(rs->rowsCount()>0)
 		{
-			data+="<div class='header pl-0 mt-4 mb-3'>"+getLabelRevenue("report_by_date",lang)+"</div>";
+			data+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["report_by_date"])+"</div>";
             data+="<table id='TABLE_2' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>"; 
             data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-			data+="<th>"+getLabelRevenue("report_date",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("total_earnings",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("parking_fee",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("lost_fee",lang)+"</th>";  
-			data+="<th>"+getLabelRevenue("product_sale_amount",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("cash_amount",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("creditcard_amount",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("wallet_amount",lang)+"</th>";  
-			data+="<th>"+getLabelRevenue("payable_entries_count",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("lost_ticket_count",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("discount_count",lang)+"</th>";  
-			data+="<th>"+getLabelRevenue("product_sale_count",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("cash_transaction_count",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("creditcard_transaction_count",lang)+"</th>";  
+			data+="<th>"+toString(label["report_date"])+"</th>"; 
+            data+="<th>"+toString(label["total_earnings"])+"</th>";        
+            data+="<th>"+toString(label["parking_fee"])+"</th>";  
+            data+="<th>"+toString(label["lost_fee"])+"</th>";  
+			data+="<th>"+toString(label["product_sale_amount"])+"</th>"; 
+            data+="<th>"+toString(label["cash_amount"])+"</th>";        
+            data+="<th>"+toString(label["creditcard_amount"])+"</th>";  
+            data+="<th>"+toString(label["wallet_amount"])+"</th>";  
+			data+="<th>"+toString(label["payable_entries_count"])+"</th>";  
+            data+="<th>"+toString(label["lost_ticket_count"])+"</th>";  
+            data+="<th>"+toString(label["discount_count"])+"</th>";  
+			data+="<th>"+toString(label["product_sale_count"])+"</th>"; 
+            data+="<th>"+toString(label["cash_transaction_count"])+"</th>";        
+            data+="<th>"+toString(label["creditcard_transaction_count"])+"</th>";  
             data+="</tr>"; 
             data+="</thead><tbody>"; 
 			i=0;
@@ -1686,7 +1733,7 @@ try
 }
 
 
-string productsaleReport(string startdate,string enddate,string weekdays,string carpark,string lang)
+string productsaleReport(string startdate,string enddate,string weekdays,string carpark,string lang,Php::Value label)
 {
 	string str_array,a,b,sum,currency,paid;
 	string data="";
@@ -1700,27 +1747,27 @@ try
 		currency = getCurrency();
 		conn=General.mysqlConnect(ReportingDB);
 		stmt=conn->createStatement();
-		query="select device_name,product_name,MIN(carpark_number) as carpark_number,carpark_name,sum(product_quantity) as product_quantity,unit_price,sum(product_sale_amount) as product_sale from revenue_product_usage where report_date between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select device_name,product_name,MIN(carpark_number) as carpark_number,carpark_name,sum(product_quantity) as product_quantity,unit_price,sum(product_sale_amount) as product_sale from revenue_product_usage where report_date between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (weekdays.length() > 0) 		           
-            query += " AND dayname(report_date) IN("+weekdays+")"; 
+            sql_query += " AND dayname(report_date) IN("+weekdays+")"; 
 
-		query += " GROUP BY device_name,product_id ORDER BY carpark_number ASC";
-		rs= stmt->executeQuery(query);
+		sql_query += " GROUP BY device_name,product_id ORDER BY carpark_number ASC";
+		rs= stmt->executeQuery(sql_query);
 		if(rs->rowsCount()>0)
 		{
-			data+="<div class='header pl-0 mt-4 mb-3'>"+getLabelRevenue("product_sales",lang)+"</div>";
+			data+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["product_sales"])+"</div>";
             data+="<table id='TABLE_5' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>"; 
             data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-			data+="<th>"+getLabelRevenue("device_name",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("product_name",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("quantity",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("unit_price",lang)+"</th>";  
-			data+="<th>"+getLabelRevenue("total_amount",lang)+"</th>"; 
+            data+="<th>"+toString(label["device_name"])+"</th>"; 
+            data+="<th>"+toString(label["product_name"])+"</th>";        
+            data+="<th>"+toString(label["quantity"])+"</th>";  
+            data+="<th>"+toString(label["unit_price"])+"</th>";  
+			data+="<th>"+toString(label["total_amount"])+"</th>"; 
             data+="</tr>"; 
             data+="</thead><tbody>"; 
 			i=0;
@@ -1769,7 +1816,7 @@ try
 
 }
 
-string discountusagesummary(string startdate,string enddate,string weekdays,string carpark,string lang)
+string discountusagesummary(string startdate,string enddate,string weekdays,string carpark,string lang,Php::Value label)
 {
 	string str_array,a,b,sum,currency,paid;
 	string data="";
@@ -1783,26 +1830,26 @@ try
 		currency = getCurrency();
 		conn=General.mysqlConnect(ReportingDB);
 		stmt=conn->createStatement();
-		query="select device_name,discount_name,MIN(carpark_number) as carpark_number,carpark_name,count(id) as discount_usage,sum(discount_amount) as discount_amount from revenue_payments where discount_amount > 0  and payment_date_time between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select device_name,discount_name,MIN(carpark_number) as carpark_number,carpark_name,count(id) as discount_usage,sum(discount_amount) as discount_amount from revenue_payments where discount_amount > 0  and payment_date_time between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (weekdays.length() > 0) 		           
-            query += " AND dayname(payment_date_time) IN("+weekdays+")"; 
+            sql_query += " AND dayname(payment_date_time) IN("+weekdays+")"; 
 
-		query += " AND device_number > 0 GROUP BY device_name,discount_id ORDER BY carpark_number ASC";
-		rs= stmt->executeQuery(query);
+		sql_query += " AND device_number > 0 GROUP BY device_name,discount_id ORDER BY carpark_number ASC";
+		rs= stmt->executeQuery(sql_query);
 		if(rs->rowsCount()>0)
 		{
-			data+="<div class='header pl-0 mt-4 mb-3'>"+getLabelRevenue("discounts",lang)+"</div>";
+			data+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["discounts"])+"</div>";
             data+="<table id='TABLE_5' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>"; 
             data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-			data+="<th>"+getLabelRevenue("device_name",lang)+"</th>"; 
-            data+="<th>"+getLabelRevenue("discount_name",lang)+"</th>";        
-            data+="<th>"+getLabelRevenue("discount_count",lang)+"</th>";  
-            data+="<th>"+getLabelRevenue("discount_amount",lang)+"</th>";  
+			data+="<th>"+toString(label["device_name"])+"</th>"; 
+            data+="<th>"+toString(label["discount_name"])+"</th>";        
+            data+="<th>"+toString(label["discount_count"])+"</th>";  
+            data+="<th>"+toString(label["discount_amount"])+"</th>";  
             data+="</tr>"; 
             data+="</thead><tbody>"; 
 			i=0;
@@ -1867,40 +1914,46 @@ void RevenueReport::revenueReport(Php::Value json)
 		string weekdays = json["weekdays"];
 		string carpark = json["carpark"];
 		string lang=json["language"];
+
+
+                string labels="total_revenue,parking_fee,lost_fee,product_sale_amount,discount_amount,notifications,report_date,device_name,carpark_number,comment,report_by_date,report_date,total_earnings,parking_fee,lost_fee,product_sale_amount,cash_amount,creditcard_amount,wallet_amount,payable_entries_count,lost_ticket_count,discount_count,product_sale_count,cash_transaction_count,creditcard_transaction_count,product_sales,product_name,quantity,unit_price,total_amount,discounts,discount_name,discount_count,discount_amount,earnings,earnings_by_payment_type,cash,credit_card,sms,transaction_count,total_earnings,payable_entries,no_records";
+                Php::Value label=General.getLabels(lang,labels);
+
+
 		currency = getCurrency();
 		rCon=General.mysqlConnect(ReportingDB);
 		rStmt=rCon->createStatement();
-		query="select device_name,carpark_number,carpark_name,sum(gross_amount) as gross_amount,sum(parking_fee) as parking_fee,sum(lost_ticket_fee) as lost_ticket_fee,sum(vat_amount) as vat_amount,sum(product_sale_amount) as product_sale_amount,sum(discount_amount) as discount_amount,sum(payable_entries_count) as payable_entries_count,sum(lost_ticket_count) as lost_ticket_count,sum(discount_count) as discount_count,sum(creditcard_payment_count) as creditcard_count,sum(sms_payment_count) as sms_count,sum(creditcard_payment_amount) as creditcard_amount,sum(gross_amount-creditcard_payment_amount) as cash_amount,sum(sms_payment_amount) as sms_amount,sum(product_sale_count) as product_sale_count from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
+		sql_query="select device_name,carpark_number,carpark_name,sum(gross_amount) as gross_amount,sum(parking_fee) as parking_fee,sum(lost_ticket_fee) as lost_ticket_fee,sum(vat_amount) as vat_amount,sum(product_sale_amount) as product_sale_amount,sum(discount_amount) as discount_amount,sum(payable_entries_count) as payable_entries_count,sum(lost_ticket_count) as lost_ticket_count,sum(discount_count) as discount_count,sum(creditcard_payment_count) as creditcard_count,sum(sms_payment_count) as sms_count,sum(creditcard_payment_amount) as creditcard_amount,sum(gross_amount-creditcard_payment_amount) as cash_amount,sum(sms_payment_amount) as sms_amount,sum(product_sale_count) as product_sale_count from summary_daily_revenue where report_date between '"+startdate+"' and '"+enddate+"'";
 		if (carpark.length() > 0) 		           
-            query += " AND carpark_number IN("+carpark+")";   
+            sql_query += " AND carpark_number IN("+carpark+")";   
   
         if (weekdays.length() > 0) 		           
-            query += " AND dayname(report_date) IN("+weekdays+")"; 
+            sql_query += " AND dayname(report_date) IN("+weekdays+")"; 
 		
-        query+=" AND device_number > 0 GROUP BY device_number ORDER BY carpark_number ASC";   
+        sql_query+=" AND device_number > 0 GROUP BY device_number ORDER BY carpark_number ASC";   
 
-		res= rStmt->executeQuery(query);
+		res= rStmt->executeQuery(sql_query);
 		string data="";
 		if(res->rowsCount()>0)
 		{
-			Php::out<<revenuesummaryReport(startdate,enddate,weekdays,carpark,lang)<<endl;
-			Php::out<<revenuedayclosurecomment(startdate,enddate,weekdays,carpark,lang)<<endl;
-			Php::out<<revenuesummaryReportbydate(startdate,enddate,weekdays,carpark,lang)<<endl;
+			Php::out<<revenuesummaryReport(startdate,enddate,weekdays,carpark,lang,label)<<endl;
+			Php::out<<revenuedayclosurecomment(startdate,enddate,weekdays,carpark,lang,label)<<endl;
+			Php::out<<revenuesummaryReportbydate(startdate,enddate,weekdays,carpark,lang,label)<<endl;
 			
 			/////////////////////////
             //Earnings
             ////////////////////////
-			data+="<div class='header pl-0 mt-4 mb-3'>"+getLabelRevenue("earnings",lang)+"</div>";
+			data+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["earnings"])+"</div>";
             data+="<table id='TABLE_3' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
             //data+="<tr class='card-header d-flex justify-content-between align-items-center'>";
 			data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-            data+="<th>"+getLabelRevenue("device_name",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("parking_fee",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("lost_fee",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("product_sale_amount",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("total_earnings",lang)+"</th>";
+            data+="<th>"+toString(label["device_name"])+"</th>";
+            data+="<th>"+toString(label["parking_fee"])+"</th>";
+            data+="<th>"+toString(label["lost_fee"])+"</th>";
+            data+="<th>"+toString(label["product_sale_amount"])+"</th>";
+            data+="<th>"+toString(label["total_earnings"])+"</th>";
             data+="</tr>";
 			data+="</thead><tbody>"; 
 			i=0;
@@ -1940,16 +1993,16 @@ void RevenueReport::revenueReport(Php::Value json)
             ////////////////////////
 			data="";
 			carpark_displayed_flag=0;
-			data+="<div class='header pl-0 mt-4 mb-3'>"+getLabelRevenue("earnings_by_payment_type",lang)+"</div>";
+			data+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["earnings_by_payment_type"])+"</div>";
             data+="<table id='TABLE_4' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
             //data+="<tr class='card-header d-flex justify-content-between align-items-center'>";
 			data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-            data+="<th>"+getLabelRevenue("device_name",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("cash",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("credit_card",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("sms",lang)+"</th>";
+            data+="<th>"+toString(label["device_name"])+"</th>";
+            data+="<th>"+toString(label["cash"])+"</th>";
+            data+="<th>"+toString(label["credit_card"])+"</th>";
+            data+="<th>"+toString(label["sms"])+"</th>";
             data+="</tr>";
 			data+="</thead><tbody>"; 
 			i=0;
@@ -1987,12 +2040,12 @@ void RevenueReport::revenueReport(Php::Value json)
 			////////////////////////
             //Prodct sale report
             ////////////////////////
-			Php::out<<productsaleReport(startdate,enddate,weekdays,carpark,lang)<<endl;
+			Php::out<<productsaleReport(startdate,enddate,weekdays,carpark,lang,label)<<endl;
 
             //////////////////////
             //Discounts report
             ///////////////////
-            Php::out<<discountusagesummary(startdate,enddate,weekdays,carpark,lang)<<endl;
+            Php::out<<discountusagesummary(startdate,enddate,weekdays,carpark,lang,label)<<endl;
 			
 			
             ////////////////////////
@@ -2000,19 +2053,19 @@ void RevenueReport::revenueReport(Php::Value json)
             ////////////////////////
 			data="";
 			carpark_displayed_flag=0;
-			data+="<div class='header pl-0 mt-4 mb-3'>"+getLabelRevenue("transaction_count",lang)+"</div>";
+			data+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["transaction_count"])+"</div>";
             data+="<table id='TABLE_6' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
             //data+="<tr class='card-header d-flex justify-content-between align-items-center'>";
 			data+="<thead>"; 
             data+="<tr>"; 
             data+="<th>#</th>"; 
-            data+="<th>"+getLabelRevenue("device_name",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("payable_entries",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("lost_ticket",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("discounts",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("product_sales",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("cash",lang)+"</th>";
-            data+="<th>"+getLabelRevenue("credit_card",lang)+"</th>";
+            data+="<th>"+toString(label["device_name"])+"</th>";
+            data+="<th>"+toString(label["payable_entries"])+"</th>";
+            data+="<th>"+toString(label["lost_ticket"])+"</th>";
+            data+="<th>"+toString(label["discounts"])+"</th>";
+            data+="<th>"+toString(label["product_sales"])+"</th>";
+            data+="<th>"+toString(label["cash"])+"</th>";
+            data+="<th>"+toString(label["credit_card"])+"</th>";
             data+="</tr>";
 			data+="</thead><tbody>"; 
 			i=0;
@@ -2053,7 +2106,7 @@ void RevenueReport::revenueReport(Php::Value json)
 
 		}
 		else{
-			Php::out<<"<div class='p-0'>"<<getLabelRevenue("no_records",lang)<<"</div>"<<endl;
+			Php::out<<"<div class='p-0'>"<<toString(label["no_records"])<<"</div>"<<endl;
 		}
 		delete rStmt;
         delete res;       

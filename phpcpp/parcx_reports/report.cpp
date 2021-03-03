@@ -9,6 +9,7 @@ GeneralOperations General;
 ParkingReport pObj;
 RevenueReport rObj;
 
+
 void writeLog(string function,string message)
     {
     General.writeLog("WebApplication/ApplicationLogs/PX-Report-"+General.currentDateTime("%Y-%m-%d"),function,message);    
@@ -19,6 +20,9 @@ void writeException(string function,string message)
     General.writeLog("WebApplication/ExceptionLogs/PX-Report-"+General.currentDateTime("%Y-%m-%d"),function,message); 
 	writeLog(function,"Exception: "+message);   
     }
+
+
+
 
 Php::Value parcxReport(Php::Parameters &params)
     {
@@ -77,14 +81,17 @@ Php::Value parcxReport(Php::Parameters &params)
                         break;
         case 25:rObj.getPdfReceipt(data);
                         break;
-
         case 26:rObj.vatReport(data);
                         break;
         case 27:pObj.watchDogDeviceAlarms(data);
                         break;
         case 28:pObj.watchdogNetworkLogs(data);
                         break;
-        case  29:response=pObj.getApplicationLabels(data);
+        //case  29:response=pObj.getApplicationLabels(data);
+        case  29:response=General.getApplicationLabels(data);
+                        break;
+        case 30:pObj.parkingDuration(data);
+                        break;
 	}
 	return response;
 	}

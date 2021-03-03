@@ -3,6 +3,11 @@
 $page_title="Visitor frequency";
 
 include('../../../includes/header.php');
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=16;
+$json=parcxReport($data);
 ?>
 
 <div class="navbar-has-tablink">
@@ -13,7 +18,7 @@ include('../../../includes/navbar-start.php');
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Visitor Frequency</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["visitor_frequency"]?></div>
 
 <?php 
 include('../../../includes/navbar-end.php');
@@ -35,17 +40,17 @@ include('../../../includes/sidebar.php');
         <div class="col-md-2">
           <!--<input type="text" id="serial" class="form-control" placeholder="TAG SERIAL">-->
 		  <select class="form-control" id="visit_type">
-			<option value="all">All</option>
-            <option value="shortterm">Short Term</option>
-            <option value="contract">Contract</option>
+			<option value="all" id="all_category"><?=$json["all_category"]?></option>
+            <option value="shortterm" id="shortterm"><?=$json["short_term"]?></option>
+            <option value="contract" id="contract"><?=$json["contract"]?></option>
           </select>
         </div>
 		
 		
         
         <!-- search -->
-        <div class="col-md-1">
-          <button type="button" class="btn btn-block btn-secondary" id="view-report-button">Search</button>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-block btn-secondary" id="view-report-button"><?=$json["view_report"]?></button>
         </div>
 
         <!-- loader -->
@@ -81,7 +86,7 @@ include('../../../includes/sidebar.php');
     <div class="container-wide">
     <div class="card">
         <div class="card-body" id="report-content">
-        <?php echo parcxReport(array("task"=>"6","visit_type"=>"all"));?>
+        <?php echo parcxReport(array("task"=>"6","visit_type"=>"all","language"=>$_SESSION["language"]));?>
         </div>
         </div>
     </div>
@@ -90,12 +95,13 @@ include('../../../includes/sidebar.php');
 
 <script>
 
-  $('#view-report-button').click(function (event) 
+  function callReport()
     { 
     var visit_type = $("#visit_type").val();       
     var data={};
     data["visit_type"]=visit_type;
     data["task"]=6;
+    data["language"]=$("#language").val();
     var temp = JSON.stringify(data);    
 
     $.post("../../ajax/reports.php", temp)
@@ -103,7 +109,51 @@ include('../../../includes/sidebar.php');
         loadReport(result);
       }, "json");
     event.preventDefault();
-  }); 
+  }
+  
+  
+$('#view-report-button').click(function (event) 
+{ 	
+    callReport();	    
+});
+
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=16;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {	
+        var json=JSON.parse(data);      
+        $("#pdf-report-header").html(json.visitor_frequency);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+ 
+ 
+            
+        $("#shortterm").html(json.short_term);
+        $("#contract").html(json.contract);
+        $("#all_category").html(json.all_category);
+        
+        
+        });    
+    }
+
+$("#language").change(function()
+    {	  
+    loadReportLabels();    
+    callReport();		
+    });   
 
   $('#export_excel_report').click(function (event) 
     {

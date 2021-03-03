@@ -1,22 +1,23 @@
 <?php
+$page_title = "Manage users";
+
 include('../../includes/header.php');
 ?>
 
 <div class="navbar-has-tablink">
 
-<?php
-include('../../includes/navbar-start.php');
-?>
+    <?php
+    include('../../includes/navbar-start.php');
+    ?>
+
 
 </ul>
 <div class="header text-dark" id="pdf-report-header">Manage Users</div>
-<div class="row">
-  <div class="col tab-header d-flex justify-content-center">
-    <div class="tab-link active" data-target="active-user">Active Users</div>
-    <div class="tab-link" data-target="disable-user">Disabled Users</div>
-    <div class="tab-link" data-target="add-user">Add User</div>
-    
-  </div>
+<div class="row hidden-sm-down">
+    <div class="col tab-header d-flex justify-content-center">
+        <div class="tab-link active" data-target="overview">Overview</div>
+        <div class="tab-link" data-target="form">Add User</div>
+    </div>
 </div>
 
 <?php
@@ -25,384 +26,373 @@ include('../../includes/sidebar.php');
 ?>
 <!-- Modal -->
 <div class="modal fade text-dark" id="changePasswordModal" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-sm" role="document">
-    <div class="modal-content">
-      <div class="modal-body ">
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title d-inline">Change Password</h3>
-            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          </div>
-          <!-- /.card-header -->
-          <div class="card-body">
-          
-            
-            <div class="modal-body">
-            <input type="hidden" id="id"/>
-              <div class="control-group">
-                <label for="current_password" class="control-label">Current Password</label>
-                <div class="controls">
-                  <input type="password" id="current_password">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body ">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title d-inline">Change Password</h3>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <form id="form-change-password">    
+
+                        <div class="modal-body">
+                            
+                            <input type="hidden" id="id"/>
+                            <div class="control-group">
+                                <label for="current_password" class="control-label">Current Password</label>
+                                <div class="controls">
+                                    <input type="password" id="current_password" required name="current_password">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="new_password" class="control-label">New Password</label>
+                                <div class="controls">
+                                    <input type="password" id="new_password" required name="new_password">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label for="confirm_password" class="control-label">Confirm Password</label>
+                                <div class="controls">
+                                    <input type="password" id="confirm_password" required name="confirm_password">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                            <input type="submit" class="col btn btn-info mt-4" id="btn-change-password" value ="change password"/>
+                            </div>
+                        </div>
+                             </form>
+                    </div>
+
+                    
+                   
                 </div>
-              </div>
-              <div class="control-group">
-                <label for="new_password" class="control-label">New Password</label>
-                <div class="controls">
-                  <input type="password" id="new_password">
-                </div>
-              </div>
-              <div class="control-group">
-                <label for="confirm_password" class="control-label">Confirm Password</label>
-                <div class="controls">
-                  <input type="password" id="confirm_password">
-                </div>
-              </div>
             </div>
-            </div>
-          
-        <div class="modal-footer">          
-          <button href="#" class="btn btn-primary" id="btnChangePassword">Change Password</button>
         </div>
+    </div>
+</div>
+
+<div class="content-wrapper">
+    <section class="content">
+        <div class="container-wide">        
+            <!-- add/update carpark form --> 
+            <form class="block-data card card-body col-md-5" data-status="form" style="display:none;" id="form">                
+                <div class="row">
+
+                </div>
+                <div class="row">                    
+                    <div class="col form-group">
+                        <label for="">User Name</label>
+                        <input type="text" class="form-control" id="user_name" required name="user_name">
+                    </div>
+                </div>                
+                <div class="row">
+                    <div class="col form-group">
+                        <label for="">Full Name</label>
+                        <input type="text" class="form-control" id="full_name"  required name="full_name">
+                    </div>
+
+                    <div class="col form-group">
+                        <label for="">Email</label>
+                        <input type="email" class="form-control" id="email" >
+                    </div>                    
+                </div>   
+                <div class="row">
+                    <div class="col form-group">
+                        <label for="">User role</label>
+                        <select id="user_role">
+                            <?php
+                            $data["task"] = 6;
+                            parcxUserManagement($data);
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Language</label>
+                        <select id="user_language">
+                            <option>English</option>
+                            <option>Arabic</option>
+                            <option>Spanish</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row" id="password-block">	
+                    <div class="col form-group">
+                        <label for="">Password</label>
+                        <input type="password" class="form-control" id="password" required name="password">
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Conform Password</label>
+                        <input type="password" class="form-control" id="conform_password" name="ConfirmPassword">
+                    </div>
+                </div> 
+                <div class="row">						     
+                    <div class="col form-group">
+                        <label for="">Company name</label>
+                        <input type="text" class="form-control" id="company_name"  >
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Phone</label>
+                        <input type="text" class="form-control" id="phone">
+                    </div>  
+                </div>
+
+                <div class="row">
+                    <div class="col form-group">
+                        <label for="">Account Activation Date</label>
+                        <input type="text" class="form-control" id="start_date" autocomplete="off" placeholder="" name="ActivationDate">
+                    </div>
+                    <div class="col form-group">
+                        <label for="">Account Expiry Date</label>
+                        <input type="text" class="form-control" id="expiry_date" autocomplete="off" placeholder="" name="ExpiryDate">
+                    </div>
+                </div>
+
+                <input type="submit" class="signUp btn btn-block btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
+            </form>
+
+            <!-- carpark table -->         
+            <div class="block-data" data-status="overview">
+                <div class="card" >               
+                    <div class="card-body">     
+                        <table id="RecordsTable" class="table table-blue table-bordered table-striped">                    
+                            <?php
+                            $data["task"] = 8;
+                            parcxUserManagement($data);
+                            ?> 
+                        </table>
+                    </div>                                                  
+                </div>             
+            </div>             
+
         </div>
-      </div>
-    </div>
-  </div>
+    </section>
 </div>
-
-
-<!-- add user -->
-<div class="content-wrapper block-data" data-status="add-user" style="display:none;">
-  <section class="content">
-    <div class="container-wide">
-      
-
-      <div class="card card-primary mb-4 col-md-6" id="active-user-table">
-        <div class="card-body ">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" class="form-control" id="operatorname" placeholder="Enter Full Name">
-              </div>
-              <!-- /.form-group -->
-              <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter email">
-              </div>
-              <!-- /.form-group -->
-            </div>
-
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>User Name</label>
-                <input type="text" class="form-control" id="username" placeholder="Enter User Name">
-              </div>
-              <!-- /.form-group -->
-              <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-control" id="password_1" placeholder="Password">
-              </div>
-              <!-- /.form-group -->
-            </div>
-
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>Confirm password</label>
-                <input type="password" class="form-control" id="password_2" placeholder="Confirm Password">
-              </div>
-              <!-- /.form-group -->
-              <div class="form-group">
-                <label>Company Name</label>
-                <input type="text" class="form-control" id="companyname" placeholder="Company Name">
-              </div>
-              <!-- /.form-group -->
-            </div>
-
-            <!-- /.col -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>User Type</label>
-                <?php
-
-
-                            $result = get_user_roles();
-
-                            echo '<select id="usertype" class="form-control select2" style="width: 100%;>';
-                            echo '<option value="">Select</option>';
-
-                            foreach ($result as $data) {
-                                foreach ($data as $key => $value) {
-                                    
-                                    if (strpos($key, "user_role_id") !== false) {
-                                        $user_role_id = $value;
-                                    }
-                                    
-                                    if (strpos($key, "user_role_name") !== false) {
-                                        $user_role_name = $value;
-                                    }
-                                }
-                                echo '<option value="' . $user_role_id . '">' . $user_role_name . '</option>'; //close your tags!!
-                            }
-                        ?>
-                </select>
-
-              </div>
-              <!-- /.form-group -->
-              <div class="form-group">
-                <label>Phone</label>
-                <input type="text" class="form-control" id="phone" placeholder="Phone">
-              </div>
-              <!-- /.form-group -->
-            </div>
-            <!-- /.col -->
-            <div class="col-md-6">
-
-              <div class="form-group">
-                <label>From Date</label>
-
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                  </div>
-                  <input type="date" class="form-control" id="fromDate" data-inputmask="'alias': 'dd/mm/yyyy'"
-                    data-mask>
-                </div>
-                <!-- /.input group -->
-              </div>
-              <!-- /.form-group -->
-            </div>
-            <!-- /.col -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>To Date</label>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                  </div>
-                  <input type="date" class="form-control" id="toDate" data-inputmask="'alias': 'dd/mm/yyyy'" data-mask>
-                </div>
-              </div>
-              <!-- /.form-group -->
-            </div>
-            <div class="col-md-6">
-              <!-- /.form-group -->
-              <div class="form-group">
-                <label for="exampleInputFile">File input</label>
-                <div class="input-group">
-                  <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="exampleInputFile">
-                    <label class="custom-file-label" for="exampleInputFile">Choose file</label>
-                  </div>
-                  <div class="input-group-append">
-                    <span class="input-group-text" id="">Upload</span>
-                  </div>
-                </div>
-              </div>
-              <!-- /.form-group -->
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary" id="add_User">Add User</button>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
-<!-- end / add user -->
-
-<!-- view active user -->
-<div class="content-wrapper block-data" data-status="active-user">
-  <section class="content">
-    <div class="container-wide">
-      
-
-      <div class="card card-primary mb-4" id="active-user-table">
-
-        <?php
-
-$result = get_active_user();
-foreach ($result as $data) {
-    echo '<div class="card-header">';
-    echo '<div class="d-flex justify-content-between align-items-center">';
-    $i = 0;
-    
-  
-    echo '<div class="col">USER NAME</div>';
-    echo '<div class="col">NAME</div>';
-    echo '<div class="col">ROLE</div>';
-    echo '<div class="col">EMAIL</div>';
-    echo '<div class="col">COMPANY</div>';
-    echo '<div class="col">PHONE</div>';
-    echo '<div class="col">FROM</div>';
-    echo '<div class="col">TO</div>';
-    echo '<div class="col"></div>';
-    echo '<div class="col"></div>';
-    echo '<div class="col"></div>';
-    echo '</div>';
-    echo '</div>';
-    break;
-}
-
-
-foreach ($result as $data) {
-    $id = $data['id'];    
-    echo '<div class="table-view">';
-    echo '<div class="card-text">';
-    echo '<div class="d-flex justify-content-between align-items-center">';
-    foreach ($data as $key => $value) {        
-    if (strpos($key, "user_name") !== false) {
-            echo '<div class="col" id="username-' .$id . '">' . $value . '</div>';
-        }
-        if (strpos($key, "operator_name") !== false) {
-            echo '<div class="col" id="name-' .$id . '">' . $value . '</div>';
-        }
-        if (strpos($key, "role") == true) {
-            echo '<div class="col" id="role-' . $id . '">' . $value . '</div>';
-        }
-        if (strpos($key, "email") == true) {
-            echo '<div class="col" id="email-' . $id. '">' . $value . '</div>';
-        }
-        if (strpos($key, "company") == true) {
-            echo '<div class="col" id="company-' . $id . '">' . $value . '</div>';
-        }
-        if (strpos($key, "phone") == true) {
-            echo '<div class="col" id="phone-' . $id . '">' . $value . '</div>';
-        }
-        if (strpos($key, "user_from") !== false) {
-            echo '<div class="col" id="from-' . $id . '">' . $value . '</div>';
-        }
-        if (strpos($key, "user_to") !== false) {
-            echo '<div class="col" id="to-' . $id . '">' . $value . '</div>';
-        }
-        
-    }
-    
-    print "<div class='col'>";    
-    echo '<input type="submit" id="' . $id . '" class="btn btn-danger btn-block btn-disable-user" name="Add" value ="Disable">';
-    print "</div> ";
-    print "<div class='col'>";  
-    // echo '<input type="submit" id="' . $id . '" class="btn btn-primary" name="Add" value ="Edit">';
-    echo '<input type="submit" id="edit' . $id . '" class="btn btn-info btn-block edit-user-button" name="Add" value ="Edit">';
-   
-    print "</div> ";
-    print "<div class='col'>";   
-    // echo '<input type="submit" id="' . $id . '" class="btn btn-primary" name="Add" value="Edit">';
-  echo '<input type="submit" id="password' . $id . '" class="btn btn-info btn-block change_password_button" data-toggle="modal" name="Add" data-target="#changePasswordModal" value="Change Password">';
-
-    print "</div> ";
-    
-    echo '</div>';
-    echo '</div>';
-    echo '</div>';
-}
-
-?>
-
-      </div>
-
-    </div>
-  </section>
-  <!-- /.content -->
-</div>
-<!-- end / view active user -->
-
-
-<!-- view disabled users -->
-<div class="content-wrapper block-data" data-status="disable-user" style="display:none;">
-  <section class="content">
-    <div class="container-wide">
-    
-
-      <div class="card card-primary mb-4" id="active-user-table">
-
-        <?php
-
-$result = get_de_active_user();
-if (sizeof($result) > 0) {
-    foreach ($result as $data) {
-        echo '<div class="card-header">';
-        echo '<div class="d-flex justify-content-between align-items-center">';
-        $i = 0;
-        
-        foreach ($data as $key => $value) {
-            $i = $i + 1;
-            
-            if (strpos($value, "user") !== false) {
-                //echo'  <td>' . $value . '</td>';
-                
-                $user_field = substr($value, 5);
-                $UserField  = strtoupper($user_field); // string upper function  
-                $users      = str_replace("_", " ", $UserField); // string replace function    
-                
-                echo '<div class="col" id="column-' . $i . '">' . $users . '</div>';
-                
-            }
-        }
-        echo '<div class="col"></div>';
-        echo '</div>';
-        echo '</div>';
-        break;
-    }
-    
-    foreach ($result as $data) {
-        $k = 0;
-        echo '<div class="table-view">';
-        echo '<div class="card-text">';
-        echo '<div class="d-flex justify-content-between align-items-center">';
-        foreach ($data as $key => $value) {
-            $k = $k + 1;
-            if (strpos($key, "user") !== false) {
-                echo '<div class="col" id="column-' . $k . '">' . $value . '</div>';
-            }
-            
-        }
-        
-        print "<div class='col'>";
-        $id = $data['id'];
-        echo '<input type="submit" id="' . $id . '" class="btn btn-success btn-block btn-enable-user" name="Add" value ="Enable">';
-        print "</div> ";
-        print "</div> ";
-        print "</div> ";
-    }
-}
-
-?>
-
-      </div>
-
-    </div>
-  </section>
-  <!-- /.content -->
-</div>
-<!-- end / view disabled users -->
-</div>
-
+<?php include('../../includes/footer.php'); ?>
 <script>
-  /* Table Show - Hide */
+    var status;
+    var id;
+    $(document).ready(function ()
+    {
+        $('#start_date').daterangepicker({timePicker: false, format: 'YYYY-MM-DD', singleDatePicker: true});
+        $('#expiry_date').daterangepicker({timePicker: false, format: 'YYYY-MM-DD', singleDatePicker: true});
+        $('#RecordsTable').DataTable(
+                {
+                    "paging": true,
+                    "lengthChange": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    "aaSorting": []
 
-  $(document).ready(function () {
-    $('.tab-link').on('click', function () {
-      var $target = $(this).data('target');
-      if ($target != 'all') {
-        $('.block-data').css('display', 'none');
-        $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
-      } else {
-        $('.block-data').css('display', 'none').fadeIn('slow');
-      }
+                });
+        $("* [data-target]").on('click', function ()
+        {
+            var $target = $(this).data('target');
+            if ($target == "form")
+            {
+                $("#form").trigger('reset');
+                $("#password-block").show();
+                $("#user_name").attr("disabled",false);
+                $("#add-edit-button").val("Submit");
+            }
+            $('.block-data').css('display', 'none');
+            $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
+            $('.tab-link').removeClass('active');
+            $(this).addClass('active');
+        });
+
+
+        //FormSubmit
+        var formElement = $("#form");
+        var rules_set = {
+            ConfirmPassword:
+                    {
+                        equalTo: "#password",
+                        required: true
+                    }
+        };
+
+        formElement.find('input[type=text]').each(function ()
+        {
+            var name = $(this).attr('name');
+            rules_set[name] = 'required';
+        });
+
+        formElement.validate({
+            rules: rules_set,
+            messages: {
+                ConfirmPassword: {
+                    required: "Retype your new password",
+                    equalTo: "Passwords don't match, please check"
+                }
+            },
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                error.addClass("text-danger");
+                error.insertAfter(element);
+            },
+            submitHandler: function ()
+            {
+                var data = {};
+                if ($("#add-edit-button").val() == "Submit")
+                    data["id"] = "";
+                else
+                    data["id"] = id;
+
+                data["full_name"] = $("#full_name").val();
+                data["user_name"] = $("#user_name").val();
+                data["email"] = $("#email").val();
+                data["password"] = $("#password").val();
+                data["company_name"] = $("#company_name").val();
+                data["phone"] = $("#phone").val();
+                data["start_date"] = $("#start_date").val();
+                data["expiry_date"] = $("#expiry_date").val();
+                data["user_role"] = $("#user_role").val();
+                data["language"] = $("#user_language").val();
+                data["task"] = "7";
+
+                var jsondata = JSON.stringify(data);                
+                $.post("../../modules/ajax/users.php", jsondata, function (result) {
+                    if (result == "Successfull")
+                        location.reload();
+                    else
+                        alert(result);
+                });
+            }
+        });
+        
+     //FormSubmit change password
+        var formElement2 = $("#form-change-password");
+        var rules_set2 = {
+            confirm_password:
+                    {
+                        equalTo: "#new_password",
+                        required: true
+                    }
+        };
+
+       
+
+        formElement2.validate({
+            rules: rules_set2,
+            messages: {
+                confirm_password: {
+                    required: "Retype your new password",
+                    equalTo: "Passwords don't match, please check"
+                }
+            },
+            errorElement: "div",
+            errorPlacement: function (error, element) {
+                error.addClass("text-danger");
+                error.insertAfter(element);
+            },
+            submitHandler: function ()
+            {
+                var data = {};
+                id = $("#id").val();       
+                var currentPass=$("#current_password").val();
+                var newPass = $("#new_password").val();
+                var confirmPass = $("#confirm_password").val();
+                
+                var data = {};
+                data["id"] = id;
+                data["current_password"] = currentPass;
+                data["new_password"] = newPass;
+                data["task"] = "10";
+
+                var jsondata = JSON.stringify(data);               
+                $.post("../../modules/ajax/users.php", jsondata, function (result) {
+                    if (result == "Successfull")
+                        location.reload();
+                    else
+                        alert(result);
+                });
+            }
+        });
+
     });
-  });
+    
+   
+    /* === enable disable product === */
+    var status;
+    var id;
+    $(document).on("click", ".user-enable-disable-btn", function ()
+    {
+        id = $(this).parent('td').parent('tr').data('id');
+        var status_text = $(this).text();
+        if (status_text == "Disable")
+            status = 0;
+        else
+            status = 1;
 
-  /* Change Active Tab Styling */
+        var data = {};
+        data["id"] = id;
+        data["status"] = status;
+        data["task"] = "9";
+        var jsondata = JSON.stringify(data);
+        $.post("../../modules/ajax/users.php", jsondata, function (result) {
+            if (result == "Successfull")
+                location.reload();
+            else
+                alert(result);
+        });
+    });
+    /*change password*/
+    $(document).on("click", ".user-change-password", function (){
+        id = $(this).parent('td').parent('tr').data('id');
+        $("#id").val(id); 
+        $('#changePasswordModal').modal('show');
+    });
+                
 
-  $('.tab-link').on('click', function () {
-    $('.tab-link').removeClass('active');
-    $(this).addClass('active');
-  });
+    /*=====edit======*/
+    $(document).on("click", ".user-edit", function ()
+    {
+        id = $(this).parent('td').parent('tr').data('id');
+        var data = {};
+        data["id"] = id;
+        data["task"] = "11";
+        var jsondata = JSON.stringify(data);
+        $.post("../../modules/ajax/users.php", jsondata, function (result) {
+            $('.block-data[data-status="overview"]').hide();
+            $('.block-data[data-status="form"]').show();
+            $('.tab-link').removeClass('active');
+                        
+            data["full_name"] = $("#full_name").val();
+                data["user_name"] = $("#user_name").val();
+                data["email"] = $("#email").val();
+                data["password"] = $("#password").val();
+                data["company_name"] = $("#company_name").val();
+                data["phone"] = $("#phone").val();
+                data["start_date"] = $("#start_date").val();
+                data["expiry_date"] = $("#expiry_date").val();
+                data["user_role"] = $("#user_role").val();
+                data["language"] = $("#user_language").val();
+                
+            var response = JSON.parse(result);
+            $("#full_name").val(response.operator_name);
+            $("#user_name").val(response.username);
+            $("#email").val(response.email);
+            $("#company_name").val(response.company_name);
+            $("#phone").val(response.phone);
+            $("#start_date").val(response.validity_from_date);
+            $("#expiry_date").val(response.validity_to_date);            
+            $("#user_language").val(response.language);
+            $("#user_role").val(response.user_role_id);            
+            
+            $("#password").val(response.password);
+            $("#conform_password").val(response.password);
+            $("#password-block").hide();
+            $("#user_name").attr("disabled",true);
+            
+            $("#add-edit-button").val("Edit");                        
+        });
 
-  /* Adjust Table Spacing */
+    });
 
-  $('#column-4, #column-12').removeClass('col').addClass('col-2');
 </script>
-
-<?php
-include '../../includes/footer.php';
-?>

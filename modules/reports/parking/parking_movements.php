@@ -1,11 +1,17 @@
 <?php
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
+
+$data=array();
+$data["task"]=29;     
+$data["language"]=$_SESSION["language"];
+$data["page"]=11;
+$json=parcxReport($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Parking Movements</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["parking_movement"]?></div>
 
 <?php
 include('../../../includes/navbar-end.php');
@@ -36,51 +42,11 @@ include('../../../includes/sidebar.php');
 
         <!-- plate -->
         <div class="col-md-2">
-          <input type="text" id="plate_number" class="form-control" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"plate_ticket"));?>">
+          <input type="text" id="plate_number" class="form-control" placeholder="<?=$json["plate_ticket"]?>">
         </div>
-        <!-- date and time -->
-        <div class="col-md-3">
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="far fa-clock"></i></span>
-            </div>
-            <input type="text" class="form-control float-right" id="reservationtime" autocomplete="off" placeholder="<?php echo parcxReport(array("task"=>"13","language"=>$_SESSION["language"],"label"=>"choose_datetime_range"));?>">
-          </div>
-        </div>
-
-        <!-- search -->
-        <div class="col-md-1">
-        <button type="button" class="btn  btn-secondary" id="view-report-button" onclick="parking_movement()">View Report</button>
-        </div>
-
-        <!-- loader -->
-        <div class='col-1' id='loader'>
-          <img src='../../../dist/img/loading.gif'>
-        </div>
-
-      </div>
-
-      <div class="additional-menu-right">
-        <div id="action-buttons">
-          <div class="btn-group">
-            <button type="button" class="btn btn-warning">Export</button>
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-              <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu" role="menu">
-              <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
-
-              <a class="dropdown-item" href="#" id="export_pdf_report">
-                Export to PDF
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+        
+        
+   <?php include('../../../includes/additional-menu-report.php');?>           
   <!-- end / additional menu -->
 
   <section class="content">
@@ -94,7 +60,8 @@ include('../../../includes/sidebar.php');
           $data["carpark"]="";    
           $data["device"]="";	        
           $data["plate_number"]=""; 
-          $data["task"]=2;                          
+          $data["task"]=2;    
+          $data["language"] = $_SESSION["language"];
           echo parcxReport($data);
           ?>  
         </div>
@@ -106,16 +73,36 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
-//$('#view-report-button').click(function (event) 
- var load_report = 0;
-function parking_movement()
-{ 
-  if ((!daterange)) 
+var id;
+var date_range_message="choose date range";
+from="<?=$current_date." ".DAY_CLOSURE_START?>";
+to="<?=$current_date." ".DAY_CLOSURE_END?>";
+
+$(function() 
     {
-    alert("choose date range");
-    } 
-  else 
-    {
+    $('#deviceNumber').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,
+        selectAllText: "<?=$json["all_devices"]?>",               
+        nonSelectedText:"<?=$json["select_devices"]?>",       
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_devices"]?>"  
+        });
+        
+    $('#multiselect').multiselect(
+        {
+        buttonWidth: '100%',
+        includeSelectAllOption: true,      
+        selectAllText: "<?=$json["all_carparks"]?>",
+        nonSelectedText: "<?=$json["select_carparks"]?>",
+        selectAllNumber: false,
+        allSelectedText: "<?=$json["all_carparks"]?>",       
+        });    
+ });
+function callReport()
+{
+
     var data={};
     data["from"]=from;
     data["to"]=to;           
@@ -131,28 +118,80 @@ function parking_movement()
         loadReport(result);
 		load_report = 1;
       }, "json");
-    } // end if 
 
     event.preventDefault();
 }
  // }); 
  
-function loadPage()
-  {
-  loadheadingreport("parking_movement");
-   if(load_report==1)
-	parking_movement(); 
-  }
-$("#language").change(function(){
-  loadPage();
-}); 
-
-$( document ).ready(function() {
-	loadheadingreport("parking_movement");
+$('#view-report-button').click(function (event) 
+{ 	
+    if (!daterange)		
+        alert(date_range_message);        		
+    else 
+        callReport();	    
 });
 
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=29;
+    data["language"]=$("#language").val();    
+    data["page"]=11;
+    var json = JSON.stringify(data);
+    $.post("../../ajax/reports.php",json,function(data)
+        {	
+        var json=JSON.parse(data);
+        date_range_message=json.choose_datetime_range;
+        $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
+        $("#pdf-report-header").html(json.parking_movement);   
+        $("#view-report-button").html(json.view_report);   
+        $("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout); 
+        search_label=json.search;   
+        entries_label= json.entries_label;
+        info_label=json.info_label;
+        previous_label=json.previous;
+        next_label=json.next;        
+        $("#plate_number").attr('placeholder',json.plate_ticket); 
+
+        
+                                        
+        $('#deviceNumber').multiselect('destroy');
+        $('#deviceNumber').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,
+            selectAllText: json.all_devices,                                    
+            nonSelectedText:json.select_devices,                   
+            selectAllNumber: false,
+            allSelectedText: json.all_devices             
+            });  
+            
+        $('#multiselect').multiselect('destroy');
+        $('#multiselect').multiselect(
+            {
+            buttonWidth: '100%',
+            includeSelectAllOption: true,      
+            selectAllText: json.all_carparks,
+            nonSelectedText: json.select_carparks,
+            selectAllNumber: false,
+            allSelectedText: json.all_carparks
+            }); 
+    
+        
+        });    
+    }
+
+$("#language").change(function()
+    {	  
+    loadReportLabels();    
+    callReport();		
+    });       
+    
   $('#export_excel_report').click(function (event) {
-    export_to_excel("#report-content", "PMS_Parking_movement_Report")
+    export_to_excel("#report-content", "PMS_Parking_Movement_Report")
 
   }); // end click event function
 </script>
