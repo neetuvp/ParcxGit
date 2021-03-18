@@ -8,7 +8,7 @@ next_label = '<?=$json["next"]?>';
 
 $(document).ready(function () 
     {	         
-    $("#language").val("<?php echo $_SESSION["language"]; ?>");
+    $("#language").val("<?php echo isset($_SESSION["language"])?$_SESSION["language"]:"English"; ?>");
     // check date is selected
     $(".applyBtn").click(function () 
         {

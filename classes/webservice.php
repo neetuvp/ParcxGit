@@ -12,7 +12,7 @@ class webservice
         } // end
     function log($msg)
         {       
-        $file = "/var/log/parcx/Services/ApplicationLogs/antipassback.log";	
+        $file = "/opt/parcx/Logs/Services/ApplicationLogs/antipassback.log";	
         $fh = fopen($file, 'a') or die("can't open file");    
         fwrite($fh,date('H:i:s'). "\t");
         fwrite($fh,$msg);

@@ -1212,6 +1212,28 @@ void carparkDropdown()
         }
     }
 
+void parkingZoneDropdown(Php::Value json)
+    {
+    try
+        {
+        con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        res=stmt->executeQuery("select * from system_parking_zone where carpark_number in ("+ToString(json["carpark_number"])+")");
+        while(res->next())
+            {
+            Php::out << "<option carpark_number='"<<res->getString("carpark_number")<<"' value='"<<res->getString("parking_zone_number")<<"'>"<<res->getString("parking_zone_name")<<"</option>" << std::endl;   
+            }
+       
+        delete res;    
+        delete stmt;
+	delete con; 
+        }
+    catch(const std::exception& e)
+        {
+        writeException("parkingZoneDropdown",e.what());
+        }
+    }
+
 void discountDropdown()
     {
     try
@@ -1479,6 +1501,8 @@ Php::Value parcxSettings(Php::Parameters &params)
         case 34:response=getDetails("system_products","product_id",data); 
 		    break;
         case 35:discountDropdown(); 
+            break;
+        case 36:parkingZoneDropdown(data);
             break;
 		}
 	return response;

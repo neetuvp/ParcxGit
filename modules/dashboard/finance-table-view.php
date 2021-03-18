@@ -136,7 +136,7 @@ include('../../includes/sidebar.php');
 <script src="../../plugins/flot/jquery.flot.min.js"></script>
 <script src="../../plugins/flot/jquery.flot.categories.min.js"></script>
 <script src="../../dist/js/gauge.js"></script>
-<!--<script src="../../dist/js/dashboard.js"></script>-->
+
 
 <!-- add moment.js -->
 <script src="../../plugins/jquery/moment.min.js"></script>

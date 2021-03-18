@@ -3,18 +3,10 @@
 require_once('../../includes/common.php');
 
 $task=$_GET['task'];
-//$data_obj=json_decode(file_get_contents("php://input"));
 
 include('../../classes/dashboard.php');
 $dashboard=new dashboard();
-include('../../classes/reporting_valet.php');
-$valet=new reporting_valet();
 
-include('../../classes/reporting_system.php');
-$system=new reporting_system();
-
-include('../../classes/reporting_revenue.php');
-$revenue=new reporting_revenue();
 
 switch($task)
     {
@@ -42,10 +34,12 @@ switch($task)
         break;
 
     case 6:
+        include('../../classes/reporting_valet.php');
+        $valet=new reporting_valet();
         $valet->valet_parking_keydashboard();
         break;    
     case 7:
-        $system->watchdog_device_alarms(0,0);
+        $dashboard->watchdog_device_alarms(0,0);
         break;
    
     case 9:$dashboard->get_device_status();
@@ -67,8 +61,9 @@ switch($task)
         $json= file_get_contents("php://input");    
         $data=json_decode($json,TRUE);         
         if($data["device_category"]=="APM")
-            $revenue->cash_levels($data["device_number"]);	
-        if($data["device_category"]=="Entry" || $data["device_category"]=="Exit")
+            $dashboard->cash_levels($data["device_number"]);	
+        
+        if($data["device_category"]=="Entry Column" || $data["device_category"]=="Exit Column")
             {
             $html='<div class="d-flex justify-content-between align-items-center mb-4">
             <div class="col"><input type="submit" class="btn btn-outline-info btn-open-barrier btn-block" value="Open Barrier" id="'.$data["device_number"].'"></div>

@@ -164,25 +164,23 @@ $(document).on("click", ".btn-sub", function()
 
 $(document).on("click", ".btn-view", function() 
     { 
-    getfolders();    
-   // var newWindow = window.open();    
+    getfolders();       
     var data = {};
     data["task"]=3;
     data["main_folder"]=main_folder;
     data["sub_folder"] = sub_folder;
-    data["file_name"] = $(this).parent('td').siblings(":eq( 1 )").text();	      
+    data["file_name"] = $(this).parent('td').siblings(":eq( 1 )").text();	   
+    data["download"] = 0;         
     $("#exampleModalLabel").html(data["file_name"]);
     var jsondata = JSON.stringify(data);  
     console.log(jsondata);	
-    $.post("../../modules/ajax/view_logs.php",jsondata,function(data){           
-        //newWindow.document.write(data);   	
+    $.post("../../modules/ajax/view_logs.php",jsondata,function(data){                   
         $("#modal-body").html(data);
         $('#exampleModal').modal('show');
     })
     .fail(function(jqxhr,status,error){
         alert("Error: "+error);
-    });
-    //newWindow.stop();  
+    });    
 
     });
 
@@ -210,15 +208,15 @@ $(document).on("click", ".btn-download", function()
     });
     
 function downloadFile()
-    {
+    {    
     var data = {};
     data["task"]=3;
     data["main_folder"]=main_folder;
     data["sub_folder"] = sub_folder;
-    data["file_name"] = file_name;      
+    data["file_name"] = file_name; 
+    data["download"] = 1;      
 
-    var jsondata = JSON.stringify(data);  
-    console.log(jsondata);	
+    var jsondata = JSON.stringify(data);      
     $.post("../../modules/ajax/view_logs.php",jsondata,function(data){           
           download(data)	
     });

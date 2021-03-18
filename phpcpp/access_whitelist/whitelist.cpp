@@ -54,6 +54,39 @@ long accessId()
 	return seconds;					
 	}
 
+Php::Value insertUpdateWhitelistPolicy(Php::Value json)
+    {
+    string message = "Failed";    
+    try
+        {        
+        con= General.mysqlConnect(ServerDB);   
+        stmt=con->createStatement();        
+        string id=json["id"];  
+        string start_date=json["start_date"];
+        string expiry_date=json["expiry_date"];
+        string validity_days=json["validity_days"];
+        string validity_timeslot=json["validity_timeslot"];
+        string facility_number=json["facility_number"];
+        string carpark_number=json["carpark_number"];  
+        string parking_zone=json["parking_zone"];  
+        string policy_name=json["policy_name"];        
+        string description=json["description"];        
+        if(id=="")
+            query="insert into whitelist_group_policy(policy_name,description,start_date,expiry_date,validity_days,validity_timeslot,facility_number,carpark_number,parking_zone,status)values('"+policy_name+"','"+description+"','"+start_date+"','"+expiry_date+"','"+validity_days+"','"+validity_timeslot+"',"+facility_number+",'"+carpark_number+"','"+parking_zone+"',1)";
+        else
+            query="update whitelist_group_policy set policy_name='"+policy_name+"',description='"+description+"',start_date='"+start_date+"',expiry_date='"+expiry_date+"',validity_days='"+validity_days+"',validity_timeslot='"+validity_timeslot+"',facility_number="+facility_number+",carpark_number='"+carpark_number+"',parking_zone='"+parking_zone+"' where id="+id;
+        stmt->executeUpdate(query);
+        
+        delete stmt;
+        delete con;   
+        message="Successfull";
+        }     
+    catch(const std::exception& e)
+        {
+        writeException("insertUpdateWhitelistPolicy",e.what());
+        }
+    return message;
+    }
 
 Php::Value insertUpdateWhitelist(Php::Value json)
     {
@@ -196,6 +229,55 @@ void showAccessWhitelistList()
     
     }
 
+void showAccessWhitelistPolicies()
+    {
+    try
+        {
+        con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        res=stmt->executeQuery("select * from whitelist_group_policy order by id desc");
+        if(res->rowsCount()>0)
+            {            
+            Php::out << "<thead>" << std::endl;
+            Php::out<<"<tr>"<<endl;
+            Php::out<<"<th>Policy Name</th>"<<endl;
+            Php::out<<"<th>Description</th>"<<endl;                       
+            Php::out<<"<th>Valid From</th>"<<endl;
+            Php::out<<"<th>Valid To</th>"<<endl;
+            Php::out<<"<th></th>"<<endl;
+            Php::out<<"<th></th>"<<endl;		           
+            Php::out<<"</tr>"<<endl;	
+            Php::out << "</thead>" << std::endl;		
+            }
+        while(res->next())
+            {
+            Php::out<<"<tr data-id='"<<res->getString("id")<<"'>"<<endl;                       
+            Php::out<<"<td>"+res->getString("policy_name")+"</td>"<<endl;
+            Php::out<<"<td>"+res->getString("description")+"</td>"<<endl;            
+            Php::out<<"<td>"+res->getString("start_date")+"</td>"<<endl;
+            Php::out<<"<td>"+res->getString("expiry_date")+"</td>"<<endl;            
+            Php::out << "<td>"<< std::endl;
+            if(res->getInt("status")==1)
+                Php::out << "<button type='button' class='col btn btn-danger policy-enable-disable-btn'>Disable</button>"<< std::endl;
+            else
+                Php::out << "<button type='button' class='col btn btn-success policy-enable-disable-btn'>Enable</button>"<< std::endl;
+            Php::out << "</td>"<< std::endl;
+            Php::out << "<td>"<< std::endl;
+            Php::out << "<button type='button' class='col btn btn-info policy-edit'><i class='fas fa-edit'></i>Edit</button>"<< std::endl;           
+            Php::out << "</td>"<< std::endl;
+            Php::out<<"</tr>"<<endl;	
+            }        
+        delete res;    
+        delete stmt;
+		delete con;  
+        }
+    catch(const std::exception& e)
+        {
+        writeException("showAccessWhitelistPolicies",e.what());
+        }
+    
+    }
+
 void showDeviceListForAccessSynch()
     {
     try
@@ -257,7 +339,7 @@ Php::Value getDetails(string table,string id,Php::Value json)
             }
         delete res;    
         delete stmt;
-		delete con;
+	delete con;
         }
     catch(const std::exception& e)
         {
@@ -366,8 +448,16 @@ Php::Value parcxWhitelistSettings(Php::Parameters &params)
         case 6:showDeviceListForAccessSynch();
             break;  
         case 7:response=enableDisable("system_devices","id","synch_whitelist_flag",data); 
-		    break; 
-		}
+		    break;                     
+        case 8:response=insertUpdateWhitelistPolicy(data); 
+		    break;
+        case 9:showAccessWhitelistPolicies();
+            break; 
+        case 10:response=enableDisable("whitelist_group_policy","id","status",data); 
+            break; 
+        case 11:response=getDetails("whitelist_group_policy","id",data); 
+            break;
+	}
 	return response;
 	}
     

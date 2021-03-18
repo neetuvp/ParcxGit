@@ -29,6 +29,7 @@ void writeException(string function,string message)
     {
     General.writeLog("WebApplication/ExceptionLogs/PX-UserManagement-"+General.currentDateTime("%Y-%m-%d"),function,message); 
     writeLog(function,"Exception: "+message);   
+    Php::out<<query<<endl;
     }
 
 void showSideBar(Php::Value data)
@@ -152,6 +153,13 @@ void showUserRoleNavigationList()
             while(rights->next())                
                 menu[rights->getInt("menu_id")]=1;                
             res->beforeFirst();
+            
+            Php::out<< "<div class='row'>"<<endl;
+            Php::out<< "<div class='col form-group'>"<<endl;
+            Php::out<< "<label for=''>User Role Name</label>"<<endl;
+            Php::out<< "<input type='text' disabled class='form-control' id='user_role_name_"<<role->getString("user_role_id")<<"' value='"<<role->getString("user_role_name")<<"' required="">"<<endl;
+            Php::out<< "</div></div>"<<endl;
+                                
             while(res->next())
                 {
                 if(group_id!=res->getInt("group_id"))
@@ -223,18 +231,35 @@ Php::Value updateUserRoleRights(Php::Value data)
     try
         {
         string user_role_id=data["user_role_id"];
+        string user_role_name=data["user_role_name"];
         Php::Value menu=data["menu"];
            
         con = General.mysqlConnect(ServerDB);
-        stmt = con->createStatement();        
-         
-        query="delete from system_role_rights where user_role_id="+user_role_id;
-        stmt->executeUpdate(query);
+        stmt = con->createStatement();  
         
+        if(user_role_name!="")
+            {
+            query="update system_user_role set user_role_name='"+user_role_name+"' where user_role_id="+user_role_id;
+            stmt->executeUpdate(query);
+            }
+         
+        query="update system_role_rights set rr_view=0,rr_edit=0,rr_delete=0 where user_role_id="+user_role_id;
+        stmt->executeUpdate(query);
+                
+        string id;
         for(int i=0;i<menu.size();i++)
             {
-            string menu_id=menu[i];
-            query="insert into system_role_rights(user_role_id,menu_id,rr_view,rr_edit ,rr_delete)values("+user_role_id+","+menu_id+",1,1,1)";
+            string menu_id=menu[i];    
+            query="select role_rights_id from system_role_rights where menu_id="+menu_id+" and user_role_id="+user_role_id;
+            res=stmt->executeQuery(query);
+            if(res->next())
+                {
+                id=res->getString("role_rights_id");
+                query="update system_role_rights set rr_view=1,rr_edit=1,rr_delete=1 where role_rights_id="+id;
+                delete res;
+                }
+            else    
+                query="insert into system_role_rights(user_role_id,menu_id,rr_view,rr_edit ,rr_delete)values("+user_role_id+","+menu_id+",1,1,1)";
             stmt->executeUpdate(query);
             }
        

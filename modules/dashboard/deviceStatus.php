@@ -56,7 +56,7 @@ include('../../includes/sidebar.php');
                         </div>
                     </div>
                 </div>
-                <!-- end / info -->
+                <!-- end / info -->                                
 
                 <!-- table -->
                 <table width="100%" id="alarm-data">
@@ -131,8 +131,8 @@ include('../../includes/sidebar.php');
                     <div class="tab-link" data-target="payment_machines">Payment Machines</div>
                     <div class="tab-link" data-target="columns">Entry/Exit Columns</div>
                     <div class="tab-link" data-target="controllers">Controllers</div>
-					<div class="tab-link" data-target="camera">Camera</div>
-					<div class="tab-link" data-target="vms">VMS</div>
+                    <div class="tab-link" data-target="camera">Camera</div>
+                    <div class="tab-link" data-target="vms">VMS</div>
                 </div>
             </div>
 

@@ -14,9 +14,9 @@ if(is_array($response))
             $_SESSION['userRollId'] = $response["user_role_id"]; 
             $_SESSION['userId'] = $response["user_id"];            
             $_SESSION["language"] = $response["language"] ;        
-            $_SESSION['last_login_timestamp'] = time();
-            echo $response["message"];
+            $_SESSION['last_login_timestamp'] = time();            
             }
+        echo $response["message"];
         }
     else 
         echo json_encode($response);

@@ -491,9 +491,9 @@ Php::Value openTransactionCheck(int getDetails) {
                 } else
                     currentDateTime = General.currentDateTime(dateTimeFormat);
                 writeLog("openTransactionCheck", "paymentUpto: " + currentDateTime);
-                
-                if (deviceType > 2 || walletEnabled == 1 || paymentExit == 1) {
-                    setParkingRateConfiguration();
+                setParkingRateConfiguration();
+                if (deviceType > 2 || walletEnabled == 1 || paymentExit == 1) 
+                    {                    
                     response["parking_rate"] = parking_rate;
                     response["parking_rate_label"] = parking_rate_label;
                     response["entry_grace_period"] = entry_grace_period;
@@ -505,7 +505,7 @@ Php::Value openTransactionCheck(int getDetails) {
                     response["vat_amount"] = 0;
                     response["gross_amount"] = 0;
                     response["parking_fee_duration_minutes"] = 0;
-                }
+                    }
 
                 stmt = reportCon->createStatement();
 
@@ -655,23 +655,22 @@ Php::Value openTransactionCheck(int getDetails) {
                     }
 
 
-                    if (deviceType > 2 || walletEnabled == 1 || paymentExit == 1) {
+                    if (deviceType >= 2 || walletEnabled == 1 || paymentExit == 1) {
                         calculateAmountToPay();
                         response["net_amount"] = parkingFee;
                         response["vat_amount"] = vatAmount;
                         response["gross_amount"] = grossAmount;
-                    }
-
-                    if (grossAmount <= 0) {
+                        
+                        if (grossAmount <= 0) {
                         response["exit_grace_time_remaining"] = to_string(exitGrace);
                         response["ticketcheck_result"] = "within_exit_grace_period";
                         response["result"] = "ticketcheck_access_allowed";
                         response["access_allowed"] = "true";
                         response["result_description"] = "Within exit grace period.Amount to pay =0";
                         return response;
+                        }
                     }
-
-
+                   
                     if (toString(response["access_allowed"]) == "false" && walletEnabled == 1) {
                         if (grossAmount > 0) {
                             Php::Value wallet = walletCheck();

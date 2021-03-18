@@ -146,21 +146,25 @@ include('../../includes/sidebar.php');
         id = $(this).data('id');
         console.log(id);
         if ($(this).val() == "Edit")
-        {
+            {
             $(this).attr('value', 'Update');
             $(this).closest("#parent").find('input[type=checkbox]').prop('disabled', false);
-        } else
-        {
+            $(this).closest("#parent").find('input[type=text]').prop('disabled', false);
+            } 
+        else
+            {
             $(this).attr('value', 'Edit');
             $(this).closest("#parent").find('input[type=checkbox]').prop('disabled', true);
+            $(this).closest("#parent").find('input[type=text]').prop('disabled', true);
             var data = {};
-            var i = 0;
+            var i = 0;            
             var menu = new Array();
             data["user_role_id"] = id;
+            data["user_role_name"]=$("#user_role_name_"+id).val();
 
             $(this).closest("#parent").find('input[type=checkbox]').each(function ()
             {
-                if ($(this).is(":checked") == true)
+                if ($(this).is(":checked") === true)
                 {
                     menuid = $(this).attr('id');
                     menu[i] = menuid.split('-')[1];

@@ -77,7 +77,7 @@ include('../../../includes/sidebar.php');
 
   <section class="content">
     <div class="container-wide">      
-      <div class="p-0" id="page-content">       
+      <div class="p-2 col-md-5" id="page-content">       
         
        
       </div>   
@@ -97,11 +97,11 @@ function callReport()
     data["ticket_id"]=$("#ticket_id").val();   
 	data["language"] = $("#language").val();	
     data["task"]=9;
-    var temp = JSON.stringify(data);    
-    console.log(temp);  
+    var temp = JSON.stringify(data);        
     $.post("../../ajax/reports.php", temp)
-      .done(function (result) {        
+      .done(function (result) {           
         $("#page-content").html(result);
+        $("#page-content").addClass("card");
         reportSuccess();
 		load_report=1;
 

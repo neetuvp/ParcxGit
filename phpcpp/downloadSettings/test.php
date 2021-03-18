@@ -4,7 +4,7 @@ $data["currency"]="AED";
 $data["device_type"]=1;
 $data["carpark_number"]=1;
 $data["facility_number"]=200005;
-$data["task"]=16;
+$data["task"]=13;
 
 $response=downloadDeviceSettings($data);
 if(is_array($response))
