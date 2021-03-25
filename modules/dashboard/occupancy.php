@@ -118,38 +118,28 @@ $dashboard = new dashboard();
 </div>
 
 <script>
-
-//ON Page Load
     $("#HourlyOccupancyGraph").hide();
-
-    var current_level = "facility";
-    var carpark = 1;
-    var facility = 1;
+    
+    var current_level = $("#dashboard_level").attr('level');
+    var carpark = $("#dashboard_level").attr('carpark_number');
+    var facility = $("#dashboard_level").attr('facility_number');
     var hourly_occ_chart;
 
     LoadKnob();
     $('#last-updated').html($("#last_updated_datetime").val());
     loadOccupancyGraph();
-//Update carpark counters 
+
 
     setInterval(function ()
     {
         current_level = $("#dashboard_level").attr('level');
+        facility = $("#dashboard_level").attr('facility_number');
+        carpark = $("#dashboard_level").attr('carpark_number');
 
-        if (current_level == "carparks")
-        {
-            facility = $("#dashboard_level").attr('facility_number');
-        }
-        if (current_level == "carpark_detail")
-        {
-            facility = $("#dashboard_level").attr('facility_number');
-            carpark = $("#dashboard_level").attr('carpark_number');
-        }
         if (current_level == "facility")
         {
             UpdateFacilityCounters();
-        }
-        if (current_level == "carparks")
+        } else if (current_level == "carparks")
         {
             UpdateCarparkCounters(facility);
         } else if (current_level == "carpark_detail")
@@ -159,17 +149,16 @@ $dashboard = new dashboard();
             {
                 $("#HourlyOccupancyGraph").show();
                 hourlyOccupancy();
-            }
-            updateHourlyOccupancy()
+            } else
+                updateHourlyOccupancy()
         }
 
     }, 1000 * 10);
 
     function loadOccupancyGraph()
-    {
-        current_level = $("#dashboard_level").attr('level');
+    {        
         if (current_level == "carpark_detail")
-        {
+        {            
             if ($("#HourlyOccupancyGraph").is(":hidden"))
             {
                 $("#HourlyOccupancyGraph").show();
@@ -329,7 +318,8 @@ $dashboard = new dashboard();
             /* occupancy data */
             maxdata = getoccupancy("Max");
             mindata = getoccupancy("Min");
-
+            console.log("maxdata " + maxdata);
+            console.log("mindata " + mindata);
             $(function () {
                 'use strict'
 
@@ -458,7 +448,6 @@ $dashboard = new dashboard();
             success: function (data) {
                 for (var i = 0; i < data.length; i++) {
                     tmp.push(data[i]);
-                    // console.log("max = " + maxdata)
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -488,7 +477,6 @@ $dashboard = new dashboard();
             contentType: 'application/json',
             dataType: 'json',
             success: function (data) {
-                console.log(data);
                 for (var i = 0; i < data.length; i++) {
                     tmp.push(data[i]);
                 }
@@ -522,7 +510,7 @@ $dashboard = new dashboard();
         hourly_occ_chart.data.datasets[1].data = getoccupancy("Max");
 
         // reset linechart data
-        hourly_occ_chart.data.datasets[2].data = getaverageoccupancy();
+        // hourly_occ_chart.data.datasets[2].data = getaverageoccupancy();
 
         hourly_occ_chart.update();
 

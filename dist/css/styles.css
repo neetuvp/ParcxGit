@@ -839,20 +839,25 @@ div#loader img {
 #right {
   border: 1px solid #ced4da;
   border-radius: 5px;
-  background-color: white;
+  background-color: white;  
+  height: 500px;
+  overflow-y: auto;
 }
 
+
+#form,#add-group-policy
+{
+    height:100%;
+}
 #left {
-  width: 40%;
-  float: left;
-  /* border: solid; */
+  width: 40%;  
+  float: left;  
   padding: 10px;
 }
 
 #right {
-  width: 45%;
-  float: left;
-  /* border: solid; */
+  width: 45%;  
+  float: left;  
   min-height: 5px;
   padding: 10px;
 }

@@ -86,8 +86,7 @@ Php::Value parcxReport(Php::Parameters &params)
         case 27:pObj.watchDogDeviceAlarms(data);
                         break;
         case 28:pObj.watchdogNetworkLogs(data);
-                        break;
-        //case  29:response=pObj.getApplicationLabels(data);
+                        break;        
         case  29:response=General.getApplicationLabels(data);
                         break;
         case 30:pObj.parkingDuration(data);

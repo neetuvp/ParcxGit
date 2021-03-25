@@ -70,12 +70,34 @@ Php::Value insertUpdateWhitelistPolicy(Php::Value json)
         string carpark_number=json["carpark_number"];  
         string parking_zone=json["parking_zone"];  
         string policy_name=json["policy_name"];        
-        string description=json["description"];        
+        string description=json["description"];   
+        string users=json["users"];
         if(id=="")
             query="insert into whitelist_group_policy(policy_name,description,start_date,expiry_date,validity_days,validity_timeslot,facility_number,carpark_number,parking_zone,status)values('"+policy_name+"','"+description+"','"+start_date+"','"+expiry_date+"','"+validity_days+"','"+validity_timeslot+"',"+facility_number+",'"+carpark_number+"','"+parking_zone+"',1)";
         else
             query="update whitelist_group_policy set policy_name='"+policy_name+"',description='"+description+"',start_date='"+start_date+"',expiry_date='"+expiry_date+"',validity_days='"+validity_days+"',validity_timeslot='"+validity_timeslot+"',facility_number="+facility_number+",carpark_number='"+carpark_number+"',parking_zone='"+parking_zone+"' where id="+id;
         stmt->executeUpdate(query);
+        
+        
+        if(id=="")
+            {
+            query="select id from whitelist_group_policy ORDER BY id DESC LIMIT 1 ";
+            res=stmt->executeQuery(query);
+            if(res->next())                
+                id=res->getString("id");
+            delete res;                                
+            
+            query="update access_whitelist_customers set whitelist_group = CONCAT_WS(',', whitelist_group, '"+id+"') where id in("+users+")";
+            stmt->executeUpdate(query);
+            }
+        else
+            {
+            query="update  access_whitelist_customers set whitelist_group= TRIM(BOTH ',' FROM REPLACE(REPLACE(whitelist_group, '"+id+"', ''), ',,', ','))";
+            stmt->executeUpdate(query);
+            query="update access_whitelist_customers set whitelist_group = CONCAT_WS(',', whitelist_group, '"+id+"') where id in("+users+")";
+            stmt->executeUpdate(query);
+            }
+        
         
         delete stmt;
         delete con;   
@@ -168,6 +190,30 @@ Php::Value enableDisable(string table,string id_field,string status_field,Php::V
         writeException("enableDisable",e.what());
         }
     return msg;
+    }
+
+void accessCustomerOptions()
+    {
+    try
+        {
+        con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        res=stmt->executeQuery("select * from access_whitelist_customers");
+        while(res->next())
+            {
+            Php::out << "<div class='form-group custom-control custom-checkbox'>"<<endl;                                
+            Php::out << "<input type='checkbox' class='custom-control-input' id='"<<res->getInt("id")<<"'>"<<endl;
+            Php::out << "<label class='custom-control-label' for='"<<res->getInt("id")<<"'>"<<res->getString("customer_name")<<"</label>"<<endl;
+            Php::out << "</div>"<<endl;
+            }
+        delete res;    
+        delete stmt;
+        delete con;                            
+        }
+    catch(const std::exception& e)
+        {
+        writeException("accessCustomerOptions",e.what());
+        }
     }
 
 void showAccessWhitelistList()
@@ -326,24 +372,33 @@ Php::Value getDetails(string table,string id,Php::Value json)
     Php::Value response;    
     try
         {
+        string row_id=json["id"];
         con= General.mysqlConnect(ServerDB);
         prep_stmt = con->prepareStatement("select * from "+table+" where "+id+"=?");
-        prep_stmt->setString(1, ToString(json["id"]));
+        prep_stmt->setString(1, row_id);
         res=prep_stmt->executeQuery();
         if(res->next())
             {
             sql::ResultSetMetaData *res_meta = res -> getMetaData();
-			int columns = res_meta -> getColumnCount();   
-			for (int i = 1; i <= columns; i++) 							
-				response[res_meta -> getColumnLabel(i)]=string(res->getString(i));				
+            int columns = res_meta -> getColumnCount();   
+            for (int i = 1; i <= columns; i++) 							
+                    response[res_meta -> getColumnLabel(i)]=string(res->getString(i));				
+            }
+        if(table=="whitelist_group_policy")
+            {            
+            query="SELECT group_concat(id) as users FROM access_whitelist_customers where find_in_set('"+row_id+"',whitelist_group)";            
+            prep_stmt = con->prepareStatement(query);
+            res=prep_stmt->executeQuery();
+            if(res->next())                   
+                response["users"]=string(res->getString("users"));
             }
         delete res;    
-        delete stmt;
+        delete prep_stmt;
 	delete con;
         }
     catch(const std::exception& e)
         {
-        writeException("getDetails",e.what());
+        writeException("getDetails",e.what());        
         } 
     return response;       
     }
@@ -457,6 +512,8 @@ Php::Value parcxWhitelistSettings(Php::Parameters &params)
             break; 
         case 11:response=getDetails("whitelist_group_policy","id",data); 
             break;
+        case 12:accessCustomerOptions();
+        break;
 	}
 	return response;
 	}

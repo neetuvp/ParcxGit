@@ -1,14 +1,14 @@
-<?php
-$page_title = "Device Dashboard";
+<?php 
+$page_title="Device Dashboard";
 
 include('../../includes/header.php');
 ?>
 
 <div class="navbar-has-tablink navbar-has-sublink">
 
-    <?php
-    include('../../includes/navbar-start.php');
-    ?>
+<?php
+include('../../includes/navbar-start.php');
+?>
 
 </ul>
 
@@ -21,7 +21,7 @@ include('../../includes/header.php');
         <div class="tab-header-link" data-target="table-view">Table View</div>
     </div>
 </div>
-<?php
+<?php 
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
@@ -29,7 +29,7 @@ include('../../includes/sidebar.php');
 
 <!-- Modal -->
 <div class="modal fade" id="error-log-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -60,7 +60,7 @@ include('../../includes/sidebar.php');
 
                 <!-- table -->
                 <table width="100%" id="alarm-data">
-
+                    
                 </table>
                 <!-- end / table -->
 
@@ -72,7 +72,7 @@ include('../../includes/sidebar.php');
 
 <!-- Modal -->
 <div class="modal fade" id="alarm-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -127,7 +127,7 @@ include('../../includes/sidebar.php');
 
             <div class="flex-grow-1 row additional-menu-left">
                 <div class="col tab-header d-flex justify-content-left pl-1">
-                    <div class="tab-link active" data-target="all">View All</div>
+                   <div class="tab-link active" data-target="all">View All</div>
                     <div class="tab-link" data-target="payment_machines">Payment Machines</div>
                     <div class="tab-link" data-target="columns">Entry/Exit Columns</div>
                     <div class="tab-link" data-target="controllers">Controllers</div>
@@ -172,7 +172,7 @@ include('../../includes/sidebar.php');
     <div class="additional-menu row m-0 bg-white border-bottom">
         <div class="col d-flex justify-content-between pl-1 align-items-center">
             <span class="menu-info text-danger">
-                <strong id="alarm_notification" data-toggle="modal" data-target="#alarm-modal">Alarms Present</strong>
+            <strong id="alarm_notification" data-toggle="modal" data-target="#alarm-modal">Alarms Present</strong>
             </span>
         </div>
     </div>
@@ -184,79 +184,7 @@ include('../../includes/sidebar.php');
                     <!-- <div class="col-md-6"> -->
                     <div class="col-md-12">
 
-                        <div id="live-device_status-content">  
-                            <div class="col-lg-3 col-sm-6 col-xs-12"> 
-                                <div class="chart-box text-center"> 
-                                    <span id="dashboard_level" level="carparks" facility_number="200005"></span>
-
-                                    <h5 class="text-left facility-name">Training Area </h5> 
-                                   <div class="card-body">
-                                       <div id="row">
-                                           <div class="col-5 text-left"  >ShortTerm</div> 
-                                           <div class="col text-right" >100/400</div>                                               
-                                       </div>
-                                       
-                                        <div id="row">
-                                            <div class="col text-left"  >Access</div>
-                                            <div class="col text-right" >25/100</div>                                                
-                                        </div> 
-                                       
-                                      <div id="row"><div class="col text-left" id="category">Reservation</div>
-                                   <div class="col text-right" >0/0</div></div> 
-                                   
-                                       
-                                   </div>
-                                   
-                                   <button type="button" class="btn btn-block bg-secondary-gradient" id="ShowCarparkDetail" facility_number="200005" carpark_number="1">More <i class="fa fa-arrow-circle-right"></i></button></div></div>
-                            
-                            
-                            <div data-status="block-view">
-                                <div class="row">
-                                    <div class="col-lg-3 ">
-                                        <div class="card">
-                                            <div class="card-header">                                
-                                                <h1>facility 1</h1>                                
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row no-gutters">
-                                                    <div class="col-md-12 ">
-                                                        <ul class="nav flex-column">
-                                                            <li class="nav-item"><span class="nav-link">Total carparks<span class="float-right ">3</span></span></li>
-                                                            <li class="nav-item"><span class="nav-link">Total devices<span class="float-right ">11</span></span></li>
-                                                            <li class="nav-item"><span class="nav-link"><div class="dot-indicator bg-success-gradient" data-toggle="tooltip" data-placement="top" title="" data-original-title="Online"></div>Devices online<span class="float-right ">2</span></span></li>
-                                                            <li class="nav-item"><span class="nav-link"><div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="" data-original-title="Online"></div>Devices offline<span class="float-right ">9</span></span></li>
-                                                        </ul>                                        
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn btn-block bg-secondary-gradient p-2" id="ShowCarparkDetail" facility_number="200005" carpark_number="2">More <i class="fa fa-arrow-circle-right"></i></button>                            
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-lg-3 ">
-                                        <div class="card">
-                                            <div class="card-header">                                
-                                                <h1>Carpark 1</h1>                                
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row no-gutters">
-                                                    <div class="col-md-12 ">
-                                                        <ul class="nav flex-column">                                                            
-                                                            <li class="nav-item"><span class="nav-link">Total devices<span class="float-right ">11</span></span></li>                                                            
-                                                            <li class="nav-item"><span class="nav-link">Entry<span class="float-right "><div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="" data-original-title="Online"></div></span></span></li>
-                                                            <li class="nav-item"><span class="nav-link">Exit<span class="float-right "><div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="" data-original-title="Online"></div></span></span></li>
-                                                            <li class="nav-item"><span class="nav-link">Cashier<span class="float-right "><div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="" data-original-title="Online"></div></span></span></li>
-                                                            <li class="nav-item"><span class="nav-link">APM<span class="float-right "><div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="" data-original-title="Online"></div></span></span></li>
-                                                        </ul>                                        
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn btn-block bg-secondary-gradient p-2" id="ShowCarparkDetail" facility_number="200005" carpark_number="2">More <i class="fa fa-arrow-circle-right"></i></button>                            
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-                            </div>                   
+                        <div id="live-device_status-content">
                         </div>
 
                     </div>
@@ -272,21 +200,21 @@ include('../../includes/sidebar.php');
 <script src="../../dist/js/manualOperations.js"></script>
 
 <script>
-
+   
     function get_live_device_Status()
     {
-        // $.get("../ajax/dashboard.php?task=9", function (data) {
-        // $('#live-device_status-content').html(data);
-        //  $('[data-target="' + clicked_view_type + '"]').click();
-        //  $('[data-target="' + clicked_device_type + '"]').click();
-        // });
-        // $.get("../ajax/dashboard.php?task=14", function (data) {
-        // if(data==0)      
-        //     $('#alarm_notification').html("No alarms");
-        // else
-        //     $('#alarm_notification').html("Alarm Present:"+data);
-
-        // });
+    $.get("../ajax/dashboard.php?task=9", function (data) {
+    $('#live-device_status-content').html(data);
+     $('[data-target="' + clicked_view_type + '"]').click();
+     $('[data-target="' + clicked_device_type + '"]').click();
+    });
+    $.get("../ajax/dashboard.php?task=14", function (data) {
+    if(data==0)      
+        $('#alarm_notification').html("No alarms");
+    else
+        $('#alarm_notification').html("Alarm Present:"+data);
+    
+    });
 
     }
 
@@ -294,7 +222,7 @@ include('../../includes/sidebar.php');
     var clicked_device_type = "all";
 
     $(document).ready(function () {
-        /* Table Show - Hide */
+ /* Table Show - Hide */
         $('.tab-link').on('click', function () {
             var $target = $(this).data('target');
 
@@ -303,7 +231,7 @@ include('../../includes/sidebar.php');
                 $("#error-log-modal .card-text").removeClass("hidden");
                 $('.card-text[data-status="header"]').removeClass("hidden");
                 $('.card-text[data-status="' + $target + '"], .block-data[data-status="' + $target +
-                        '"]').removeClass("hidden").fadeIn('slow');
+                    '"]').removeClass("hidden").fadeIn('slow');
             } else {
                 // all
                 $('.card-text, .block-data').removeClass("hidden").fadeIn('slow');
@@ -327,16 +255,15 @@ include('../../includes/sidebar.php');
                 $('[data-status="' + $target + '"]').removeClass("hidden").fadeIn('slow');
 
             }
-            clicked_device_type = $target;
+             clicked_device_type = $target;
         });
 
         get_live_device_Status();
-        current_ime();
-        ;
+        current_ime();;
 
         setInterval(function () {
-            //get_live_device_Status();
-            // alert("");
+            get_live_device_Status();
+           // alert("");
         }, 30000);
 
         setInterval(function () {
@@ -348,18 +275,18 @@ include('../../includes/sidebar.php');
 
     //dismiss
     $(document).on('click', '.btn-dismis-alarm', function () {
-        var id = $(this).attr('id');
-        var data = {id: id};
-        var json = JSON.stringify(data);
-        // alert(json);
-        $.post("../ajax/dashboard.php?task=16", json)
-                .done(function (result) {
+    var id = $(this).attr('id');
+    var data = {id: id}; 
+    var json = JSON.stringify(data);
+   // alert(json);
+     $.post("../ajax/dashboard.php?task=16", json)
+     .done(function (result) {
 
-                    $.get("../ajax/dashboard.php?task=15", function (data) {
-                        $('#latest-alarm-data').html(data);
-                    });
-                }, "json");
-
+       $.get("../ajax/dashboard.php?task=15", function (data) {
+       $('#latest-alarm-data').html(data);
+       });
+     }, "json");    
+    
     });
 
     /* Change Active Tab Styling */
@@ -381,8 +308,8 @@ include('../../includes/sidebar.php');
 
     /* Generate Modal Data */
 
-    $('body').on('click', "[data-target='#error-log-modal']", function ()
-    {
+    $('body').on('click', "[data-target='#error-log-modal']", function () 
+        {        
         var device_name = $(this).find(".card-title").text();
         var device_number = $(this).find(".device_number").text();
         var device_ip = $(this).find(".device_ip").text();
@@ -394,44 +321,43 @@ include('../../includes/sidebar.php');
         $("#device_ip").html(device_ip);
         $("#device_number").html(device_number);
         $("#device_img").attr("src", ("/parcx/dist/img/icon/device_icons/" + device_img + "-lg.png"));
-
-
-        var data = {};
-        data["device_number"] = device_number;
-        data["device_category"] = device_category;
-        var temp = JSON.stringify(data);
-
+        
+        
+        var data={};
+        data["device_number"]=device_number;
+        data["device_category"]=device_category;
+        var temp=JSON.stringify(data);
+        
         $.ajax({
-            type: "post",
-            url: "../ajax/dashboard.php?task=13",
-            data: temp,
-            cache: false,
-            contentType: "application/json",
-            success: function (data) {
-                var details = '<input type="hidden" device_type="1" id="device_details_' + device_number + '" device_ip="' + device_ip + '" device_name="' + device_name + '" carpark_number="1">';
-                ;
-                $('#alarm-data').html(details + data);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                alert("error:" + errorThrown + " " + textStatus);
-            }
+        type: "post",
+        url: "../ajax/dashboard.php?task=13",
+        data: temp,
+        cache:false,
+        contentType:"application/json",
+        success:function(data){    
+         var details='<input type="hidden" device_type="1" id="device_details_'+device_number+'" device_ip="'+device_ip+'" device_name="'+device_name+'" carpark_number="1">';;
+        $('#alarm-data').html(details+data);
+        },
+        error:function(jqXHR,textStatus,errorThrown){
+        alert("error:"+errorThrown+" "+textStatus);
+        }
         }); //end of ajax
     });
     //
 
 //latest alarm
-    $('body').on('click', "[data-target='#alarm-modal']", function () {
-        $.get("../ajax/dashboard.php?task=15", function (data) {
-            $('#latest-alarm-data').html(data);
-
-        });
+$('body').on('click', "[data-target='#alarm-modal']", function () {
+    $.get("../ajax/dashboard.php?task=15", function (data) {
+    $('#latest-alarm-data').html(data);
+    
     });
+});
 
 //after close modal reload page
-    $("#close-alarm-modal").click(function (event) {
-        location.reload();
+$("#close-alarm-modal").click(function(event){
+   location.reload();
 
-    });
+});
 </script>
 
-<?php include('../../includes/footer.php'); ?>
+<?php include('../../includes/footer.php');?>

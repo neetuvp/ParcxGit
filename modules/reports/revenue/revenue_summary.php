@@ -71,21 +71,11 @@ include('../../../includes/sidebar.php');
           </div>
         </div>
       </div>
-      <br>
-    <div class="card">
+      <br>   
       <div class="card-body" id="report-content">   
-	  <?php
-	  $current_date=date("Y-m-d");    
-	  $data["from"]=$current_date." ".DAY_CLOSURE_START;
-	  $data["to"]=$current_date." ".DAY_CLOSURE_END;           
-	  $data["carpark"]="";    
-	  $data["weekdays"]="";		  
-	  $data["language"] = $_SESSION["language"];
-	  $data["task"]=22; 
-	  echo parcxReport($data); 
-	  ?>
+	  
       </div>
-    </div>
+    
 </div>
 </section>
 </div>
@@ -152,7 +142,7 @@ function callReport()
     var jsondata = JSON.stringify(data);     
 	$.post("../../ajax/reports.php",jsondata,function(data)
       {		
-	
+      $("#report-content").addClass("card")    
       $("#report-content").html(data);
       reportSuccess();
       createChart();
@@ -347,7 +337,7 @@ function createChart()
 
 function getChartData() 
   {
-  parking_fee = $("#chart-data").attr('data-parking-fee');
+  parking_fee = $("#chart-data").attr('data-parking-fee');  
   lost_ticket_fee = $("#chart-data").attr('data-lost-ticket');
   product_sale_amount = $("#chart-data").attr('data-product-sale');
   //vat_amount = $("#chart-data").attr('data-vat');

@@ -107,30 +107,13 @@ $(document).ready(function () {
   // get client data for pdf header
   //////////////////////////////
 
-  // var client_name = "test";
-  var client_name = "ubora";
-  // var client_name = "globalVillage";
+ 
+  
+  var logo_url="/parcx/dist/img/pdf-logo/logo_small_white_bg.png";
+  var address_text="";
+  var address_width="";
 
-  /* get logo and address text based on client_name */
-
-  var client
-  var logo_url
-  var address_text
-  var address_width
-
-  $.get('/parcx/clientData.xml', function (data) {
-    $(data).find('data').each(function () {
-
-      client = $(this).find('client').text();
-
-      if (client === client_name) {
-        logo_url = $(this).find('logo').text();
-        address_text = $(this).find('address').text();
-        address_width = $(this).find('addressWidth').text();
-      }
-
-    });
-  });
+ 
 
   function modalHide() {
     setTimeout(function () {
@@ -249,8 +232,7 @@ $(document).ready(function () {
 
         if($(".jspdf-table").attr("id")=="RecordsTable")
           {
-          RecordsTable_length=$('select[name="RecordsTable_length"]').val();
-          console.log(RecordsTable_length);
+          RecordsTable_length=$('select[name="RecordsTable_length"]').val();          
           $('select[name="RecordsTable_length"]')
           .val('-1')
           .trigger('change');   
@@ -382,8 +364,7 @@ $(document).ready(function () {
                   pageCount += 1;
 
                 } else {
-
-                  console.log("graph fits on current pg")
+                  
 
                   // reset offsetValue for positioning
                   // different offsetValue for first page versus other pages due to report header

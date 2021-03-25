@@ -7,6 +7,9 @@ $task=$_GET['task'];
 include('../../classes/dashboard.php');
 $dashboard=new dashboard();
 
+include('../../classes/reporting_valet.php');
+$valet=new reporting_valet();
+
 
 switch($task)
     {
@@ -34,8 +37,7 @@ switch($task)
         break;
 
     case 6:
-        include('../../classes/reporting_valet.php');
-        $valet=new reporting_valet();
+        
         $valet->valet_parking_keydashboard();
         break;    
     case 7:
@@ -49,7 +51,7 @@ switch($task)
         $dashboard->live_revenue();
         break;
 
-    case '.$data["device_number"].':
+    case 11:
         $valet->get_valet_counters();
         break;
 

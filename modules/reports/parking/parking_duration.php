@@ -71,7 +71,7 @@ include('../../../includes/sidebar.php');
       </div>
 
       <div>
-        <div class="card-body p-0" id="report-content">
+        <div class="card-body" id="report-content">
         </div>
       </div>
 
@@ -129,7 +129,7 @@ function callReport()
     //alert(temp);
     $.post("../../ajax/reports.php", temp)
       .done(function (result) {
-
+        $("#report-content").addClass("card");
         $("#report-content").html(result);
 
         reportSuccess();

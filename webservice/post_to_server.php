@@ -3,7 +3,7 @@ ini_set("display_errors","1");
 header("Content-Type: application/json; charset=UTF-8");
 include("../classes/general.php"); 
 $general = new General_Oprations();
-$filename="PostToServer-Webservice";
+$filename="PXDeviceUpload-webservice";
 if($_SERVER['REQUEST_METHOD']=='POST')
 	{
 	$request_ip_address=$_SERVER['REMOTE_ADDR']; 		

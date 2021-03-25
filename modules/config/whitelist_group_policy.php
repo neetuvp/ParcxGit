@@ -17,6 +17,7 @@ include('../../includes/header.php');
     <div class="col tab-header d-flex justify-content-center">
         <div class="tab-link active" data-target="overview">Overview</div>
         <div class="tab-link" data-target="form">Add Policy</div>
+
     </div>
 </div>
 
@@ -29,42 +30,43 @@ include('../../includes/sidebar.php');
     <section class="content">
         <div class="container-wide">        
             <!-- add/update carpark form --> 
-            <form class="block-data card card-body col-md-4" data-status="form" style="display:none;" id="form">                 
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="">Policy name</label>
-                        <input type="text" class="form-control" id="policy_name" placeholder=""  required name="policy_name">
+            <div class="block-data"data-status="form" style="display:none;">
+                 <form class="row card card-body col-md-5 mb-3"   id="form">                 
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="">Policy name</label>
+                            <input type="text" class="form-control" id="policy_name" placeholder=""  required name="policy_name">
+                        </div>
+                    </div>	
+                    <div class="row">	
+                        <div class="col form-group">
+                            <label for="">Description</label>
+                            <input type="text" class="form-control" id="description" >
+                        </div>
                     </div>
-                </div>	
-                <div class="row">	
-                    <div class="col form-group">
-                        <label for="">Description</label>
-                        <input type="text" class="form-control" id="description" >
+                    <div class="row">	
+                        <div class="col form-group">
+                            <label for="">Carpark Name</label>
+                            <select id="carpark" multiple="multiple">                  
+                                <?php echo parcxSettings(array("task" => "12")); ?>
+                            </select>
+                        </div> 
+                        <div class="col form-group">
+                            <label for="">Parking Zone</label>
+                            <select id="parking_zone" multiple="multiple">                           
+                                <?php //echo parcxSettings(array("task" => "36","carpark_number"=>"1")); ?>
+                            </select>
+                        </div>  
                     </div>
-                </div>
-               <div class="row">	
-                    <div class="col form-group">
-                        <label for="">Carpark Name</label>
-                        <select id="carpark" multiple="multiple">                  
-                            <?php echo parcxSettings(array("task" => "12")); ?>
-                        </select>
-                    </div> 
-                   <div class="col form-group">
-                        <label for="">Parking Zone</label>
-                        <select id="parking_zone" multiple="multiple">                           
-                           <?php //echo parcxSettings(array("task" => "36","carpark_number"=>"1")); ?>
-                        </select>
-                    </div>  
-                </div>
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="">Facility Name</label>
-                        <select id="facility">                  
-                            <?php echo parcxSettings(array("task" => "5")); ?>
-                        </select>
-                    </div> 
-                </div>
-                <div class="row">
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="">Facility Name</label>
+                            <select id="facility">                  
+                                <?php echo parcxSettings(array("task" => "5")); ?>
+                            </select>
+                        </div> 
+                    </div>
+                    <div class="row">
                         <div class="col form-group">
                             <label for="">Activation Date</label>
                             <input type="text" class="form-control" id="start_date">
@@ -99,15 +101,37 @@ include('../../includes/sidebar.php');
                             </select>
                         </div>
                     </div>
-                <input type="submit" class="signUp btn btn-block btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
-            </form>
+                    
+                </form>
+                
+                <div id="customer-div" class="row card card-body">
+                    <div class="row mb-3">
+                        <div class="col"><h4>USERS</h4></div>
+                        <div class="col"></h4></div>
+                        <div class="col"><h4>GROUP</h4></div>
+                    </div>
+                    <div class="row" id="add-group-policy">
+                        <div class="col" id="left">
+                            <?php echo parcxWhitelistSettings(array("task" => "12")); ?>
+                            
+                            
+                        </div>
+                        <div class="p-5" >
+                            <input type="button" class="btn  btn-block btn-outline-primary btn-lg" value="Add Users" id="add_user_button"/>
+                            <input type="button" class="btn  btn-block btn-outline-primary btn-lg" value="Remove Users" id="remove_user_button"/>
+                        </div>
+                        <div class="col" id="right"></div>                        
+                    </div>                                                                                                  
+                </div>
+            <input type="submit" class="signUp btn btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
+            </div>
 
-            <!-- carpark table -->         
+            
             <div class="block-data" data-status="overview">
                 <div class="card" >               
                     <div class="card-body">     
                         <table id="RecordsTable" class="table table-blue table-bordered table-striped">                                                
-                            <?php echo parcxWhitelistSettings(array("task"=>"9"));?>
+                            <?php echo parcxWhitelistSettings(array("task" => "9")); ?>
                         </table>
                     </div>                                                  
                 </div>             
@@ -117,39 +141,54 @@ include('../../includes/sidebar.php');
     </section>
 </div>
 <?php include('../../includes/footer.php'); ?>
+
 <script>
     var status;
     var id;
-    var previous_carpark;
-    var previous_facility;
-        function getParkingZone(value)
-            {
-            var data={};
-            data["task"]=36;
-            data["carpark_number"]=$("#carpark").val().toString();
-            var jsondata = JSON.stringify(data);           
-            $.post("../../modules/ajax/settings.php", jsondata, function (result) {                
-              $("#parking_zone").html(result);
-                $('#parking_zone').multiselect({
-                    buttonWidth: '100%',
-                    includeSelectAllOption: true,
-                    selectAllText: "All Parking Zone",
-                    nonSelectedText: 'Select Parking Zone',
-                    selectAllNumber: false,
-                    allSelectedText: "All Parking Zone",
-                });
-                $('#parking_zone').multiselect('rebuild');
-                if(value!="")
-                    {
-                    var array = value.split(",");                               
-                    $("#parking_zone").val(array);            
-                    }
-                $('#parking_zone').multiselect("refresh");
-               });     
-            }
+    var users=$("#left").html();
     
-       function multislect()
-        {
+$("#add_user_button").click(function(){  
+  $('div#left input:checked').each(function() {            
+    $("#right").append('<div class="form-group custom-control custom-checkbox">'+$(this).parents('div').html()+'</div>')    
+     $(this).closest('div').remove();
+    });
+}); 
+
+$("#remove_user_button").click(function(){
+   $('div#right input:checked').each(function() {            
+    $("#left").append('<div class="form-group custom-control custom-checkbox">'+$(this).parents('div').html()+'</div>')    
+     $(this).closest('div').remove();
+    });
+}); 
+
+    function getParkingZone(value)
+    {
+        var data = {};
+        data["task"] = 36;
+        data["carpark_number"] = $("#carpark").val().toString();
+        var jsondata = JSON.stringify(data);
+        $.post("../../modules/ajax/settings.php", jsondata, function (result) {
+            $("#parking_zone").html(result);
+            $('#parking_zone').multiselect({
+                buttonWidth: '100%',
+                includeSelectAllOption: true,
+                selectAllText: "All Parking Zone",
+                nonSelectedText: 'Select Parking Zone',
+                selectAllNumber: false,
+                allSelectedText: "All Parking Zone",
+            });
+            $('#parking_zone').multiselect('rebuild');
+            if (value != "")
+            {
+                var array = value.split(",");
+                $("#parking_zone").val(array);
+            }
+            $('#parking_zone').multiselect("refresh");
+        });
+    }
+
+    function multislect()
+    {
         $('#carpark').multiselect({
             buttonWidth: '100%',
             includeSelectAllOption: true,
@@ -158,7 +197,7 @@ include('../../includes/sidebar.php');
             selectAllNumber: false,
             allSelectedText: "All Carparks",
         });
-                                    
+
         $('#days').multiselect({
             buttonWidth: '100%',
             includeSelectAllOption: true,
@@ -179,39 +218,40 @@ include('../../includes/sidebar.php');
 
 
         // select all on load
-//        var multiselectElements = ['#days', '#time-slots', '#carpark']
-//
-//        for (var i in multiselectElements) {
+        var multiselectElements = ['#days', '#time-slots', '#carpark']
+
+        for (var i in multiselectElements) {
 //            $(multiselectElements[i] + " option").each(function () {
 //                this.selected = true;
 //            });
-//            $(multiselectElements[i]).multiselect("refresh");
-//        }
+            $(multiselectElements[i]).multiselect("refresh");
+        }
     }
-    
+var formElement = $("#form");
+
     $(document).ready(function ()
     {
-    multislect();    
-    getParkingZone("");    
-    $('#start_date,#expiry_date').daterangepicker({
-        timePicker: false,
-        timePickerIncrement: 10,
-        format: 'YYYY-MM-DD',
-        singleDatePicker: true,
-    })
-        
-    $('#RecordsTable').DataTable(
-        {
-        "paging": true,
-        "lengthChange":true,
-        "searching": true,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
-        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        "aaSorting": []
+        multislect();
+        getParkingZone("");
+        $('#start_date,#expiry_date').daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 10,
+            format: 'YYYY-MM-DD',
+            singleDatePicker: true,
+        })
 
-        });  
+        $('#RecordsTable').DataTable(
+                {
+                    "paging": true,
+                    "lengthChange": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    "aaSorting": []
+
+                });
         $("* [data-target]").on('click', function ()
         {
             var $target = $(this).data('target');
@@ -220,6 +260,8 @@ include('../../includes/sidebar.php');
                 $("#form").trigger('reset');
                 $("#add-edit-button").val("Submit");
                 multislect();
+                $("#left").html(users);
+                $("#right").html("");
             }
             $('.block-data').css('display', 'none');
             $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
@@ -228,11 +270,11 @@ include('../../includes/sidebar.php');
         });
 
         $("#carpark").on("change", function () {
-            getParkingZone("");  
+            getParkingZone("");
         });
 
         //FormSubmit
-        var formElement = $("#form");
+        
         var rules_set = {};
 
         formElement.find('input[type=text]').each(function ()
@@ -247,38 +289,48 @@ include('../../includes/sidebar.php');
             errorPlacement: function (error, element) {
                 error.addClass("text-danger");
                 error.insertAfter(element);
-            },
-            submitHandler: function ()
+            }           
+        });
+
+    });
+    $("#add-edit-button").click(function(){        
+        if(formElement.valid()==true)
+            formSubmit();
+    });
+    
+    function formSubmit()
             {
                 var data = {};
-                if ($("#add-edit-button").val() == "Submit")                
-                    data["id"] = "";                   
-                else                
+                if ($("#add-edit-button").val() == "Submit")
+                    data["id"] = "";
+                else
                     data["id"] = id;
-                    
+
                 data["policy_name"] = $("#policy_name").val();
                 data["description"] = $("#description").val();
                 data["facility_number"] = $("#facility").val();
-                data["carpark_number"] = $("#carpark").val().toString();                
-                data["parking_zone"] = $("#parking_zone").val().toString();                
+                data["carpark_number"] = $("#carpark").val().toString();
+                data["parking_zone"] = $("#parking_zone").val().toString();
                 data["validity_days"] = $("#days").val().toString();
                 data["validity_timeslot"] = $("#time-slots").val().toString();
                 data["start_date"] = $("#start_date").val();
                 data["expiry_date"] = $("#expiry_date").val();
                 data["task"] = "8";
                 
-                var jsondata = JSON.stringify(data);
+                var selected = [];
+                $('div#right input').each(function() {    
+                    selected.push($(this).attr('id'));
+                });                
+                data["users"]=selected.toString();
+                var jsondata = JSON.stringify(data);  
                 console.log(jsondata);
                 $.post("../../modules/ajax/whitelist.php", jsondata, function (result) {
                     if (result == "Successfull")
                         location.reload();
                     else
                         alert(result);
-                });                        
+                });
             }
-        });
-
-    });
 
     /* === enable disable product === */
     var status;
@@ -316,17 +368,20 @@ include('../../includes/sidebar.php');
         $.post("../../modules/ajax/whitelist.php", jsondata, function (result) {
             $('.block-data[data-status="overview"]').hide();
             $('.block-data[data-status="form"]').show();
-            $('.tab-link').removeClass('active');            
-            var response = JSON.parse(result);                                       
-                
+            $('.tab-link').removeClass('active');
+            $("#left").html(users);
+            $("#right").html("");   
+            
+            var response = JSON.parse(result);
+
             $("#policy_name").val(response.policy_name);
             $("#description").val(response.description);
             $("#facility").val(response.facility_number);
-            
-            
+
+
             $("#start_date").val(response.start_date);
             $("#expiry_date").val(response.expiry_date);
-            
+
             var array = response.validity_days.split(",");
             $("#days").val(array);
             $('#days').multiselect('refresh');
@@ -334,17 +389,25 @@ include('../../includes/sidebar.php');
             array = response.validity_timeslot.split(",");
             $("#time-slots").val(array);
             $('#time-slots').multiselect('refresh');
-            
+
             array = response.carpark_number.split(",");
             $("#carpark").val(array);
-            $('#carpark').multiselect('refresh');
+            $("#carpark").multiselect('refresh');
             
-            getParkingZone(response.parking_zone);            
             
-            $("#add-edit-button").val("Edit");  
+            array=response.users.split(",");
+            for(var i=0;i<array.length;i++)
+                {                
+                $("#"+array[i]).prop('checked', true);
+                }            
+            $("#add_user_button").click();
             
+            getParkingZone(response.parking_zone);
+
+            $("#add-edit-button").val("Edit");
+
         });
-                
+
     });
 
 </script>

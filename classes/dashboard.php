@@ -56,7 +56,7 @@ class dashboard {
             mysqli_close($con);
         }
         return $data;
-    }
+    }  
 
     function live_revenue() {
         $con = $this->db_connect();
@@ -255,6 +255,8 @@ class dashboard {
     }
 
 // End Function . Live Revenue 
+
+
 
     function revenue_lastdays() {
         $con = $this->db_connect_reporting();

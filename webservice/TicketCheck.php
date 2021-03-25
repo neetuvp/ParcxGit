@@ -3,7 +3,7 @@ ini_set("display_errors","1");
 header("Content-Type: application/json; charset=UTF-8");
 include("../classes/general.php"); 
 $general = new General_Oprations();
-$filename="TicketCheck-Webservice";
+$filename="PXTicketCheck-webservice";
 $request_ip_address=$_SERVER['REMOTE_ADDR']; 
 //$request_proxy_ip_address=$_SERVER['HTTP_X_FORWARDED_FOR'];// To be logged 	
 

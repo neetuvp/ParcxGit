@@ -1,6 +1,7 @@
 <?php            	        
-$data["user_role_id"]="105"; 
-$data["task"]=4;                          
+$data["user_name"]="parcx";
+$data["password"]="Parcx123!"; 
+$data["task"]=12;                          
 $r=parcxUserManagement($data);
 if(is_array($r))
 print_r($r);

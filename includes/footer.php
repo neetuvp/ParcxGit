@@ -26,13 +26,14 @@ $(document).ready(function ()
         });        
     
     if($("#report-content").find('#RecordsTable').length!=0) 
-        loadDataTable();    
+       loadDataTable();    
     });
              
                               
   // button ui changes on successful report load
   function loadReport(data)
       {
+      
       $("#report-content").html(data);
       $("#loader").css("visibility", "hidden");       
       if($("#report-content").find('table').length!=0)
@@ -49,7 +50,7 @@ $(document).ready(function ()
       }
 
   function reportSuccess() 
-    {    
+    {     
     $("#action-buttons").css("visibility", "visible");
     $("#loader").css("visibility", "hidden");      
     if($("#report-content").find('#RecordsTable').length!=0) 
@@ -59,7 +60,7 @@ $(document).ready(function ()
 
 
 function loadDataTable()
-    {    
+    {      
     $('#RecordsTable').DataTable(
         {
         "paging": true,
@@ -146,10 +147,10 @@ function loadheadingreport(label)
 <script src="<?=URL?>dist/js/parcx.js"></script>
 
 <!-- PDF export -->
-<script src="<?=URL?>dist/js/plugins/jspdf/canvas2image.js"></script>
-<script src="<?=URL?>dist/js/plugins/jspdf/html2canvas.js"></script>
-<script src="<?=URL?>dist/js/plugins/jspdf/jspdf.1.5.3.js"></script>
-<script src="<?=URL?>dist/js/plugins/jspdf/jspdf.autotable.js"></script>
+<script src="<?=URL?>plugins/jspdf/canvas2image.js"></script>
+<script src="<?=URL?>plugins/jspdf/html2canvas.js"></script>
+<script src="<?=URL?>plugins/jspdf/jspdf.1.5.3.js"></script>
+<script src="<?=URL?>plugins/jspdf/jspdf.autotable.js"></script>
 
  <!-- DataTables -->
  <script src="<?=URL?>plugins/datatables/jquery.dataTables.js"></script>
@@ -171,7 +172,7 @@ function loadheadingreport(label)
 <!--validation-->
 <script src="<?=URL?>dist/js/jquery.validate.js"></script>
 
-<!-- init daterangepicker // before pdf export -->
+<!-- init daterangepicker -->
 <script src="<?=URL?>dist/js/init-daterangepicker.js"></script>
 
 <!-- export scripts -->
@@ -179,8 +180,8 @@ function loadheadingreport(label)
 <script src="<?=URL?>dist/js/pdf-export.js"></script>
 
 <!-- application scripts --> 
-<script src="<?=URL?>dist/js/alertModule.js"></script>
-<script src="<?=URL?>dist/js/counter.js"></script>
+<!--<script src="<?=URL?>dist/js/alertModule.js"></script>-->
+<!--<script src="<?=URL?>dist/js/counter.js"></script>-->
 <script src="<?=URL?>dist/js/validationUsers.js"></script>
 <script src="<?=URL?>dist/js/configuration.js"></script>
 </body>
