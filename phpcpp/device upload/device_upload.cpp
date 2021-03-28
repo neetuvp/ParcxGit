@@ -533,8 +533,15 @@ Php::Value UploadPayments(Php::Value request) {
             string coupon_category = request[i]["coupon_category"];
             string coupon_source = request[i]["coupon_source"];
             string payment_type = request[i]["payment_type"];
+            
             string validation_value = request[i]["validation_value"];
             string validation_id = request[i]["validation_id"];
+            string validator_id=request[i]["validator_id"];
+            string validation_type=request[i]["validation_type"];
+            
+            
+            
+                    
             string balance_returned = request[i]["balance_returned"];
             string credit_note = request[i]["credit_note"];
             string bank_notes = request[i]["bank_notes"];
@@ -543,7 +550,42 @@ Php::Value UploadPayments(Php::Value request) {
             string entry_plate_number = request[i]["entry_plate_number"];
             string exit_plate_number = request[i]["exit_plate_number"];            
             string wallet_points = request[i]["wallet_points"];  
-            int operation_type= request[i]["operation_type"];  
+            int operation_type= request[i]["operation_type"]; 
+            
+            if(validator_id!="")
+                {
+                string offline_validator_id,offline_validation_type,offline_validation_value;
+                istringstream ss_id(validator_id);
+                istringstream ss_type(validation_type);
+                istringstream ss_value(validation_value);
+                sql::ResultSet *res;
+                validation_id="";
+                string v_id;
+                        
+                while(getline(ss_id, offline_validator_id, ',')) 
+                    {
+                    getline(ss_type, offline_validation_type, ',');
+                    getline(ss_value, offline_validation_value, ',');
+                    
+                    if (offline_validation_type == "1")
+                        offline_validation_type = "Time Value";
+                    if (offline_validation_type == "2")
+                        offline_validation_type = "Percentage Value";
+                    
+                    offline_validation_value=offline_validation_value.substr(0, offline_validation_value.size()-1); 
+                    
+                    query = "INSERT into parking_validation(product_name,carpark_number,carpark_name,facility_number,ticket_id,validation_value,validation_type,validator_id,date_time)VALUES('Offline'," + carpark_number + ",'" + carpark_name + "'," + facility_number + ",'" + ticket_id + "'," + offline_validation_value + ",'" + offline_validation_type + "','" + offline_validator_id + "',CURRENT_TIMESTAMP)";
+                    result = stmt->executeUpdate(query);
+                    query="SELECT LAST_INSERT_ID() as id";
+                    res = stmt->executeQuery(query);
+                    if(res->next())
+                        v_id=res->getString("id"); 
+                    validation_id=v_id+","+validation_id;
+                    delete res;
+                    }
+                validation_id=validation_id.substr(0, validation_id.size()-1);                
+                }
+            
             if(operation_type==4)
                 {
                 query="update valet_parking set paid_status=1,payment_date_time='"+payment_date_time+"' where ticket_number='"+ticket_id+"'";
@@ -563,7 +605,7 @@ Php::Value UploadPayments(Php::Value request) {
             else
                 {
                 query = "INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,operator_id,operator_name,shift_id,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,lost_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,gross_amount,amount_received,discount_id,discount_category,discount_name,coupon_id,coupon_category,coupon_source,payment_type,validation_value,validation_id,receipt_number,bank_notes,balance_returned,credit_note,authentication_code,entry_plate_number,exit_plate_number,wallet_points)VALUES('" + device_number + "','" + device_name + "'," + carpark_number + ",'" + carpark_name + "','" + facility_number + "'," + operator_id + ",'" + operator_name + "','" + shift_id + "','" + parking_rate_label + "','" + parking_rate_name + "','" + entry_grace_period + "','" + exit_grace_period + "','" + vat_type + "','" + vat_percentage + "','" + ticket_id + "'," + entry_date_time + ",'" + payment_date_time + "'," + max_exit_date_time + ",'" + parking_duration + "','" + payment_category + "','" + parking_fee + "','" + vat_amount + "','" + lost_fee + "','" + admin_fixed_charges + "','" + ticket_replacement_fee + "','" + discount_amount + "','" + gross_amount + "','" + amount_received + "','" + discount_id + "','" + discount_category + "','" + discount_name + "','" + coupon_id + "','" + coupon_category + "','" + coupon_source + "','" + payment_type + "','" + validation_value + "','" + validation_id + "','" + receipt_number + "','" + bank_notes + "','" + balance_returned + "','" + credit_note + "','" + authentication_code + "','" + entry_plate_number + "','" + exit_plate_number + "'," + wallet_points + ")";
-                result = stmt->executeUpdate(query);
+                result = stmt->executeUpdate(query);                
 
                 if (result == 1) {
                     jsonresponse[i] = id;

@@ -256,6 +256,11 @@ label:not(.form-check-label):not(.custom-file-label) {
   color: #333;
   padding: 0.9rem 1rem !important;
 }
+#device-status-block .card-header {
+  background: white;
+  color: #333;
+  padding: 0.9rem 1rem !important;
+}
 
 [data-status="block-view"] .card-text {
   border: none !important;

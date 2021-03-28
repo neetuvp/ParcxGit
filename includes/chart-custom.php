@@ -1,5 +1,5 @@
-<script src="<?=URL?>dist/js/plugins/chartjs/chart.min.js"></script>
-<script src="<?=URL?>dist/js/plugins/chartjs/custom-graphs.js"></script>
+<script src="<?=URL?>plugins/chartjs/chart.min.js"></script>
+<script src="<?=URL?>plugins/chartjs/custom-graphs.js"></script>
 
 <script>
     //////////////////////////////

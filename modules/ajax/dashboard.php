@@ -107,6 +107,15 @@ switch($task)
     case 21:
         $dashboard->UpdateOccupancyFacilityCounters();
         break;
+    case 22:
+       $dashboard->get_device_status_by_facility();
+       break;
+    case 23:
+       $dashboard->get_device_status_by_carpark($_GET['facility_number']);
+       break;
+    case 24:        
+       $dashboard->get_device_status_by_device($_GET['facility_number'],$_GET['carpark_number']);
+       break;
     } // End Switch 
 
 exit();
