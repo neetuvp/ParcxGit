@@ -1035,3 +1035,10 @@ color:#ffffff;
     margin:7px 0 0 0;
     padding:5px;
 }
+
+#latest-alarm-data,#alarm-data
+{
+  /* min-height: 10px;
+  max-height:400px;
+  overflow-y: auto; */
+}

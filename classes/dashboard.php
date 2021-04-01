@@ -359,9 +359,9 @@ class dashboard {
 
 // End . alarms
 
-    function getDeviceAlarmscount($device, $alarmseverity1, $alarmseverity2) {
+    function getDeviceAlarmscount($facility_number,$carpark_number,$device, $alarmseverity1, $alarmseverity2) {
         $con = $this->db_connect_reporting();
-        $query_string = "select * from watchdog_device_alarms where device_number='" . $device . "' and alarm_severity between
+        $query_string = "select * from watchdog_device_alarms where device_number='" . $device . "' and facility_number=".$facility_number." and carpark_number=".$carpark_number." and alarm_severity between
         " . $alarmseverity1 . " and " . $alarmseverity2 . " and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -7 DAY)";
         //echo $query_string;
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
@@ -374,20 +374,26 @@ class dashboard {
     
     function get_alarm_count($facility,$carpark,$device, $alarmseverity1, $alarmseverity2) {
         $con = $this->db_connect_reporting();
-        $query_string = "select count(*) as count from watchdog_device_alarms where facility_number='" . $facility . "'";
+        $query_string = "select count(*) as count from watchdog_device_alarms where alarm_severity between " . $alarmseverity1 . " and " . $alarmseverity2 . " and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -7 DAY)";
+        
+        if($facility>0)
+            $query_string.=" and facility_number='" . $facility . "'";
         if($carpark>0)
             $query_string.=" and carpark_number=".$carpark;
         if($device>0)
-            $query_string.=" and device_number=".$device;
-        $query_string .=" and alarm_severity between " . $alarmseverity1 . " and " . $alarmseverity2 . " and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -7 DAY)";        
+            $query_string.=" and device_number in (".$device.")";
+        
+        //echo $query_string."<br>";
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         if ($data = mysqli_fetch_assoc($result))                  
             $rows = $data["count"];
+        
+        //echo $rows."<br>";
         mysqli_close($con);
         return $rows;
     }
 
-    function getLatestAlarmsCount() {
+    function get_latest_alarms_count() {
         $con = $this->db_connect_reporting();
         $query_string = "select * from watchdog_device_alarms where alarm_severity between 1 and 10 and dismiss=0 and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -7 DAY)";
         //echo $query_string;
@@ -398,7 +404,7 @@ class dashboard {
         echo $rows;
     }
 
-    function dismissAlarm($id) {
+    function dismiss_alarm($id) {
         $con = $this->db_connect_reporting();
         $query_string = "update watchdog_device_alarms set dismiss=1 where id=" . $id;
         //echo $query_string;
@@ -406,49 +412,75 @@ class dashboard {
         mysqli_close($con);
     }
 
-    function getAlarmList($device) {
+    function get_alarm_list($data) {
+        $device=$data["device_number"];
+        $carpark=$data["carpark_number"];
+        $facility=$data["facility_number"];
+        
         $con = $this->db_connect_reporting();
-        $query_string = "select * from watchdog_device_alarms where device_number='" . $device . "' and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -5 DAY)";
-        //echo $query_string;
+        $query_string = "select * from watchdog_device_alarms where alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL - 7 DAY)";       
+        if($facility>0)
+            $query_string.=" and facility_number='" . $facility . "'";
+        if($carpark>0)
+            $query_string.=" and carpark_number=".$carpark;
+        if($device>0)
+            $query_string.=" and device_number in (".$device.")";
+            
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $htmldata = "";
         if (mysqli_num_rows($result) > 0) {
-            $htmldata .= '<tbody>';
-            $htmldata .= '<tr class="card-header d-flex justify-content-between align-items-center">';
-            $htmldata .= '<th class="col">Alarm Severity</th>';
-            $htmldata .= '<th class="col">Report Date</th>';
-            $htmldata .= '<th class="col">Alarm code</th>';
-            $htmldata .= ' <th class="col">Description</th>';
-            $htmldata .= ' <th class="col">Comment</th>';
+            
+            $htmldata .= '<table id="RecordsTable" class="table table-blue table-bordered jspdf-table">';
+            $htmldata .= '<thead><tr>';            
+            if($device==0)                
+                $htmldata .= ' <th>Device name</th>';
+            $htmldata .= '<th>Alarm Severity</th>';            
+            $htmldata .= '<th>Report Date</th>';
+            $htmldata .= '<th>Alarm code</th>';
+            $htmldata .= ' <th>Description</th>';
+            $htmldata .= ' <th>Comment</th>';
+            
+            $htmldata .= ' <th></th>';
+                
             $htmldata .= '</tr>';
-            $htmldata .= '</tbody>';
-            $htmldata .= '<tbody class="table-view">';
-        }
-        while ($data = mysqli_fetch_assoc($result)) {
-            $htmldata .= '<tr class="card-text d-flex justify-content-between align-items-center">';
-            $htmldata .= '<td class="col">';
+            $htmldata .= '</thead>';
+            $htmldata .= '<tbody>';
+        
+        
+        while ($data = mysqli_fetch_assoc($result)) {   
+            if($device==0)                
+                $htmldata .= '<td>' . $data["device_name"] . '</td>';
+            $htmldata .= '<td>';
             $button = "";
-            if ($data["alarm_severity"] < 10)
+            if ($data["alarm_severity"] < 6)
                 $button = "danger";
-            if (($data["alarm_severity"] >= 10))
+            if (($data["alarm_severity"] >= 6))
                 $button = "warning";
             $htmldata .= '<div class="dot-indicator bg-' . $button . '-gradient"></div>' . $data["alarm_severity"] . '
             </td>';
-            $htmldata .= '<td class="col">' . $data["alarm_date_time"] . '</td>';
-            $htmldata .= '<td class="col">' . $data["alarm_code"] . '</td>';
-            $htmldata .= '<td class="col">' . $data["alarm_description"] . '</td>';
+            $htmldata .= '<td>' . $data["alarm_date_time"] . '</td>';
+            $htmldata .= '<td>' . $data["alarm_code"] . '</td>';
+            $htmldata .= '<td>' . $data["alarm_description"] . '</td>';
             $dismiss = "";
             if ($data["dismiss"] == 1)
                 $dismiss = "Dismissed";
-            $htmldata .= '<td class="col">' . $dismiss . '</td>';
+            $htmldata .= '<td>' . $dismiss . '</td>';   
+            if ($data["dismiss"] == 1)
+                $htmldata .= ' <td></td>';
+            else
+                $htmldata .= ' <td><button type="button" class="btn btn-danger btn-dismis-alarm" id="' . $data["id"] . '">Dismiss</button></td>';
+                
             $htmldata .= ' </tr>';
         }
-        $htmldata .= '</tbody>';
+        $htmldata .= '</tbody></table>';
+        }
+       else
+            $htmldata="<strong>No alarms</strong>";
         mysqli_close($con);
         echo $htmldata;
     }
 
-    function getLatestAlarmList() {
+    function get_latest_alarm_list($data) {
         $con = $this->db_connect_reporting();
         $query_string = "select * from watchdog_device_alarms where alarm_severity between 1 and 10 and dismiss=0 and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -7 DAY) order by alarm_date_time desc";
         //echo $query_string;
@@ -470,9 +502,9 @@ class dashboard {
             $htmldata .= '<tr class="card-text d-flex justify-content-between align-items-center">';
             $htmldata .= '<td class="col">';
             $button = "";
-            if ($data["alarm_severity"] < 10)
+            if ($data["alarm_severity"] < 5)
                 $button = "danger";
-            if (($data["alarm_severity"] >= 10))
+            if (($data["alarm_severity"] >= 5))
                 $button = "warning";
             $htmldata .= '<div class="dot-indicator bg-' . $button . '-gradient"></div>' . $data["alarm_severity"] . '
             </td>';
@@ -494,7 +526,7 @@ class dashboard {
         $html="";
         $facility_number=0;
         $con = $this->db_connect();
-        $query_string = "select distinct facility_number,facility_name from watchdog_device_status order by facility_number";        
+        $query_string = "select facility_number,facility_name from watchdog_device_status group by facility_number";        
         $facility_result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $rows=mysqli_num_rows($facility_result);        
         if ($rows > 0) 
@@ -503,7 +535,7 @@ class dashboard {
                 {
                 $facility_number=$facility["facility_number"];
                 $facility_name=$facility["facility_name"];
-                if($rows>1)
+                //if($rows>1)
                     {
                     $query_string ="select count(*) as devices,count(distinct carpark_number) as carparks from watchdog_device_status where facility_number=".$facility_number;
                     $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
@@ -549,13 +581,13 @@ class dashboard {
                     $html.='<b>Alarms</b>'; 
                     $html.='<a class="float-right">';
                     $html.='<span class="nav-link p-1">';
-                    $html.='<span class="fa-stack fa-1x" >';
+                    $html.='<span class="fa-stack fa-1x" title="warnings">';
                     $html.='<i class="fa fa-circle fa-stack-2x text-warning"></i>';
-                    $html.='<strong class="fa-stack-1x text-dark">'.$this->get_alarm_count($facility_number,0,0,11,20).'</strong>';
+                    $html.='<strong class="fa-stack-1x text-dark">'.$this->get_alarm_count($facility_number,0,0,6,20).'</strong>';
                     $html.='</span>';
-                    $html.='<span class="fa-stack fa-1x">';
+                    $html.='<span class="fa-stack fa-1x" title="critical alarms">';
                     $html.='<i class="fa fa-circle fa-stack-2x text-danger"></i>';
-                    $html.='<strong class="fa-stack-1x text-white">'.$this->get_alarm_count($facility_number,0,0,0,10).'</strong>';
+                    $html.='<strong class="fa-stack-1x text-white">'.$this->get_alarm_count($facility_number,0,0,0,5).'</strong>';
                     $html.='</span></span></a></li></ul>';
 
                     $html.='<button type="button" class="show-facility-details btn btn-block bg-secondary-gradient" facility_number="'.$facility_number.'">More <i class="fa fa-arrow-circle-right"></i></button>';
@@ -565,10 +597,6 @@ class dashboard {
                 }
             }
         mysqli_close($con);   
-        if($rows==1)
-            $this->get_device_status_by_carpark($facility_number);
-        else
-            echo "<input type='hidden' id='current_level' value='facility'>";
         
         }
         
@@ -577,7 +605,7 @@ class dashboard {
         $carpark_number=0;
         $html="";
         $con = $this->db_connect();
-        $query_string = "select distinct carpark_number,carpark_name from watchdog_device_status where facility_number=".$facility_number." order by carpark_number";
+        $query_string = "select carpark_number,carpark_name from watchdog_device_status where facility_number=".$facility_number." group by carpark_number";
         $carpark_result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $rows=mysqli_num_rows($carpark_result);        
         if ($rows > 0) 
@@ -586,7 +614,7 @@ class dashboard {
                 {
                 $carpark_number=$carpark["carpark_number"];
                 $carpark_name=$carpark["carpark_name"];    
-                if($rows>1)
+                //if($rows>1)
                     {
                     $query_string ="select count(*) as devices from watchdog_device_status where facility_number=".$facility_number." and carpark_number=".$carpark_number;
 
@@ -625,41 +653,33 @@ class dashboard {
                     $html.='<span class="fa-stack fa-1x" title="Offline">';
                     $html.='<i class="fa fa-circle fa-stack-2x text-danger"></i>';
                     $html.='<strong class="fa-stack-1x text-white">'.$offline.'</strong>';
-                    $html.='</span></span></a></li>';
-
-                    $html.='<li class="list-group-item">';                                    
-                    $html.='<b>Alarms</b>'; 
-                    $html.='<a class="float-right">';
-                    $html.='<span class="nav-link p-1">';
-                    $html.='<span class="fa-stack fa-1x" >';
-                    $html.='<i class="fa fa-circle fa-stack-2x text-warning"></i>';
-                    $html.='<strong class="fa-stack-1x text-dark">'.$this->get_alarm_count($facility_number,$carpark_number,0,11,20).'</strong>';
-                    $html.='</span>';
-                    $html.='<span class="fa-stack fa-1x">';
-                    $html.='<i class="fa fa-circle fa-stack-2x text-danger"></i>';
-                    $html.='<strong class="fa-stack-1x text-white">'.$this->get_alarm_count($facility_number,$carpark_number,0,0,10).'</strong>';
-                    $html.='</span></span></a></li>';
+                    $html.='</span></span></a></li>';                  
 
                     $online='<div class="dot-indicator bg-success-gradient"  title="Online"></div>';
                     $offline='<div class="dot-indicator bg-danger-gradient"  title="Offline"></div>';
 
-                    $query_string ="select device_number,device_name,device_network_status from watchdog_device_status where facility_number=".$facility_number." and carpark_number=".$carpark_number;
+                    $query_string ="SELECT group_concat(device_number)device_number,group_concat(device_network_status)device_network_status,device_type FROM watchdog_device_status where facility_number=".$facility_number." and carpark_number=".$carpark_number." group by device_type";                    
                     $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+                    
                     while($data = mysqli_fetch_assoc($result)) 
-                        {                          
-                        $status=$offline;
-                        if($data["device_network_status"]==1)
-                            $status=$online;                    
-
-                        $html.='<li class="list-group-item"><b>'.$status.''.$data["device_name"].'</b><a class="float-right">';
+                        {                                  
+                        $category =$this->get_device_category_name($data["device_type"]);
+                        $n_status = explode(',', $data["device_network_status"]);                       
+                        if (in_array("0", $n_status))                        
+                            $status=$offline;
+                        else
+                            $status=$online; 
+                            
+                                           
+                        $html.='<li class="list-group-item"><b>'.$status.''.$category.'</b><a class="float-right">';
                         $html.='<span class="nav-link p-1">';
-                        $html.='<span class="fa-stack fa-1x" >';
+                        $html.='<span class="fa-stack fa-1x" title="warnings">';
                         $html.='<i class="fa fa-circle fa-stack-2x text-warning"></i>';
-                        $html.='<strong class="fa-stack-1x text-dark">'.$this->get_alarm_count($facility_number,$carpark_number,$data["device_number"],11,20).'</strong>';
+                        $html.='<strong class="fa-stack-1x text-dark">'.$this->get_alarm_count($facility_number,$carpark_number,$data["device_number"],6,20).'</strong>';
                         $html.='</span>';
-                        $html.='<span class="fa-stack fa-1x">';
+                        $html.='<span class="fa-stack fa-1x" title="critical alarms">';
                         $html.='<i class="fa fa-circle fa-stack-2x text-danger"></i>';
-                        $html.='<strong class="fa-stack-1x text-white">'.$this->get_alarm_count($facility_number,$carpark_number,$data["device_number"],0,10).'</strong>';
+                        $html.='<strong class="fa-stack-1x text-white">'.$this->get_alarm_count($facility_number,$carpark_number,$data["device_number"],0,5).'</strong>';
                         $html.='</span></span>';
                         $html.='</a></li>';
                         }
@@ -671,80 +691,19 @@ class dashboard {
                     echo $html;
                     }
                 }
+            echo "<input type='hidden' value='".$this->get_alarm_count($facility_number,0,0, 0,20)."' id='alarm_count'>";
             }
         mysqli_close($con);          
-        if($rows==1)
-            $this->get_device_status_by_device($facility_number,$carpark_number);
-        else
-            echo "<input type='hidden' id='current_level' facility_number='".$facility_number."' value='carpark'>";
+//        if($rows==1)
+//            $this->get_device_status_by_device($facility_number,$carpark_number);
+//        else
+//            echo "<input type='hidden' id='current_level' facility_number='".$facility_number."' value='carpark'>";
         }
         
-    function get_device_status_by_device($facility_number,$carpark_number)
+    function get_device_category_name($device_type)
         {
-        
-        $con = $this->db_connect();
-        $query_string = "select * from watchdog_device_status where facility_number=".$facility_number." and carpark_number=".$carpark_number." order by device_type,device_number";
-        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
-
-        while ($data = mysqli_fetch_assoc($result)) {
-            $html_data="";
-            $data_status = "all";
-
-            if ($data["device_type"] == 1 || $data["device_type"] == 2) {
-                $data_status = "columns";
-                $image_url = "/parcx/dist/img/icon/device_icons/column.png";
-                $data_img = "column";
-            } else if ($data["device_type"] == 3) {
-                $data_status = "payment_machines";
-                $image_url = "/parcx/dist/img/icon/device_icons/cashier-pos.png";
-                $data_img = "cashier-pos";
-            } else if ($data["device_type"] == 5) {
-                $data_status = "payment_machines";
-                $image_url = "/parcx/dist/img/icon/device_icons/handheld-pos.png";
-                $data_img = "handheld-pos";
-            } else if ($data["device_type"] == 4) {
-                $data_status = "payment_machines";
-                $image_url = "/parcx/dist/img/icon/device_icons/payment-machine.png";
-                $data_img = "payment-machine";
-            } else if ($data["device_type"] == 6 || $data["device_type"] == 7) {
-                $data_status = "controllers";
-                $image_url = "/parcx/dist/img/icon/device_icons/controller.png";
-                $data_img = "controller";
-            } else if ($data["device_type"] == 8) {
-                $data_status = "camera";
-                $image_url = "/parcx/dist/img/icon/device_icons/cctv.png";
-                $data_img = "cctv";
-            } else if ($data["device_type"] == 9) {
-                $data_status = "vms";
-                $image_url = "/parcx/dist/img/icon/device_icons/vms.png";
-                $data_img = "vms";
-            }
-
-            $html_data .= '<div class="col-lg-3 col-md-6 block-data" data-img="' . $data_img . '" data-status="' . $data_status . '" data-toggle="modal" data-target="#error-log-modal">';
-            // $html_data .= '<div class="card card-danger card-outline">';
-
-            $html_data .= '<div class="card">';
-
-            $html_data .= '<div class="card-header">';
-            $html_data .= '<div class="nav-item d-flex justify-content-between align-items-center">';
-
-            $html_data .= '<h3 class="card-title">' . $data["device_name"] . '</h3>';
-            $html_data .= '<span>';
-
-            if ($data["device_network_status"] == 1) {
-                $html_data .= '<span class="float-right ml-3 header-icon">';
-                $html_data .= '<i class="fas fa-server text-success" data-toggle="tooltip" data-placement="top" data-original-title="Server Connectivity"></i>';
-                $html_data .= '</span>';
-                $html_data .= '</span>';
-            } else {
-                $html_data .= '<span class="float-right ml-3 header-icon">';
-                $html_data .= '<i class="fas fa-server text-danger" data-toggle="tooltip" data-placement="top" data-original-title="Server Connectivity"></i>';
-                $html_data .= '</span>';
-                $html_data .= '</span>';
-            }
-
-            $category = "";
-            switch ($data["device_type"]) {
+        $category="";
+        switch ($device_type) {
                 case 1:
                     $category = "Entry Column";
                     break;
@@ -773,14 +732,126 @@ class dashboard {
                     $category = "VMS";
                     break;
             }
+        return $category;    
+        }
+        
+    function device_details($data)
+    {          
+        $device_number=$data["device_number"];
+        $carpark_number=$data["carpark_number"];
+        $facility_number=$data["facility_number"];
+        $category=$data["device_category"];
+        $con=$this->db_connect();
+        if($con!=NULL)
+            {            
+            $sql="select * from watchdog_device_status where device_number=".$device_number." and facility_number=".$facility_number." and carpark_number=".$carpark_number;
+            $result = $con->query($sql);
 
+
+            $html_data='';
+
+            if($data = mysqli_fetch_array($result)) 
+                {                                   
+                $html_data.='<h4 class="mb-3">'.$data["device_name"].'</h4>';
+                $html_data.='<p><strong>Category: </strong>'.$category.'</p>';
+                $html_data.='<p><strong>Device number: </strong>'.$data["device_number"].'</p>'; 
+                $html_data.='<p><strong>IP Address: </strong>'.$data["device_ip"].'</p>'; 
+                if($data["device_type"]==1 || $data["device_type"]==2){
+                    if($data["presence_loop_status"]==1)
+                        $html_data.='<p><strong>Presence loop status: </strong><span class="dot-indicator bg-success-gradient" data-toggle="tooltip" data-placement="top" title="Active"></span></p>';
+                    else
+                    $html_data.='<p><strong>Presence loop status: </strong><span class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="Deactive"></span></p>';
+
+                    $html_data.='<p><strong>Last presence loop active: </strong>'.$data["last_presence_loop_active"].'</p>';
+                    $html_data.='<p><strong>Last presence loop deactive: </strong>'.$data["last_presence_loop_deactive"].'</p>';
+                    if($data["safety_loop_status"]==1)
+                        $html_data.='<p><strong>Safety loop status: </strong><span class="dot-indicator bg-success-gradient" data-toggle="tooltip" data-placement="top" title="Active"></span></p>';
+                    else
+                        $html_data.='<p><strong>Safety loop status: </strong><span class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="Deactive"></span></p>';
+
+                    $html_data.='<p><strong>Last safety loop active: </strong>'.$data["last_safety_loop_active"].'</p>';
+                    $html_data.='<p><strong>Last safety loop deactive: </strong>'.$data["last_safety_loop_deactive"].'</p>';
+                }
+                if($data["device_type"]==3 || $data["device_type"]==5)
+                {
+                $sql="select * from parcx_reporting.revenue_shifts where device_number=".$device_number." and facility_number=".$facility_number." and carpark_number=".$carpark_number." order by last_updated_date_time desc limit 1";
+                $result = $con->query($sql);   
+                if($data = mysqli_fetch_array($result))
+                    {
+                    $html_data.='<p><strong>Last hift id: </strong>'.$data["shift_id"].'</p>'; 
+                    $html_data.='<p><strong>Operator name: </strong>'.$data["operator_name"].'</p>'; 
+                    if($data["shift_status"]==1)
+                        $html_data.='<p><strong>Shift status: </strong><span class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="Closed"></span></p>';
+                    else
+                        $html_data.='<p><strong>Shift status: </strong><span class="dot-indicator bg-success-gradient" data-toggle="tooltip" data-placement="top" title="Open"></span></p>';
+                    $html_data.='<p><strong>Shift earnings: </strong>'.$data["shift_earnings"].'</p>'; 
+                    }
+                }
+            }
+            mysqli_close($con);
+            echo $html_data;
+        }
+    else
+        echo "No server connection";
+    }
+        
+        
+    function get_device_status_by_device($facility_number,$carpark_number)
+        {
+        
+        $con = $this->db_connect();
+        $query_string = "select * from parcx_server.system_device_category";
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        $device= array();
+        while ($data = mysqli_fetch_assoc($result)) 
+            {
+            $id=$data["id"];
+            $device[$id]["name"]=$data["category_name"];
+            $device[$id]["image"]=$data["image_url"];
+            $device[$id]["group"]=$data["group"];              
+            }            
+        $query_string = "select * from watchdog_device_status where facility_number=".$facility_number." and carpark_number=".$carpark_number." order by device_type,device_number";
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+
+        while ($data = mysqli_fetch_assoc($result)) {
+            $html_data="";
+            $i=$data["device_type"];                    
+            $data_status =$device[$i]["group"] ;
+            $category =$device[$i]["name"];
+            $image_url=$device[$i]["image"];
+            
+            
+
+            $html_data .= '<div class="col-lg-3 col-md-6 block-data" data-number="'.$data["device_number"].'" data-type="'.$i.'" data-img="' . $image_url . '" data-status="' . $data_status . '" data-toggle="modal" data-target="#error-log-modal">';            
+            $html_data .= '<div class="card">';
+
+            $html_data .= '<div class="card-header">';
+            $html_data .= '<div class="nav-item d-flex justify-content-between align-items-center">';
+
+            $html_data .= '<h3 class="card-title">' . $data["device_name"] . '</h3>';
+            $html_data .= '<span>';
+
+            if ($data["device_network_status"] == 1) {
+                $html_data .= '<span class="float-right ml-3 header-icon">';
+                $html_data .= '<i class="fas fa-server text-success" data-toggle="tooltip" data-placement="top" data-original-title="Server Connectivity"></i>';
+                $html_data .= '</span>';
+                $html_data .= '</span>';
+            } else {
+                $html_data .= '<span class="float-right ml-3 header-icon">';
+                $html_data .= '<i class="fas fa-server text-danger" data-toggle="tooltip" data-placement="top" data-original-title="Server Connectivity"></i>';
+                $html_data .= '</span>';
+                $html_data .= '</span>';
+            }
+
+            
+        
             $html_data .= '</div>';
             $html_data .= '</div>';
 
             $html_data .= '<div class="card-body p-0">';
             $html_data .= '<div class="row no-gutters">';
 
-            $html_data .= '<div class="col-4 block-view-img my-auto text-center"><img class="img-fluid" src="' . $image_url . '"></div>';
+            $html_data .= '<div class="col-4 block-view-img my-auto text-center"><img class="img-fluid" src="/parcx/dist/img/icon/device_icons/' . $image_url . '.png"></div>';
 
             $html_data .= '<div class="col-8">';
             $html_data .= '<ul class="nav flex-column">';
@@ -805,14 +876,14 @@ class dashboard {
             $html_data .= 'Notifications';
             $html_data .= '</span>';
             $html_data .= '<span class="nav-link p-1">';
-            $html_data .= '<span class="fa-stack fa-1x">';
+            $html_data .= '<span class="fa-stack fa-1x" title="warnings">';
             $html_data .= '<i class="fa fa-circle fa-stack-2x text-warning"></i>';
-            $html_data .= '<strong class="fa-stack-1x text-dark">' . $this->getDeviceAlarmscount($data["device_number"], 11, 20) . '</strong>';
+            $html_data .= '<strong class="fa-stack-1x text-dark">' . $this->get_alarm_count($facility_number,$carpark_number,$data["device_number"], 6, 20) . '</strong>';
             $html_data .= '</span>';
 
-            $html_data .= '<span class="fa-stack fa-1x">';
-            $html_data .= '<i class="fa fa-circle fa-stack-2x text-danger"></i>';
-            $html_data .= '<strong class="fa-stack-1x text-white">' . $this->getDeviceAlarmscount($data["device_number"], 1, 10) . '</strong>';
+            $html_data .= '<span class="fa-stack fa-1x" title="critical alarms">';
+            $html_data .= '<i class="fa fa-circle fa-stack-2x text-danger" title="critical alarms"></i>';
+            $html_data .= '<strong class="fa-stack-1x text-white">' . $this->get_alarm_count($facility_number,$carpark_number,$data["device_number"], 0,5) . '</strong>';
             $html_data .= '</span>';
             $html_data .= '</span>';
             $html_data .= '</li>';
@@ -827,8 +898,9 @@ class dashboard {
             $html_data .= '</div>';
             echo $html_data;
         }
+        echo "<input type='hidden' value='".$this->get_alarm_count($facility_number,$carpark_number,0, 0,20)."' id='alarm_count'>";
         mysqli_close($con);           
-        echo "<input type='hidden' id='current_level' value='device' facility_number='".$facility_number."' carpark_number='".$carpark_number."'>";
+        //echo "<input type='hidden' id='current_level' value='device' facility_number='".$facility_number."' carpark_number='".$carpark_number."'>";
         }
                
     function get_device_status() {
@@ -1062,12 +1134,12 @@ class dashboard {
             $html_data .= '<span class="nav-link p-1">';
             $html_data .= '<span class="fa-stack fa-1x">';
             $html_data .= '<i class="fa fa-circle fa-stack-2x text-warning"></i>';
-            $html_data .= '<strong class="fa-stack-1x text-dark">' . $this->getDeviceAlarmscount($data["device_number"], 11, 20) . '</strong>';
+            $html_data .= '<strong class="fa-stack-1x text-dark">' . $this->getDeviceAlarmscount(0,0,$data["device_number"], 11, 20) . '</strong>';
             $html_data .= '</span>';
 
             $html_data .= '<span class="fa-stack fa-1x">';
             $html_data .= '<i class="fa fa-circle fa-stack-2x text-danger"></i>';
-            $html_data .= '<strong class="fa-stack-1x text-white">' . $this->getDeviceAlarmscount($data["device_number"], 1, 10) . '</strong>';
+            $html_data .= '<strong class="fa-stack-1x text-white">' . $this->getDeviceAlarmscount(0,0,$data["device_number"], 1, 10) . '</strong>';
             $html_data .= '</span>';
             $html_data .= '</span>';
             $html_data .= '</li>';
@@ -1300,54 +1372,44 @@ class dashboard {
 
 // end choose bhg by occupancy level 
 
-    function cash_levels($device) {
+    function cash_levels($data) 
+        {
         $con = $this->db_connect();
-        $query_string = "SELECT a.device_number,a.device_name,a.denomination,a.current_level as recycler_current_level,b.current_level as cashbox_current_level FROM apm_recycle_levels as a join apm_cashbox_levels as b on a.denomination=b.denomination and a.device_number=b.device_number order by denomination asc";
-        if (strlen($carpark) > 0)
-            $query_string .= " AND device_number IN(" . $device . ")";
+        $query_string = "SELECT a.device_number,a.device_name,a.denomination,a.current_level as recycler_current_level,b.current_level as cashbox_current_level FROM apm_recycle_levels as a join apm_cashbox_levels as b on a.denomination=b.denomination and a.device_number=b.device_number and a.carpark_number=b.carpark_number and a.facility_number=b.facility_number and a.device_number= ".$data["device_number"]." and a.carpark_number =".$data["carpark_number"]." and a.facility_number=".$data["facility_number"]." order by denomination asc";
 
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        if(mysqli_num_rows($result)>0)
+            {
+            $html_data = "<table id='cash_level_table' class='table table-blue table-bordered jspdf-table'>";
+            $html_data .= "<thead><tr>";        
+            $html_data .= "<th>Banknote</th>";
+            $html_data .= "<th>Recycler level</th>";
+            $html_data .= "<th>Cashbox level</th>";
+            $html_data .= "<th>Total</th>";
+            $html_data .= "</tr></thead>";
+            $html_data .= "<tbody>";
 
-        $header .= '<table width="100%" >';
-        $header .= '<tr class="card-header d-flex justify-content-between align-items-center">';
-        //$header.="<th class='col'>DeviceName</th>";
-        $header .= "<th class='col'>Banknote</th>";
-        $header .= "<th class='col'>Recycler level</th>";
-        $header .= "<th class='col'>Cashbox level</th>";
-        $header .= "<th class='col'>Total</th>";
-        $header .= "</tr>";
-        $header .= "<tbody class='table-view'>";
 
-
-        $apm_total = 0;
-        $html_data = "";
-        $device = "";
-        while ($data = mysqli_fetch_assoc($result)) {
-            if ($html_data == "")
-                $html_data .= $header;
-            if ($device != $data['device_number']) {
-                if ($device != "") {
-                    $html_data .= "<tr class='card-text d-flex justify-content-between align-items-center'><td class='col'></td><td class='col'></td><td class='col'><h3>Total</h3></td><td class='col'><h3>" . $apm_total . "</h3></td></tr>";
-                    $apm_total = 0;
+            $apm_total = 0;            
+            while ($data = mysqli_fetch_assoc($result)) 
+                {                          
+                $html_data .= "<tr>";            
+                $html_data .= "<td>" . $data['denomination'] . "</td>";
+                $html_data .= "<td>" . $data['recycler_current_level'] . "</td>";
+                $html_data .= "<td>" . $data['cashbox_current_level'] . "</td>";
+                $total = $data['denomination'] * $data['cashbox_current_level'] + $data['denomination'] * $data['recycler_current_level'];
+                $html_data .= "<td>" . $total . "</td>";
+                $html_data .= "</tr>";
+                $apm_total = $apm_total + $total;
                 }
-                $html_data .= "<tr class='subhead card-text d-flex justify-content-between align-items-center pl-2'><td>" . $data['device_name'] . "</td></tr>";
-                $device = $data["device_number"];
+            if($html_data!="")
+            $html_data.="<tr><td></td><td></td><td><h3>Total</h3></td><td><h3>".$apm_total."</h3></td></tr>";
+            $html_data.="</tbody></table>";
+            
+            echo $html_data;
             }
-            $html_data .= "<tr class='card-text d-flex justify-content-between align-items-center'>";
-            //$html_data.="<td class='col'>".$data['device_name']."</td>";    
-            $html_data .= "<td class='col'>" . $data['denomination'] . "</td>";
-            $html_data .= "<td class='col'>" . $data['recycler_current_level'] . "</td>";
-            $html_data .= "<td class='col'>" . $data['cashbox_current_level'] . "</td>";
-            $total = $data['denomination'] * $data['cashbox_current_level'] + $data['denomination'] * $data['recycler_current_level'];
-            $html_data .= "<td class='col'>" . $total . "</td>";
-            $html_data .= "</tr>";
-            $apm_total = $apm_total + $total;
+        mysqli_close($con);
         }
-        if ($html_data != "")
-            $html_data .= "<tr class='card-text d-flex justify-content-between align-items-center'><td class='col'></td><td class='col'></td><td class='col'><h3>Total</h3></td><td class='col'><h3>" . $apm_total . "</h3></td></tr>";
-
-        echo $html_data;
-    }
 
 // End
 

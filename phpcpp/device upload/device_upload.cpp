@@ -554,13 +554,13 @@ Php::Value UploadPayments(Php::Value request) {
             
             if(validator_id!="")
                 {
-                string offline_validator_id,offline_validation_type,offline_validation_value;
+                string offline_validator_id,offline_validation_type,offline_validation_value,offline_validation_id="";
                 istringstream ss_id(validator_id);
                 istringstream ss_type(validation_type);
                 istringstream ss_value(validation_value);
-                sql::ResultSet *res;
-                validation_id="";
+                sql::ResultSet *res;                
                 string v_id;
+                int hour=0,percentage=0;
                         
                 while(getline(ss_id, offline_validator_id, ',')) 
                     {
@@ -568,22 +568,39 @@ Php::Value UploadPayments(Php::Value request) {
                     getline(ss_value, offline_validation_value, ',');
                     
                     if (offline_validation_type == "1")
+                        {
                         offline_validation_type = "Time Value";
+                        hour=hour+stoi(offline_validation_value);
+                        }
                     if (offline_validation_type == "2")
-                        offline_validation_type = "Percentage Value";
+                        {
+                        offline_validation_type = "Percentage Value";                                        
+                        percentage=percentage+stoi(offline_validation_value);
+                        }
                     
-                    offline_validation_value=offline_validation_value.substr(0, offline_validation_value.size()-1); 
-                    
-                    query = "INSERT into parking_validation(product_name,carpark_number,carpark_name,facility_number,ticket_id,validation_value,validation_type,validator_id,date_time)VALUES('Offline'," + carpark_number + ",'" + carpark_name + "'," + facility_number + ",'" + ticket_id + "'," + offline_validation_value + ",'" + offline_validation_type + "','" + offline_validator_id + "',CURRENT_TIMESTAMP)";
+                    query = "INSERT into parking_validation(product_name,carpark_number,carpark_name,facility_number,ticket_id,plate_number,validation_value,validation_type,validator_id,date_time)VALUES('Offline'," + carpark_number + ",'" + carpark_name + "'," + facility_number + ",'" + ticket_id + "','"+entry_plate_number+"'," + offline_validation_value + ",'" + offline_validation_type + "','" + offline_validator_id + "',CURRENT_TIMESTAMP)";
                     result = stmt->executeUpdate(query);
                     query="SELECT LAST_INSERT_ID() as id";
                     res = stmt->executeQuery(query);
                     if(res->next())
                         v_id=res->getString("id"); 
-                    validation_id=v_id+","+validation_id;
+                    offline_validation_id=v_id+","+offline_validation_id;
                     delete res;
                     }
-                validation_id=validation_id.substr(0, validation_id.size()-1);                
+                
+                //online exist
+                if(getline(ss_value, offline_validation_value, ','))                    
+                    hour=hour+stoi(offline_validation_value);
+                    
+                if(getline(ss_value, offline_validation_value, ','))                    
+                    percentage=percentage+stoi(offline_validation_value);
+                
+                if(validation_id!="")
+                    validation_id=offline_validation_id+validation_id;
+                else
+                    validation_id=offline_validation_id.substr(0, offline_validation_id.size()-1);     
+                
+                validation_value=to_string(hour)+","+to_string(percentage);
                 }
             
             if(operation_type==4)

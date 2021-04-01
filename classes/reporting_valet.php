@@ -513,6 +513,21 @@ class reporting_valet {
         }
         return $imageurl;
     }
+    
+    function get_image_url($image,$folder) {
+
+        // image
+        if ($image == "default_car.jpg" || $image == "default.jpg")
+            $imageurl = IMAGEURL . "default_car.jpg";
+        else 
+            {
+            $folder = $data_summary['valet_in_datetime'];
+            $folder = substr($folder, 8, 2) . "-" . substr($folder, 5, 2) . "-" . substr($folder, 0, 4);
+            $folder = $folder . '/';
+            $imageurl = IMAGEURL . $folder . $image;
+            }
+        return $imageurl;
+    }
 
     function get_valet_car_pictures($id) {
         $con = $this->db_connect();
@@ -525,13 +540,13 @@ class reporting_valet {
 
         
         $html_data .= '<div class="row mb-2">';        
-        $html_data .= '<div class="col"> <img src=' . $this->getImageUrl($data_summary["front_plate"]) . '></div>';    
-        $html_data .= '<div class="col "> <img src=' . $this->getImageUrl($data_summary["right_plate"]) . '></div>';
+        $html_data .= '<div class="col"> <img src=' . $this->get_image_url($data_summary["front_plate"],$data_summary["valet_in_datetime"]) . '></div>';    
+        $html_data .= '<div class="col "> <img src=' . $this->get_image_url($data_summary["right_plate"],$data_summary["valet_in_datetime"]) . '></div>';
         $html_data .= '</div>';
 
         $html_data .= '<div class="row">';
-        $html_data .= '<div class="col"> <img src=' . $this->getImageUrl($data_summary["left_plate"]) . '></div>';       
-        $html_data .= '<div class="col"> <img src=' . $this->getImageUrl($data_summary["back_plate"]) . '></div>';
+        $html_data .= '<div class="col"> <img src=' . $this->get_image_url($data_summary["left_plate"],$data_summary["valet_in_datetime"]) . '></div>';       
+        $html_data .= '<div class="col"> <img src=' . $this->get_image_url($data_summary["back_plate"],$data_summary["valet_in_datetime"]) . '></div>';
         $html_data .= '</div>';
 
 

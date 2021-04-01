@@ -55,7 +55,7 @@ function getLabel($label)
 
   <!-- ui dependent scripts -->
   <script src="<?=URL?>plugins/jquery/jquery-3.3.1.min.js"></script>
-  <script src="<?=URL?>dist/js/plugins/bootstrap-multiselect.min.js"></script>
+  <script src="<?=URL?>plugins/bootstrap-multiselect.min.js"></script>
 
   <!-- unchecked -->
 

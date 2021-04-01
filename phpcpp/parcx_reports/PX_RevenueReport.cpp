@@ -619,8 +619,8 @@ void RevenueReport::getPaymentDetails(Php::Value json)
 			if(res->getDouble("discount_amount")>0)
 				html_data+="<tr><td>"+toString(label["discount_name"])+"</td><td>"+res->getString("discount_name")+"</td></tr>";
 			html_data+="<tr><td>"+toString(label["gross_amount"])+"</td><td class='font-weight-bold'>"+SetDoublePrecision(res->getDouble("gross_amount"))+" "+currency+"</td></tr>";          
-			if(stoi(res->getString("validation_hours"))>0)
-				html_data+="<tr><td>"+toString(label["validation_hours"])+"</td><td>"+res->getString("validation_hours")+"</td></tr>";                                
+			// if(stoi(res->getString("validation_hours"))>0)
+			// 	html_data+="<tr><td>"+toString(label["validation_hours"])+"</td><td>"+res->getString("validation_hours")+"</td></tr>";                                
 									
 			/*notes=data['bank_notes'];
 			total=0;

@@ -10,6 +10,9 @@ $dashboard=new dashboard();
 include('../../classes/reporting_valet.php');
 $valet=new reporting_valet();
 
+$json= file_get_contents("php://input");    
+$data=json_decode($json,TRUE); 
+
 
 switch($task)
     {
@@ -18,15 +21,12 @@ switch($task)
         
         break;
     case 2:   // basic counters
-        $json= file_get_contents("php://input");    
-        $data=json_decode($json);   
-        $dashboard->OccupancyCarparkDetail($data->{"facility_number"},$data->{"carpark_number"});
+       
+        $dashboard->OccupancyCarparkDetail($data["facility_number"],$data["carpark_number"]);
         break;
 
-    case 3:   // hourly Occupancy
-        $json= file_get_contents("php://input"); 
-        $data=json_decode($json);
-        $response=$dashboard->HourlyOccupancyReport($data->{'carpark'},$data->{'type'});
+    case 3:   // hourly Occupancy       
+        $response=$dashboard->HourlyOccupancyReport($data['carpark'],$data['type']);
         echo json_encode($response);
         break;
     case 4: $dashboard->revenue_lastdays();
@@ -59,45 +59,25 @@ switch($task)
         $dashboard->getLastUpdatedDateForOccupancy();
         break;
 
-    case 13:
-        $json= file_get_contents("php://input");    
-        $data=json_decode($json,TRUE);         
-        if($data["device_category"]=="APM")
-            $dashboard->cash_levels($data["device_number"]);	
-        
-        if($data["device_category"]=="Entry Column" || $data["device_category"]=="Exit Column")
-            {
-            $html='<div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="col"><input type="submit" class="btn btn-outline-info btn-open-barrier btn-block" value="Open Barrier" id="'.$data["device_number"].'"></div>
-            <div class="col"><input type="submit" class="btn btn-outline-info btn-close-barrier btn-block" value="Close Barrier" id="'.$data["device_number"].'"></div>
-            <div class="col"><input type="submit" class="btn btn-outline-info btn-close-lane btn-block" value="Lane Closed Mode" id="'.$data["device_number"].'"></div>
-            <div class="col"><input type="submit" class="btn btn-outline-info btn-free-passage btn-block" value="Free Passage Mode" id="'.$data["device_number"].'"></div>
-            <div class="col"><input type="submit" class="btn btn-outline-info btn-standard-operation btn-block" value="Standard Operation Mode" id="'.$data["device_number"].'"></div>
-            </div>';
-            echo $html;
-            }
-        $dashboard->getAlarmList($data["device_number"]);
+    case 13:                    
+        $dashboard->get_alarm_list($data);        
         break;
     case 14:
-        $dashboard->getLatestAlarmsCount();
+        $dashboard->get_latest_alarms_count()();
         break;
     case 15:
-        $dashboard->getLatestAlarmList();
+        $dashboard->get_latest_alarm_list($data);
         break;
-    case 16:
-        $json= file_get_contents("php://input");    
-        $data=json_decode($json);   
-        $dashboard->dismissAlarm($data->{"id"});
+    case 16:       
+        $dashboard->dismiss_alarm($data["id"]);
         break;
 
     case 17:
         $dashboard->OccupancyCarparkDetail($carpark);
         break;
         
-    case 18:
-        $json= file_get_contents("php://input");    
-        $data=json_decode($json);    
-        $dashboard->OccupancyCarparkCounters($data->{"facility_number"});
+    case 18:       
+        $dashboard->OccupancyCarparkCounters($data["facility_number"]);
         break;
 
     case 19:     
@@ -116,6 +96,12 @@ switch($task)
     case 24:        
        $dashboard->get_device_status_by_device($_GET['facility_number'],$_GET['carpark_number']);
        break;
+    case 25:        
+       $dashboard->device_details($data);
+       break;
+    case 26:
+            $dashboard->cash_levels ($data);
+        break;
     } // End Switch 
 
 exit();

@@ -378,11 +378,12 @@ include('../../includes/sidebar.php');
                 data["device_number"] = $("#device_number").val();
                 data["device_name"] = $("#device_name").val();
                 data["device_ip"] = $("#device_ip").val();
-                if($("#camera_id").val().length()!=0)
+                if($("#camera_id").val().length!=0)
                     data["camera_id"] = $("#camera_id").val();
                 else
                     data["camera_id"] ="0";
-                if($("#camera_index").val().length()!=0)
+                
+                if($("#camera_index").val().length!=0)
                     data["camera_index"] = $("#camera_index").val();
                 else
                     data["camera_index"] ="0";

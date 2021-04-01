@@ -3,9 +3,7 @@ var task, device_ip, device_number, carpark_number, device_name, description, mo
 $(document).on("click", ".btn-open-barrier, .btn-close-barrier, .btn-restart-machine, .btn-barrier-status, .btn-close-lane, .btn-open-lane, .btn-free-passage,.btn-standard-operation", function (){
     var value = $(this).attr('value');   
     device_number = $(this).attr('id');
-    var retVal = confirm("Confirm : " + value + " ?");
-    if (retVal == true)
-    {
+
 
         device_name = $("#device_details_" + device_number).attr('device_name');
         carpark_number = $("#device_details_" + device_number).attr('carpark_number');
@@ -77,7 +75,7 @@ $(document).on("click", ".btn-open-barrier, .btn-close-barrier, .btn-restart-mac
                 break;
         }
         $('#detailModal').modal('show');
-    }
+    
 
 });
 

@@ -12,7 +12,7 @@ $(function()
     $.post("../../parcx/modules/ajax/users.php", jsondata, function (result) {
       console.log(result);
         if (result == "Success")
-          window.location="../../parcx/modules/dashboard/deviceStatus.php";
+          window.location="../../parcx/modules/dashboard/device_status_facility.php";
         else
         $("#messagebox").html(result);
       });
