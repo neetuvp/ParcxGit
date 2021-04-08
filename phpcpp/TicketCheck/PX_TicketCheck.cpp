@@ -877,7 +877,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
         plateCapturedId = json["plate_captured_id"];
         writeLog("plateCapturedId", to_string(plateCapturedId));
 
-        if (plateCapturedId > 0 || json["anpr_check_only"] == 1 || json["anpr_enabled"] == 1)
+        if (plateCapturedId > 0 || json["anpr_check_only"] == 1 || json["anpr_enable"] == 1)
             anprEnabled = 1;
         else
             anprEnabled = 0;
@@ -898,10 +898,16 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
 
             plateCapturedInterval = json["plate_captured_interval"];
             writeLog("plateCapturedInterval", to_string(plateCapturedInterval));
+            anprSettings = "";
+            ticketId = toString(json["ticket_id"]);
+            writeLog("ticketId", ticketId);
+            plateNumber = toString(json["plate_number"]);
+            writeLog("plateNumber", plateNumber);
+            plateType = "";
+            plateCountry = "";
+            plateArea = "";
 
-
-            if (anprEnabled == 1) {
-                ticketId = "";
+            if (anprEnabled == 1) {               
                 Php::Value plate_details = AnprObj.getPlateDetails(cameraId, plateCapturedInterval, plateCapturedId);
                 response = plate_details;
                 if (toString(plate_details["result"]) == "plate_available") {
@@ -909,25 +915,8 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                     plateArea = toString(plate_details["plate_area"]);                    
                     plateCountry = toString(plate_details["plate_country"]);
                     plateType = toString(plate_details["plate_type"]);
-                } else {
-                    accessEnabled = 0;
-                    reservationEnabled = 0;
-                    plateType = "";
-                    plateCountry = "";
-                    plateArea = "";
-                    plateNumber = "";
-                }
-            } else {
-                anprSettings = "";
-                ticketId = toString(json["ticket_id"]);
-                writeLog("ticketId", ticketId);
-                plateNumber = toString(json["plate_number"]);
-                writeLog("plateNumber", plateNumber);
-                plateType = "";
-                plateCountry = "";
-                plateArea = "";
-            }
-
+                } 
+            } 
 
             response["access_allowed"] = "false";
             response["ticket_id"] = ticketId;

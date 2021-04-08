@@ -8,7 +8,7 @@
 #define ServerDB "parcx_server"
 #define ReportingDB "parcx_reporting"
 #define DashboardDB "parcx_dashboard"
-#define dateTimeFormat "%Y-%m-%d %H:%M:%S"
+#define dateFormat "%Y-%m-%d"
 
 using namespace std;
 GeneralOperations General;
@@ -22,12 +22,12 @@ string query;
 
 void writeLog(string function,string message)
     {
-    General.writeLog("WebApplication/ApplicationLogs/PX-UserManagement-"+General.currentDateTime("%Y-%m-%d"),function,message);    
+    General.writeLog("WebApplication/ApplicationLogs/PX-UserManagement-"+General.currentDateTime(dateFormat),function,message);    
     }
 
 void writeException(string function,string message)
     {
-    General.writeLog("WebApplication/ExceptionLogs/PX-UserManagement-"+General.currentDateTime("%Y-%m-%d"),function,message); 
+    General.writeLog("WebApplication/ExceptionLogs/PX-UserManagement-"+General.currentDateTime(dateFormat),function,message); 
     writeLog(function,"Exception: "+message);   
     Php::out<<query<<endl;
     }
@@ -503,23 +503,37 @@ Php::Value loginUser(Php::Value json)
         string password=json["password"];
         con= General.mysqlConnect(ServerDB); 
         stmt=con->createStatement();
-        query="SELECT operator_name,system_users.user_role_id,user_role_name,account_status,user_id,language  FROM system_users INNER JOIN system_user_role ON system_users.user_role_id=system_user_role.user_role_id where username= '"+user_name+"'and password= md5('"+password+ "') and validity_from_date<=CURRENT_DATE and validity_to_date>=CURRENT_DATE LIMIT 1";
+        query="SELECT md5('"+password+ "') as user_password,password,validity_from_date,validity_to_date,operator_name,system_users.user_role_id,user_role_name,account_status,user_id,language  FROM system_users INNER JOIN system_user_role ON system_users.user_role_id=system_user_role.user_role_id where username= '"+user_name+"'  LIMIT 1";
         res=stmt->executeQuery(query);
         if(res->next())
-            {
+            {            
+            string current_date = General.currentDateTime(dateFormat);
+            string expiry_date = res->getString("validity_to_date");
+            string start_date = res->getString("validity_from_date");
+            string user_password=res->getString("user_password");
+            password=res->getString("password");
+            
             if(res->getInt("account_status")==0)
-                message="Your In Disable Mode. Please Contact Admin";
+                message="Account disabled";
+            else if(password!=user_password)
+                message="Wrong password";
+            else if (expiry_date.compare(current_date) < 0) 
+                message="User validity expired";  
+            else if (start_date.compare(current_date) > 0) 
+               message = "User validity not started";
             else
+                {
                 message="Success";
-            response["operator_name"]=string(res->getString("operator_name"));
-            response["user_role_id"]=string(res->getString("user_role_id"));
-            response["user_role_name"]=string(res->getString("user_role_name"));
-            response["user_id"]=string(res->getString("user_id"));
-            response["language"]=string(res->getString("language"));
+                response["operator_name"]=string(res->getString("operator_name"));
+                response["user_role_id"]=string(res->getString("user_role_id"));
+                response["user_role_name"]=string(res->getString("user_role_name"));
+                response["user_id"]=string(res->getString("user_id"));
+                response["language"]=string(res->getString("language"));
+                }                                                                                                               
             delete res;
             }
         else
-            message="Wrong Username / Password Combination or Validity expired";
+            message="Wrong Username";
         delete stmt;
         delete con; 
         response["message"]=message;

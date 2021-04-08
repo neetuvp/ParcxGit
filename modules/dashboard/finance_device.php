@@ -14,14 +14,6 @@ include('../../includes/navbar-start.php');
 
 <div class="header text-dark" id="pdf-report-header">Finance</div>
 
-<div class="row">
-    <div class="col tab-header d-flex justify-content-center">
-        
-        <div class="tab-header-link active" data-target="table-view">Table View</div>
-        <div class="tab-header-link" data-target="block-view">Block View</div>
-    </div>
-</div>
-
 <?php 
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
@@ -42,16 +34,7 @@ include('../../includes/sidebar.php');
                     </div>
                 </div>
 
-                <div class="additional-menu-right row align-items-center">
-
-                    <div class="nav-details">
-                        <span class="text-bold m-0">
-                            Service Updated Date and Time:
-                        </span>
-                        <span id="last-updated">
-                        </span>
-                    </div>
-
+                <div class="additional-menu-right row align-items-center">                
                     <div id="action-buttons">
                         <div class="btn-group">
                             <button type="button" class="btn btn-warning">Export</button>
@@ -115,15 +98,13 @@ include('../../includes/sidebar.php');
                                 <!-- end / donut chart -->
 
                             </div>
-
-                            <div id="live-revenue-summary-content">
-                            </div> <!-- End . Live Revenue Summary Content --->
-
+                            <div class="card">
+                                
+                                    <div id="live-revenue-summary-content">
+                                    </div>                                
+                            </div>                            
                         </div>
-
                     </div>
-
-
                 </div>
 
             </div>
@@ -152,59 +133,41 @@ include('../../includes/sidebar.php');
 <?php include('../../includes/footer.php');?>
 
 <script>
+    var facility_number = <?php echo $_GET["facility_number"]; ?>;
+    var carpark_number =<?php echo $_GET["carpark_number"]; ?>;
 function get_live_revenue_summary()
     {	
-    $.get( "../ajax/dashboard.php?task=5", function( data ) 
+    $.get( "../ajax/dashboard.php?task=5&facility_number="+facility_number+"&carpark_number="+carpark_number, function( data ) 
         {  
-        $('#live-revenue-summary-content').html(data);     
-        $('[data-target="' + clicked_view_type + '"]').click();
-        $('[data-target="' + clicked_device_type + '"]').click();
-        $('#last-updated').html($("#last_updated_time").val());
+        $('#live-revenue-summary-content').html(data);             
+        $('[data-target="' + clicked_device_type + '"]').click();        
         });            
     } 
 
 /* Table Show - Hide */
-var clicked_view_type = "table-view";
 var clicked_device_type = "all";
 
 $(document).ready(function () 
     {
     $('.tab-link').on('click', function () 
         {
-        var $target = $(this).data('target');            
+        var $target = $(this).data('target');               
         if ($target != 'all') 
             {
-            $('.card-text, .block-data').addClass("hidden");
-            $('.card-text[data-status="header"]').removeClass("hidden");
-            $('.card-text[data-status="' + $target + '"], .block-data[data-status="' + $target +'"]').removeClass("hidden").fadeIn('slow');
+            $('tbody>tr').addClass("hidden");;
+            $('tbody>tr[data-status="' + $target +'"]').removeClass("hidden");    
             } 
         else 
             {
-            // all
-            $('.card-text, .block-data').removeClass("hidden").fadeIn('slow');
-            $('.card-text[data-status="header"]').removeClass("hidden").fadeIn('slow');
+            $('tbody>tr').removeClass("hidden").fadeIn('slow');           
             }
             clicked_device_type = $target;
         });
+ 
 
-    $('.tab-header-link').on('click', function () 
-        {
-        var $target = $(this).data('target');
-
-        if ($target === 'block-view') 
-            {                
-            $('[data-status="table-view"]').addClass("hidden");
-            $('[data-status="' + $target + '"]').removeClass("hidden").fadeIn('slow');
-            } 
-        else 
-            {
-            $('[data-status="block-view"]').addClass("hidden");
-            $('[data-status="' + $target + '"]').removeClass("hidden").fadeIn('slow');
-            }
-            //clicked_view_type = $target;            
-        });
-
-    get_live_revenue_summary();    
+    get_live_revenue_summary();  
+    rev7days();
+    revenueSources();
     setInterval(function () 
         {             
         get_live_revenue_summary();  
@@ -220,12 +183,7 @@ $(document).ready(function ()
         $('.tab-link').removeClass('active');
         $(this).addClass('active');
         });
-
-    $('.tab-header-link').on('click', function () 
-        {
-        $('.tab-header-link').removeClass('active');
-        $(this).addClass('active');
-        });
+  
 
     $('#export_excel_report').click(function (event) 
         {
@@ -246,9 +204,7 @@ function rev7days()
     var revenue_amounts = {};
     var weekdays = [];
 
-    $.get("../ajax/dashboard.php?task=4", function (data) {
-        
-        // get dynamic data
+    $.get("../ajax/dashboard.php?task=4&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) {                      
 
         /* chart variables */
 
@@ -547,8 +503,8 @@ function createNewLegendAndAttach(chartInstance, legendOpts)
 
 function updateRevenueSources() 
     {
-    $.get("../ajax/dashboard.php?task=10", function (data) 
-        {
+    $.get("../ajax/dashboard.php?task=30&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) 
+        {        
         amount = JSON.parse(data);
         pieValues[0] = amount["parking_fee"];
         pieValues[1] = amount["lost_fee"];
@@ -560,6 +516,5 @@ function updateRevenueSources()
         });
     }
 
-rev7days();
-revenueSources();
+
 </script>

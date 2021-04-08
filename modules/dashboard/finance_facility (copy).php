@@ -39,9 +39,6 @@ include('../../includes/sidebar.php');
 var donutChart=[];
 var donutChartValues=[];
 var facilityNumber=[];
-var facility_number=0;
-var carpark_number=0;
-var amount;
 
 
 get_live_revenue();
@@ -49,13 +46,9 @@ get_live_revenue();
 function get_live_revenue()
     {
     $.get("../ajax/dashboard.php?task=27", function (data) {        
-        $('#revenue-live-block').html(data);  
-        carpark_number=$("#carpark_number").val();
-        facility_number=$("#facility_number").val();
-        if (typeof carpark_number !== "undefined")
-            window.location="finance_device.php?facility_number="+facility_number+"&carpark_number="+carpark_number;
-        else if (typeof facility_number !== "undefined")  
-            window.location="finance_carpark.php?facility_number="+facility_number;
+        $('#revenue-live-block').html(data);    
+        if($(".finance-facility").length==1)
+            $(".show-facility-details").click();
         else
             show_donut_chart();
     });

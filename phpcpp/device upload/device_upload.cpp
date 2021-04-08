@@ -474,13 +474,13 @@ Php::Value UploadParkingValidations(Php::Value request) {
     return result;
 }
 
-Php::Value UploadPayments(Php::Value request) {
+Php::Value UploadPayments(Php::Value request) {    
     sql::Statement *stmt;    
     Php::Value result;
     Json::Value jsonresponse;
     try {
         conn = DBConnection(DATABASE);
-        stmt = conn->createStatement();
+        stmt = conn->createStatement(); 
         int j=0;
         for (int i = 0; i < request.size(); i++) {
             string device_number = request[i]["device_number"];
@@ -604,7 +604,7 @@ Php::Value UploadPayments(Php::Value request) {
                 }
             
             if(operation_type==4)
-                {
+                {                
                 query="update valet_parking set paid_status=1,payment_date_time='"+payment_date_time+"' where ticket_number='"+ticket_id+"'";
                 result = stmt->executeUpdate(query);                
                 if (result == 1)
@@ -612,11 +612,19 @@ Php::Value UploadPayments(Php::Value request) {
                     query = "INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,operator_id,operator_name,shift_id,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,lost_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,gross_amount,amount_received,discount_id,discount_category,discount_name,coupon_id,coupon_category,coupon_source,payment_type,validation_value,validation_id,receipt_number,bank_notes,balance_returned,credit_note,authentication_code,entry_plate_number,exit_plate_number,wallet_points)VALUES('" + device_number + "','" + device_name + "'," + carpark_number + ",'" + carpark_name + "','" + facility_number + "'," + operator_id + ",'" + operator_name + "','" + shift_id + "','" + parking_rate_label + "','" + parking_rate_name + "','" + entry_grace_period + "','" + exit_grace_period + "','" + vat_type + "','" + vat_percentage + "','" + ticket_id + "'," + entry_date_time + ",'" + payment_date_time + "'," + max_exit_date_time + ",'" + parking_duration + "','" + payment_category + "','" + parking_fee + "','" + vat_amount + "','" + lost_fee + "','" + admin_fixed_charges + "','" + ticket_replacement_fee + "','" + discount_amount + "','" + gross_amount + "','" + amount_received + "','" + discount_id + "','" + discount_category + "','" + discount_name + "','" + coupon_id + "','" + coupon_category + "','" + coupon_source + "','" + payment_type + "','" + validation_value + "','" + validation_id + "','" + receipt_number + "','" + bank_notes + "','" + balance_returned + "','" + credit_note + "','" + authentication_code + "','" + entry_plate_number + "','" + exit_plate_number + "'," + wallet_points + ")";
                     result = stmt->executeUpdate(query);
 
-                    if (result == 1) 
+                    if (result == 1)                         
+                        jsonresponse[j++] = id;                                                                           
+                    }
+                else
+                    {
+                    sql::ResultSet *res; 
+                    query="select id from valet_parking where ticket_number='"+ticket_id+"'";
+                    res = stmt->executeQuery(query);
+                    if(res->next())
                         {
-                        jsonresponse[j] = id;
-                        j++;                                                
-                        }                   
+                        jsonresponse[j++] = id;  
+                        delete res;
+                        }                    
                     }
                 }
             else
@@ -1300,7 +1308,7 @@ Php::Value UploadContractPrkingsubscriptions(Php::Value request) {
 
 Php::Value uploadToServer(Php::Parameters &params) {
     Php::Value data = params[0];
-    int task = data["task"];
+    int task = data["task"];   
     Php::Value request = data["data"];
     Php::Value response;
     switch (task) {

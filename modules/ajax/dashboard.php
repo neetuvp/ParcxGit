@@ -29,11 +29,11 @@ switch($task)
         $response=$dashboard->HourlyOccupancyReport($data['carpark'],$data['type']);
         echo json_encode($response);
         break;
-    case 4: $dashboard->revenue_lastdays();
+    case 4: $dashboard->revenue_lastdays($_GET["facility_number"],$_GET["carpark_number"]);
     break;
 
     case 5:
-        $dashboard->get_revenue_summary();
+        $dashboard->get_revenue_summary($_GET["facility_number"],$_GET["carpark_number"]);
         break;
 
     case 6:
@@ -43,13 +43,15 @@ switch($task)
     case 7:
         $dashboard->watchdog_device_alarms(0,0);
         break;
+    
+    
    
     case 9:$dashboard->get_device_status();
         break;
 
     case 10:
-        $dashboard->live_revenue();
-        break;
+        $dashboard->live_revenue_facility();
+        break;    
 
     case 11:
         $valet->get_valet_counters();
@@ -101,6 +103,18 @@ switch($task)
        break;
     case 26:
             $dashboard->cash_levels ($data);
+        break;
+    case 27:
+        $dashboard->show_live_revenue_facility();
+        break;
+    case 28:
+        $dashboard->show_live_revenue_carpark($_GET['facility_number']);
+        break;
+    case 29:
+        $dashboard->live_revenue_carpark($_GET['facility_number']);
+        break;
+    case 30:
+        $dashboard->live_revenue_device($_GET['facility_number'],$_GET['carpark_number']);
         break;
     } // End Switch 
 

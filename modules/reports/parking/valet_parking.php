@@ -127,8 +127,8 @@ include('../../../includes/sidebar.php');
             </div>
             <!-- valet summary chart -->
 
-            <div class="">
-                <div class="card-body p-0" id="report-content">        
+            <div class="card">
+                <div class="card-body" id="report-content">        
                 </div>
             </div>
 
@@ -168,6 +168,17 @@ include('../../../includes/sidebar.php');
                         createChart(result);
 
                         reportSuccess();
+//                        $('#valet_table').DataTable(
+//                            {
+//                            "paging": true,
+//                            "lengthChange":true,
+//                            "searching": true,
+//                            "ordering": true,
+//                            "info": true,
+//                            "autoWidth": false,
+//                            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+//                            "aaSorting": [],        				            
+//                            });   	  
 
                     }, "json");
         } // end if 

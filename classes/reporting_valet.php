@@ -133,8 +133,93 @@ class reporting_valet {
     }
 
 // End . Driver Utilization
+    
+    function get_duration($date1,$date2)
+        {
+        if($date1!="" && $date2!="")
+            {
+            $datetime1 = new DateTime($date1);
+            $datetime2 = new DateTime($date2);
+            $interval = $datetime1->diff($datetime2);
+            if($interval->format('%h')>0)
+                return $interval->format('%h H %i M');
+            else 
+                return $interval->format('%i M');
+            }
+        else 
+            return "0";
+        }
+    
+        function get_valet_parking_transactions($FromDateTime, $ToDateTime, $carpark) {
+        $con = $this->db_connect();
+        $query_string = "select * from valet_parking where valet_in_datetime between '" . $FromDateTime . "' AND '" . $ToDateTime . "'";
+        if ($carpark != 0)             
+            $query_string .= " AND carpark_number=" . $carpark;            
+              
 
-    function get_valet_parking_transactions($FromDateTime, $ToDateTime, $carpark) {
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        if (mysqli_num_rows($result)) {
+            $html_data .= $this->valet_parking_summary($FromDateTime, $ToDateTime, $carpark, 0);
+
+
+            $header = " <table id='valet_table' class='table table-blue table-bordered table-striped jspdf-table'>";
+            $header .= "<thead>";
+            $header .= "<tr>";
+            $header .= "<th>#</th>";
+            $header .= "<th>Plate Number</th>";
+            $header .= "<th>Ticket Id</th>";            
+            $header .= "<th>Customer Card Number</th>";            
+            $header .= "<th>Valet IN</th>";
+            $header .= "<th>Valet OUT</th>";
+            $header .= "<th>Key IN</th>";
+            $header .= "<th>Key OUT</th>";
+            $header .= "<th>Drop Off</th>";            
+            $header .= "<th>Payment</th>";           
+            $header .= "<th>Parking Duration</th>";
+            $header .= "<th>Pickup To Parking</th>";
+            $header .= "<th>Parking To DropOff</th>";
+            $header .= "<th>Dropoff To Delivery</th>";
+            $header .= "<th></th>";
+            $header .= "</tr></thead><tbody>";
+
+            $html_data = $header;
+
+            $i = 0;
+            while ($data = mysqli_fetch_assoc($result)) 
+                {
+                $i++;
+
+                $html_data .= "<tr id='view_pictures' valet_id='" . $data['id'] . "'>";
+                $html_data .= "<td>" . $i . "</td>";
+                $html_data .= "<td>" .$data['plate_prefix']." ". $data['plate_number'] . "</td>"; 
+                $html_data .= "<td>" . $data['ticket_number'] . "</td>";    
+                $html_data .= "<td>" . $data['customer_card_number'] . "</td>";                    
+                $html_data .= "<td>" . $data['valet_in_datetime'] . "</td>";
+                $html_data .= "<td>" . $data['valet_out_datetime'] . "</td>"; 
+                $html_data .= "<td>" . $data['parking_in_datetime'] . "</td>";
+                $html_data .= "<td>" . $data['parking_out_datetime'] . "</td>";                
+                $html_data .= "<td>" . $data['dropoff_datetime'] . "</td>";                
+                $html_data .= "<td>" . $data['payment_date_time'] . "</td>"; 
+                
+                $html_data .= "<td>" . $this->get_duration($data['valet_out_datetime'], $data['valet_in_datetime']) . "</td>";
+                $html_data .= "<td>" . $this->get_duration($data['parking_in_datetime'], $data['valet_in_datetime']) . "</td>";
+                $html_data .= "<td>" . $this->get_duration($data['parking_out_datetime'], $data['parking_in_datetime']) . "</td>";
+                $html_data .= "<td>" . $this->get_duration($data['dropoff_datetime'], $data['parking_out_datetime']) . "</td>";
+                $html_data .= "<td><a href='#' class='view-img'  id=" . $data['id'] . ">View Images</a></td>";
+                $html_data .= "</tr>";
+            }
+
+            $html_data .= "</tbody>";
+            $html_data .= "</table>";
+            mysqli_close($con);
+        } else {
+            $html_data = "<div class='p-3 card'>No records/transactions available for the current search criteria</div>";
+        }
+
+        echo $html_data;
+    }
+
+    function get_valet_parking_transactions2($FromDateTime, $ToDateTime, $carpark) {
         $con = $this->db_connect();
         $query_string = "select * from valet_parking where valet_in_datetime between '" . $FromDateTime . "' AND '" . $ToDateTime . "'";
         if ($carpark != 0) {
@@ -214,21 +299,26 @@ class reporting_valet {
 
 // End . Valet Parking
 
-    function valet_parking_summary($FromDateTime, $ToDateTime, $carpark_number, $weekdays) {
+    function valet_parking_summary($FromDateTime, $ToDateTime, $carpark_number, $weekdays) 
+        {
         $html_data = $this->keyinout_by_drivers_chart($FromDateTime, $ToDateTime);
 
         $con = $this->db_connect();
-//$query_string="select MAX(duration_parking) as max_parking_duration,MIN(duration_parking) as min_parking_duration from valet_parking where valet_in_datetime between '".$FromDateTime."' AND '".$ToDateTime."'";
-        $query_string = "select count(*) as count,min(NULLIF(duration_pickup_parking,0)) as min_pickup_parking,max(duration_pickup_parking) as max_pickup_parking,avg(duration_pickup_parking) as avg_pickup_parking,"
-                . "max(duration_parking) as max_parking_duration,avg(duration_parking) as avg_parking_duration,"
-                . "min(NULLIF(duration_parking_dropoff,0)) as min_parking_dropoff,max(duration_parking_dropoff) as max_parking_dropoff,avg(duration_parking_dropoff) as avg_parking_dropoff,"
-                . "min(NULLIF(duration_dropoff_delivery,0)) as min_dropoff_delivery,max(duration_dropoff_delivery) as max_dropoff_delivery,avg(duration_dropoff_delivery) as avg_dropoff_delivery "
-                . "from valet_parking where valet_in_datetime between '" . $FromDateTime . "' AND '" . $ToDateTime . "'";
-//echo $query_string;        
+//        $query_string = "select count(*) as count,min(NULLIF(duration_pickup_parking,0)) as min_pickup_parking,max(duration_pickup_parking) as max_pickup_parking,avg(duration_pickup_parking) as avg_pickup_parking,"
+//                . "max(duration_parking) as max_parking_duration,avg(duration_parking) as avg_parking_duration,"
+//                . "min(NULLIF(duration_parking_dropoff,0)) as min_parking_dropoff,max(duration_parking_dropoff) as max_parking_dropoff,avg(duration_parking_dropoff) as avg_parking_dropoff,"
+//                . "min(NULLIF(duration_dropoff_delivery,0)) as min_dropoff_delivery,max(duration_dropoff_delivery) as max_dropoff_delivery,avg(duration_dropoff_delivery) as avg_dropoff_delivery "
+//                . "from valet_parking where valet_in_datetime between '" . $FromDateTime . "' AND '" . $ToDateTime . "'";      
+        
+        
+         $query_string = "select count(*) as count,min(NULLIF(TIMESTAMPDIFF(MINUTE,valet_in_datetime,parking_in_datetime),0)) as min_pickup_parking,max(TIMESTAMPDIFF(MINUTE,valet_in_datetime,parking_in_datetime)) as max_pickup_parking,avg(TIMESTAMPDIFF(MINUTE,valet_in_datetime,parking_in_datetime)) as avg_pickup_parking,"
+                . "max(TIMESTAMPDIFF(MINUTE,valet_in_datetime,valet_out_datetime)) as max_parking_duration,avg(TIMESTAMPDIFF(MINUTE,valet_in_datetime,valet_out_datetime)) as avg_parking_duration,"
+                . "min(NULLIF(TIMESTAMPDIFF(MINUTE,parking_out_datetime,dropoff_datetime),0)) as min_parking_dropoff,max(TIMESTAMPDIFF(MINUTE,parking_out_datetime,dropoff_datetime)) as max_parking_dropoff,avg(TIMESTAMPDIFF(MINUTE,parking_out_datetime,dropoff_datetime)) as avg_parking_dropoff,"
+                . "min(NULLIF(TIMESTAMPDIFF(MINUTE,dropoff_datetime,valet_out_datetime),0)) as min_dropoff_delivery,max(TIMESTAMPDIFF(MINUTE,dropoff_datetime,valet_out_datetime)) as max_dropoff_delivery,avg(TIMESTAMPDIFF(MINUTE,dropoff_datetime,valet_out_datetime)) as avg_dropoff_delivery "
+                . "from valet_parking where valet_in_datetime between '" . $FromDateTime . "' AND '" . $ToDateTime . "'";      
 
-        if ($carpark_number != 0) {
-            $query_string .= " AND carpark_number=" . $carpark_number;
-        }
+        if ($carpark_number != 0)             
+            $query_string .= " AND carpark_number=" . $carpark_number;        
 
 
 
@@ -242,19 +332,7 @@ class reporting_valet {
         $html_data .= '></span>';
 
         $html_data .= '<div class="row mb-4 jspdf-graph">';
-        /* $html_data.='<div class="col-lg-3 col-6">';
-          $html_data.='<!-- small box -->';
-          $html_data.='<div class="small-box bg-success">';
-          $html_data.='<div class="inner">';
-          $html_data.='<h3>'.$data_summary["max_parking_duration"].'/'.round($data_summary["avg_parking_duration"],2).'</h3>';
-          $html_data.='<p>Max / Average Parking Duration </p>';
-          $html_data.='</div>';
-          $html_data.='<div class="icon">';
-          $html_data.='<i class="ion ion-stats-bars"></i>';
-          $html_data.='</div>';
-          //$html_data.='<a href="#" class="small-box-footer"> <i class="fa fa-arrow-circle-right"></i></a>';
-          $html_data.='</div>';
-          $html_data.='</div>'; */
+       
 
         $html_data .= '<div class="col-lg-3 col-6">';
         $html_data .= '<!-- small box -->';
@@ -520,8 +598,7 @@ class reporting_valet {
         if ($image == "default_car.jpg" || $image == "default.jpg")
             $imageurl = IMAGEURL . "default_car.jpg";
         else 
-            {
-            $folder = $data_summary['valet_in_datetime'];
+            {            
             $folder = substr($folder, 8, 2) . "-" . substr($folder, 5, 2) . "-" . substr($folder, 0, 4);
             $folder = $folder . '/';
             $imageurl = IMAGEURL . $folder . $image;

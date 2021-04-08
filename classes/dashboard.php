@@ -1,16 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- * Description of dashboard
- *
- * @author User
- */
 class dashboard {
 
     function db_connect() {
@@ -22,7 +11,6 @@ class dashboard {
             return $con;
     }
 
-// end 
 
     function db_connect_config() {
         $con = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
@@ -32,7 +20,6 @@ class dashboard {
             return $con;
     }
 
-// end 
 
     function db_connect_reporting() {
         $con = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME_REPORTING);
@@ -42,10 +29,8 @@ class dashboard {
             return $con;
     }
 
-// end
 
-    function getFacilityFeatures() {
-        $data;
+    function getFacilityFeatures() {       
         $con = $this->db_connect_config();
         if ($con) {
             $query_string = "select setting_name,setting_value from system_settings where setting_name in('currency','decimal_places','vat_percentage','facility_name','address_line1','address_line2','vat_id')";
@@ -58,22 +43,161 @@ class dashboard {
         return $data;
     }  
 
-    function live_revenue() {
+    function live_revenue_facility() {
         $con = $this->db_connect();
-        $query_string = "select sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue";
+        $query_string = "select facility_number,sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue group by facility_number";
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
-        if ($data = mysqli_fetch_assoc($result)) {
-            $response["gross_amount"] = $data["gross_amount"];
-            $response["parking_fee"] = $data["parking_fee"];
-            $response["vat_amount"] = $data["vat_amount"];
-            $response["lost_fee"] = $data["lost_fee"];
-            $response["product_sale_amount"] = $data["product_sale_amount"];
+        $i=0;
+        while ($data = mysqli_fetch_assoc($result)) {
+            $row["facility_number"]=$data["facility_number"];
+            $row["gross_amount"] = $data["gross_amount"];
+            $row["parking_fee"] = $data["parking_fee"];
+            $row["vat_amount"] = $data["vat_amount"];
+            $row["lost_fee"] = $data["lost_fee"];
+            $row["product_sale_amount"] = $data["product_sale_amount"];
+            $response[$i]=$row;
+            $i++;
         }
         mysqli_close($con);
         echo json_encode($response);
     }
+    
+     function live_revenue_carpark($facility_number) {
+        $con = $this->db_connect();
+        $query_string = "select carpark_number,sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue where facility_number=".$facility_number." group by carpark_number";
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        $i=0;
+        while ($data = mysqli_fetch_assoc($result)) {
+            $row["carpark_number"]=$data["carpark_number"];
+            $row["gross_amount"] = $data["gross_amount"];
+            $row["parking_fee"] = $data["parking_fee"];
+            $row["vat_amount"] = $data["vat_amount"];
+            $row["lost_fee"] = $data["lost_fee"];
+            $row["product_sale_amount"] = $data["product_sale_amount"];
+            $response[$i]=$row;
+            $i++;
+        }
+        mysqli_close($con);
+        echo json_encode($response);
+    }
+    
+      function live_revenue_device($facility_number,$carpark_number) {
+        $con = $this->db_connect();
+        $query_string = "select sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue where facility_number=".$facility_number." and carpark_number=".$carpark_number." group by carpark_number";
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        $i=0;
+        if ($data = mysqli_fetch_assoc($result)) {            
+            $row["gross_amount"] = $data["gross_amount"];
+            $row["parking_fee"] = $data["parking_fee"];
+            $row["vat_amount"] = $data["vat_amount"];
+            $row["lost_fee"] = $data["lost_fee"];
+            $row["product_sale_amount"] = $data["product_sale_amount"];
+            
+            $i++;
+        }
+        mysqli_close($con);
+        echo json_encode($row);
+    }
+    
+    function show_live_revenue_facility()
+        {        
+        $con = $this->db_connect();
+        $query_string = "select facility_number,facility_name,count(*) as devices,sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,"
+                . "sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,"
+                . "sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue group by facility_number";
+        
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        
+        if (mysqli_num_rows($result) == 1) 
+            {            
+            $data = mysqli_fetch_assoc($result);
+            $facility_number=$data["facility_number"];
+            mysqli_close($con);            
+            $this->show_live_revenue_carpark($facility_number);
+            }
+        else
+            {  
+            $facility=$this->getFacilityFeatures();
+            while ($data = mysqli_fetch_assoc($result)) 
+                {
+                $html='';
+                $html.='<div class="finance-facility col-md-4">';
+                $html.='<div class="card ">';
+                $html.='<div class="card-body box-profile">';
+                $html.='<h3 class="profile-username text-center">'.$data["facility_name"].'</h3>';
+                $html.='<p class="text-muted text-center">'.$data["facility_number"].'</p>';                                                                                                
+                $html.='<canvas facility-number="'.$data["facility_number"].'" class="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>';
 
-    function get_revenue_summary() {
+                $html.='<ul class="list-group list-group-unbordered mb-3 mt-3">';                                
+                $html.='<li class="list-group-item"><b>Total payment devices</b> <a class="float-right">'.$data["devices"].'</a></li>';            
+                $html.='<li class="list-group-item"><b>Gross Amount</b> <a class="float-right">'.$data["gross_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Parking Fee</b> <a class="float-right">'.$data["parking_fee"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Lost fee</b> <a class="float-right">'.$data["lost_fee"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Product sale</b> <a class="float-right">'.$data["product_sale_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Vat amount</b> <a class="float-right">'.$data["vat_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Discount amount</b> <a class="float-right">'.$data["discount_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='</ul>';
+                $html.='<button type="button" class="show-facility-details btn btn-block bg-secondary-gradient" facility_number="'.$data["facility_number"].'">More <i class="fa fa-arrow-circle-right"></i></button>';
+                $html.='</div>';
+                $html.='</div>';
+                $html.='</div>';
+                echo $html;
+                }
+             mysqli_close($con);
+            }
+        }
+        
+        function show_live_revenue_carpark($facility_number)
+        {
+        
+        $con = $this->db_connect();
+        $query_string = "select facility_number,carpark_number,carpark_name,count(*) as devices,sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,"
+                . "sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,"
+                . "sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue where facility_number=".$facility_number." group by carpark_number";
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));              
+        if (mysqli_num_rows($result) == 1) 
+            {            
+            $data = mysqli_fetch_assoc($result);
+            $carpark_number=$data["carpark_number"];
+            mysqli_close($con);
+            $html="<input type='hidden' id='facility_number' value='".$facility_number."'>";
+            $html.="<input type='hidden' id='carpark_number' value='".$carpark_number."'>";
+            echo $html;
+            //$this->get_revenue_summary($facility_number,$carpark_number);
+            }
+        else
+            {              
+            $facility=$this->getFacilityFeatures();  
+            $html="<input type='hidden' id='facility_number' value='".$facility_number."'>";
+            while ($data = mysqli_fetch_assoc($result)) 
+                {                
+                $html.='<div class="finance-carpark col-md-4">';
+                $html.='<div class="card ">';
+                $html.='<div class="card-body box-profile">';
+                $html.='<h3 class="profile-username text-center">'.$data["carpark_name"].'</h3>';
+                $html.='<p class="text-muted text-center">'.$data["carpark_number"].'</p>';                                                                                                
+                $html.='<canvas facility-number="'.$data["facility_number"].'" carpark-number="'.$data["carpark_number"].'" class="donutChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>';
+
+                $html.='<ul class="list-group list-group-unbordered mb-3 mt-3">';                                
+                $html.='<li class="list-group-item"><b>Total payment devices</b> <a class="float-right">'.$data["devices"].'</a></li>';            
+                $html.='<li class="list-group-item"><b>Gross Amount</b> <a class="float-right">'.$data["gross_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Parking Fee</b> <a class="float-right">'.$data["parking_fee"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Lost fee</b> <a class="float-right">'.$data["lost_fee"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Product sale</b> <a class="float-right">'.$data["product_sale_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Vat amount</b> <a class="float-right">'.$data["vat_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='<li class="list-group-item"><b>Discount amount</b> <a class="float-right">'.$data["discount_amount"].' '.$facility["currency"].'</a></li>';
+                $html.='</ul>';
+                $html.='<button type="button" class="show-carpark-details btn btn-block bg-secondary-gradient" facility_number="'.$data["facility_number"].'" carpark_number="'.$data["carpark_number"].'">More <i class="fa fa-arrow-circle-right"></i></button>';
+                $html.='</div>';
+                $html.='</div>';
+                $html.='</div>';                
+                }
+            echo $html;
+             mysqli_close($con);
+            }
+        }
+
+    function get_revenue_summary2() {
         $fdata = $this->getFacilityFeatures();
         $d = $fdata["decimal_places"];
         $currency = $fdata["currency"];
@@ -256,8 +380,95 @@ class dashboard {
 
 // End Function . Live Revenue 
 
+    
+    function get_revenue_summary($facility_number,$carpark_number) {
+        $fdata = $this->getFacilityFeatures();
+        $d = $fdata["decimal_places"];
+        $currency = $fdata["currency"];
+        $vat = $fdata["vat_percentage"];
+
+        $con = $this->db_connect();               
+       
+        $html_data = "";
+        $header = "";
+
+        $header .= '<table class="jspdf-table table table-blue table-bordered" data-status="table-view">';
+        $header .= '<thead><tr>';
+
+        $header .= '<th>Device Name</th>';
+        $header .= '<th>Total Revenue</th>';
+        $header .= '<th>Parking Fee</th>';
+        $header .= '<th>Product Sale Amount</th>';
+        $header .= '<th>VAT Amount</th>';
+        $header .= '<th>Lost Ticket Fee</th>';
+        $header .= '<th>Discount Amount</th>';
+        $header .= '<th>Payable Entries</th>';
+        $header .= '<th>Lost Ticket Count</th>';
+        $header .= '<th>Discount Count</th>';
 
 
+        $header .= '</tr></thead>';
+        $html_data=$header;
+
+        
+        $query_string = "select * from parking_revenue where carpark_number=" . $carpark_number . " and facility_number=".$facility_number;
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+
+        $html_data .= '<tbody>';
+
+        while ($data = mysqli_fetch_assoc($result)) 
+            {
+            $data_status = "all";
+            switch ($data["device_type"]) 
+                {
+                case 3:
+                    $data_status = "manual-cashier";
+                    break;
+                case 4:
+                    $data_status = "payonfoot-machine";
+                    break;
+                case 5:
+                    $data_status = "handheld-pos";
+                    break;
+                }
+
+            $html_data .= '<tr data-status="' . $data_status . '">';
+
+            $html_data .= '<td class="text-left text-dark table-row-detail">';
+            $html_data .= '<h6>';
+                if ($data["network_status"] == 1) {
+                    $html_data .= '<div class="dot-indicator bg-success-gradient" data-toggle="tooltip" data-placement="top" title="Online" ></div>';
+                } else {
+                    $html_data .= '<div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="Currently Off line"></div>';
+                }
+                $html_data .= $data["device_name"] . '</h6>';
+                $html_data .= '<p class="table-detail">';
+                $html_data .= 'Last Transaction update<br>' . $data["last_transaction"] . '';
+                $html_data .= '</p>';
+                $html_data .= '</td>';
+                $html_data .= '<td>' . number_format($data["gross_amount"], $d) . '</td>';
+                $html_data .= '<td>' . number_format($data["parking_fee"], $d) . '</td>';
+                $html_data .= '<td>' . number_format($data["product_sale_amount"], $d) . '</td>';
+                $html_data .= '<td>' . number_format($data["vat_amount"], $d) . '</td>';
+                $html_data .= '<td>' . number_format($data["lost_ticket_fee"], $d) . '</td>';
+                $html_data .= '<td>' . number_format($data["discount_amount"], $d) . '</td>';
+                $html_data .= '<td>' . $data["payable_entries_count"] . '</td>';
+                $html_data .= '<td>' . $data["lost_ticket_count"] . '</td>';
+                $html_data .= '<td>' . $data["discount_count"] . '</td>';
+                $html_data .= '</tr>';
+            }
+            
+        $html_data .= '</tbody>';
+        $html_data .= '</table>';
+
+        mysqli_close($con);
+               
+        echo $html_data;
+    }
+
+// End Function . Live Revenue 
+
+    
     function revenue_lastdays() {
         $con = $this->db_connect_reporting();
         $query_string = "select report_date,report_day,sum(gross_amount) as gross_amount from summary_daily_revenue where
