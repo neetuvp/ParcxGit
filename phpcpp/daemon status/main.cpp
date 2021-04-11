@@ -223,9 +223,10 @@ Php::Value startDaemon(string daemon)
         if(pid==-1)
             {
 			path = GetPath(daemon);
-            //command = "cd /opt/parcx/Daemons && sudo ./"+daemon;
+            //command = "cd /opt/parcx/Daemons && sudo ./"+daemon;            
 			
 			command = "cd "+path+" && sudo ./"+daemon;
+            writeLog("startDaemon","Command:"+command);
             int n = system(command.c_str());
             result =n;                                   
             }

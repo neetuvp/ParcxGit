@@ -25,6 +25,8 @@ void writeAnprException(string function, string message) {
 Php::Value Anpr::getEntryPlateDetails(int id) {
     Php::Value response;
     response["entry_plate_captured_status"] = "false";
+    response["entry_plate_number"]="###";
+    response["entry_camera_id"]="0";
     try {
         writeAnprLog("getEntryPlateDetails", "Id:" + to_string(id));
         sql::Connection *con;
@@ -62,6 +64,8 @@ Php::Value Anpr::getPlateDetails(int cameraId, int delay, int id) {
     response["result"] = "plate_unavailable";
     response["result_description"] = "Plate unavailable";
     response["plate_captured_id"] = 0;
+    response["current_plate_number"] = "###";  
+    response["plate_image_name"]="";           
     try {
         writeAnprLog("getPlateDetails", "cameraId:" + to_string(cameraId));
         if (cameraId == 0 && id == 0)

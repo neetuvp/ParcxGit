@@ -73,13 +73,14 @@ function show_donut_chart()
             labels: [
                 'Parking Fee',           
                 'Lost Fee',                   
-                'Product Sale', 
+                'Product Sale',
+                'VAT',
 
             ],
             datasets: [
               {
-                data: [0,0,0],
-                backgroundColor : ['#00a65a','#f56954', '#f39c12'],
+                data: [],
+                backgroundColor : ['#00a65a','#00c0ef','#f56954', '#f39c12'],
               }
             ]
           }
@@ -111,6 +112,7 @@ function updateRevenueSources()
             donutChartValues[index][0] = amount[i]["parking_fee"];            
             donutChartValues[index][1] = amount[i]["lost_fee"];
             donutChartValues[index][2] = amount[i]["product_sale_amount"];             
+            donutChartValues[index][3] = amount[i]["vat_amount"];             
             donutChart[index].update();        
             }
         });

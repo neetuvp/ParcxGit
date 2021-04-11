@@ -42,8 +42,7 @@ function get_live_revenue()
     {
     $.get("../ajax/dashboard.php?task=28&facility_number="+facility_number, function (data) {        
         $('#revenue-live-block').html(data);  
-        carpark_number=$("#carpark_number").val();   
-        console.log(carpark_number);
+        carpark_number=$("#carpark_number").val();           
         if (typeof carpark_number !== "undefined")
             window.location="finance_device.php?facility_number="+facility_number+"&carpark_number="+carpark_number;
        else
@@ -76,16 +75,17 @@ function show_donut_chart()
             labels: [
                 'Parking Fee',           
                 'Lost Fee',                   
-                'Product Sale', 
+                'Product Sale',
+                'VAT',
 
             ],
             datasets: [
               {
-                data: [0,0,0],
-                backgroundColor : ['#00a65a','#f56954', '#f39c12'],
+                data: [],
+                backgroundColor : ['#00a65a','#00c0ef','#f56954', '#f39c12'],
               }
             ]
-          }
+          }       
         var donutOptions     = {
           maintainAspectRatio : false,
           responsive : true,
@@ -114,7 +114,8 @@ function updateRevenueSources()
             var index = carparkNumber.indexOf(amount[i]["carpark_number"]);              
             donutChartValues[index][0] = amount[i]["parking_fee"];            
             donutChartValues[index][1] = amount[i]["lost_fee"];
-            donutChartValues[index][2] = amount[i]["product_sale_amount"];             
+            donutChartValues[index][2] = amount[i]["product_sale_amount"];   
+            donutChartValues[index][3] = amount[i]["vat_amount"];             
             donutChart[index].update();        
             }
         });

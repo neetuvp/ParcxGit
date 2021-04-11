@@ -155,15 +155,7 @@ include('../../includes/sidebar.php');
                 <button class="btn btn-danger" data-toggle="modal" data-target="#alarm-modal"><i class="fas fa-bell mr-1"></i><span id="alarm_notification">Alarms:100</span></button>                
             </div>
         </div>
-    </div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="device_status_facility.php">Facilities</a></li>
-            <li class="breadcrumb-item"><a href="device_status_carpark.php?facility_number=<?php echo $_GET["facility_number"]; ?>">Carparks</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Devices</li>
-        </ol>
-    </nav>
-
+    </div>    
     <section class="content">
         <div class="container-wide">
             <div class="row" id="device-status-block" >

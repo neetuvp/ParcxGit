@@ -436,6 +436,8 @@ Php::Value openTransactionCheck(int getDetails) {
         res = stmt->executeQuery(query);
         if (res->next()) {
             response["open_transaction_check"] = "true";
+            response["entry_plate_number"] = "###";            
+
             if (res->getString("plate_captured_id") != "")
                 response = AnprObj.getEntryPlateDetails(res->getInt("plate_captured_id"));
 
@@ -453,7 +455,7 @@ Php::Value openTransactionCheck(int getDetails) {
             writeLog("openTransactionCheck", "maxEntryGrace: " + maxEntryGrace);
 
             response["ticket_id"] = ticketId;
-            response["plate_number"] = plateNumber;
+            response["plate_number"] = plateNumber;            
             response["entry_grace_period"] = maxEntryGrace;
             response["entry_date_time"] = entryDateTime;
             response["entry_type"] = entryType;
@@ -907,7 +909,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
             plateCountry = "";
             plateArea = "";
 
-            if (anprEnabled == 1) {               
+            if (anprEnabled == 1) {                  
                 Php::Value plate_details = AnprObj.getPlateDetails(cameraId, plateCapturedInterval, plateCapturedId);
                 response = plate_details;
                 if (toString(plate_details["result"]) == "plate_available") {

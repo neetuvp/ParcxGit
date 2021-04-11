@@ -41,8 +41,7 @@ NAME				=	PX_ExportSettings
 #	this with a different fixed directory
 #
 
-EXTENSION_DIR		=	/opt/lampp/lib/php/extensions/no-debug-non-zts-20160303
-
+EXTENSION_DIR		=	$(shell /opt/lampp/bin/php-config --extension-dir)
 
 #
 #	The name of the extension and the name of the .ini file

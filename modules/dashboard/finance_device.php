@@ -98,7 +98,7 @@ include('../../includes/sidebar.php');
                                 <!-- end / donut chart -->
 
                             </div>
-                            <div class="card">
+                            <div class="">
                                 
                                     <div id="live-revenue-summary-content">
                                     </div>                                
@@ -113,14 +113,6 @@ include('../../includes/sidebar.php');
     </div>
 </div>
 
-<script src="../../plugins/gauge/raphael-2.1.4.min.js"></script>
-<script src="../../plugins/flot/jquery.flot.min.js"></script>
-<script src="../../plugins/flot/jquery.flot.categories.min.js"></script>
-<script src="../../dist/js/gauge.js"></script>
-
-
-<!-- add moment.js -->
-<script src="../../plugins/jquery/moment.min.js"></script>
 
 <!-- save day_closure_start as js variable for use in graphs -->
 <div id="dom-target" style="display: none;">
@@ -394,22 +386,13 @@ function revenueSources()
         data: {
             datasets: [{
                 data: [],
-                backgroundColor: [
-                    "rgba(40, 167, 69, 0.5)",
-                    "rgba(0, 123, 255, 0.5)",
-                    "rgba(113, 128, 172, 0.5)"
-                ],
-                borderColor: [
-                    "#28a745",
-                    "#007bff",
-                    "#7180ac"
-                ],
-                label: 'Dataset 1'
+                backgroundColor : ['#00a65a','#00c0ef','#f56954', '#f39c12'],                                
             }],
             labels: [
                 'Parking Fee',
                 'Lost Fee',
-                'Product Sale'
+                'Product Sale',
+                'VAT'
             ]
         },
         options: {
@@ -425,80 +408,10 @@ function revenueSources()
     })
 
     // get dynamic data
-
-    var parking_fee, vat_amount, lost_fee, amount;
+    
     pieValues = pieChart.data.datasets[0].data
 
     updateRevenueSources();
-
-    // edits to add margin between legend and chart
-
-    function getBoxWidth(labelOpts, fontSize) 
-        {
-        return labelOpts.usePointStyle ?
-            fontSize * Math.SQRT2 :
-            labelOpts.boxWidth;
-        };
-
-    Chart.NewLegend = Chart.Legend.extend(
-        {
-        afterFit: function () {
-            this.height = this.height + 10;
-        },
-    });
-
-function createNewLegendAndAttach(chartInstance, legendOpts) 
-    {
-    var legend = new Chart.NewLegend(
-        {
-        ctx: chartInstance.chart.ctx,
-        options: legendOpts,
-        chart: chartInstance
-        });
-
-    if (chartInstance.legend) 
-        {
-        Chart.layoutService.removeBox(chartInstance, chartInstance.legend);
-        delete chartInstance.newLegend;
-        }
-
-    chartInstance.newLegend = legend;
-    Chart.layoutService.addBox(chartInstance, legend);
-    }
-
-    // Register the legend plugin
-    Chart.plugins.register({
-        beforeInit: function (chartInstance) {
-            var legendOpts = chartInstance.options.legend;
-
-            if (legendOpts) {
-                createNewLegendAndAttach(chartInstance, legendOpts);
-            }
-        },
-        beforeUpdate: function (chartInstance) {
-            var legendOpts = chartInstance.options.legend;
-
-            if (legendOpts) {
-                legendOpts = Chart.helpers.configMerge(Chart.defaults.global.legend, legendOpts);
-
-                if (chartInstance.newLegend) {
-                    chartInstance.newLegend.options = legendOpts;
-                } else {
-                    createNewLegendAndAttach(chartInstance, legendOpts);
-                }
-            } else {
-                Chart.layoutService.removeBox(chartInstance, chartInstance.newLegend);
-                delete chartInstance.newLegend;
-            }
-        },
-        afterEvent: function (chartInstance, e) {
-            var legend = chartInstance.newLegend;
-            if (legend) {
-                legend.handleEvent(e);
-            }
-        }
-    });
-
     }
 
 function updateRevenueSources() 
@@ -509,6 +422,7 @@ function updateRevenueSources()
         pieValues[0] = amount["parking_fee"];
         pieValues[1] = amount["lost_fee"];
         pieValues[2] = amount["product_sale_amount"];        
+        pieValues[3] = amount["vat_amount"];        
         pieChart.update();
         //update barchart
         revenue_data[7]=amount["gross_amount"];

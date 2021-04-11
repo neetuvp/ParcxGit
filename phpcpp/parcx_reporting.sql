@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 11, 2021 at 09:59 AM
+-- Generation Time: Apr 08, 2021 at 10:44 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.2.28
 
@@ -249,52 +249,6 @@ CREATE TABLE `parking_duration` (
   `average_parking_duration` float NOT NULL DEFAULT 0,
   `flag` int(1) NOT NULL DEFAULT 0,
   `cloud_upload_status` int(11) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `parking_duration_bak`
---
-
-CREATE TABLE `parking_duration_bak` (
-  `id` int(11) NOT NULL,
-  `report_date` date NOT NULL,
-  `report_day` varchar(25) NOT NULL,
-  `carpark_number` int(5) NOT NULL DEFAULT 1,
-  `carpark_name` varchar(50) NOT NULL DEFAULT 'PARCX',
-  `category` varchar(25) NOT NULL DEFAULT 'shortterm',
-  `m0to30` int(5) NOT NULL,
-  `m30to60` int(5) NOT NULL,
-  `h1to2` int(5) NOT NULL,
-  `h2to3` int(5) NOT NULL,
-  `h3to4` int(5) NOT NULL,
-  `h4to5` int(5) NOT NULL,
-  `h5to6` int(11) NOT NULL,
-  `h6to7` int(11) NOT NULL,
-  `h7to8` int(11) NOT NULL,
-  `h8to9` int(5) NOT NULL,
-  `h9to10` int(5) NOT NULL,
-  `h10to11` int(5) NOT NULL,
-  `h11to12` int(5) NOT NULL,
-  `h12to13` int(5) NOT NULL,
-  `h13to14` int(5) NOT NULL,
-  `h14to15` int(5) NOT NULL,
-  `h15to16` int(5) NOT NULL DEFAULT 0,
-  `h16to17` int(5) NOT NULL DEFAULT 0,
-  `h17to18` int(5) NOT NULL DEFAULT 0,
-  `h18to19` int(5) NOT NULL DEFAULT 0,
-  `h19to20` int(5) NOT NULL DEFAULT 0,
-  `h20to21` int(5) NOT NULL DEFAULT 0,
-  `h21to22` int(5) NOT NULL DEFAULT 0,
-  `h22to23` int(5) NOT NULL DEFAULT 0,
-  `h23to24` int(5) NOT NULL DEFAULT 0,
-  `d1to2` int(5) NOT NULL DEFAULT 0,
-  `d2to3` int(5) NOT NULL DEFAULT 0,
-  `maximum_parking_duration` int(11) NOT NULL DEFAULT 0,
-  `minimum_parking_duration` int(11) NOT NULL DEFAULT 0,
-  `average_parking_duration` float NOT NULL DEFAULT 0,
-  `flag` int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -629,70 +583,6 @@ CREATE TABLE `revenue_payments` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `revenue_payments_org`
---
-
-CREATE TABLE `revenue_payments_org` (
-  `id` int(11) NOT NULL,
-  `device_number` int(5) NOT NULL DEFAULT 0,
-  `device_name` varchar(50) NOT NULL DEFAULT 'Cashier',
-  `operator_id` int(11) NOT NULL DEFAULT 0,
-  `operator_name` varchar(50) NOT NULL DEFAULT 'Operator',
-  `shift_id` varchar(25) NOT NULL DEFAULT '1',
-  `carpark_name` varchar(50) NOT NULL DEFAULT 'Car Park ',
-  `carpark_number` int(5) NOT NULL DEFAULT 2,
-  `parking_rate_label` varchar(25) DEFAULT NULL,
-  `parking_rate_name` varchar(25) DEFAULT NULL,
-  `entry_grace_period` varchar(25) NOT NULL DEFAULT '0',
-  `exit_grace_period` varchar(25) NOT NULL DEFAULT '0',
-  `vat_type` text DEFAULT NULL,
-  `vat_percentage` int(11) NOT NULL DEFAULT 0,
-  `ticket_id` varchar(50) NOT NULL DEFAULT '0',
-  `entry_date_time` datetime DEFAULT current_timestamp(),
-  `payment_date_time` datetime DEFAULT current_timestamp(),
-  `max_exit_date_time` datetime DEFAULT current_timestamp(),
-  `parking_duration` varchar(20) NOT NULL DEFAULT '0',
-  `payment_category` varchar(20) NOT NULL DEFAULT '0',
-  `parking_fee` double NOT NULL DEFAULT 0,
-  `vat_amount` double NOT NULL DEFAULT 0,
-  `lost_fee` double NOT NULL DEFAULT 0,
-  `admin_fixed_charges` double NOT NULL DEFAULT 0,
-  `ticket_replacement_fee` double NOT NULL DEFAULT 0,
-  `discount_amount` double NOT NULL DEFAULT 0,
-  `gross_amount` double NOT NULL DEFAULT 0,
-  `amount_received` double NOT NULL DEFAULT 0,
-  `discount_id` int(5) DEFAULT 0,
-  `discount_category` varchar(25) DEFAULT '0',
-  `discount_name` varchar(50) NOT NULL DEFAULT '0',
-  `coupon_id` varchar(50) DEFAULT NULL,
-  `coupon_category` varchar(25) DEFAULT NULL,
-  `coupon_source` varchar(25) DEFAULT NULL,
-  `product_id` int(11) NOT NULL DEFAULT 0,
-  `product_quantity` int(11) NOT NULL DEFAULT 0,
-  `payment_type` varchar(25) NOT NULL DEFAULT 'cash',
-  `authentication_code` varchar(25) DEFAULT NULL,
-  `void` text DEFAULT NULL,
-  `record_creation_time` datetime DEFAULT current_timestamp(),
-  `facility_number` int(11) NOT NULL DEFAULT 0,
-  `entry_plate_number` varchar(15) DEFAULT NULL,
-  `exit_plate_number` varchar(15) DEFAULT NULL,
-  `anpr_comparison_number` int(11) DEFAULT NULL,
-  `validation_value` varchar(50) DEFAULT NULL,
-  `validation_id` text DEFAULT NULL,
-  `void_user` varchar(50) DEFAULT NULL,
-  `void_reason` text DEFAULT NULL,
-  `void_datetime` datetime NOT NULL DEFAULT current_timestamp(),
-  `receipt_number` int(11) NOT NULL DEFAULT 0,
-  `customer_card_id` int(11) DEFAULT NULL,
-  `bank_notes` varchar(100) DEFAULT NULL,
-  `balance_returned` double NOT NULL DEFAULT 0,
-  `credit_note` double NOT NULL DEFAULT 0,
-  `upload_status` int(11) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `revenue_payment_exceptions`
 --
 
@@ -946,70 +836,6 @@ CREATE TABLE `summary_parking_movements` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `summary_parking_movements-bak`
---
-
-CREATE TABLE `summary_parking_movements-bak` (
-  `id` int(11) NOT NULL,
-  `report_date` date NOT NULL,
-  `report_day` varchar(25) NOT NULL,
-  `category` varchar(25) DEFAULT NULL,
-  `movement_type` int(11) NOT NULL,
-  `device_number` int(3) DEFAULT NULL,
-  `car_park_number` int(3) DEFAULT NULL,
-  `h0to1` int(5) DEFAULT 0,
-  `h1to2` int(5) DEFAULT 0,
-  `h2to3` int(5) DEFAULT 0,
-  `h3to4` int(5) DEFAULT 0,
-  `h4to5` int(5) DEFAULT 0,
-  `h5to6` int(11) DEFAULT 0,
-  `h6to7` int(11) NOT NULL DEFAULT 0,
-  `h7to8` int(11) DEFAULT NULL,
-  `h8to9` int(5) DEFAULT NULL,
-  `h9to10` int(5) DEFAULT NULL,
-  `h10to11` int(5) DEFAULT NULL,
-  `h11to12` int(5) DEFAULT NULL,
-  `h12to13` int(5) DEFAULT NULL,
-  `h13to14` int(5) DEFAULT NULL,
-  `h14to15` int(5) DEFAULT NULL,
-  `h15to16` int(5) DEFAULT NULL,
-  `h16to17` int(5) DEFAULT NULL,
-  `h17to18` int(5) DEFAULT NULL,
-  `h18to19` int(5) DEFAULT NULL,
-  `h19to20` int(5) DEFAULT NULL,
-  `h20to21` int(5) DEFAULT NULL,
-  `h21to22` int(5) DEFAULT NULL,
-  `h22to23` int(5) DEFAULT NULL,
-  `h23to24` int(5) DEFAULT NULL,
-  `dayclosure` int(1) DEFAULT NULL,
-  `comment` text DEFAULT NULL,
-  `total_count` int(10) DEFAULT NULL,
-  `flag` int(11) DEFAULT NULL,
-  `DayclosureComment` varchar(50) DEFAULT NULL,
-  `tag` varchar(25) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `system_user_activity`
---
-
-CREATE TABLE `system_user_activity` (
-  `user_actvity_id` int(11) NOT NULL,
-  `source_ip_address` varchar(25) NOT NULL,
-  `source_device` varchar(100) NOT NULL,
-  `source_additional_info` tinytext NOT NULL,
-  `user_role` varchar(25) NOT NULL DEFAULT 'application_user',
-  `activity_category` varchar(25) NOT NULL COMMENT 'module name access, reservation ,login',
-  `activity_date_time` datetime NOT NULL,
-  `activity_description` text NOT NULL,
-  `activity_internal_description` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `track_ticket`
 --
 
@@ -1047,28 +873,35 @@ CREATE TABLE `track_ticket` (
 
 CREATE TABLE `valet_parking` (
   `id` int(11) NOT NULL,
-  `ticket_number` varchar(30) DEFAULT NULL,
+  `carpark_number` int(3) NOT NULL DEFAULT 0,
+  `customer_name` varchar(13) DEFAULT NULL,
+  `mobile_no` varchar(10) DEFAULT NULL,
   `plate_number` varchar(12) DEFAULT NULL,
   `plate_prefix` varchar(5) DEFAULT NULL,
   `plate_country` varchar(25) DEFAULT NULL,
   `plate_emirate` varchar(25) DEFAULT NULL,
+  `front_plate` varchar(50) DEFAULT NULL,
+  `left_plate` varchar(50) DEFAULT NULL,
+  `right_plate` varchar(50) DEFAULT NULL,
+  `back_plate` varchar(50) DEFAULT NULL,
+  `ticket_number` varchar(30) DEFAULT NULL,
   `customer_card_number` int(11) NOT NULL DEFAULT 0,
   `customer_card_id` varchar(15) DEFAULT NULL,
-  `valet_in_datetime` datetime DEFAULT current_timestamp(),
   `key_card_id` varchar(15) DEFAULT NULL,
   `key_card_number` int(11) NOT NULL DEFAULT 0,
   `key_position` varchar(25) DEFAULT NULL,
   `parking_bay` varchar(25) DEFAULT NULL,
-  `parking_in` tinyint(1) NOT NULL DEFAULT 0,
-  `parking_in_datetime` datetime DEFAULT NULL,
   `paid_status` tinyint(1) NOT NULL DEFAULT 0,
   `payment_date_time` datetime DEFAULT NULL,
-  `parking_out` tinyint(1) NOT NULL DEFAULT 0,
-  `parking_out_datetime` datetime DEFAULT NULL,
-  `ready_for_delivery` tinyint(1) NOT NULL DEFAULT 0,
-  `dropoff_datetime` datetime DEFAULT NULL,
   `valet_out` tinyint(1) NOT NULL DEFAULT 0,
+  `parking_in` tinyint(1) NOT NULL DEFAULT 0,
+  `parking_out` tinyint(1) NOT NULL DEFAULT 0,
+  `dropoff_datetime` datetime DEFAULT NULL,
+  `ready_for_delivery` tinyint(1) NOT NULL DEFAULT 0,
+  `valet_in_datetime` datetime DEFAULT current_timestamp(),
   `valet_out_datetime` datetime DEFAULT NULL,
+  `parking_in_datetime` datetime DEFAULT NULL,
+  `parking_out_datetime` datetime DEFAULT NULL,
   `pickup_driver_id` varchar(25) DEFAULT NULL,
   `pickup_driver_name` varchar(25) DEFAULT NULL,
   `delivery_driver_id` varchar(25) DEFAULT NULL,
@@ -1083,16 +916,9 @@ CREATE TABLE `valet_parking` (
   `operator_name` varchar(25) DEFAULT NULL,
   `car_brand` varchar(25) DEFAULT NULL,
   `car_color` varchar(50) DEFAULT NULL,
-  `carpark_number` int(3) NOT NULL DEFAULT 0,
   `car_model` varchar(25) DEFAULT NULL,
   `record_creation_datetime` datetime NOT NULL DEFAULT current_timestamp(),
-  `customer_name` varchar(13) DEFAULT NULL,
-  `mobile_no` varchar(10) DEFAULT NULL,
-  `front_plate` varchar(50) DEFAULT NULL,
-  `back_plate` varchar(50) DEFAULT NULL,
-  `right_plate` varchar(50) DEFAULT NULL,
-  `cloud_upload_status` int(1) NOT NULL DEFAULT 0,
-  `left_plate` varchar(50) DEFAULT NULL
+  `cloud_upload_status` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -1232,12 +1058,6 @@ ALTER TABLE `parking_duration`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `parking_duration_bak`
---
-ALTER TABLE `parking_duration_bak`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `parking_movements`
 --
 ALTER TABLE `parking_movements`
@@ -1310,12 +1130,6 @@ ALTER TABLE `revenue_payments`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `revenue_payments_org`
---
-ALTER TABLE `revenue_payments_org`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `revenue_payment_exceptions`
 --
 ALTER TABLE `revenue_payment_exceptions`
@@ -1362,18 +1176,6 @@ ALTER TABLE `summary_daily_revenue`
 --
 ALTER TABLE `summary_parking_movements`
   ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `summary_parking_movements-bak`
---
-ALTER TABLE `summary_parking_movements-bak`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `system_user_activity`
---
-ALTER TABLE `system_user_activity`
-  ADD PRIMARY KEY (`user_actvity_id`);
 
 --
 -- Indexes for table `track_ticket`
@@ -1458,12 +1260,6 @@ ALTER TABLE `parking_duration`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `parking_duration_bak`
---
-ALTER TABLE `parking_duration_bak`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `parking_movements`
 --
 ALTER TABLE `parking_movements`
@@ -1536,12 +1332,6 @@ ALTER TABLE `revenue_payments`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `revenue_payments_org`
---
-ALTER TABLE `revenue_payments_org`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `revenue_payment_exceptions`
 --
 ALTER TABLE `revenue_payment_exceptions`
@@ -1588,18 +1378,6 @@ ALTER TABLE `summary_daily_revenue`
 --
 ALTER TABLE `summary_parking_movements`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `summary_parking_movements-bak`
---
-ALTER TABLE `summary_parking_movements-bak`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `system_user_activity`
---
-ALTER TABLE `system_user_activity`
-  MODIFY `user_actvity_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `track_ticket`

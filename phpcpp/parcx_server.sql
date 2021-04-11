@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 11, 2021 at 09:59 AM
+-- Generation Time: Apr 08, 2021 at 10:46 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.2.28
 
@@ -44,13 +44,6 @@ CREATE TABLE `access_anpr_checks` (
   `allow_O_Q_mismatch` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `access_anpr_checks`
---
-
-INSERT INTO `access_anpr_checks` (`anpr_check_id`, `facility_number`, `carpark_number`, `carpark_name`, `check_plate_type`, `check_plate_country`, `check_plate_area`, `check_plate_prefix`, `check_plate_number`, `check_partial_plate_number`, `check_plate_number_begining`, `check_plate_number_end`, `allow_O_Q_mismatch`) VALUES
-(1, 20001, 1, 'P1', 1, 1, 1, 0, 0, 0, 0, 0, 0);
-
 -- --------------------------------------------------------
 
 --
@@ -90,23 +83,27 @@ CREATE TABLE `access_whitelist` (
   `personalized_message_line2` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `access_whitelist`
+-- Table structure for table `access_whitelist_customers`
 --
 
-INSERT INTO `access_whitelist` (`access_whitelist_id`, `access_id`, `customer_name`, `ticket_id`, `plate_number`, `corporate_parker`, `validity_start_date`, `validity_expiry_date`, `tag_serial`, `tag`, `tag_tid`, `access_zones`, `carpark_number`, `facility_number`, `creation_date_time`, `status`, `antipassback_enabled`, `last_visited_date_time`, `wallet_payment`, `season_card`, `wallet_user_id`, `company_name`, `last_sync`, `country`, `operator_id`, `user_qrcode`, `description`, `cloud_upload_status`, `personalized_message_line1`, `personalized_message_line2`) VALUES
-(2, 35810209, 'Parcx Parcx1', '5a4a189d', 'KUW 1 12121', 201, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 11:16:48', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(3, 35810208, 'Parcx Parcx2', '5a4a1891', 'KUW 1 11111', 201, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(4, 35810201, 'Parcx Parcx3', '5a4a1892', 'h 95942', 201, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(5, 35810202, 'Parcx Parcx4', '5a4a1893', 'h 95944', 201, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(6, 35810203, 'Parcx Parcx5', '5a4a1894', 'OMN W 99790', 201, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(7, 35810203, 'Parcx Parcx6', '5a4a1894', 'OMN S 63899', 0, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(8, 35810203, 'Parcx Parcx7', '5a4a1894', 'OMN YR 3', 0, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(9, 35810203, 'Jeena 1', '123456789', 'OMN TB 2544', 0, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(10, 35810203, 'Jeena 1', '123456789', 'OMN HS 7125', 0, '2021-02-18', '2021-03-11', '', '', '', '', '1,1', 200005, '2021-02-18 12:05:33', 1, 1, NULL, 1, 1, 234, '', '2021-02-25 11:01:50', '', 0, NULL, '', 1, NULL, NULL),
-(11, 36928423, 'jeena', '20210303095327', 'BAH A 11221', 0, '2021-03-03', '2021-03-31', '', '', '', '', '1', 200005, '2021-03-03 09:53:43', 1, 0, NULL, 0, 0, 0, NULL, '2021-03-03 09:53:43', 'BAH', 0, NULL, NULL, 0, '', ''),
-(12, 36928466, 'Neethu', '20210303095400', 'KUW R 5678', 0, '2021-03-03', '2021-03-31', '', '', '', '', '1', 200005, '2021-03-03 09:54:26', 1, 0, NULL, 0, 0, 0, NULL, '2021-03-03 09:54:26', 'KUW', 0, NULL, NULL, 0, '', ''),
-(13, 37036328, 'jeena', '20210304035145', 'DXB H 95943', 0, '2021-03-04', '2021-03-31', '', '', '', '', '1,2', 200005, '2021-03-04 15:52:08', 1, 0, NULL, 0, 0, 0, NULL, '2021-03-04 15:52:08', 'UAE', 0, NULL, NULL, 0, '', '');
+CREATE TABLE `access_whitelist_customers` (
+  `id` int(11) NOT NULL,
+  `customer_name` varchar(50) NOT NULL,
+  `country` varchar(50) NOT NULL,
+  `creation_date_time` datetime NOT NULL DEFAULT current_timestamp(),
+  `operator_id` int(11) NOT NULL DEFAULT 0,
+  `wallet_payment` tinyint(4) NOT NULL DEFAULT 0,
+  `season_card` tinyint(4) NOT NULL DEFAULT 0,
+  `wallet_user_id` int(11) NOT NULL DEFAULT 0,
+  `corporate_parker` int(11) NOT NULL DEFAULT 0,
+  `company_name` varchar(100) DEFAULT NULL,
+  `whitelist_group` text DEFAULT NULL,
+  `personalized_message_line2` varchar(100) DEFAULT NULL,
+  `active` int(11) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -123,13 +120,6 @@ CREATE TABLE `alerts_alarms` (
   `mobile` text NOT NULL,
   `last_send_datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `alerts_alarms`
---
-
-INSERT INTO `alerts_alarms` (`id`, `start_date_time`, `hour`, `minute`, `email`, `mobile`, `last_send_datetime`) VALUES
-(9, '2018-07-21 15:23:00', 1, 0, 'jeenavolga@gmail.com', '', '2018-08-01 12:30:07');
 
 -- --------------------------------------------------------
 
@@ -151,15 +141,6 @@ CREATE TABLE `alerts_counter` (
   `mobile` text NOT NULL,
   `last_send_datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `alerts_counter`
---
-
-INSERT INTO `alerts_counter` (`id`, `counter_id`, `counter_name`, `counter_condition`, `start_date_time`, `hour`, `minute`, `counterId_in_message`, `counters_in_message`, `email`, `mobile`, `last_send_datetime`) VALUES
-(128, 1, 'VIP1', '<10', '2018-07-21 15:20:00', 1, 0, '1,2', 'VIP1,VIP2', 'jeenavolga@gmail.com', '', '2018-07-25 13:13:39'),
-(129, NULL, NULL, NULL, '2018-07-21 15:20:00', 1, 0, '1,2', 'VIP1,VIP2', 'jeenavolga@gmail.com', '', '2019-02-03 10:27:24'),
-(136, 1, 'VIP1', '<50', '2018-07-23 00:50:00', 5, 0, '1', 'VIP1', 'jdcoutho@alfalakme.com,,rbernard@alfalakme.com', '', '2018-07-25 13:13:47');
 
 -- --------------------------------------------------------
 
@@ -206,13 +187,6 @@ CREATE TABLE `cooperate_users` (
   `expiry_date` date DEFAULT NULL,
   `status` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `cooperate_users`
---
-
-INSERT INTO `cooperate_users` (`user_id`, `user_name`, `parking_spaces`, `date_validity`, `start_date`, `expiry_date`, `status`) VALUES
-(201, 'jeena volga', 2, 0, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -322,181 +296,6 @@ INSERT INTO `customer_messages` (`id`, `device_type`, `message`, `media_path`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `customer_messages_media`
---
-
-CREATE TABLE `customer_messages_media` (
-  `id` int(11) NOT NULL,
-  `device_type` int(3) NOT NULL DEFAULT 1,
-  `message` varchar(50) NOT NULL,
-  `media_type` varchar(25) NOT NULL DEFAULT 'image',
-  `media_path` text NOT NULL,
-  `status` tinyint(4) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `customer_messages_media`
---
-
-INSERT INTO `customer_messages_media` (`id`, `device_type`, `message`, `media_type`, `media_path`, `status`) VALUES
-(1, 1, 'EntryPresenceLoopActivatedChipcoin', 'image', '/parcx/Media/download.png', 1),
-(2, 1, 'EntryStandBy', 'image', '/parcx/Media/entrypushbutton2.jpg', 1),
-(3, 1, 'TakeEntryTicket', 'image', '/parcx/Media/download.png', 1),
-(4, 1, 'AccessAllowedExit', 'image', '/Media/ThankYou.gif', 1),
-(5, 1, 'AccessDeniedEntry', 'image', '/Media/AccessDenied.gif', 1),
-(6, 1, 'NoVehiclePresent', 'image', '/Media/NoVehiclePresent.gif', 1),
-(7, 1, 'AccessAllowedEntry', 'image', '/Media/AccessAllowed2.jpg', 1),
-(8, 1, 'AccessDeniedInvalidTicket', 'image', '/Media/InvalidTicket.gif', 1),
-(9, 1, 'AccessDeniedUnpaidTicket', 'image', '/Media/UnpaidTicket.gif', 1),
-(10, 1, 'EntryTicketBlacklisted', 'image', '/Media/TicketBlacklisted.gif', 1),
-(11, 1, 'OpenBarrier', 'image', '/Media/AccessAllowed1.jpg', 1),
-(12, 1, 'CloseBarrier', 'image', '/Media/Barrier-Close.gif', 1),
-(13, 1, 'Processing', 'image', '/parcx/Media/entrypushbutton2.jpg', 1),
-(14, 1, 'AccessDeniedExitGrace', 'image', '/Media/GracePeriodExceeded.jpg', 1),
-(15, 1, 'AccessDeniedAlreadyExited', 'image', '/Media/TktAlreadyExited.jpg', 1),
-(16, 1, 'AccessDeniedInvalidTag', 'image', '/Media/InvalidTag.gif', 1),
-(17, 1, 'ExitStandBy', 'image', '/Media/TerminalBackgroundExit.jpg', 1),
-(18, 1, 'ExitPresenceLoopActivatedChipcoin', 'image', '/Media/ExitScanchipcoin.gif', 1),
-(19, 1, 'OutOfService', 'image', '/Media/OutOfService.gif', 1),
-(22, 1, 'AnprImageDemo', 'image', '/Media/demo_car.png', 1),
-(23, 1, 'AccessDeniedReservationUsed', 'image', '/Media/AccessDenied.gif', 1),
-(24, 1, 'NoChipCoin', 'image', '/Media/InvalidChipcoin.png', 1),
-(25, 1, 'NoWaletBalance', 'image', '/Media/UnpaidTicket.gif', 1),
-(26, 1, 'EntryPresenceLoopActivatedTicket', 'image', '/Media/EntryPushButtonTicket.gif', 1),
-(27, 1, 'ExitPresenceLoopActivatedTicket', 'image', '/Media/ExitScanTicket.gif', 1),
-(28, 1, 'TakeEntryChipcoin', 'image', '/Media/EntryTakeChipcoin.gif', 1),
-(29, 1, 'EntryChipcoinBlacklisted', 'image', '/Media/InvalidChipcoin.png', 1),
-(30, 1, 'ScreenSaver', 'image', '/Media/Parcx-Screensaver.gif', 1),
-(31, 1, 'RFIDError', 'image', '/Media/InvalidChipcoin.png', 1),
-(32, 1, 'SetProtocolFailed', 'image', '/Media/InvalidChipcoin.png', 1),
-(33, 1, 'OpenBarrierFromServer', 'image', '/Media/EntryTakeChipcoin.gif', 1),
-(34, 1, 'CarparkFull', 'image', '/Media/TerminalBackgroundEntry.jpg', 1),
-(35, 1, 'FreePassage', 'image', '/Media/TerminalBackgroundEntry.jpg', 1),
-(36, 1, 'LaneClosed', 'image', '/Media/TerminalBackgroundEntry.jpg', 1),
-(37, 1, 'RestartTerminal', 'image', '/Media/TerminalBackgroundEntry.jpg', 1),
-(38, 1, 'FreePassageEntry', 'image', '/Media/TerminalBackgroundEntry.jpg', 1),
-(39, 1, 'OutOfServiceTicket', 'image', '/Media/OutOfService.gif', 1),
-(40, 1, 'AccessDeniedCardExpired', 'image', '/Media/AccessDenied.gif', 1),
-(41, 1, 'ExternalOpen', 'image', '/Media/AccessAllowed1.jpg', 1),
-(42, 1, 'TicketBoxError', 'image', '/Media/TerminalBackgroundEntry.jpg', 1),
-(43, 1, 'Testing', 'image', '/parcx/Media/LoopBCabin.PNG', 1),
-(44, 1, 'Testing1', 'image', '/parcx/Media/entrypushbutton2.jpg', 1),
-(45, 0, '', 'image', '', 1),
-(46, 0, '', 'image', '', 1),
-(47, 0, '', 'image', '', 1),
-(48, 1, 'teeee', 'image', '/parcx/Media/', 1),
-(49, 1, 'testtttt', 'image', '', 1),
-(50, 1, 'EEEE', 'image', '/parcx/Media/entrypushbutton2.jpg', 1),
-(51, 1, 'Spanish Testing', 'image', '/parcx/Media/entrypushbutton2.jpg', 1),
-(52, 1, 'Test Test', 'image', '', 1),
-(53, 1, 'Test44', 'image', '', 1),
-(54, 1, 'Tes4343', 'image', '', 1),
-(55, 1, 'Entry Message', 'image', '', 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `customer_messages_text`
---
-
-CREATE TABLE `customer_messages_text` (
-  `id` int(11) NOT NULL,
-  `device_type` int(3) NOT NULL DEFAULT 11,
-  `message` varchar(100) NOT NULL,
-  `english_line1` varchar(100) NOT NULL DEFAULT 'NA',
-  `english_line2` varchar(50) NOT NULL DEFAULT 'NA',
-  `english_line3` varchar(50) NOT NULL DEFAULT 'NA',
-  `arabic_line1` varchar(100) NOT NULL DEFAULT 'NA',
-  `arabic_line2` varchar(100) NOT NULL DEFAULT 'NA',
-  `arabic_line3` varchar(100) NOT NULL DEFAULT 'NA',
-  `spanish_line1` varchar(25) NOT NULL,
-  `spanish_line2` varchar(25) NOT NULL,
-  `spanish_line3` varchar(25) NOT NULL,
-  `status` tinyint(4) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `customer_messages_text`
---
-
-INSERT INTO `customer_messages_text` (`id`, `device_type`, `message`, `english_line1`, `english_line2`, `english_line3`, `arabic_line1`, `arabic_line2`, `arabic_line3`, `spanish_line1`, `spanish_line2`, `spanish_line3`, `status`) VALUES
-(1, 1, 'EntryPresenceLoopActivatedChipcoin', 'edittest', 'Test26', 'Test353', '212121', 'NA', 'NA', 'sp1', 'sp2', 'sp6565656', 1),
-(2, 1, 'TakeEntryTicket', 'Please take the ticket', 'test1', 'tes81', 'NA', 'NA', 'NA', '', '', '', 1),
-(3, 1, 'Processing', 'Processing..', 'Please Wait', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(4, 1, 'EntryStandBy', 'Demo Carpark ', 'FREE PARKING', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(5, 1, 'AccessAllowedEntry', 'Welcome', '', '', '', '', '', '', '', '', 1),
-(6, 2, 'AccessDeniedUnpaidTicket', 'Unpaid Parking Fee', 'Pay at Payment Machine', '', '', '', '', '', '', '', 1),
-(7, 2, 'AccessAllowedExit', 'Thank You for visiting', '', '', '', '', '', '', '', '', 1),
-(8, 2, 'AccessDeniedInvalidTicket', 'Invalid Chipcoin', '', '', '', '', '', '', '', '', 1),
-(9, 2, 'AccessDeniedWrongCarpark', 'Incorrect Car Park ', '', '', '', '', '', '', '', '', 1),
-(10, 2, 'AccessDeniedWrongFacility', 'Incorrect Car Park ', '', '', '', '', '', '', '', '', 1),
-(11, 2, 'AccessDeniedExitGrace', 'test', 'test', 'testhtbjb', '', '', '', '', '', '', 1),
-(12, 3, 'AccessDeniedAlreadyExited', 'Ticket Already Exited', '', '', '', '', '', '', '', '', 1),
-(13, 3, 'AccessDeniedBlacklisted', 'Ticket Blacklisted', '', '', '', '', '', '', '', '', 1),
-(14, 3, 'EntryTicketBlacklisted', 'Ticket Blacklisted', '', '', '', '', '', '', '', '', 1),
-(15, 3, 'NoVehiclePresent', 'No Vehicle Present', '', '', '', '', '', '', '', '', 1),
-(16, 4, 'AccessDeniedTagUnknown', 'Tag Unknown', '', '', '', '', '', '', '', '', 1),
-(17, 4, 'AccessDeniedWrongParkingZone', 'Incorrect Parking Zone', '', '', '', '', '', '', '', '', 1),
-(18, 4, 'AccessDeniedCardExpired', 'Card Expired', '', '', '', '', '', '', '', '', 1),
-(19, 4, 'AccessDeniedAntipassback', 'AntiPassBack Error', '', '', '', '', '', '', '', '', 1),
-(20, 4, 'AccessDeniedTagDisabled', 'Tag disabled', '', '', '', '', '', '', '', '', 1),
-(21, 0, 'OpenBarrierFromServer', 'Open Barrier From Server', '', '', '', '', '', '', '', '', 1),
-(22, 5, 'CloseBarrierFromServer', 'Close Barrier From Server', '', '', '', '', '', '', '', '', 1),
-(25, 5, 'EntryBarrierOpened', 'Barrier already Opened,Wait', '', '', '', '', '', '', '', '', 1),
-(26, 5, 'ExitPresenceLoopActivatedChipcoin', 'Please insert chipcoin', '', '', '', '', '', '', '', '', 1),
-(27, 5, 'ExitStandBy', 'Demo Carpark ', '', '', '', '', '', '', '', '', 1),
-(28, 5, 'AccessDeniedReservationNotInTimePeriod', 'Not In Reservation Time Period', '', '', '', '', '', '', '', '', 1),
-(29, 5, 'BarrierAlreadyOpened', 'Barrier already opened', 'Please wait to close the barrier', '', '', '', '', '', '', '', 1),
-(30, 5, 'NoChipCoin', 'No chipcoin available on machine', '', '', '', '', '', '', '', '', 1),
-(31, 5, 'OutOfService', 'Out Of Service', '', '', '', '', '', '', '', '', 1),
-(32, 5, 'SetProtocolFailed', 'Cant connect to rfid', 'Please check the connection', '', '', '', '', '', '', '', 1),
-(33, 5, 'AccessDeniedReservationNotUsed', 'Not Used Reservation', '', '', '', '', '', '', '', '', 1),
-(34, 5, 'AccessDeniedReservationUsed', 'Used Reservation', '', '', '', '', '', '', '', '', 1),
-(35, 5, 'AccessDeniedRegisteredAnotherCarpark', 'Not Registered to use this carpark', '', '', '', '', '', '', '', '', 1),
-(36, 5, 'AccessDeniedRegistrationExpired', 'Parking Access  expired', '', '', '', '', '', '', '', '', 1),
-(37, 5, 'ProcessingNumberPlate', 'Processing number plate', 'Please Wait', '', '', '', '', '', '', '', 1),
-(38, 5, 'AccessDeniedReservation', 'Not in reservation time slot', '', '', '', '', '', '', '', '', 1),
-(39, 5, 'NoWaletBalance', 'No balance in walet', '', '', '', '', '', '', '', '', 1),
-(40, 5, 'AccessDeniedReservationExitGrace', 'Reservation Exit Grace period exceeded', '', '', '', '', '', '', '', '', 1),
-(41, 5, 'AccessDeniedReservationAlreadyExited', 'Reservation Ticket Already Exited', '', '', '', '', '', '', '', '', 1),
-(42, 5, 'NoReservation', 'No Reservation', '', '', '', '', '', '', '', '', 1),
-(43, 5, 'OutOfTickets', 'Machine out of Tickets', '', '', '', '', '', '', '', '', 1),
-(44, 5, 'PrintTicketFailed', 'Ticket printing failed', '', '', '', '', '', '', '', '', 1),
-(45, 5, 'PrintFailedWrongPassword', 'Print failed wrong password', '', '', '', '', '', '', '', '', 1),
-(46, 5, 'EntryPresenceLoopActivatedTicket', 'Push button for Ticket', 'Or Scan Access Card', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(47, 5, 'ExitPresenceLoopActivatedTicket', 'Please Sacn ticket', '', '', '', '', '', '', '', '', 1),
-(48, 5, 'TakeEntryChipcoin', 'Please take the chipcoin', '', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(49, 5, 'EntryChipcoinBlacklisted', 'Chipcoin Blacklisted', '', '', '', '', '', '', '', '', 1),
-(50, 5, 'InvalidEntry', 'Invalid Entry', '', '', '', '', '', '', '', '', 1),
-(51, 5, 'WalletExpired', 'Wallet expired', '', '', '', '', '', '', '', '', 1),
-(52, 5, 'WaletDisabled', 'Walet Disabled', '', '', '', '', '', '', '', '', 1),
-(53, 5, 'NoPlate', 'No plate captured', '', '', '', '', '', '', '', '', 1),
-(54, 5, 'RFIDError', 'Chip coin reading not working', '', '', '', '', '', '', '', '', 1),
-(55, 5, 'RestartTerminal', 'Restarting Terminal ', '', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(56, 5, 'FreePassage', 'Free Passage Mode', '', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(57, 5, 'LaneClosed', 'Lane Temporarily Closed', '', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(58, 5, 'CarparkFull', 'NA', 'Carpark FULL', 'Entry Temporarily Blocked', 'NA', 'NA', 'NA', '', '', '', 1),
-(59, 5, 'FreePassageEntry', 'Free Passage Entry', '', '', 'NA', 'NA', 'NA', '', '', '', 1),
-(60, 5, 'OutOfServiceTicket', 'Out Of Service', 'Machine out of tickets', '', '', '', '', '', '', '', 1),
-(62, 5, 'ExternalOpen ', 'Manual Open ', 'Please Enter ', '', '', '', '', '', '', '', 1),
-(63, 5, 'TicketBoxError', 'Ticket Box Error', 'Unable to process entry ticket ', '', '', '', '', '', '', '', 1),
-(64, 1, 'Message', '1', '2', '3', 'NA', 'NA', 'NA', '', '', '', 1),
-(65, 3, 'Message', 'Line 1', 'Line 2', 'Line 3', 'NA', 'NA', 'NA', '', '', '', 1),
-(66, 1, 'Entry Message', '', '', 'ssdsaddddddddddddddddddddddddddddddddddddddddddddd', '', '', '', '', '', '', 1),
-(67, 1, 'Entry Message', '', '', 'ssdsaddddddddddddddddddddddddddddddddddddddddddddd', '', '', '', '', '', '', 1),
-(91, 1, 'Testing', '1', '2', '3', '5', '4', '6', '', '', '', 1),
-(92, 1, 'Testing1', '1', '', '3', '5', '4', '6', '', '', '', 1),
-(97, 1, 'testtttt', '', '', '', '', '', '', '', '', '', 1),
-(98, 1, 'EEEE', '123', '', '', '', '', '', '', '', '', 1),
-(99, 1, 'Spanish Testing', '1', '2', '', '', '', '', '3', '4', '5', 1),
-(100, 1, 'Test Test', '', '', '', '', '', '', '', '', '', 1),
-(101, 1, 'Test44', '2323', 'rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr', '', '', '', '', '', '', '', 1),
-(102, 1, 'Tes4343', '', 'kljlkjklkljkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj', '', '', '', '', '', '', '', 1),
-(103, 1, 'Entry Message', '', '', 'ssdsaddddddddddddddddddddddddddddddddddddddddddddd', '', '', '', '', '', '', 1);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `daemon_status`
 --
 
@@ -515,14 +314,11 @@ CREATE TABLE `daemon_status` (
 --
 
 INSERT INTO `daemon_status` (`id`, `daemon_name`, `path`, `daemon_label`, `status`, `pid`, `start_time`) VALUES
-(1, 'px_maintenance_daemon', '/opt/parcx/Daemons', 'Maintenance Daemon', 1, 20200, '2020-09-24 08:31:46'),
+(1, 'PX-RealTimeDaemon-V103-20200924', '/opt/parcx/Daemons', 'Parc Realtime Daemon', 1, 19721, '2020-09-28 12:07:16'),
 (2, 'PX_DC_V_103_20200728', '/opt/parcx/Daemons', 'Parcx Dayclosure Daemon', 1, 0, NULL),
-(3, 'px_cloud_DC_27052020', '/opt/parcx/Daemons', 'Cloud Dayclosure Daemon', 0, 0, NULL),
-(4, 'PX_CloudRT_V_103_09062020', '/opt/parcx/Daemons', 'Cloud RealTime Daemon', 0, 0, NULL),
-(5, 'PX_CloudDownload_V01_03_02_11072020', '/opt/parcx/Daemons', 'Cloud Download Daemon', 1, 10585, '2021-02-25 10:53:19'),
-(6, 'PX_CloudUpload_V01_03_02_09242020', '/opt/parcx/Daemons', 'Cloud Upload Daemon', 1, 25970, '2021-02-17 15:19:54'),
+(5, 'PX_CloudUpload_V01_03_02_20210215', '/opt/parcx/Daemons', 'Cloud Download Daemon', 1, 10585, '2021-02-25 10:53:19'),
+(6, 'PX_CloudDownload_V01_03_02_20210223', '/opt/parcx/Daemons', 'Cloud Download Daemon', 1, 25970, '2021-02-17 15:19:54'),
 (7, 'ANPR/PXANPR_CAMERA1_V01_03_03', '/opt/parcx/Daemons', 'ANPR CAMERA 1', 1, 0, NULL),
-(8, 'PX-RealTimeDaemon-V103-20200924', '/opt/parcx/Daemons', 'Parc Realtime Daemon', 1, 19721, '2020-09-28 12:07:16'),
 (10, 'PX_ValetCloudUpload_V01_03_02_20210208', '/opt/parcx/Daemons', 'Cloud Valet Upload Daemon', 1, 30172, '2021-02-17 10:23:25');
 
 -- --------------------------------------------------------
@@ -803,7 +599,8 @@ INSERT INTO `device_application_label` (`id`, `message`, `english`, `arabic`, `s
 (232, 'no_products_vouchers_to_sale', 'No products or vouchers for sale', 'لا توجد منتجات أو قسائم للبيع', 1),
 (233, 'enter_units_for_sale', 'Enter quantity', 'أدخل الكمية', 1),
 (234, 'total_price', 'Total Price', 'السعر الكلي', 1),
-(235, 'enter_proper_quantity_for_product_sale', 'Enter proper quantity for product sale', 'أدخل الكمية المناسبة لبيع المنتج', 1);
+(235, 'enter_proper_quantity_for_product_sale', 'Enter proper quantity for product sale', 'أدخل الكمية المناسبة لبيع المنتج', 1),
+(236, 'issue_entry_ticket', 'Issue Entry Ticket', 'إصدار تذكرة دخول', 1);
 
 -- --------------------------------------------------------
 
@@ -926,17 +723,6 @@ CREATE TABLE `parking_ewallet` (
   `wallet_enabled` int(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `parking_ewallet`
---
-
-INSERT INTO `parking_ewallet` (`id`, `user_id`, `user_name`, `plate_number`, `last_top_up_amount`, `last_deducted_amount`, `wallet_balance`, `last_payment_date_time`, `last_top_up_datetime`, `expiry_date`, `wallet_enabled`) VALUES
-(1, 140, 'Celahi@alfalakme.com', NULL, 0, 691, 20, '2020-08-19 12:35:50', '2020-07-23 08:02:03', '2020-09-02', 1),
-(2, 151, 'bader.salmeen@gmail.com', NULL, 0, 250, 210, '2020-09-09 12:12:59', '2020-07-23 17:25:37', '2020-09-30', 1),
-(3, 165, 'marcel@gmail.com', NULL, 0, 0, 0, '2020-07-24 15:03:19', '2020-07-24 15:03:19', '2020-08-23', 1),
-(4, 192, 'marcelblajut@gmail.com', NULL, 0, 0, 20.5, '2020-07-27 08:01:47', '2020-07-27 08:01:47', '2020-08-26', 1),
-(5, 216, 'Celahi@alfalakme.com', NULL, 0, 30, 16180, '2020-12-07 13:47:57', '2020-07-23 08:02:03', '2020-12-31', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -1000,17 +786,6 @@ CREATE TABLE `plates_ewallet` (
   `status` int(11) NOT NULL DEFAULT 1,
   `create_datetime` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `plates_ewallet`
---
-
-INSERT INTO `plates_ewallet` (`id`, `user_id`, `operator_id`, `country`, `plate_number`, `ticket_id`, `status`, `create_datetime`) VALUES
-(1, 252, 43, 'BAH', 'BAH AB 12345', '5a4f8add', 0, '2021-02-25 11:27:19'),
-(2, 251, 43, 'BAH', 'BAH H 5678', '5a4f76bb', 1, '2021-02-25 15:03:59'),
-(3, 252, 43, 'OMN', 'OMN J 64332', '5a4f8add', 1, '2021-02-25 15:10:39'),
-(4, 252, 43, 'KUW', 'KUW G 43234', '5a4f8add', 1, '2021-02-25 15:15:59'),
-(5, 252, 43, 'BAH', 'BAH H 7623', '5a4f8add', 1, '2021-02-25 15:18:22');
 
 -- --------------------------------------------------------
 
@@ -1161,14 +936,6 @@ CREATE TABLE `reservation_user` (
   `phone` varchar(15) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `reservation_user`
---
-
-INSERT INTO `reservation_user` (`user_id`, `password`, `first_name`, `last_name`, `company_name`, `email`, `address_line1`, `address_line2`, `city`, `country`, `mobile`, `phone`) VALUES
-(27, '27afcbf6e4b3e83d0a540f044832ae9e', 'jeena', 'Pankan', 'AFME', 'jeenavolga@gmail.com', 'AL thammam3,G02', 'Remraam', 'Dubai', 'UAE', '0553736589', '0553736589'),
-(28, '9a69e50114a30c4c5c1d455a2cfb87d1', 'root', 'admin', 'AFME', 'root@gmail.com', 'AL thammam', 'remraam', 'dubai', 'UAE', '0503029959', '0503029959');
-
 -- --------------------------------------------------------
 
 --
@@ -1228,14 +995,6 @@ CREATE TABLE `revenue_coupons_whitelist` (
   `coupon_usage_datetime` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `revenue_coupons_whitelist`
---
-
-INSERT INTO `revenue_coupons_whitelist` (`id`, `discount_id`, `carpark_number`, `discount_category`, `coupon_id`, `transaction_id`, `DiscountName`, `status`, `coupon_usage`, `ticket_id`, `coupon_usage_datetime`) VALUES
-(1, 102, 1, 1, '000001010b00583b1f27', '', 'Ecommerce', 1, 1, '000001010100584beb7d', '2020-01-28 16:13:07'),
-(2, 103, 1, 1, '000001010b0057dae8f6', '', 'Ecommerce', 1, 1, '000001010100584beb4f', '2020-01-28 16:13:32');
-
 -- --------------------------------------------------------
 
 --
@@ -1254,14 +1013,6 @@ CREATE TABLE `revenue_discounts` (
   `status` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
---
--- Dumping data for table `revenue_discounts`
---
-
-INSERT INTO `revenue_discounts` (`id`, `discount_id`, `discount_name`, `discount_type`, `discount_option`, `discount_category`, `discount_value`, `carpark_number`, `status`) VALUES
-(1, 1, 'test', 'amount', 'coupon', 0, 100, '1', 1),
-(2, 1, 'system_test', 'amount', 'pos', 0, 10, '1', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -1277,13 +1028,6 @@ CREATE TABLE `revenue_dynamic_parking_rates` (
   `parking_rate` varchar(25) NOT NULL,
   `status` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `revenue_dynamic_parking_rates`
---
-
-INSERT INTO `revenue_dynamic_parking_rates` (`id`, `parking_rate_label`, `datetime`, `day`, `rate_type`, `parking_rate`, `status`) VALUES
-(1, 'New year rate', '2020-01-01', '', 2, 'parking_rates4', 1);
 
 -- --------------------------------------------------------
 
@@ -1351,9 +1095,9 @@ CREATE TABLE `revenue_parking_rates` (
 --
 
 INSERT INTO `revenue_parking_rates` (`id`, `time_unit_parking_rates1`, `time_duration_parking_rates1`, `parking_rates1`, `time_unit_parking_rates2`, `time_duration_parking_rates2`, `parking_rates2`, `time_unit_parking_rates3`, `time_duration_parking_rates3`, `parking_rates3`, `time_unit_parking_rates4`, `time_duration_parking_rates4`, `parking_rates4`, `time_unit_parking_rates5`, `time_duration_parking_rates5`, `parking_rates5`) VALUES
-(1, 'mins', 30, 5, 'mins', 30, 10, 'hours', 1, 20, 'hours', 1, 10, 'hours', 1, 30),
-(2, 'hours', 1, 10, 'hours', 1, 20, 'hours', 2, 30, 'hours', 2, 20, 'hours', 2, 30),
-(3, 'hours', 2, 15, 'hours', 2, 30, 'hours', 3, 40, 'mins', 3, 22, 'hours', 3, 30),
+(1, 'mins', 30, 100, 'mins', 30, 10, 'hours', 1, 20, 'hours', 1, 10, 'hours', 1, 30),
+(2, 'hours', 1, 100, 'hours', 1, 20, 'hours', 2, 30, 'hours', 2, 20, 'hours', 2, 30),
+(3, 'hours', 2, 100, 'hours', 2, 30, 'hours', 3, 40, 'mins', 3, 22, 'hours', 3, 30),
 (4, 'hours', 3, 20, 'hours', 3, 40, 'hours', 4, 50, 'hours', 4, 30, 'hours', 4, 50),
 (5, 'hours', 4, 25, 'hours', 4, 50, 'hours', 5, 60, 'hours', 5, 30, 'hours', 5, 50),
 (6, 'hours', 5, 30, 'hours', 5, 60, 'hours', 6, 70, 'hours', 6, 30, 'hours', 6, 50),
@@ -1397,39 +1141,6 @@ CREATE TABLE `revenue_products` (
   `status` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `revenue_products`
---
-
-INSERT INTO `revenue_products` (`id`, `product_name`, `unit_price`, `status`) VALUES
-(1, 'Parking Voucher', 10, 0);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `revenue_validation`
---
-
-CREATE TABLE `revenue_validation` (
-  `id` int(11) NOT NULL,
-  `validation_id` int(5) NOT NULL,
-  `validator_id` int(11) NOT NULL,
-  `validation_name` tinytext CHARACTER SET latin1 NOT NULL,
-  `validation_type` varchar(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'hour',
-  `validation_value` int(11) NOT NULL,
-  `carpark_number` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
-  `status` int(11) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Dumping data for table `revenue_validation`
---
-
-INSERT INTO `revenue_validation` (`id`, `validation_id`, `validator_id`, `validation_name`, `validation_type`, `validation_value`, `carpark_number`, `status`) VALUES
-(1, 100, 18, '1 HOUR', 'hour', 1, '1', 1),
-(2, 101, 18, '2 HOUR', 'hour', 2, '1', 1),
-(16, 101, 2, '3 HOUR', 'hour', 3, '1', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -1454,14 +1165,6 @@ CREATE TABLE `system_carparks` (
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `system_carparks`
---
-
-INSERT INTO `system_carparks` (`carpark_id`, `carpark_number`, `carpark_name`, `rate_plan`, `rate_type`, `reservation_rate_plan`, `total_spaces`, `occupancy_threshold`, `shortterm_spaces`, `reservation_spaces`, `access_spaces`, `facility_number`, `facility_name`, `status`, `user_id`) VALUES
-(1, 1, 'P1', 'parking_rates1', 1, 'parking_rates1', 500, 0, 400, 0, 100, 200005, '200005', 1, 30),
-(2, 2, 'P2', 'parking_rates1', 1, '', 200, 0, 100, 0, 100, 200005, 'Training Area', 1, 30);
-
 -- --------------------------------------------------------
 
 --
@@ -1472,15 +1175,6 @@ CREATE TABLE `system_chipcoin` (
   `serial_number` varchar(20) NOT NULL,
   `tag_id` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `system_chipcoin`
---
-
-INSERT INTO `system_chipcoin` (`serial_number`, `tag_id`) VALUES
-('100', '78945612'),
-('101', '123456'),
-('M2550', '2B492E1C');
 
 -- --------------------------------------------------------
 
@@ -1532,30 +1226,35 @@ CREATE TABLE `system_devices` (
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `system_devices`
---
-
-INSERT INTO `system_devices` (`id`, `device_category`, `device_category_name`, `device_name`, `device_ip`, `device_number`, `device_enabled`, `carpark_number`, `carpark_name`, `parking_zone`, `rate_plan`, `reservation_rate_plan`, `rate_type`, `camera_id`, `camera_index`, `customer_receipt_mandatory`, `shift_receipt_mandatory`, `shift_physical_cash_count_required`, `synch_whitelist_flag`, `last_updated_whitelist`, `issue_lost`, `anpr_enabled`, `wiegand_enabled`, `access_enabled`, `reservation_enabled`, `review_mode`, `device_function`, `barrier_open_time_limit`, `duration_hold_barrier_open`, `display_anpr_image`, `barrier_open_status_type`, `bms_status_enabled`, `barrier_status_monitoring`, `wiegand2_enabled`, `server_handshake_interval`, `plate_capturing_wait_delay`, `quick_barrier_close`, `payment_enabled_exit`, `facility_number`, `facility_name`, `user_id`) VALUES
-(1, 1, 'Entry', 'Entry11', '192.168.1.11', 11, 1, 1, 'P1', NULL, 'parking_rates1', 'parking_rates1', 1, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 1, 1, 0, 1, 10, 100, 0, 0, 0, 0, 0, 90, 7, 0, 0, 200005, 'Training Area', 30),
-(2, 2, 'Exit', 'Exit 31', '192.168.1.31', 31, 1, 1, 'P1', NULL, 'parking_rates1', 'parking_rates1', 1, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 1, 1, 0, 1, 10, 100, 0, 0, 0, 0, 0, 90, 7, 0, 0, 200005, 'Training Area', 30),
-(3, 3, 'Cashier', 'Cashier 81', '192.168.1.81', 81, 1, 1, 'P1', NULL, 'parking_rates1', 'parking_rates1', 1, 0, 0, 1, 1, 1, 0, NULL, 1, 1, 0, 0, 0, 0, 3, 10, 100, 0, 0, 0, 0, 0, 90, 7, 0, 0, 200005, '200005', 30),
-(4, 4, 'Auto Payment Machine', 'APM 51', '192.168.1.51', 51, 1, 1, 'P1', NULL, 'parking_rates1', 'parking_rates1', 1, 0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 1, 1, 0, 1, 10, 100, 0, 0, 0, 0, 0, 90, 7, 0, 0, 200005, 'Training Area', 30);
-
 -- --------------------------------------------------------
 
 --
--- Table structure for table `system_facility`
+-- Table structure for table `system_device_category`
 --
 
-CREATE TABLE `system_facility` (
-  `facility_id` int(11) NOT NULL,
-  `facility_number` int(11) NOT NULL,
-  `facility_name` varchar(100) NOT NULL,
-  `facility_location` text NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `status` int(11) NOT NULL DEFAULT 1
+CREATE TABLE `system_device_category` (
+  `id` int(11) NOT NULL,
+  `category_name` varchar(50) NOT NULL,
+  `image_url` varchar(100) NOT NULL,
+  `group` varchar(25) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `system_device_category`
+--
+
+INSERT INTO `system_device_category` (`id`, `category_name`, `image_url`, `group`) VALUES
+(1, 'Entry Column', 'column', 'columns'),
+(2, 'Exit Column', 'column', 'columns'),
+(3, 'Cashier', 'cashier-pos', 'payment_machines'),
+(4, 'APM', 'payment-machine', 'payment_machines'),
+(5, 'Handheld', 'handheld-pos', 'payment_machines'),
+(6, 'Entry Controller', 'controller', 'controllers'),
+(7, 'Exit Controller', 'controller', 'controllers'),
+(8, 'Camera', 'cctv', 'camera'),
+(9, 'VMS', 'vms', 'vms'),
+(10, 'Key Manager', 'cashier-pos', 'valet'),
+(11, 'Podium Manager', 'cashier-pos', 'valet');
 
 -- --------------------------------------------------------
 
@@ -1578,29 +1277,29 @@ CREATE TABLE `system_navigation` (
 --
 
 INSERT INTO `system_navigation` (`menu_id`, `group_id`, `menu_name`, `menu_link`, `menu_icon`, `menu_order_index`, `menu_status`) VALUES
-(23, 7, 'Devices', 'modules/config/system_device.php', 'far fa-circle', 3, 1),
-(33, 5, 'Finance', 'modules/dashboard/finance-table-view.php', 'fa fa-university', 3, 1),
+(23, 7, 'Devices', 'modules/config/system_device.php', 'far fa-circle', 4, 1),
+(33, 5, 'Finance', 'modules/dashboard/finance_facility.php', 'fa fa-university', 3, 1),
 (34, 5, 'Occupancy', 'modules/dashboard/occupancy.php', 'fas fa-tachometer-alt', 2, 1),
 (35, 1, 'Shift Report', 'modules/reports/revenue/shift_report.php', 'far fa-circle', 3, 1),
 (37, 1, 'Payment transactions', 'modules/reports/revenue/payment_transactions.php', 'far fa-circle', 1, 1),
-(45, 2, 'Manual Movements', 'modules/reports/parking/manual_movements.php', 'fa hand-fa paper-o', 3, 1),
+(45, 2, 'Manual Movements', 'modules/reports/parking/manual_movements.php', 'far fa-circle', 3, 1),
 (46, 1, 'Revenue Summary', 'modules/reports/revenue/revenue_summary.php', 'far fa-circle', 2, 1),
 (47, 3, 'Watchdog Network Logs', 'modules/reports/system/watchdog_network.php', 'far fa-circle', 2, 1),
 (48, 3, 'Watchdog Device Alarms', 'modules/reports/system/watchdog_device_alarms.php', 'far fa-circle', 1, 1),
 (49, 4, 'Manage User', 'modules/users/manage_users.php', 'far fa-circle', 5, 1),
-(50, 7, 'User Role', 'modules/users/user_roles.php', 'far fa-circle', 2, 1),
+(50, 7, 'User Role', 'modules/users/user_roles.php', 'far fa-circle', 5, 1),
 (51, 7, 'Counter Alerts', 'modules/config/counter_alerts.php', 'far fa-circle', 12, 1),
 (52, 7, 'Correction Factor', 'modules/counters/correction_factor.php', 'far fa-circle', 9, 1),
 (54, 2, 'Access report', 'modules/reports/parking/access_reports.php', 'far fa-circle', 2, 1),
 (56, 2, 'Parking duration', 'modules/reports/parking/parking_duration.php', 'far fa-circle', 10, 1),
 (57, 2, 'Traffic report', 'modules/reports/parking/traffic_report.php', 'far fa-circle', 9, 1),
 (58, 2, 'Visitor frequency', 'modules/reports/parking/visitor_frequency.php', 'far fa-circle', 11, 1),
-(59, 2, 'Valet', 'modules/dashboard/valet.php', 'far fa-circle', 6, 1),
+(59, 5, 'Valet', 'modules/dashboard/valet.php', 'fa fa-car', 6, 1),
 (60, 2, 'Valet Parking', 'modules/reports/parking/valet_parking.php', 'far fa-circle', 17, 1),
-(61, 5, 'Device Status', 'modules/dashboard/deviceStatus.php', 'fa fa-flag', 1, 1),
+(61, 5, 'Device Status', 'modules/dashboard/device_status_facility.php', 'fa fa-flag', 1, 1),
 (63, 4, 'Dynamic Parking Rates', 'modules/config/dynamic_parking_rates.php', 'far fa-circle', 2, 1),
 (64, 4, 'Discounts', 'modules/config/discounts.php', 'far fa-circle', 3, 1),
-(65, 1, 'Discount Summary', 'modules/reports/revenue/discount_usage.php', 'far fa-circle', 5, 1),
+(65, 1, 'Discount Summary', 'modules/reports/revenue/discount_usage.php', 'far fa-circle', 5, 0),
 (66, 4, 'Parking Rates', 'modules/config/parking_rates.php', 'far fa-circle', 1, 1),
 (67, 2, 'Validation Report', 'modules/reports/parking/validation_report.php', 'far fa-circle', 12, 1),
 (68, 2, 'Blacklist Report', 'modules/reports/parking/blacklist_report.php', 'far fa-circle', 4, 1),
@@ -1609,8 +1308,8 @@ INSERT INTO `system_navigation` (`menu_id`, `group_id`, `menu_name`, `menu_link`
 (72, 1, 'APM Refill Report', 'modules/reports/revenue/apm_refill_report.php', 'far fa-circle', 8, 1),
 (73, 2, 'Open Transactions', 'modules/reports/parking/open_transactions.php', 'far fa-circle', 1, 1),
 (74, 1, 'APM Cash Levels', 'modules/reports/revenue/cash_levels.php', 'far fa-circle', 7, 1),
-(76, 7, 'APM Threshold', 'modules/config/cash_levels.php', 'far fa-circle', 7, 1),
-(77, 5, 'Overview', 'modules/dashboard/overview.php', 'far fa-circle', 1, 1),
+(76, 7, 'APM Threshold', 'modules/config/cash_levels.php', 'far fa-circle', 7, 0),
+(77, 5, 'Overview', 'modules/dashboard/overview.php', 'far fa-circle', 1, 0),
 (78, 6, 'Manual Operations', 'modules/operation/manualOperation.php', 'fa fa-hand-paper-o', 1, 1),
 (79, 7, 'VMS Shedule', 'modules/config/vms_shedule.php', 'far fa-circle', 11, 1),
 (80, 7, 'VMS Devices', 'modules/config/vms_devices.php', 'far fa-circle', 10, 1),
@@ -1619,21 +1318,22 @@ INSERT INTO `system_navigation` (`menu_id`, `group_id`, `menu_name`, `menu_link`
 (83, 7, 'Export settings', 'modules/config/export_settings.php', 'far fa-circle', 8, 1),
 (84, 2, 'Plates captured', 'modules/reports/parking/plates_captured.php', 'far fa-circle', 5, 1),
 (85, 1, 'Transaction Exceptions', 'modules/reports/revenue/payment_transaction_exceptions.php', 'far fa-circle', 10, 1),
-(86, 7, 'Carpark', 'modules/config/system_carpark.php', 'far fa-circle', 2, 1),
-(87, 7, 'Facility', 'modules/config/system_facility.php', 'far fa-circle', 1, 1),
+(86, 7, 'Carpark', 'modules/config/system_carpark.php', 'far fa-circle', 3, 1),
+(87, 7, 'Facility', 'modules/config/system_facility.php', 'far fa-circle', 2, 1),
 (88, 5, 'ANPR Review', 'modules/dashboard/plate_review.php', 'fa fa-taxi', 4, 1),
 (89, 4, 'Customer Messages', 'modules/config/customer_messages.php', 'far fa-circle', 5, 1),
 (90, 2, 'Parking Movements', 'modules/reports/parking/parking_movements.php', 'far fa-circle', 1, 1),
 (91, 1, 'VAT Report', 'modules/reports/revenue/vat_report.php', 'far fa-circle', 4, 1),
 (92, 5, 'Live Report', 'modules/dashboard/live_parking.php', 'fa fa-car', 5, 1),
-(93, 7, 'Daemon status', 'modules/config/daemon_status.php', 'far fa-circle', 4, 1),
-(94, 7, 'View logs', 'modules/config/view_logs.php', 'far fa-circle', 1, 1),
+(93, 7, 'Daemon status', 'modules/config/daemon_status.php', 'far fa-circle', 6, 1),
+(94, 7, 'View logs', 'modules/config/view_logs.php', 'far fa-circle', 7, 1),
 (95, 4, 'VMS configuraton', 'modules/config/vms_config.php', 'far fa-circle', 6, 1),
 (98, 2, 'Visitor Frequency RealTime', 'modules/reports/parking/visitor_frequency_realtime.php', 'far fa-circle', 8, 1),
 (99, 4, 'Products', 'modules/config/system_product.php', 'far fa-circle', 6, 1),
 (100, 4, 'Validators', 'modules/config/validator-user.php', 'far fa-circle', 7, 1),
 (102, 2, 'Ticket Details', 'modules/reports/parking/ticket_details.php', 'far fa-circle', 7, 1),
-(103, 7, 'Whitelist group policy', 'modules/config/whitelist_group_policy.php', 'far fa-circle', 2, 1);
+(103, 7, 'Whitelist group policy', 'modules/config/whitelist_group_policy.php', 'far fa-circle', 2, 1),
+(104, 5, 'Key/Podium Manager', 'modules/dashboard/key_podium_manager.php', 'fa fa-car', 7, 1);
 
 -- --------------------------------------------------------
 
@@ -1657,7 +1357,7 @@ CREATE TABLE `system_navigation_group` (
 INSERT INTO `system_navigation_group` (`group_id`, `group_name`, `group_icon`, `group_order_index`, `header_id`, `group_expand`) VALUES
 (1, 'REVENUE', 'fa fa-money-bill', 1, 2, 1),
 (2, 'PARKING', 'fa fa-car', 2, 2, 1),
-(3, 'SYSTEM', 'fa fa-server', 3, 2, 1),
+(3, 'WATCHDOG', 'fa fa-server', 3, 2, 1),
 (4, 'CONFIGURATION', 'fa fa-sliders', 2, 3, 1),
 (5, 'DASHBOARD', 'fa fa-server', 1, 1, 0),
 (6, 'MANUAL OPERATION', 'fa-hand-paper-o', 1, 3, 0),
@@ -1686,91 +1386,11 @@ INSERT INTO `system_navigation_header` (`header_id`, `header_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `system_navigation_old`
---
-
-CREATE TABLE `system_navigation_old` (
-  `menu_id` int(11) NOT NULL,
-  `menu_group_name` varchar(50) NOT NULL,
-  `menu_name` varchar(50) NOT NULL,
-  `menu_link` varchar(60) NOT NULL,
-  `menu_group_order_index` int(11) NOT NULL,
-  `menu_order_index` int(11) NOT NULL,
-  `group_menu_icon` varchar(50) NOT NULL,
-  `menu_status` tinyint(1) NOT NULL DEFAULT 1,
-  `menu_header_name` varchar(100) NOT NULL,
-  `menu_header_inder` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `system_navigation_old`
---
-
-INSERT INTO `system_navigation_old` (`menu_id`, `menu_group_name`, `menu_name`, `menu_link`, `menu_group_order_index`, `menu_order_index`, `group_menu_icon`, `menu_status`, `menu_header_name`, `menu_header_inder`) VALUES
-(23, 'CONFIGURATION', 'Devices', 'modules/config/system_device.php', 4, 3, 'nav-icon fa fa-th', 1, '', 0),
-(33, 'DASHBOARD', 'Finance', 'modules/dashboard/finance-table-view.php', 5, 4, 'nav-icon fas fa-tachometer-alt', 1, '', 0),
-(34, 'DASHBOARD', 'Occupancy', 'modules/dashboard/occupancy.php', 5, 3, 'nav-icon fas fa-tachometer-alt', 1, '', 0),
-(35, 'REVENUE', 'Shift Report', 'modules/reports/revenue/shift_report.php', 1, 3, 'nav-icon fas fa-money-bill', 1, '', 0),
-(37, 'REVENUE', 'Payment transactions', 'modules/reports/revenue/payment_transactions.php', 1, 1, 'nav-icon fa fa-money-bill', 1, '', 0),
-(45, 'PARKING', 'Manual Movements', 'modules/reports/parking/manual_movements.php', 2, 15, 'nav-icon fa fa-car', 1, '', 0),
-(46, 'REVENUE', 'Revenue Summary', 'modules/reports/revenue/revenue_summary.php', 1, 2, 'nav-icon fa fa-money-bill', 1, '', 0),
-(47, 'SYSTEM', 'Watchdog Network Logs', 'modules/reports/system/watchdog_network.php', 3, 22, 'nav-icon fa fa-server', 1, '', 0),
-(48, 'SYSTEM', 'Watchdog Device Alarms', 'modules/reports/system/watchdog_device_alarms.php', 3, 21, 'nav-icon fa fa-server', 1, '', 0),
-(49, 'USER MANAGEMENT', 'Manage User', 'modules/users/manage_users.php', 6, 1, 'nav-icon fa fa-user', 1, '', 0),
-(50, 'USER MANAGEMENT', 'User Role', 'modules/users/user_roles.php', 6, 2, 'nav-icon fa fa-user', 1, '', 0),
-(51, 'CONFIGURATION', 'Counter Alerts', 'modules/config/counter_alerts.php', 4, 12, 'nav-icon fa fa-warning', 1, '', 0),
-(52, 'COUNTERS', 'Correction Factor', 'modules/counters/correction_factor.php', 7, 1, 'nav-icon fa fa-cc', 1, '', 0),
-(54, 'PARKING', 'Access report', 'modules/reports/parking/access_reports.php', 2, 13, 'nav-icon fa fa-car', 1, '', 0),
-(56, 'PARKING', 'Parking duration', 'modules/reports/parking/parking_duration.php', 2, 12, 'nav-icon fa fa-car', 1, '', 0),
-(57, 'PARKING', 'Traffic report', 'modules/reports/parking/traffic_report.php', 2, 11, 'nav-icon fa fa-car', 1, '', 0),
-(58, 'PARKING', 'Visitor frequency', 'modules/reports/parking/visitor_frequency.php', 2, 13, 'nav-icon fa fa-car', 1, '', 0),
-(59, 'DASHBOARD', 'Valet', 'modules/dashboard/valet.php', 5, 6, 'nav-icon fas fa-tachometer-alt', 1, '', 0),
-(60, 'PARKING', 'Valet Parking', 'modules/reports/parking/valet_parking.php', 2, 17, 'nav-icon fa fa-car', 1, '', 0),
-(61, 'DASHBOARD', 'Device Status', 'modules/dashboard/deviceStatus.php', 5, 2, 'nav-icon fas fa-tachometer-alt', 1, '', 0),
-(63, 'CONFIGURATION', 'Dynamic Parking Rates', 'modules/config/dynamic_parking_rates.php', 4, 5, 'nav-icon fa fa-th', 1, '', 0),
-(64, 'CONFIGURATION', 'Discounts', 'modules/config/discounts.php', 4, 6, 'nav-icon fa fa-th', 1, '', 0),
-(65, 'REVENUE', 'Discount Summary', 'modules/reports/revenue/discount_usage.php', 1, 6, 'nav-icon fa fa-money-bill', 1, '', 0),
-(66, 'CONFIGURATION', 'Parking Rates', 'modules/config/parking_rates.php', 4, 4, 'nav-icon fa fa-th', 1, '', 0),
-(67, 'PARKING', 'Validation Report', 'modules/reports/parking/validation_report.php', 2, 16, 'nav-icon fa fa-car', 1, '', 0),
-(68, 'PARKING', 'Blacklist Report', 'modules/reports/parking/blacklist_report.php', 2, 11, 'nav-icon fa fa-car', 1, '', 0),
-(69, 'CONFIGURATION', 'Access Whitelist', 'modules/config/access_whitelist.php', 4, 7, 'nav-icon fa fa-th', 1, '', 0),
-(71, 'REVENUE', 'Credit card Payment transactions', 'modules/reports/revenue/creditcard_payment_transactions.php', 1, 5, 'nav-icon fa fa-money-bill', 1, '', 0),
-(72, 'REVENUE', 'APM Refill Report', 'modules/reports/revenue/apm_refill_report.php', 1, 9, 'nav-icon fa fa-money-bill', 1, '', 0),
-(73, 'PARKING', 'Open Transactions', 'modules/reports/parking/open_transactions.php', 2, 14, 'nav-icon fa fa-car', 1, '', 0),
-(74, 'REVENUE', 'APM Cash Levels', 'modules/reports/revenue/cash_levels.php', 1, 8, 'nav-icon fa fa-money-bill', 1, '', 0),
-(76, 'CONFIGURATION', 'APM Threshold', 'modules/config/cash_levels.php', 4, 8, 'nav-icon fa fa-th', 1, '', 0),
-(77, 'DASHBOARD', 'Overview', 'modules/dashboard/overview.php', 5, 1, 'nav-icon fas fa-tachometer-alt', 1, '', 0),
-(78, 'MANUAL OPERATION', 'Manual Operations', 'modules/operation/manualOperation.php', 8, 1, 'nav-icon fa fa-hand-paper-o', 1, '', 0),
-(79, 'CONFIGURATION', 'VMS Shedule', 'modules/config/vms_shedule.php', 4, 11, 'nav-icon fa fa-th', 1, '', 0),
-(80, 'CONFIGURATION', 'VMS Devices', 'modules/config/vms_devices.php', 4, 10, 'nav-icon fa fa-th', 1, '', 0),
-(81, 'CONFIGURATION', 'System Settings', 'modules/config/system_settings.php', 4, 1, 'nav-icon fa fa-th', 1, '', 0),
-(82, 'REVENUE', 'APM Payout Report', 'modules/reports/revenue/apm_payout_report.php', 1, 10, 'nav-icon fa fa-money-bill', 1, '', 0),
-(83, 'CONFIGURATION', 'Export settings', 'modules/config/export_settings.php', 4, 9, 'nav-icon fa fa-warning', 1, '', 0),
-(84, 'PARKING', 'Plates captured', 'modules/reports/parking/plates_captured.php', 2, 13, 'nav-icon fa fa-car', 1, '', 0),
-(85, 'REVENUE', 'Transaction Exceptions', 'modules/reports/revenue/payment_transaction_exceptions.php', 1, 7, 'nav-icon fa fa-money-bill', 1, '', 0),
-(86, 'CONFIGURATION', 'Carpark', 'modules/config/system_carpark.php', 4, 2, 'nav-icon fa fa-th', 1, '', 0),
-(87, 'CONFIGURATION', 'Facility', 'modules/config/system_facility.php', 4, 1, 'nav-icon fa fa-th', 1, '', 0),
-(88, 'DASHBOARD', 'ANPR Review', 'modules/dashboard/plate_review.php', 5, 5, 'nav-icon fas fa-tachometer-alt', 1, '', 0),
-(89, 'CONFIGURATION', 'Customer Messages', 'modules/config/customer_messages.php', 4, 7, 'nav-icon fa fa-th', 1, '', 0),
-(90, 'PARKING', 'Parking Movements', 'modules/reports/parking/parking_movements.php', 2, 11, 'nav-icon fa fa-car', 1, '', 0),
-(91, 'REVENUE', 'VAT Report', 'modules/reports/revenue/vat_report.php', 1, 4, 'nav-icon fa fa-money-bill', 1, '', 0),
-(92, 'DASHBOARD', 'Live Report', 'modules/dashboard/live_parking.php', 5, 6, 'nav-icon fas fa-tachometer-alt', 1, '', 0),
-(93, 'CONFIGURATION', 'Daemon status', 'modules/config/daemon_status.php', 4, 7, 'nav-icon fa fa-th', 1, '', 0),
-(94, 'View Logs', 'View logs', 'modules/config/view_logs.php', 9, 1, 'nav-icon fa fa-file', 1, '', 0),
-(95, 'CONFIGURATION', 'VMS configuraton', 'modules/config/vms_config.php', 4, 7, 'nav-icon fa fa-th', 1, '', 0),
-(98, 'PARKING', 'Visitor Frequency RealTime', 'modules/reports/parking/visitor_frequency_realtime.php', 2, 12, 'nav-icon fa fa-car', 1, '', 0),
-(99, 'CONFIGURATION', 'Products', 'modules/config/system_product.php', 4, 8, 'nav-icon fa fa-th', 1, '', 0),
-(100, 'CONFIGURATION', 'Validators', 'modules/config/validator-user.php', 4, 9, 'nav-icon fa fa-th', 1, '', 0),
-(102, 'PARKING', 'Ticket Details', 'modules/reports/parking/ticket_details.php', 2, 11, 'nav-icon fa fa-car', 1, '', 0);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `system_parking_zone`
 --
 
 CREATE TABLE `system_parking_zone` (
-  `id` int(11) NOT NULL,
+  `parking_zone_number` int(11) NOT NULL,
   `parking_zone_name` varchar(25) NOT NULL,
   `carpark_number` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -1801,22 +1421,6 @@ CREATE TABLE `system_products` (
   `facility_number` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `system_products`
---
-
-INSERT INTO `system_products` (`product_id`, `product_name`, `date_validity`, `start_date`, `expiry_date`, `validity_days`, `validity_time_slots`, `product_type`, `product_value`, `product_price`, `description`, `carparks`, `user_id`, `status`, `create_datetime`, `validation_type`, `facility_number`) VALUES
-(1, '1 hour', 1, '2020-06-13', '2020-08-31', 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday', '00:00 - 01:00,01:00 - 02:00,02:00 - 03:00,03:00 - 04:00,04:00 - 05:00,05:00 - 06:00,06:00 - 07:00,07:00 - 08:00,08:00 - 09:00,09:00 - 10:00,10:00 - 11:00,11:00 - 12:00,12:00 - 13:00,13:00 - 14:00,14:00 - 15:00,15:00 - 16:00,16:00 - 17:00,17:00 - 18:00,18:00 - 19:00,19:00 - 20:00,20:00 - 21:00,21:00 - 22:00,22:00 - 23:00,23:00 - 24:00', 'Validation', 1, '0.00', '1 hour', '1,2', 44, 1, '2020-06-13 09:41:10', 'Time Value', 0),
-(2, '2 hour', 1, '2020-06-13', '2020-08-31', 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday', '00:00 - 01:00,01:00 - 02:00,02:00 - 03:00,03:00 - 04:00,04:00 - 05:00,05:00 - 06:00,06:00 - 07:00,07:00 - 08:00,08:00 - 09:00,09:00 - 10:00,10:00 - 11:00,11:00 - 12:00,12:00 - 13:00,13:00 - 14:00,14:00 - 15:00,15:00 - 16:00,16:00 - 17:00,17:00 - 18:00,18:00 - 19:00,19:00 - 20:00,20:00 - 21:00,21:00 - 22:00,22:00 - 23:00,23:00 - 24:00', 'Validation', 2, '0.00', '2 hour', '1,2', 44, 1, '2020-06-13 09:41:10', 'Time Value', 0),
-(3, '7 days Parking', 1, '2020-11-11', '2021-02-28', NULL, NULL, 'contract_parking', 7, '7.00', '7 day parking subscription', '1', 0, 1, '2020-11-12 10:43:22', '', 0),
-(4, '14 days Parking', 1, '2020-11-11', '2021-02-28', NULL, NULL, 'contract_parking', 14, '14.00', '14 day parking subscription', '1', 0, 1, '2020-11-12 10:43:22', '', 0),
-(5, '7 day season parking-Test', 0, '2021-03-01', '2021-03-31', '', '', 'contract_parking', 7, '7.00', 'test', '1,2,3', 30, 1, '2020-11-25 15:04:43', '', 200005),
-(6, 'test', 0, '2020-11-25', '2020-11-30', '', '', 'contract_parking', 7, '7.00', '', '1,2,3', 30, 1, '2020-11-25 15:11:33', '', 200005),
-(7, 'validation-test', 1, '2020-11-25', '2020-11-25', 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday', '00:00 - 01:00,01:00 - 02:00,02:00 - 03:00,03:00 - 04:00,04:00 - 05:00,05:00 - 06:00,06:00 - 07:00,07:00 - 08:00,08:00 - 09:00,09:00 - 10:00,10:00 - 11:00,11:00 - 12:00,12:00 - 13:00,13:00 - 14:00,14:00 - 15:00,15:00 - 16:00,16:00 - 17:00,17:00 - 18:00,18:00 - 19:00,19:00 - 20:00,20:00 - 21:00,21:00 - 22:00,22:00 - 23:00,23:00 - 24:00', 'validation', 10, '0.00', '', '1,2,3', 30, 1, '2020-11-25 15:14:04', '', 200005),
-(8, 'validation-test', 1, '2020-11-25', '2020-11-25', 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday', '00:00 - 01:00,01:00 - 02:00,02:00 - 03:00,03:00 - 04:00,04:00 - 05:00,05:00 - 06:00,06:00 - 07:00,07:00 - 08:00,08:00 - 09:00,09:00 - 10:00,10:00 - 11:00,11:00 - 12:00,12:00 - 13:00,13:00 - 14:00,14:00 - 15:00,15:00 - 16:00,16:00 - 17:00,17:00 - 18:00,18:00 - 19:00,19:00 - 20:00,20:00 - 21:00,21:00 - 22:00,22:00 - 23:00,23:00 - 24:00', 'validation', 11, '0.00', 'testing', '1,2,3', 30, 1, '2020-11-25 15:23:13', '', 200005),
-(9, 'validation-test', 0, '2021-03-01', '2021-03-31', 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday', '00:00 - 01:00,01:00 - 02:00,02:00 - 03:00,03:00 - 04:00,04:00 - 05:00,05:00 - 06:00,06:00 - 07:00,07:00 - 08:00,08:00 - 09:00,09:00 - 10:00,10:00 - 11:00,11:00 - 12:00,12:00 - 13:00,13:00 - 14:00,14:00 - 15:00,15:00 - 16:00,16:00 - 17:00,17:00 - 18:00,18:00 - 19:00,19:00 - 20:00,20:00 - 21:00,21:00 - 22:00,22:00 - 23:00,23:00 - 24:00', 'validation', 11, '0.00', 'testing', '1,2,3', 30, 1, '2020-11-25 15:23:20', '', 200005),
-(10, '2 weeks parking', 0, '2020-11-25', '2020-11-30', '', '', 'contract_parking', 14, '14.00', '', '1,2,3', 30, 1, '2020-11-25 15:24:40', '', 200005);
-
 -- --------------------------------------------------------
 
 --
@@ -1844,7 +1448,7 @@ INSERT INTO `system_role_rights` (`role_rights_id`, `user_role_id`, `menu_id`, `
 (5, 105, 87, 1, 1, 1),
 (6, 105, 50, 1, 1, 1),
 (7, 105, 103, 1, 1, 1),
-(8, 105, 76, 1, 1, 1),
+(8, 105, 76, 0, 0, 0),
 (9, 105, 93, 1, 1, 1),
 (10, 105, 94, 1, 1, 1),
 (11, 105, 78, 1, 1, 1),
@@ -1886,9 +1490,10 @@ INSERT INTO `system_role_rights` (`role_rights_id`, `user_role_id`, `menu_id`, `
 (47, 105, 85, 1, 1, 1),
 (48, 105, 82, 1, 1, 1),
 (49, 105, 72, 1, 1, 1),
-(50, 105, 65, 1, 1, 1),
+(50, 105, 65, 0, 0, 0),
 (51, 105, 74, 1, 1, 1),
-(52, 105, 35, 1, 1, 1);
+(52, 105, 35, 1, 1, 1),
+(53, 105, 104, 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -1912,7 +1517,7 @@ INSERT INTO `system_settings` (`settings_id`, `setting_name`, `setting_value`, `
 (1, 'facility_name', 'Training Area', 'Facility name', 1),
 (2, 'facility_number', '200005', 'Facility number', 1),
 (3, 'dayclosure_start_time', '00:00:00', 'Day closure start time', 1),
-(4, 'dayclosure_end_time', '23:59:59', 'Day closure end time', 1),
+(4, 'dayclosure_end_time', '10:00:00', 'Day closure end time', 1),
 (5, 'currency', 'AED', 'Currency', 1),
 (6, 'vat_percentage', '5', 'Vat Percentage', 1),
 (7, 'vat_type', 'inclusive', 'Vat type', 1),
@@ -1975,7 +1580,7 @@ CREATE TABLE `system_users` (
 --
 
 INSERT INTO `system_users` (`user_id`, `operator_name`, `username`, `company_name`, `email`, `phone`, `password`, `user_role_id`, `language`, `validity_from_date`, `validity_to_date`, `account_status`) VALUES
-(30, 'parcx', 'parcx', 'afme', 'parcx@test.com', '0503029959', '7aa84b18e17a847b3dcc315126acb56d', 105, 'English', '2018-07-02', '2021-03-31', 1),
+(30, 'parcx', 'parcx', 'afme', 'parcx@test.com', '0503029959', '7aa84b18e17a847b3dcc315126acb56d', 105, 'English', '2021-04-01', '2021-07-31', 1),
 (46, 'Reporting User', 'reportuser', 'Al Falak Middle East LLC Dubai', 'report@gmail.com', '561154055', '7aa84b18e17a847b3dcc315126acb56d', 106, '', '2020-07-01', '2020-08-07', 1),
 (47, 'Jeena volga', 'jeena', '', 'jeenavolga@gmail.com', '', '7aa84b18e17a847b3dcc315126acb56d', 105, 'English', '2021-03-03', '2021-03-31', 1);
 
@@ -2027,15 +1632,6 @@ CREATE TABLE `system_validators` (
   `validation_report_view` int(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `system_validators`
---
-
-INSERT INTO `system_validators` (`user_id`, `display_name`, `email`, `password`, `date_validity`, `start_date`, `expiry_date`, `status`, `mobile`, `create_datetime`, `carparks`, `logo`, `products`, `ticket_age`, `total_maximum_validation_hours`, `daily_maximum_validation_hours`, `weekly_maximum_validation_hours`, `monthly_maximum_validation_hours`, `validation_report_view`) VALUES
-(1, 'jeena', 'jeenavolga@gmail.com', '7aa84b18e17a847b3dcc315126acb56d', 1, '2020-06-15', '2020-08-31', 1, '020566', '2020-06-15 13:20:18', '1,2', 'user.jpg', '1,2', 10, 2, 2, 2, 2, 1),
-(2, 'elvina', 'elvina@gmail.com', '7aa84b18e17a847b3dcc315126acb56d', 1, '2020-06-15', '2020-06-22', 1, '023569', '2020-06-15 14:37:26', '2', 'user.jpg', '2', 0, 0, 0, 0, 0, 0),
-(3, 'parcx', 'parcx@gmail.com', '7aa84b18e17a847b3dcc315126acb56d', 1, '2020-07-07', '2020-09-30', 1, '12345', '2020-07-07 09:54:57', '1,2,3,4,5,6,7,8', 'user.jpg', '1,2', 10, 0, 0, 0, 0, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -2050,22 +1646,6 @@ CREATE TABLE `system_vms_devices` (
   `hold_status` int(11) NOT NULL,
   `device_enabled` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `system_vms_devices`
---
-
-INSERT INTO `system_vms_devices` (`vms_id`, `vms_name`, `location`, `port_name`, `hold_status`, `device_enabled`) VALUES
-(1, 'vms 1', 'site 1', '/dev/ttyr00', 1, 0),
-(2, 'vms 2', 'site 5', '/dev/ttyr01', 0, 0),
-(3, 'test', 'afme', '/dev/ttyr02', 1, 0),
-(5, 'test', 'rty', 'wwewe', 0, 0),
-(6, 'test', 'test', '/dev/ttyr07', 0, 1),
-(7, 'test', 'test', '/dev/ttyr07', 0, 1),
-(8, 'rere', 'erer', '/dev/ttyr00', 0, 1),
-(9, 'wqw', 'wqwqw', '/dev/ttyr00', 0, 0),
-(10, 're', 'ds', '/dev/ttyr00', 0, 1),
-(11, 'fdfdf', 'fdfd', '/dev/ttyr00', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -2143,97 +1723,6 @@ CREATE TABLE `vms_communication_config` (
   `status_message` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `vms_communication_config`
---
-
-INSERT INTO `vms_communication_config` (`id`, `device_number`, `ip_address`, `serial_port`, `group_address`, `vms_address`, `vms_name`, `vms_width`, `vms_height`, `daemon_port_id`, `icon_font_size`, `icon_color`, `left_icon`, `left_icon_text`, `left_icon_name`, `left_color`, `left_font_size`, `left_character_count`, `left_counter`, `center_icon`, `center_icon_text`, `center_icon_name`, `center_color`, `center_font_size`, `center_character_count`, `center_counter`, `right_icon`, `right_icon_text`, `right_icon_name`, `right_character_count`, `right_counter`, `right_color`, `right_font_size`, `test`, `status`, `data_sent`, `last_communication_datetime`, `brightness_time1`, `brightness_time2`, `brightness_time3`, `brightness_time4`, `brightness_time5`, `brightness_value1`, `brightness_value2`, `brightness_value3`, `brightness_value4`, `brightness_value5`, `delay`, `connect_start_stop`, `delay_between_signs`, `wait_for_response`, `sign_type`, `review_mode`, `last_daemon_update`, `status_message`) VALUES
-(1, 0, '10.1.121.65', '/dev/tty8', 4, 20, 'VMS1', 0, 0, 9, 0, 0, '', '', '', 2, 1, 2, '1', '', '', '', 7, 0, 2, '14+16+19', '', '', '', 2, '', 7, 0, 0, 1, '', '2020-11-03 08:43:34', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty8'),
-(9, 1, '10.1.121.62', '/dev/tty1', 3, 15, 'VMS1', 96, 16, 13, 0, 0, '', '', '', 0, 0, 4, '1', '', '', '', 7, 6, 3, '8+9+10+12+14+16+19+20', '2', '', '', 0, '', 7, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 0, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty1'),
-(10, 1, '10.1.121.62', '/dev/tty2', 3, 16, 'VMS1', 96, 16, 14, 0, 0, '', '', '', 0, 1, 4, '1', '0', '', '', 7, 6, 3, '2+7+3+4', '3', '', '', 0, '', 0, 0, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty2'),
-(11, 1, '10.1.121.62', '/dev/tty3', 3, 18, 'VMS1', 96, 16, 16, 0, 0, '0', '', '', 7, 5, 2, '2+3+4', '2', '', '', 7, 6, 3, '6+7+8+9+40+12+14+16+19+20', '4', '', '', 4, '', 7, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty3'),
-(12, 1, '10.1.121.62', '/dev/tty4', 3, 19, 'VMS1', 96, 16, 18, 0, 0, '0', '', '', 0, 5, 2, '4', '2', '', '', 0, 0, 3, '0', '0', '', '', 4, '2', 7, 5, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty4'),
-(13, 0, '10.1.121.65', '/dev/tty5', 4, 21, 'VMS1', 96, 16, 15, 0, 0, '', '\n', '', 0, 1, 4, '1', '2', '', '', 0, 1, 3, '8+20+19+14', '3', '', '', 4, '4+5', 0, 0, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty5'),
-(14, 0, '10.1.121.65', '/dev/tty6', 4, 22, 'VMS1', 96, 16, 22, 0, 0, '4', '', '', 0, 1, 4, '0', '2', '', '', 0, 0, 3, '', '', '', '', 4, '1+3+5', 0, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty6'),
-(15, 0, '10.1.121.65', '/dev/tty7', 4, 23, 'VMS1', 96, 16, 17, 0, 0, '4', '', '', 0, 1, 4, '0', '2', '', '', 0, 0, 3, '', '', '', '', 4, '5', 0, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty7'),
-(16, 1, '10.1.121.62', '/dev/tty8', 3, 17, 'VMS1', 96, 16, 9, 0, 0, '0', '', '', 0, 1, 4, '1+2+3+4+5', '', '', '', 0, 0, 3, '', '4', '', '', 4, '6', 0, 1, 0, 1, '', '2020-11-03 08:43:42', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty8'),
-(17, 0, '10.1.121.68', '/dev/tty8', 1, 3, 'VMS1', 96, 16, 9, 0, 0, '', '', '', 0, 1, 4, '0', '4', '', '', 0, 1, 4, '', '', '', '', 4, '0', 0, 1, 0, 1, '', '2020-11-03 08:43:51', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty8'),
-(18, 0, '10.1.121.68', '/dev/tty9', 6, 27, 'VMS1', 96, 16, 24, 0, 0, '', '', '', 0, 1, 4, '1+2+3', '6', '', '', 0, 1, 4, '', '', '', '', 4, '', 0, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty9'),
-(19, 0, '10.1.121.69', '/dev/tty10', 7, 28, 'VMS1', 96, 16, 19, 0, 0, '', '', '', 0, 1, 4, '1+3', '4', '', '', 0, 1, 4, '', '', '', '', 4, '', 0, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty10'),
-(20, 0, '10.1.121.69', '/dev/tty11', 7, 29, 'VMS1', 96, 16, 21, 0, 0, '', '', '', 0, 1, 4, '5', '6', '', '', 0, 1, 4, '', '', '', '', 4, '0', 0, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty11'),
-(21, 0, '10.1.121.71', '/dev/tty12', 9, 32, 'VMS1', 96, 16, 20, 0, 0, '', '', '', 0, 1, 4, '4', '4', '', '', 0, 1, 4, '', '', '', '', 4, '', 0, 1, 0, 1, '', '2020-11-03 08:42:56', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 1, '2020-11-03 16:19:46', 'Connect to /dev/tty12');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `vms_communication_config2`
---
-
-CREATE TABLE `vms_communication_config2` (
-  `id` int(11) NOT NULL,
-  `device_number` int(11) NOT NULL DEFAULT 0,
-  `ip_address` varchar(30) NOT NULL,
-  `serial_port` varchar(20) NOT NULL,
-  `group_address` int(11) NOT NULL,
-  `vms_address` int(11) NOT NULL DEFAULT 1,
-  `vms_name` varchar(50) NOT NULL,
-  `vms_width` int(11) NOT NULL,
-  `vms_height` int(11) NOT NULL,
-  `daemon_port_id` int(11) NOT NULL,
-  `icon_font_size` int(11) NOT NULL,
-  `icon_color` int(11) NOT NULL,
-  `left_icon` varchar(100) NOT NULL,
-  `left_icon_text` varchar(25) NOT NULL,
-  `left_icon_name` varchar(25) NOT NULL,
-  `left_color` int(1) NOT NULL,
-  `left_font_size` int(1) NOT NULL,
-  `left_character_count` int(2) NOT NULL,
-  `left_counter` varchar(100) NOT NULL,
-  `center_icon` varchar(100) NOT NULL,
-  `center_icon_text` varchar(25) NOT NULL,
-  `center_icon_name` varchar(25) NOT NULL,
-  `center_color` int(11) NOT NULL,
-  `center_font_size` int(11) NOT NULL,
-  `center_character_count` int(2) NOT NULL,
-  `center_counter` varchar(100) NOT NULL,
-  `right_icon` varchar(100) NOT NULL,
-  `right_icon_text` varchar(25) NOT NULL,
-  `right_icon_name` varchar(25) NOT NULL,
-  `right_character_count` int(2) NOT NULL,
-  `right_counter` varchar(100) NOT NULL,
-  `right_color` int(11) NOT NULL,
-  `right_font_size` int(11) NOT NULL,
-  `test` int(11) NOT NULL,
-  `status` int(1) NOT NULL,
-  `data_sent` text NOT NULL,
-  `last_communication_datetime` datetime NOT NULL DEFAULT current_timestamp(),
-  `brightness_time1` int(11) NOT NULL,
-  `brightness_time2` int(11) NOT NULL,
-  `brightness_time3` int(11) NOT NULL,
-  `brightness_time4` int(11) NOT NULL,
-  `brightness_time5` int(11) NOT NULL,
-  `brightness_value1` int(11) NOT NULL,
-  `brightness_value2` int(11) NOT NULL,
-  `brightness_value3` int(11) NOT NULL,
-  `brightness_value4` int(11) NOT NULL,
-  `brightness_value5` int(11) NOT NULL,
-  `delay` int(11) NOT NULL,
-  `connect_start_stop` int(11) NOT NULL,
-  `delay_between_signs` int(11) NOT NULL,
-  `wait_for_response` tinyint(4) NOT NULL DEFAULT 0,
-  `sign_type` int(11) NOT NULL,
-  `review_mode` tinyint(4) NOT NULL DEFAULT 0,
-  `last_daemon_update` datetime NOT NULL,
-  `status_message` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `vms_communication_config2`
---
-
-INSERT INTO `vms_communication_config2` (`id`, `device_number`, `ip_address`, `serial_port`, `group_address`, `vms_address`, `vms_name`, `vms_width`, `vms_height`, `daemon_port_id`, `icon_font_size`, `icon_color`, `left_icon`, `left_icon_text`, `left_icon_name`, `left_color`, `left_font_size`, `left_character_count`, `left_counter`, `center_icon`, `center_icon_text`, `center_icon_name`, `center_color`, `center_font_size`, `center_character_count`, `center_counter`, `right_icon`, `right_icon_text`, `right_icon_name`, `right_character_count`, `right_counter`, `right_color`, `right_font_size`, `test`, `status`, `data_sent`, `last_communication_datetime`, `brightness_time1`, `brightness_time2`, `brightness_time3`, `brightness_time4`, `brightness_time5`, `brightness_value1`, `brightness_value2`, `brightness_value3`, `brightness_value4`, `brightness_value5`, `delay`, `connect_start_stop`, `delay_between_signs`, `wait_for_response`, `sign_type`, `review_mode`, `last_daemon_update`, `status_message`) VALUES
-(1, 0, '192.168.1.96', '/dev/ttyr00', 254, 254, 'VMS1', 96, 16, 1, 0, 0, '', '0', '', 0, 1, 4, '1', '', '', '', 0, 0, 0, '', '', '', '', 4, '7+8', 0, 0, 0, 1, '[FT100][FC00]0[FT110][FC01]0000  [FT110][FC01]0000', '2020-09-29 12:27:48', 1, 2, 3, 4, 5, 0, 0, 0, 0, 0, 3, 1, 0, 1, 0, 0, '2020-09-30 05:46:46', 'No change');
-
 -- --------------------------------------------------------
 
 --
@@ -2254,30 +1743,6 @@ CREATE TABLE `vms_device_shedule` (
   `start_datetime` datetime NOT NULL DEFAULT current_timestamp(),
   `last_updated_datetime` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `vms_device_shedule`
---
-
-INSERT INTO `vms_device_shedule` (`id`, `vms_id`, `vms_name`, `message`, `colour`, `action`, `shedule_time`, `shedule_interval`, `hold_time`, `status`, `start_datetime`, `last_updated_datetime`) VALUES
-(1, 1, 'vms1', 'Time to leave the carpark', 'white', 'static', '13:31:00', 'Monday', 5, 2, '2019-06-24 08:52:12', '2019-06-24 13:31:24'),
-(2, 1, 'vms 1', 'static', '1234[CR]1234', 'white', '00:33:00', 'daily', 3, 0, '2019-06-25 03:33:00', '2019-06-25 08:30:59'),
-(3, 1, 'vms 1', 'static', '1234', 'white', '14:21:00', 'daily', 3, 0, '2019-01-01 01:00:00', '2019-06-25 08:46:08'),
-(4, 1, 'vms 1', '1234', 'white', 'static', '01:00:00', 'daily', 5, 0, '2019-01-02 01:01:00', '2019-06-25 08:48:51'),
-(5, 1, 'vms 1', '1234', 'white', 'static', '00:34:00', 'Array', 444, 2, '0004-04-04 04:44:00', '2019-06-25 09:03:49'),
-(6, 1, 'vms 1', '1234', 'white', 'static', '04:04:00', 'Array', 4, 2, '0004-04-04 04:44:00', '2019-06-25 09:36:54'),
-(7, 1, 'vms 1', '343434', 'white', 'static', '01:00:00', 'Array', 3, 0, '2019-06-25 03:03:00', '2019-06-25 09:59:19'),
-(8, 1, 'vms 1', '232323', 'white', 'static', '01:00:00', 'Array', 4, 0, '2019-01-01 01:00:00', '2019-06-25 10:01:50'),
-(9, 1, 'vms 1', '44443434', 'white', 'static', '01:00:00', 'daily', 5, 0, '2019-01-01 01:00:00', '2019-06-25 10:02:34'),
-(10, 1, 'vms 1', '65656', 'white', 'static', '01:00:00', 'daily', 4, 1, '2019-01-01 01:00:00', '2019-06-25 10:07:05'),
-(11, 1, 'vms 1', '232323', 'white', 'static', '01:00:00', '0,1,2,', 3, 1, '2019-01-01 01:00:00', '2019-06-25 10:07:45'),
-(12, 1, 'vms 1', 'qqwqwq', 'white', 'static', '01:00:00', 'Array', 1, 1, '2019-01-01 01:00:00', '2019-06-25 10:10:10'),
-(13, 1, 'vms 1', '5454', 'white', 'static', '02:00:00', 'Array', 1, 1, '2019-01-01 01:00:00', '2019-06-25 10:10:44'),
-(14, 1, 'vms 1', 'sddsdsdsd', 'white', 'static', '02:00:00', 'Tuesday,Wednesday,Thursday,', 2, 1, '2019-01-24 01:06:00', '2019-06-25 10:12:30'),
-(15, 1, 'vms 1', 'erere', 'white', 'static', '01:00:00', 'Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,', 2, 1, '2019-01-01 01:00:00', '2019-06-25 10:13:39'),
-(16, 1, 'vms 1', '1234', 'white', 'static', '01:00:00', 'daily', 43, 1, '2019-01-01 01:00:00', '2019-06-25 16:56:14'),
-(17, 1, 'vms 1', 'wqwqw', 'white', 'static', '01:00', 'daily', 5, 1, '2019-06-26 01:00:00', '2019-06-26 08:22:54'),
-(18, 2, 'vms 2', '21212', 'white', 'static', '01:00:00', 'daily', 2, 1, '2019-01-01 01:00:00', '2019-06-26 10:47:13');
 
 -- --------------------------------------------------------
 
@@ -2615,247 +2080,6 @@ INSERT INTO `web_application_labels` (`id`, `message`, `english`, `arabic`, `spa
 -- --------------------------------------------------------
 
 --
--- Table structure for table `web_application_labels_2`
---
-
-CREATE TABLE `web_application_labels_2` (
-  `id` int(11) NOT NULL,
-  `message` varchar(100) DEFAULT NULL,
-  `english` varchar(100) DEFAULT NULL,
-  `arabic` varchar(100) DEFAULT NULL,
-  `spanish` varchar(100) DEFAULT NULL,
-  `status` int(11) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `web_application_labels_2`
---
-
-INSERT INTO `web_application_labels_2` (`id`, `message`, `english`, `arabic`, `spanish`, `status`) VALUES
-(1, 'date_time', 'Date Time', 'وقت التاريخ', 'Fecha y hora', 1),
-(2, 'device_number', 'Device number', 'رقم الجهاز', 'Número del dispositivo', 1),
-(3, 'device_name', 'Device name', 'اسم الجهاز', 'Nombre del dispositivo', 1),
-(4, 'result', 'Result', 'نتيجة', '', 1),
-(5, 'live_parking', 'Live Review', 'مراجعة مباشرة', '', 1),
-(6, 'manual_movement', 'Manual Movements', 'مراجعة مباشرة', '', 1),
-(7, 'transactions', 'Transactions', 'المعاملات', '', 1),
-(8, 'operator_name', 'Operator Name', 'المشغل أو العامل', '', 1),
-(9, 'action', 'Action', 'عمل', '', 1),
-(10, 'reason', 'Reason', 'السبب', '', 1),
-(11, 'description', 'Description', 'وصف', 'Descripción', 1),
-(12, 'camera_name', 'Camera Name', 'اسم الكاميرا', '', 1),
-(13, 'plate_number', 'Plate Number', 'رقم لوحة', '', 1),
-(14, 'plate_area', 'Plate Area', 'منطقة', '', 1),
-(15, 'plate_country', 'Plate Country', 'بلد', '', 1),
-(16, 'cropped_image', 'Cropped Image', 'الصورة التي تم اقتصاصها', '', 1),
-(17, 'full_image', 'Full Image', 'الصورة الكاملة', '', 1),
-(18, 'plates_captured', 'Plates Captured', 'تم التقاط لوحات الأرقام', '', 1),
-(19, 'shift_number', 'Shift Number', 'رقم التحول', '', 1),
-(20, 'operator_number', 'OperatorNumber', 'رقم المشغل', '', 1),
-(21, 'shift_start', 'Shift Start', 'بدء التحول', '', 1),
-(22, 'shift_end', 'Shift End', 'نهاية التحول', '', 1),
-(23, 'shift_earnings', 'Shift Earnings', 'أرباح', '', 1),
-(24, 'over_short', 'Over/Short', 'فوق/قصيرة', '', 1),
-(25, 'last_updated', 'Last Updated', 'آخر تحديث', '', 1),
-(26, 'status', 'Status', 'الحالة', '', 1),
-(27, 'open_amount', 'Shift Open Amount', 'مبلغ مفتوح', '', 1),
-(28, 'close_amount', 'Shift Close Amount', 'مبلغ الإغلاق', '', 1),
-(29, 'payin_amount', 'Pay In Amount', 'المبلغ المدفوع', '', 1),
-(30, 'payout_amount', 'Pay Out Amount', 'مبلغ الدفع', '', 1),
-(31, 'duration', 'Parking Duration', 'المدة الزمنية', '', 1),
-(32, 'parking_fee', 'Parking Fee', 'رسوم الإصطفاف', '', 1),
-(33, 'lost_fee', 'Lost Ticket Fee', 'رسوم التذكرة المفقودة', '', 1),
-(34, 'vat', 'VAT', 'ضريبة القيمة المضافة', '', 1),
-(35, 'shift_earnings', 'Shift Earnings', 'أرباح', '', 1),
-(36, 'physical_cash', 'Physical Cash Collected', 'جمع النقد', '', 1),
-(37, 'shift_report', 'Shift Report', 'تقرير التحول', '', 1),
-(38, 'ticket_id', 'Ticket Id', 'رقم التذكرة', '', 1),
-(39, 'blacklisting_reason', 'Blacklisting Reason', 'سبب القائمة السوداء', '', 1),
-(40, 'blacklist_report', 'Blacklist Report', 'تقرير القائمة السوداء', '', 1),
-(41, 'parking_movement', 'Parking Movements', 'حركة وقوف السيارات', '', 1),
-(42, 'entry_details', 'Entry Details', 'تفاصيل الدخول', '', 1),
-(43, 'entry_type', 'Entry Type', 'نوع الإدخال', '', 1),
-(44, 'entry_date_time', 'Entry Date Time', 'موعد الدخول', '', 1),
-(45, 'entry_grace_period', 'Entry Grace Period', 'فترة السماح دخول', '', 1),
-(46, 'entry_device_name', 'Entry Device Name', 'اسم الجهاز عند الدخول', '', 1),
-(47, 'entry_carpark_name', 'Entry Carpark Name', 'اسم موقف السيارات عند الدخول', '', 1),
-(48, 'access_details', 'Access Details', 'تفاصيل الوصول', '', 1),
-(49, 'customer_name', 'Customer Name', 'اسم الزبون', '', 1),
-(50, 'validity_start_date', 'Validity Start Date', 'تاريخ البدء', '', 1),
-(51, 'validity_expiry_date', 'Validity Expiry Date', 'تاريخ انتهاء الصلاحية', '', 1),
-(52, 'reservation_details', 'Reservation Details', 'تفاصيل الحجز', '', 1),
-(53, 'payment_details', 'Payment Details', 'بيانات الدفع', '', 1),
-(54, 'payment_date_time', 'Payment Date Time', 'تاريخ ووقت الدفع', '', 1),
-(55, 'maximum_exit_date_time', 'Maximum Exit Date Time', 'وقت الخروج الأقصى', '', 1),
-(56, 'payment_device_name ', 'Payment Device Name', 'اسم جهاز الدفع', '', 1),
-(57, 'payment_carpark_name ', 'Payment Carpark Name', 'اسم موقف سيارات الدفع', '', 1),
-(58, 'amount_paid', 'Amount Paid', 'المبلغ المدفوع', '', 1),
-(59, 'discount_name', 'Discount Name', 'اسم الخصم', '', 1),
-(60, 'validation_value', 'Validation Value', 'التحقق من الصحة', '', 1),
-(61, 'exit_details', 'Exit Details', 'تفاصيل الخروج', '', 1),
-(62, 'exit_time', 'Exit Date Time', 'وقت الخروج', '', 1),
-(63, 'exit_device_name', 'Exit Device Name', 'اسم الجهاز عند الخروج', '', 1),
-(64, 'exit_carpark_name', 'Exit Carpark Name', 'اسم موقف السيارات عند المخرج', '', 1),
-(65, 'invalid_ticket', 'Invalid Ticket', 'تذكرة غير صالحة', '', 1),
-(66, 'ticket_details', 'Ticket Details', 'تفاصيل التذكرة', '', 1),
-(67, 'visitor_frequency_realtime', 'Realtime Visitor Frequency', 'تردد الزائر في الوقت الفعلي', '', 1),
-(68, 'no_of_visits', 'No of Visits', 'عدد الزيارات', '', 1),
-(69, 'tag', 'Tag', 'بطاقة', '', 1),
-(70, 'access_movements', 'Access Movements', 'حركة الوصول', '', 1),
-(71, 'carpark_name', 'Carpark Name', 'اسم موقف السيارات', '', 1),
-(72, 'open_transactions', 'Open Transactions', 'فتح المعاملات', '', 1),
-(73, 'exit_grace_period', 'Exit Grace Period', 'فترة سماح الخروج', '', 1),
-(74, 'image', 'Image', 'صورة', '', 1),
-(75, 'validation_report', 'Validation Report', 'تقرير التحقق من صحة', '', 1),
-(76, 'validator', 'Va;idator', 'المدقق', '', 1),
-(77, 'product', 'Product', 'المنتج', '', 1),
-(78, 'no_records', 'No records/transactions available for the current search criteria', 'لا توجد سجلات / معاملات متاحة لمعايير البحث الحالية', 'No hay registros / transacciones disponibles para los criterios de búsqueda actuales', 1),
-(79, 'banknote', 'Banknote x Quantity', 'الأوراق النقدية × الكمية', '', 1),
-(80, 'amount', 'Amount', 'قيمة', '', 1),
-(81, 'apm_refill_report', 'APM Refill Report', 'APM ملأ ثانية', '', 1),
-(82, 'total_amount_refilled', 'Total Amount Refilled', 'إجمالي المبلغ المعاد تعبئته', '', 1),
-(83, 'banknotes', 'Banknote', 'الأوراق النقدية', '', 1),
-(84, 'recycler_level', 'Recycler Level', 'مستوى إعادة التدوير', '', 1),
-(85, 'cashbox_level', 'Cashbox Level', 'مستوى كاش بوكس', '', 1),
-(86, 'total', 'Total', 'مجموع', '', 1),
-(87, 'cash_levels', 'APM Cash Level', 'المستوى النقدي APM', '', 1),
-(88, 'operation', 'Operation', 'عملية', '', 1),
-(89, 'apm_payout_report', 'APM Payout Report', 'تقرير عائد APM', '', 1),
-(90, 'total_payout', 'Total Payout', 'إجمالي المدفوعات', '', 1),
-(91, 'exception', 'Exception', 'استثناء', '', 1),
-(92, 'amount_received', 'Amount Received', 'المبلغ الذي تسلمه', '', 1),
-(93, 'balance_returned', 'Balance Returned', 'توازن', '', 1),
-(94, 'credit_note', 'Credit Note', 'دين', '', 1),
-(95, 'payment_transaction_exception', 'Payment Transaction Exceptions', 'استثناءات معاملات الدفع', '', 1),
-(96, 'creditcard_transactions', 'Creditcard Transactions', 'معاملات بطاقات الائتمان', '', 1),
-(97, 'total_revenue', 'Total Revenue', 'إجمالي الإيرادات', '', 1),
-(98, 'merchant_id', 'Merchant id', 'معرف التاجر', '', 1),
-(99, 'terminal_id', 'Terminal id', 'معرف المحطة', '', 1),
-(100, 'comment', 'Comment', 'تعليق', '', 1),
-(101, 'card_type', 'Card Type', 'نوع البطاقة', '', 1),
-(102, 'authentication_code', 'Authentication Code', 'رمز الدخول', '', 1),
-(103, 'reference_number', 'Reference Number', 'رقم المرجع', '', 1),
-(104, 'report_date', 'Report Date', 'تاريخ التقرير', '', 1),
-(105, 'product_sale_amount', 'Product Sale Amount', 'مبلغ بيع المنتج', '', 1),
-(106, 'discount_amount', 'Discount Amount', 'مقدار الخصم', '', 1),
-(107, 'notifications', 'Notifications', 'إشعارات', '', 1),
-(108, 'carpark_number', 'Carpark Number', 'رقم موقف السيارات', '', 1),
-(109, 'report_by_date', 'Report by Date', 'تقرير حسب التاريخ', '', 1),
-(110, 'total_earnings', 'Total Earnings', 'الأرباح الكلية', '', 1),
-(111, 'cash_amount', 'Cash Amount', 'مبلغ نقدي', '', 1),
-(112, 'creditcard_amount', 'Creditcard Amount', 'مبلغ بطاقة الائتمان', '', 1),
-(113, 'wallet_amount', 'Wallet Amount', 'مبلغ المحفظة', '', 1),
-(114, 'payable_entries_count', 'Payable Entries Count', 'إدخالات مستحقة الدفع', '', 1),
-(115, 'lost_ticket_count', 'Lost Ticket Count', 'عدد التذاكر المفقودة', '', 1),
-(116, 'discount_count', 'Discount Count', 'عدد الخصومات', '', 1),
-(117, 'product_sale_count', 'Product Sale Cout', 'عدد بيع المنتج', '', 1),
-(118, 'cash_transaction_count', 'Cash Transaction Count', 'عدد المعاملات النقدية', '', 1),
-(119, 'creditcard_transaction_count', 'Creditcard Transaction Count', 'عدد معاملات بطاقة الائتمان', '', 1),
-(120, 'cash', 'Cash', 'السيولة النقدية', '', 1),
-(121, 'credit_card', 'Creditcard', 'بطاقة ائتمان', '', 1),
-(122, 'sms', 'SMS', 'رسالة قصيرة', '', 1),
-(123, 'product_name', 'Product Name', 'اسم المنتج', '', 1),
-(124, 'quantity', 'Quantity', 'كمية', '', 1),
-(125, 'unit_price', 'Unit Price', 'سعر الوحدة', '', 1),
-(126, 'total_amount', 'Total Amount', 'المبلغ الإجمالي', '', 1),
-(127, 'payable_entries', 'Payable Entries', 'إدخالات مستحقة الدفع', '', 1),
-(128, 'discounts', 'Discounts', 'الخصومات', '', 1),
-(129, 'product_sales', 'Product Sales', 'مبيعات المنتج', '', 1),
-(130, 'earnings', 'Earnings', 'الأرباح', '', 1),
-(131, 'earnings_by_payment_type', 'Earnings by Payment Type', 'الأرباح حسب نوع الدفع', '', 1),
-(132, 'transaction_count', 'Transaction Count', 'عدد المعاملات', '', 1),
-(133, 'revenue_report', 'Revenue Report', 'تقرير الإيرادات', '', 1),
-(134, 'lost_ticket', 'Lost Ticket', 'تذكرة ضائعة', '', 1),
-(135, 'traffic_report', 'Traffic Report', 'تقرير المرور', '', 1),
-(136, 'entries', 'Entries', 'إدخالات', '', 1),
-(137, 'exits', 'Exits', 'مخارج', '', 1),
-(138, 'manual_operation', 'Manual Operation', 'التشغيل اليدوي', '', 1),
-(139, 'short_term', 'Short Term/Contract', 'عقد على المدى القصير', '', 1),
-(140, 'entry_exit', 'Entry/Exit', 'دخول / خروج', '', 1),
-(141, 'shortterm_entries', 'Entries Short-term', 'إدخالات قصيرة المدى', '', 1),
-(142, 'shortterm_exits', 'Exits Short-term', 'مخارج قصيرة المدى', '', 1),
-(143, 'contract_entries', 'Entries Contract', 'إدخالات العقد', '', 1),
-(144, 'contract_exits', 'Exits Contract', 'مخارج العقد', '', 1),
-(145, 'manual_entry', 'Manual Entry', 'الإدخال اليدوي', '', 1),
-(146, 'manual_exit', 'Manual Exit', 'خروج يدوي', '', 1),
-(147, 'from', 'From', 'من عند', '', 1),
-(148, 'to', 'To', 'ل', '', 1),
-(149, 'payment_transactions', 'Payment Transactions', 'معاملات الدفع', '', 1),
-(150, 'category', 'Category', 'الفئة', '', 1),
-(151, 'payment_type', 'Payment Type', 'نوع الدفع', '', 1),
-(152, 'gross_amount', 'Gross Amount', 'المبلغ الإجمالي', '', 1),
-(153, 'all_carparks', 'All Carparks', 'جميع مواقف السيارات', '', 1),
-(154, 'select_carparks', 'Select Carparks', 'حدد موقف السيارات', '', 1),
-(155, 'all_parking_zone', 'All Parking Zone', 'كل منطقة وقوف السيارات', '', 1),
-(156, 'select_parking_zone', 'Select Parking Zone', 'حدد منطقة وقوف السيارات', '', 1),
-(157, 'all_devices', 'All Devices', 'جميع الاجهزة', 'Todos los dispositivos', 1),
-(158, 'select_devices', 'Select Devices', 'حدد الأجهزة', 'Seleccionar dispositivos', 1),
-(159, 'all_operators', 'All Operators', 'جميع المشغلين', '', 1),
-(160, 'select_operators', 'Select Operators', 'حدد المشغلين', '', 1),
-(161, 'all_category', 'All Category', 'كل الفئات', '', 1),
-(162, 'select_category', 'Select Category', 'اختر الفئة', '', 1),
-(163, 'all_payment', 'All Payment Type', 'جميع أنواع الدفع', '', 1),
-(164, 'select_payment', 'Select Payment Type', 'حدد أنواع الدفع', '', 1),
-(165, 'all_discount', 'All Discounts', 'كل خصم', '', 1),
-(166, 'select_discount', 'Select Discounts', 'حدد الخصومات', '', 1),
-(167, 'all_days', 'All Days of the Week', 'كل أيام الأسبوع', '', 1),
-(168, 'select_days', 'Select Day of the Week', 'حدد يوم من الأسبوع', '', 1),
-(169, 'daily', 'Daily', 'اليومي', '', 1),
-(170, 'select_interval', 'Select Interval', 'حدد الفاصل الزمني', '', 1),
-(171, 'view_report', 'View Report', 'عرض التقرير', 'Vista del informe', 1),
-(172, 'logout', 'Logout', 'تسجيل خروج', 'Cerrar sesión', 1),
-(173, 'choose_date_range', 'Choose Date Range', 'اختر النطاق الزمني', '', 1),
-(174, 'parking_rate', 'Parking Rate', 'معدل وقوف السيارات', '', 1),
-(175, 'validations', 'validations', 'التحقق من صحة', '', 1),
-(176, 'validation_hours', 'Validation Hours', 'التحقق من الصحة', '', 1),
-(177, 'pdf_receipt', 'PDF Receipt', 'إيصال PDF', '', 1),
-(178, 'detailed_payment', 'Detailed Payment Information', 'معلومات دفع مفصلة', '', 1),
-(179, 'trn_no', 'TRN No', 'رقم TRN', '', 1),
-(180, 'net_amount', 'Net Amount', 'كمية الشبكة', '', 1),
-(181, 'detailed_shift', 'Detailed Shift Information', 'معلومات التحول التفصيلية', '', 1),
-(182, 'choose_datetime_range', 'Choose Date and Time Range', 'اختر نطاق التاريخ والوقت', '', 1),
-(183, 'plate_ticket', 'Plate Number/Ticket Id', 'رقم لوحة  / رقم التذكرة', '', 1),
-(184, 'view_details', 'View Details', 'عرض التفاصيل', '', 1),
-(185, 'contract', 'Contract', 'خطب', '', 1),
-(186, 'search', 'Search', 'بحث', '', 1),
-(187, 'select', 'Select', 'تحديد', '', 1),
-(188, 'sunday', 'Sunday', 'الأحد', '', 1),
-(189, 'monday', 'Monday', 'الإثنين', '', 1),
-(190, 'tuesday', 'Tuesday', 'الثلاثاء', '', 1),
-(191, 'wednesday', 'Wednesday', 'الأربعاء', '', 1),
-(192, 'thursday', 'Thursday', 'الخميس', '', 1),
-(193, 'friday', 'Friday', 'يوم الجمعة', '', 1),
-(194, 'saturday', 'Saturday', 'يوم السبت', '', 1),
-(195, 'vat_report', 'VAT Report', 'تقرير ضريبة القيمة المضافة', '', 1),
-(196, 'vat_amount', 'VAT Amount', 'قيمة الضريبة', '', 1),
-(197, 'total_vat', 'Toatl VAT', 'إجمالي ضريبة القيمة المضافة', '', 1),
-(198, 'severity', 'Severity', 'خطورة', 'Gravedad', 1),
-(199, 'ip_address', 'IP Address', 'عنوان IP', '', 1),
-(200, 'connection_lost', 'Connection Lost', 'فقد الاتصال', '', 1),
-(201, 'connection_restored', 'Connection Restored', 'تمت استعادة الاتصال', '', 1),
-(202, 'watchdog_device_alarms', 'Watchdog device alarms', 'أجهزة الإنذار جهاز المراقبة', 'Alarmas de dispositivos de vigilancia', 1),
-(203, 'export', 'Export', 'تصدير', 'Exportar', 1),
-(204, 'export_to_excel', 'Export to Excel', 'تصدير إلى Excel', 'Exportar a Excel', 1),
-(205, 'export_to_pdf', 'Export to PDF', 'تصدير إلى PDF', 'Exportar a PDF', 1),
-(206, 'high', 'High', 'عالي', 'Alto', 1),
-(207, 'low', 'Low', 'منخفض', 'Bajo', 1),
-(208, 'medium', 'Medium', 'متوسط', 'Medio', 1),
-(209, 'select_severity', 'Select Severity', 'حدد الخطورة', 'Seleccionar gravedad', 1),
-(210, 'search', 'Search', 'بحث', 'Buscar', 1),
-(211, 'entries_label', 'Show _MENU_ entries', 'إظهار _MENU_ مداخل', 'Mostrar _MENU_ entradas', 1),
-(212, 'info_label', 'Showing _START_ to _END_ of _TOTAL_ entries', 'إظهار_START_ إلى _END_ من _TOTAL_ مدخلات', 'Mostrando _START_ a _END_ de _TOTAL_ entradas', 1),
-(213, 'previous', 'Previous', 'السابق', 'Previo', 1),
-(214, 'next', 'Next', 'التالى', 'Próximo', 1),
-(215, 'receipt_details', 'Receipt Details', 'تفاصيل الإيصال', 'Detalles del recibo', 1),
-(216, 'close', 'Close', 'قريب', 'Cerca', 1),
-(217, 'print', 'Print', 'طباعة', 'Impresión', 1),
-(218, 'tax_invoice', 'Tax invoice', 'فاتورة ضريبية', 'Factura fiscal', 1),
-(219, 'discount', 'Discount', 'خصم', 'Descuento', 1),
-(220, 'grace_period', 'Grace Period', 'فترة السماح', 'Periodo de gracia', 1);
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `web_application_messages`
 --
 
@@ -2921,15 +2145,9 @@ CREATE TABLE `whitelist_group_policy` (
   `validity_timeslot` text NOT NULL,
   `facility_number` int(11) NOT NULL,
   `carpark_number` varchar(25) DEFAULT NULL,
+  `parking_zone` varchar(100) NOT NULL,
   `status` int(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `whitelist_group_policy`
---
-
-INSERT INTO `whitelist_group_policy` (`id`, `policy_name`, `description`, `start_date`, `expiry_date`, `validity_days`, `validity_timeslot`, `facility_number`, `carpark_number`, `status`) VALUES
-(1, 'afme employees', 'For afme employees', '2021-03-04', '2021-03-31', 'Sunday,Monday,Tuesday,Wednesday,Thursday', '06:00 - 07:00,07:00 - 08:00,08:00 - 09:00,09:00 - 10:00,10:00 - 11:00,11:00 - 12:00,12:00 - 13:00,13:00 - 14:00,14:00 - 15:00,15:00 - 16:00,16:00 - 17:00,17:00 - 18:00,18:00 - 19:00', 200005, '1', 1);
 
 --
 -- Indexes for dumped tables
@@ -2946,6 +2164,12 @@ ALTER TABLE `access_anpr_checks`
 --
 ALTER TABLE `access_whitelist`
   ADD PRIMARY KEY (`access_whitelist_id`);
+
+--
+-- Indexes for table `access_whitelist_customers`
+--
+ALTER TABLE `access_whitelist_customers`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `alerts_alarms`
@@ -2975,18 +2199,6 @@ ALTER TABLE `cooperate_users`
 -- Indexes for table `customer_messages`
 --
 ALTER TABLE `customer_messages`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `customer_messages_media`
---
-ALTER TABLE `customer_messages_media`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `customer_messages_text`
---
-ALTER TABLE `customer_messages_text`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -3123,12 +2335,6 @@ ALTER TABLE `revenue_products`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `revenue_validation`
---
-ALTER TABLE `revenue_validation`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `system_carparks`
 --
 ALTER TABLE `system_carparks`
@@ -3147,10 +2353,10 @@ ALTER TABLE `system_devices`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `system_facility`
+-- Indexes for table `system_device_category`
 --
-ALTER TABLE `system_facility`
-  ADD PRIMARY KEY (`facility_id`);
+ALTER TABLE `system_device_category`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `system_navigation`
@@ -3172,17 +2378,10 @@ ALTER TABLE `system_navigation_header`
   ADD PRIMARY KEY (`header_id`);
 
 --
--- Indexes for table `system_navigation_old`
---
-ALTER TABLE `system_navigation_old`
-  ADD PRIMARY KEY (`menu_id`),
-  ADD UNIQUE KEY `menu_name` (`menu_name`);
-
---
 -- Indexes for table `system_parking_zone`
 --
 ALTER TABLE `system_parking_zone`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`parking_zone_number`);
 
 --
 -- Indexes for table `system_products`
@@ -3244,12 +2443,6 @@ ALTER TABLE `vms_communication_config`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `vms_communication_config2`
---
-ALTER TABLE `vms_communication_config2`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Indexes for table `vms_device_shedule`
 --
 ALTER TABLE `vms_device_shedule`
@@ -3259,12 +2452,6 @@ ALTER TABLE `vms_device_shedule`
 -- Indexes for table `web_application_labels`
 --
 ALTER TABLE `web_application_labels`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `web_application_labels_2`
---
-ALTER TABLE `web_application_labels_2`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -3287,25 +2474,31 @@ ALTER TABLE `whitelist_group_policy`
 -- AUTO_INCREMENT for table `access_anpr_checks`
 --
 ALTER TABLE `access_anpr_checks`
-  MODIFY `anpr_check_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `anpr_check_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `access_whitelist`
 --
 ALTER TABLE `access_whitelist`
-  MODIFY `access_whitelist_id` int(25) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `access_whitelist_id` int(25) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `access_whitelist_customers`
+--
+ALTER TABLE `access_whitelist_customers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `alerts_alarms`
 --
 ALTER TABLE `alerts_alarms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `alerts_counter`
 --
 ALTER TABLE `alerts_counter`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `cashier_user_roles`
@@ -3318,18 +2511,6 @@ ALTER TABLE `cashier_user_roles`
 --
 ALTER TABLE `customer_messages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
-
---
--- AUTO_INCREMENT for table `customer_messages_media`
---
-ALTER TABLE `customer_messages_media`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
-
---
--- AUTO_INCREMENT for table `customer_messages_text`
---
-ALTER TABLE `customer_messages_text`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
 
 --
 -- AUTO_INCREMENT for table `daemon_status`
@@ -3347,7 +2528,7 @@ ALTER TABLE `DataExportSettings`
 -- AUTO_INCREMENT for table `device_application_label`
 --
 ALTER TABLE `device_application_label`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=236;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=237;
 
 --
 -- AUTO_INCREMENT for table `device_maintenance`
@@ -3371,7 +2552,7 @@ ALTER TABLE `manual_movements_reasons`
 -- AUTO_INCREMENT for table `parking_ewallet`
 --
 ALTER TABLE `parking_ewallet`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `pgs_counter_alarm`
@@ -3389,7 +2570,7 @@ ALTER TABLE `pgs_interface_config`
 -- AUTO_INCREMENT for table `plates_ewallet`
 --
 ALTER TABLE `plates_ewallet`
-  MODIFY `id` int(25) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(25) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `pxcloud_download_settings`
@@ -3413,7 +2594,7 @@ ALTER TABLE `receipt_settings`
 -- AUTO_INCREMENT for table `reservation_user`
 --
 ALTER TABLE `reservation_user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `revenue_banknote_denominations`
@@ -3425,19 +2606,19 @@ ALTER TABLE `revenue_banknote_denominations`
 -- AUTO_INCREMENT for table `revenue_coupons_whitelist`
 --
 ALTER TABLE `revenue_coupons_whitelist`
-  MODIFY `id` int(25) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(25) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `revenue_discounts`
 --
 ALTER TABLE `revenue_discounts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `revenue_dynamic_parking_rates`
 --
 ALTER TABLE `revenue_dynamic_parking_rates`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `revenue_fixed_parking_rates`
@@ -3461,37 +2642,31 @@ ALTER TABLE `revenue_parking_rate_label`
 -- AUTO_INCREMENT for table `revenue_products`
 --
 ALTER TABLE `revenue_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `revenue_validation`
---
-ALTER TABLE `revenue_validation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `system_carparks`
 --
 ALTER TABLE `system_carparks`
-  MODIFY `carpark_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `carpark_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `system_devices`
 --
 ALTER TABLE `system_devices`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `system_facility`
+-- AUTO_INCREMENT for table `system_device_category`
 --
-ALTER TABLE `system_facility`
-  MODIFY `facility_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `system_device_category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `system_navigation`
 --
 ALTER TABLE `system_navigation`
-  MODIFY `menu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
+  MODIFY `menu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT for table `system_navigation_group`
@@ -3506,28 +2681,22 @@ ALTER TABLE `system_navigation_header`
   MODIFY `header_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `system_navigation_old`
---
-ALTER TABLE `system_navigation_old`
-  MODIFY `menu_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
-
---
 -- AUTO_INCREMENT for table `system_parking_zone`
 --
 ALTER TABLE `system_parking_zone`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `parking_zone_number` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `system_products`
 --
 ALTER TABLE `system_products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `system_role_rights`
 --
 ALTER TABLE `system_role_rights`
-  MODIFY `role_rights_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `role_rights_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `system_settings`
@@ -3551,13 +2720,13 @@ ALTER TABLE `system_user_role`
 -- AUTO_INCREMENT for table `system_validators`
 --
 ALTER TABLE `system_validators`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `system_vms_devices`
 --
 ALTER TABLE `system_vms_devices`
-  MODIFY `vms_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `vms_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `valet_drivers`
@@ -3569,31 +2738,19 @@ ALTER TABLE `valet_drivers`
 -- AUTO_INCREMENT for table `vms_communication_config`
 --
 ALTER TABLE `vms_communication_config`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
-
---
--- AUTO_INCREMENT for table `vms_communication_config2`
---
-ALTER TABLE `vms_communication_config2`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `vms_device_shedule`
 --
 ALTER TABLE `vms_device_shedule`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `web_application_labels`
 --
 ALTER TABLE `web_application_labels`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=313;
-
---
--- AUTO_INCREMENT for table `web_application_labels_2`
---
-ALTER TABLE `web_application_labels_2`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=221;
 
 --
 -- AUTO_INCREMENT for table `web_application_messages`
@@ -3605,7 +2762,7 @@ ALTER TABLE `web_application_messages`
 -- AUTO_INCREMENT for table `whitelist_group_policy`
 --
 ALTER TABLE `whitelist_group_policy`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

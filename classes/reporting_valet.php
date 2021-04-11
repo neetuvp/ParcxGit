@@ -902,7 +902,7 @@ payment_date_time>'$current_date' group by device_name";
    
     function get_car_details_on_the_way_to_podium(){
         $con = $this->db_connect();       
-        $query_string="select id,plate_number,plate_prefix,parking_out_datetime,TIMESTAMPDIFF(MINUTE,parking_out_datetime,now()),customer_card_number From valet_parking where parking_in=1 and parking_out=1 and valet_out=0 and ready_for_delivery=0 and paid_status=1 and parking_out_datetime is not null order by parking_out_datetime desc";                       
+        $query_string="select id,plate_number,plate_prefix,parking_out_datetime,TIMESTAMPDIFF(MINUTE,parking_out_datetime,now()) as timer,customer_card_number From valet_parking where parking_in=1 and parking_out=1 and valet_out=0 and ready_for_delivery=0 and paid_status=1 and parking_out_datetime is not null order by parking_out_datetime desc";                       
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con)); 
         $html="";
         while($data = mysqli_fetch_assoc($result))
@@ -931,7 +931,7 @@ payment_date_time>'$current_date' group by device_name";
     
     function get_car_details_ready_to_delivery(){
         $con = $this->db_connect();       
-        $query_string="select id,plate_number,plate_prefix,dropoff_datetime,TIMESTAMPDIFF(MINUTE,dropoff_datetime,now()),customer_card_number From valet_parking where parking_in=1 and parking_out=1 and paid_status=1 and valet_out=0 and ready_for_delivery=1 and dropoff_datetime>'".date(Y-m-d)." 00:00:00' order by dropoff_datetime desc";                       
+        $query_string="select id,plate_number,plate_prefix,dropoff_datetime,TIMESTAMPDIFF(MINUTE,dropoff_datetime,now()) as timer,customer_card_number From valet_parking where parking_in=1 and parking_out=1 and paid_status=1 and valet_out=0 and ready_for_delivery=1 and dropoff_datetime>'".date(Y-m-d)." 00:00:00' order by dropoff_datetime desc";                       
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con)); 
         $html="";
         while($data = mysqli_fetch_assoc($result))
@@ -950,7 +950,7 @@ payment_date_time>'$current_date' group by device_name";
             $html.='<div class="col-2 my-auto text-center"><h1>'.$data["customer_card_number"].'</h1></div>';
             $html.='<div class="col-10">';
             $html.='<ul class="nav flex-column">';
-            $html.='<li class="nav-item"><span class="nav-link">Dop off date time <span class="float-right">'.$data["dropoff_datetime"].'</span></span></li>';
+            $html.='<li class="nav-item"><span class="nav-link">Drop off date time <span class="float-right">'.$data["dropoff_datetime"].'</span></span></li>';
             $html.='<li class="nav-item"><span class="nav-link">Timer <span class="float-right">'.$timer.'</span></span></li>';           
             $html.='</ul></div></div></div></div>';
             }

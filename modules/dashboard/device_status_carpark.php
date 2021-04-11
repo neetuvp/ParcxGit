@@ -47,12 +47,7 @@ include('../../includes/sidebar.php');
             </span>
         </div>
     </div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="device_status_facility.php">Facilities</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Carparks</li>
-        </ol>
-    </nav>
+   
 
     <section class="content">
         <div class="container-wide">
@@ -74,12 +69,18 @@ var alarm_count
 function get_device_status_by_carpark()
     {
     $.get("../ajax/dashboard.php?task=23&facility_number=" + facility_number, function (data) {
-        $('#device-status-block').html(data);    
-        alarm_count=$("#alarm_count").val();        
-        if(alarm_count==0)      
-            $('#alarm_notification').html("No alarms");
+        $('#device-status-block').html(data);  
+        carpark_number=$("#carpark_number").val();           
+        if (typeof carpark_number !== "undefined")
+            window.location="device_status_device.php?facility_number="+facility_number+"&carpark_number="+carpark_number;
         else
-            $('#alarm_notification').html("Alarm Present:"+alarm_count);
+            {
+            alarm_count=$("#alarm_count").val();                    
+            if(alarm_count==0)      
+                $('#alarm_notification').html("No alarms");
+            else
+                $('#alarm_notification').html("Alarm Present:"+alarm_count);
+            }
     });
     }
     

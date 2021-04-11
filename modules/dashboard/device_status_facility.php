@@ -21,13 +21,7 @@ include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
 
-<div class="content-wrapper">      
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">Facilities</li>
-        </ol>
-    </nav>
-
+<div class="content-wrapper">         
     <section class="content">
         <div class="container-wide">
             <div class="row" id="device-status-block" >
@@ -41,11 +35,18 @@ include('../../includes/sidebar.php');
 
 <script>
 var facility_number = 0;
+var carpark_number=0;
 
 function get_live_device_Status()
     {
     $.get("../ajax/dashboard.php?task=22", function (data) {
-        $('#device-status-block').html(data);        
+        $('#device-status-block').html(data); 
+        carpark_number=$("#carpark_number").val();
+        facility_number=$("#facility_number").val();
+        if (typeof carpark_number !== "undefined")
+            window.location="device_status_device.php?facility_number="+facility_number+"&carpark_number="+carpark_number;
+        else if (typeof facility_number !== "undefined")  
+            window.location="device_status_carpark.php?facility_number="+facility_number;        
     });
     }
     

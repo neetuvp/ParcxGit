@@ -229,6 +229,9 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "watchdog_network_logs";
                     break;
             
+            case 24://anpr_entry_plate_correction
+                label = reportlabels + "anpr_plate_correction";
+                    break;
 
 }
         }

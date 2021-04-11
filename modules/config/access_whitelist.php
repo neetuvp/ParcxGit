@@ -178,4 +178,22 @@ include('../../includes/sidebar.php');
     </section>    
 </div>
 <script src="../../dist/js/whitelistsettings.js"></script>
+<script>
+$(document).ready(function () 
+  {
+  $('#RecordsTable').DataTable(
+      {
+      "paging": true,
+      "lengthChange":true,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+      "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+      "aaSorting": []
+      
+      });  
+    });
+</script>
 <?php include('../../includes/footer.php');?>
+

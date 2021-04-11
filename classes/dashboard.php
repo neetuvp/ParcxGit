@@ -41,8 +41,8 @@ class dashboard {
             mysqli_close($con);
         }
         return $data;
-    }  
-
+    } 
+           
     function live_revenue_facility() {
         $con = $this->db_connect();
         $query_string = "select facility_number,sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue group by facility_number";
@@ -83,7 +83,7 @@ class dashboard {
     
       function live_revenue_device($facility_number,$carpark_number) {
         $con = $this->db_connect();
-        $query_string = "select sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue where facility_number=".$facility_number." and carpark_number=".$carpark_number." group by carpark_number";
+        $query_string = "select sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue where facility_number=".$facility_number." and carpark_number=".$carpark_number;
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $i=0;
         if ($data = mysqli_fetch_assoc($result)) {            
@@ -118,9 +118,9 @@ class dashboard {
         else
             {  
             $facility=$this->getFacilityFeatures();
+            $html='<input type="hidden" id="vat" value="'.$facility["vat_percentage"].'">';
             while ($data = mysqli_fetch_assoc($result)) 
-                {
-                $html='';
+                {                
                 $html.='<div class="finance-facility col-md-4">';
                 $html.='<div class="card ">';
                 $html.='<div class="card-body box-profile">';
@@ -140,10 +140,10 @@ class dashboard {
                 $html.='<button type="button" class="show-facility-details btn btn-block bg-secondary-gradient" facility_number="'.$data["facility_number"].'">More <i class="fa fa-arrow-circle-right"></i></button>';
                 $html.='</div>';
                 $html.='</div>';
-                $html.='</div>';
-                echo $html;
+                $html.='</div>';                
                 }
-             mysqli_close($con);
+            echo $html;
+            mysqli_close($con);
             }
         }
         
@@ -197,200 +197,96 @@ class dashboard {
             }
         }
 
-    function get_revenue_summary2() {
-        $fdata = $this->getFacilityFeatures();
-        $d = $fdata["decimal_places"];
-        $currency = $fdata["currency"];
-        $vat = $fdata["vat_percentage"];
 
-        $con = $this->db_connect();
-        $carpark = array();
-        $carpark_name = array();
-        $last_updated_date_time = "";
-        $i = 0;
-        $html_data = "";
-        $header = "";
-
-        $header .= '<table width="100%" class="jspdf-table" data-status="table-view">';
-        $header .= '<tr class="card-header d-flex justify-content-between align-items-center">';
-
-        $header .= '<th class="col-2">Device Name</th>';
-        $header .= '<th class="col">Total Revenue</th>';
-        $header .= '<th class="col">Parking Fee</th>';
-        $header .= '<th class="col">Product Sale Amount</th>';
-        $header .= '<th class="col">VAT Amount</th>';
-        $header .= '<th class="col">Lost Ticket Fee</th>';
-        $header .= '<th class="col">Discount Amount</th>';
-        $header .= '<th class="col">Payable Entries</th>';
-        $header .= '<th class="col">Lost Ticket Count</th>';
-        $header .= '<th class="col">Discount Count</th>';
-
-
-        $header .= '</tr>';
-
-        $query_string = "select carpark_number,carpark_name,last_updated_date_time from parking_revenue group by carpark_number order by carpark_number ASC";
-        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
-        while ($data = mysqli_fetch_assoc($result)) {
-            $carpark[] = $data['carpark_number'];
-            $carpark_name[] = $data['carpark_name'];
-            $last_updated_date_time = $data['last_updated_date_time'];
-        }
-        $html_data = '<input type="hidden" id="last_updated_time" value="' . $last_updated_date_time . '">';
-        $html_data .= $header;
-
-        while ($i < count($carpark)) {
-            $query_string = "select * from parking_revenue where carpark_number=" . $carpark[$i][0] . " order by carpark_number DESC";
-            $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
-
-            $html_data .= '<tbody class="table-view">';
-
-            $html_data .= "<tr class='subhead card-text d-flex justify-content-between align-items-center pl-2' data-status='header'><td>" . $carpark_name[$i] . "</td></tr>";
-
-
-            while ($data = mysqli_fetch_assoc($result)) {
-                $data_status = "all";
-                switch ($data["device_type"]) {
-                    case 3:
-                        $data_status = "manual-cashier";
-                        break;
-                    case 4:
-                        $data_status = "payonfoot-machine";
-                        break;
-                    case 5:
-                        $data_status = "handheld-pos";
-                        break;
-                }
-
-                $html_data .= '<tr class="card-text d-flex justify-content-between align-items-center" data-status="' . $data_status . '">';
-
-                $html_data .= '<td class="col-2 text-left text-dark table-row-detail">';
-                $html_data .= '<h6>';
-                if ($data["network_status"] == 1) {
-                    $html_data .= '<div class="dot-indicator bg-success-gradient" data-toggle="tooltip" data-placement="top" title="Online" ></div>';
-                } else {
-                    $html_data .= '<div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="Currently Off line"></div>';
-                }
-                $html_data .= $data["device_name"] . '</h6>';
-                $html_data .= '<p class="table-detail">';
-                $html_data .= 'Last Transaction update<br>' . $data["last_transaction"] . '';
-                $html_data .= '</p>';
-                $html_data .= '</td>';
-                $html_data .= '<td class="col" label="total-revenue">' . number_format($data["gross_amount"], $d) . '</td>';
-                $html_data .= '<td class="col" label="parking-fee">' . number_format($data["parking_fee"], $d) . '</td>';
-                $html_data .= '<td class="col" label="product-sale-amount">' . number_format($data["product_sale_amount"], $d) . '</td>';
-                $html_data .= '<td class="col" label="vat-amount">' . number_format($data["vat_amount"], $d) . '</td>';
-                $html_data .= '<td class="col" label="lost-ticket-fee">' . number_format($data["lost_ticket_fee"], $d) . '</td>';
-                $html_data .= '<td class="col" label="total-discount">' . number_format($data["discount_amount"], $d) . '</td>';
-                $html_data .= '<td class="col" label="vip coupons">' . $data["payable_entries_count"] . '</td>';
-                $html_data .= '<td class="col" label="lost-ticket-count">' . $data["lost_ticket_count"] . '</td>';
-                $html_data .= '<td class="col" label="discount-count">' . $data["discount_count"] . '</td>';
-                $html_data .= '</tr>';
-            }
-            $i++;
-        }
-
-        mysqli_close($con);
-
-        $con = $this->db_connect_reporting();
-
-        $html_data .= '</tbody>';
-        $html_data .= '</table>';
-
-        // block view
-
-        $html_data .= '<div data-status="block-view" class="jspdf-graph">';
-        $html_data .= '<div class="row">';
-
-        $current_date = date("Y-m-d") . " " . DAY_CLOSURE_START;
-        $day_closure_start = new DateTime($current_date);
-        $start = $day_closure_start->format('Y-m-d H:i:s');
-        $day_closure_end = $day_closure_start->add(new DateInterval('PT23H59M59S'));
-        $end = $day_closure_end->format('Y-m-d H:i:s');
-
-        $query_string = "select * from revenue_shifts where login_time between '$start' and '$end'";
-        //echo $query_string;
-        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
-
-        while ($data = mysqli_fetch_assoc($result)) {
-            $data_status = "all";
-
-            if (stripos($data["device_name"], "Cashier") !== false) {
-                $data_status = "manual-cashier";
-                $image_url = "/parcx/dist/img/icon/device_icons/manual-cashier.png";
-            } else if (stripos($data["device_name"], "Handheld") !== false) {
-                $data_status = "handheld-pos";
-                $image_url = "/parcx/dist/img/icon/device_icons/handheld-pos.png";
-            } else if (stripos($data["device_name"], "Auto Payment Machine") !== false) {
-                $data_status = "payonfoot-machine";
-                $image_url = "/parcx/dist/img/icon/device_icons/payonfoot-machine.png";
-            }
-
-            $html_data .= '<div class="col-lg-3 col-sm-6 col-xs-12 block-data" data-status="' . $data_status . '">';
-
-            if ($data["network_status"] == 1) {
-                $html_data .= '<div class="card card-success card-outline" data-network="' . $data[" network_status"] . '">';
-            } else {
-                $html_data .= '<div class="card card-danger card-outline" data-network="' . $data[" network_status"] . '">';
-            }
-
-            $html_data .= '<div class="card-header">';
-            $html_data .= '<h3 class="card-title">' . $data["device_name"] . '</h3>';
-            $html_data .= '</div>';
-            $html_data .= '<div class="card-body p-0">';
-            $html_data .= '<div class="row no-gutters">';
-            $html_data .= '<div class="col-4 block-view-img my-auto text-center">';
-            $html_data .= '<img class="img-fluid" src="' . $image_url . '">';
-            $html_data .= '</div>';
-            $html_data .= '<div class="col-8">';
-            $html_data .= '<ul class="nav flex-column">';
-            $html_data .= '<li class="nav-item">';
-            $html_data .= '<span class="nav-link">';
-            $html_data .= 'Current User <span class="float-right">' . $data['operator_name'] . '</span>';
-            $html_data .= '</span>';
-            $html_data .= '</li>';
-            $html_data .= '<li class="nav-item">';
-            $html_data .= '<span class="nav-link">';
-            $html_data .= 'Shift Start Time <span class="float-right">' . substr($data["login_time"], 11) . '</span>';
-            $html_data .= '</span>';
-            $html_data .= '</li>';
-            $html_data .= '<li class="nav-item">';
-            $html_data .= '<span class="nav-link">';
-            $html_data .= 'Last Updated <span class="float-right">' . substr($data["last_updated_date_time"], 11) . '</span>';
-            $html_data .= '</span>';
-            $html_data .= '</li>';
-            $html_data .= '<li class="nav-item">';
-            $html_data .= '<span class="nav-link">';
-            $html_data .= 'Earnings <span class="float-right">AED ' . $data['shift_earnings'] . '</span>';
-            $html_data .= '</span>';
-            $html_data .= '</li>';
-            $html_data .= '</ul>';
-            $html_data .= '</div>';
-            $html_data .= '</div>';
-            $html_data .= '</div>';
-            $html_data .= '</div>';
-            $html_data .= '</div>';
-        }
-        mysqli_close($con);
-        $html_data .= '</div>';
-        $html_data .= '</div>';
-        // end / block view        
-
-        echo $html_data;
-    }
-
-// End Function . Live Revenue 
-
-    
     function get_revenue_summary($facility_number,$carpark_number) {
         $fdata = $this->getFacilityFeatures();
         $d = $fdata["decimal_places"];
         $currency = $fdata["currency"];
         $vat = $fdata["vat_percentage"];
 
-        $con = $this->db_connect();               
+        $con = $this->db_connect();    
+        
+        $query_string="select sum(parking_fee) as parking_fee,sum(lost_ticket_fee) as lost_fee,sum(gross_amount) as earnings,sum(vat_amount) as vat,sum(product_sale_amount) as product_sale,sum(discount_amount) as discount_amount from parking_revenue where carpark_number=" . $carpark_number . " and facility_number=".$facility_number;
+
+        
+
+
+        $result=mysqli_query($con,$query_string) or die(mysqli_error($con));    
+        
+        $data_summary=mysqli_fetch_assoc($result);    
+               
+        $html_data='<div class="row mb-4 jspdf-graph">';
+        $html_data.='<div class="col">';    
+        $html_data.='<div class="small-box bg-success">';
+        $html_data.='<div class="inner">';
+        $html_data.='<h3>'.$currency." ".number_format($data_summary["earnings"],$d).'</h3>';
+        $html_data.='<p>Total Revenue</p>';
+        $html_data.='</div>';     		
+        $html_data.='</div>';
+        $html_data.='</div>';
+
+
+        $html_data.='<div class="col">';		
+        $html_data.='<div class="small-box box-color-parking-fee">';
+        $html_data.='<div class="inner">';
+        $html_data.='<h3>'.$currency." ".number_format($data_summary["parking_fee"],$d).'</h3>';
+        $html_data.='<p>Parking Fee</p>';
+        $html_data.='</div>';     		
+        $html_data.='</div>';
+        $html_data.='</div>';
+
+        $html_data.='<div class="col">';    
+        $html_data.='<div class="small-box box-color-lost-fee">';
+        $html_data.='<div class="inner">';
+        $html_data.='<h3>'.$currency." ".number_format($data_summary["lost_fee"],$d).'</h3>';
+        $html_data.='<p>Lost Ticket Fee</p>';
+        $html_data.='</div>';
+        $html_data.='<div class="icon">';
+        $html_data.='<i class="ion ion-stats-bars"></i>';
+        $html_data.='</div>';		
+        $html_data.='</div>';
+        $html_data.='</div>';
+
+        $html_data.='<div class="col">';		
+        $html_data.='<div class="small-box box-color-product-fee">';
+        $html_data.='<div class="inner">';
+        $html_data.='<h3>'.$currency." ".number_format($data_summary["product_sale"],$d).'</h3>';
+        $html_data.='<p>Product Sale Amount</p>';
+        $html_data.='</div>';	
+        $html_data.='</div>';
+        $html_data.='</div>';
+
+         if($vat!=0)
+             {
+             $html_data.='<div class="col">';		
+             $html_data.='<div class="small-box bg-success">';
+             $html_data.='<div class="inner">';
+             $html_data.='<h3>'.$currency." ".number_format($data_summary["vat"],$d).'</h3>';
+             $html_data.='<p>VAT</p>';
+             $html_data.='</div>';
+             $html_data.='</div>';
+             $html_data.='</div>';
+             }
+
+        $html_data.='<div class="col">';
+        $html_data.='<!-- small box -->';
+        $html_data.='<div class="small-box box-color-discount-fee">';
+        $html_data.='<div class="inner">';
+        $html_data.='<h3>'.$currency." ".number_format($data_summary["discount_amount"],$d).'</h3>';
+        $html_data.='<p>Discount Amount</p>';
+        $html_data.='</div>';
+        $html_data.='</div>';
+        $html_data.='</div>';
+
+        $html_data.='</div><!-- Row End -->';
+        $html_data.='</div>';
+
+        
+
+        echo $html_data;
        
         $html_data = "";
-        $header = "";
+        $header = "<div class='card'>";
 
         $header .= '<table class="jspdf-table table table-blue table-bordered" data-status="table-view">';
         $header .= '<thead><tr>';
@@ -442,9 +338,7 @@ class dashboard {
                     $html_data .= '<div class="dot-indicator bg-danger-gradient" data-toggle="tooltip" data-placement="top" title="Currently Off line"></div>';
                 }
                 $html_data .= $data["device_name"] . '</h6>';
-                $html_data .= '<p class="table-detail">';
-                $html_data .= 'Last Transaction update<br>' . $data["last_transaction"] . '';
-                $html_data .= '</p>';
+                $html_data .= '<small class="form-text text-muted">Last transaction:'.$data["last_transaction"].' </small>';
                 $html_data .= '</td>';
                 $html_data .= '<td>' . number_format($data["gross_amount"], $d) . '</td>';
                 $html_data .= '<td>' . number_format($data["parking_fee"], $d) . '</td>';
@@ -459,7 +353,7 @@ class dashboard {
             }
             
         $html_data .= '</tbody>';
-        $html_data .= '</table>';
+        $html_data .= '</table></div>';
 
         mysqli_close($con);
                
@@ -740,8 +634,15 @@ class dashboard {
         $query_string = "select facility_number,facility_name from watchdog_device_status group by facility_number";        
         $facility_result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $rows=mysqli_num_rows($facility_result);        
-        if ($rows > 0) 
-            {            
+        if($rows==1)
+            {
+            $data = mysqli_fetch_assoc($facility_result);
+            $facility_number=$data["facility_number"];
+            mysqli_close($con);            
+            $this->get_device_status_by_carpark($facility_number);
+            }
+        else
+            {
             while ($facility = mysqli_fetch_assoc($facility_result)) 
                 {
                 $facility_number=$facility["facility_number"];
@@ -806,8 +707,8 @@ class dashboard {
                     echo $html;
                     }
                 }
-            }
-        mysqli_close($con);   
+            mysqli_close($con);  
+            }         
         
         }
         
@@ -819,8 +720,17 @@ class dashboard {
         $query_string = "select carpark_number,carpark_name from watchdog_device_status where facility_number=".$facility_number." group by carpark_number";
         $carpark_result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $rows=mysqli_num_rows($carpark_result);        
-        if ($rows > 0) 
-            {            
+        if ($rows == 1) 
+            { 
+            $data = mysqli_fetch_assoc($carpark_result);
+            $carpark_number=$data["carpark_number"];
+            mysqli_close($con);
+            $html="<input type='hidden' id='facility_number' value='".$facility_number."'>";
+            $html.="<input type='hidden' id='carpark_number' value='".$carpark_number."'>";
+            echo $html;
+            }
+        else
+            {
             while ($carpark = mysqli_fetch_assoc($carpark_result)) 
                 {
                 $carpark_number=$carpark["carpark_number"];
@@ -903,12 +813,8 @@ class dashboard {
                     }
                 }
             echo "<input type='hidden' value='".$this->get_alarm_count($facility_number,0,0, 0,20)."' id='alarm_count'>";
-            }
-        mysqli_close($con);          
-//        if($rows==1)
-//            $this->get_device_status_by_device($facility_number,$carpark_number);
-//        else
-//            echo "<input type='hidden' id='current_level' facility_number='".$facility_number."' value='carpark'>";
+            mysqli_close($con);          
+            }       
         }
         
     function get_device_category_name($device_type)

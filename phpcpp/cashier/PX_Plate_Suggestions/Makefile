@@ -18,7 +18,7 @@
 #	are automatically generated
 #
 
-NAME				=	PX_PlateSuggestions
+NAME				=	PX_Plate_Suggestions
 
 
 #
