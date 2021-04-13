@@ -43,135 +43,6 @@ inline string toString(Php::Value param)
 	return value;
 	}
 
-
-string getLabel(string label,string lang)
-    {
-    sql::ResultSet *res_label;
-    try
-        {
-        con = General.mysqlConnect(ServerDB);
-	stmt = con->createStatement();
-        query= "select "+lang+",english from web_application_labels where message='"+label+"'";	
-        res_label=stmt->executeQuery(query);
-        
-        if(res_label->next())
-            {
-            if(res_label->getString(lang)!="")
-                label=res_label->getString(lang);
-            else
-                label=res_label->getString("english");
-            }
-        delete res_label;
-	delete stmt;
-	delete con;	
-        return label;
-        }
-    catch(const std::exception& e)
-        {
-        std::cerr << e.what() << '\n';
-		writeParkingReportException("getLabel",e.what());
-        } 
-    return "";       
-    }
-
-
-string ParkingReport::getApplicationLabel(Php::Value data)
-    {
-    string lang=data["language"];  
-    string label=data["label"];    
-    try
-        {               
-        label=getLabel(label,lang);         
-        }
-    catch(const std::exception& e)
-        {
-	writeParkingReportException("getLabel",e.what());	
-        }
-    return label;  
-    }
-
-/*Php::Value getLabels(string lang,string label)
-    {     
-    Php::Value result;
-    try
-        {  
-        if (label.find(',') != std::string::npos)
-            {
-            stringstream ss(label);
-            string substr;
-            label="";
-            while (getline(ss, substr, ',')) 
-                {                        
-                label=label+"'"+substr+"'"+",";
-                }
-            label=label.substr(0,label.size()-1);
-            query= "select "+lang+",message,english from web_application_labels where message in("+label+")";            
-            }
-        else
-            query= "select "+lang+",message,english from web_application_labels where message='"+label+"'";	
-            
-        sql::ResultSet *res; 
-        con = General.mysqlConnect(ServerDB);
-	stmt = con->createStatement();
-        
-        res=stmt->executeQuery(query);
-        
-        if(res->rowsCount()==1)
-            {
-            if(res->next())
-                {
-                if(res->getString(lang)!="")
-                    label=res->getString(lang);
-                else
-                    res->getString("english");                
-                }
-            result=label;
-            }
-        else
-            {
-            while(res->next())                
-                {
-                if(res->getString(lang)!="")
-                    result[res->getString("message").asStdString()]=res->getString(lang).asStdString();                
-                else
-                    result[res->getString("message").asStdString()]=res->getString("english").asStdString();                
-                }
-            }
-        delete res;
-	delete stmt;
-	delete con;	
-        return result;
-        }
-    catch(const std::exception& e)
-        {
-	writeParkingReportException("getApplicationLabels",e.what());	
-        }
-    return result;  
-    }
-
-Php::Value ParkingReport::getApplicationLabels(Php::Value data)
-    {
-    string lang=data["language"];  
-    int page=data["page"];                
-    string label=data["label"];    
-    if(page>0)
-        {
-        string reportlabels="choose_datetime_range,view_report,export,export_to_excel,export_to_pdf,logout,search,entries_label,info_label,previous,next,";
-        switch(page)
-            {
-            case 1://"watchdog_device_alarms"
-                    label=reportlabels+"watchdog_device_alarms,select_severity,low,high,medium,all_devices,select_devices";
-                    break;
-            case 2 ://payment_transactions
-                label=reportlabels+"payment_transactions,detailed_payment,receipt_details,close,print,tax_invoice,cash,credit_card,parking_fee,lost_ticket,discount,grace_period,product_sales,all_devices,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
-                    break;
-            case 3 ://revenue_summary
-                label = reportlabels+"sunday,monday,tuesday,wednesday,thursday,friday,saturday,total_revenue";
-            }
-        }
-    return  getLabels(lang,label);
-    }*/
-
 void ParkingReport::openTransactionReport(Php::Value json)
     {
     try
@@ -393,6 +264,63 @@ void ParkingReport::parkingMovementsReport(Php::Value json)
     catch(const std::exception& e)
         {
         writeParkingReportException("parkingMovementsReport",e.what());        
+        }
+    }
+
+
+void ParkingReport::liveParking(Php::Value json)
+    {
+    try
+        {                
+	string lang = json["language"];
+        current_date_time=General.currentDateTime(dateTimeFormat); 
+
+        string labels="date_time,result,device_name,no_records,ticket_id,plate_number";
+        Php::Value label=General.getLabels(lang,labels);
+
+
+        rCon=General.mysqlConnect(ReportingDB);
+        rStmt=rCon->createStatement();
+        query="select * from parcx_dashboard.ticket_check order by id desc limit 50";                
+        res= rStmt->executeQuery(query);
+        if(res->rowsCount()>0)
+            {
+            
+            Php::out<<"<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>"<<endl; 
+            Php::out<<"<thead><tr>"<<endl;            
+            Php::out<<"<th>"<<toString(label["date_time"])<<"</th>"<<endl;                         
+            Php::out<<"<th>"<<toString(label["ticket_id"])<<"</th>"<<endl;
+            Php::out<<"<th>"<<toString(label["plate_number"])<<"</th>"<<endl;
+            Php::out<<"<th>"<<toString(label["device_name"])<<"</th>"<<endl;
+            Php::out<<"<th>"<<toString(label["result"])<<"</th>"<<endl;                            
+            Php::out<<"</tr></thead>"<<endl;
+            Php::out<<"<tbody>"<<endl;
+            
+            while(res->next())
+                {             
+		Php::out<<"<tr>"<<endl;                 
+                Php::out<<"<td>"+res->getString("date_time")+"</td>"<<endl; 
+                Php::out<<"<td>"+res->getString("ticket_id")+"</td>"<<endl;  
+                Php::out<<"<td>"+res->getString("plate_number")+"</td>"<<endl;                                               
+                Php::out<<"<td> "+res->getString("device_name")+" </td>"<<endl;                                                             
+                Php::out<<"<td> "+res->getString("result_description")+" </td>"<<endl;                                                                             
+		Php::out<<"</tr>"<<endl;                
+                }  
+            Php::out<<"</tbody></table>"<<endl;
+            }
+        else
+            {
+            Php::out<<"<div class='p-0'>"+toString(label["no_records"])+"</div>"<<endl;
+            }
+
+        delete rStmt;
+        delete res;       
+        rCon->close();
+        delete rCon;
+        }
+    catch(const std::exception& e)
+        {
+        writeParkingReportException("liveParking",e.what());        
         }
     }
 
@@ -994,7 +922,7 @@ void ParkingReport::ticketDetails(Php::Value json)
         int entry_type=0;
         string entry_date_time="",exit_date_time="",parking_duration="",entry_grace_period="",payment_date_time="",exit_grace_period="",amount_paid="",plate_number="";
         
-        string labels="status,entry_details,entry_type,plate_number,entry_date_time,entry_grace_period,entry_device_name,entry_carpark_name,access_details,customer_name,validity_start_date,validity_expiry_date,reservation_details,customer_name,validity_start_date,validity_expiry_date,payment_details,payment_date_time,maximum_exit_date_time,payment_device_name,payment_carpark_name,amount_paid,discount_name,validation_value,exit_details,exit_time,exit_device_name,exit_carpark_name,invalid_ticket";
+        string labels="all_devices,status,entry_details,entry_type,plate_number,entry_date_time,entry_grace_period,entry_device_name,entry_carpark_name,access_details,customer_name,validity_start_date,validity_expiry_date,reservation_details,customer_name,validity_start_date,validity_expiry_date,payment_details,payment_date_time,maximum_exit_date_time,payment_device_name,payment_carpark_name,amount_paid,discount_name,validation_value,exit_details,exit_time,exit_device_name,exit_carpark_name,invalid_ticket";
         Php::Value label=General.getLabels(lang,labels);
 
         rCon=General.mysqlConnect(ReportingDB);
@@ -1497,7 +1425,7 @@ void ParkingReport::platescapturedReport(Php::Value json)
         {        
             
 
-        string labels="date_time,plate_number,plate_area,plate_country,cropped_image,full_image,camera_name,no_records";
+        string labels="transactions,date_time,plate_number,plate_area,plate_country,cropped_image,full_image,camera_name,no_records";
         Php::Value label=General.getLabels(lang,labels);
 
         current_date_time=General.currentDateTime(dateTimeFormat); 
@@ -1559,21 +1487,8 @@ void ParkingReport::platescapturedReport(Php::Value json)
 				//device_name = getdevicename(res->getInt("camera_device_number"));
                 Php::out<<"<td>"<<endl;
 				
-				
-                con=General.mysqlConnect(ServerDB);
-                stmt=con->createStatement();
-                res2 = stmt->executeQuery("select device_name from system_devices where device_number="+res->getString("camera_device_number"));
-                if(res2->next())
-                {
-                        Php::out<<res2->getString("device_name")<<endl;
-                }
-                else{
-                        Php::out<<"Unkown"<<endl;
-                }
-                delete res2;
-                delete stmt;
-                delete con;
-
+		Php::out<<res->getString("camera_name")<<endl;		                
+                
                 string plate_image=res->getString("plate_image_name");
                 plate_image=str_replace(plate_image," ","%20");
                 plate_image=str_replace(plate_image,"#","%23");	
@@ -1610,7 +1525,107 @@ void ParkingReport::platescapturedReport(Php::Value json)
         writeParkingReportException("platescapturedReport",e.what());        
         }
     }
-	
+
+
+void ParkingReport::platesCorrectedReport(Php::Value json)
+    {
+        Php::Value device_name;
+        string lang=json["language"]; 
+        string ImageURL = json["imageurl"];
+        string device=json["device"]; 
+        try
+        {        
+            
+
+        string labels="operator_name,transactions,entry_date_time,initial_plate_number,corrected_plate_number,plate_area,plate_country,cropped_image,full_image,camera_name,no_records";
+        Php::Value label=General.getLabels(lang,labels);
+
+        current_date_time=General.currentDateTime(dateTimeFormat); 
+        rCon=General.mysqlConnect(ReportingDB);
+        rStmt=rCon->createStatement();
+        query="select * from plates_captured where capture_date_time between '"+toString(json["from"])+"' and '"+toString(json["to"])+"' and initial_plate_number is not NULL";
+
+        if(device.length()>0)
+          query = query+" and camera_device_number in("+device+")";
+
+        query = query+" order by capture_date_time desc";
+            
+
+        res= rStmt->executeQuery(query);
+        if(res->rowsCount()>0)
+            {
+            Php::out<<"<div class='row mb-4 jspdf-graph'>"<<endl;
+            Php::out<<"<div class='col-lg-3 col-6'>"<<endl;                       
+            Php::out<<"<div class='small-box bg-success'>"<<endl;
+            Php::out<<"<div class='inner'>"<<endl;
+            Php::out<<"<h3>"<<res->rowsCount()<<"</h3>"<<endl;
+            Php::out<<"<h6>"<<label["transactions"]<<"</h6>"<<endl;
+            Php::out<<"</div>"<<endl;            
+            Php::out<<"</div>"<<endl;
+            Php::out<<"</div>"<<endl;
+            Php::out<<"</div>"<<endl;
+            
+            Php::out<<"<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>"<<endl; 
+            Php::out<<"<thead><tr>"<<endl;
+            Php::out<<"<th>#</th>"<<endl;    
+            Php::out<<"<th>"<<label["camera_name"]<<"</th>"<<endl;  
+            Php::out<<"<th>"<<label["entry_date_time"]<<"</th>"<<endl;                         
+            Php::out<<"<th>"<<label["initial_plate_number"]<<"</th>"<<endl;    
+            Php::out<<"<th>"<<label["corrected_plate_number"]<<"</th>"<<endl;    
+            Php::out<<"<th>"<<label["plate_area"]<<"</th>"<<endl;	  
+            Php::out<<"<th>"<<label["plate_country"]<<"</th>"<<endl;             
+            Php::out<<"<th>"<<label["operator_name"]<<"</th>"<<endl;             
+            Php::out<<"<th>"<<label["cropped_image"]<<"</th>"<<endl;	  
+            Php::out<<"<th>"<<label["full_image"]<<"</th>"<<endl;	  
+            Php::out<<"</tr></thead>"<<endl;
+            Php::out<<"<tbody>"<<endl;
+            i=0;
+            while(res->next())
+                { 
+                i++;                   
+		Php::out<<"<tr>"<<endl; 
+                Php::out<<"<td>"<<i<<"</td>"<<endl;				
+                Php::out<<"<td>"<<endl;
+		Php::out<<res->getString("camera_name")<<endl;		                
+                string plate_image=res->getString("plate_image_name");
+                plate_image=str_replace(plate_image," ","%20");
+                plate_image=str_replace(plate_image,"#","%23");	
+
+                string plate_date=res->getString("capture_date_time");
+                plate_date=plate_date.substr(0,10);
+
+
+                Php::out<<"</td>"<<endl;                              
+                Php::out<<"<td>"+res->getString("capture_date_time")+"<input type='hidden' id = 'date"+to_string(i)+"' value = '"+plate_date+"'><input type='hidden' id = 'camera_no"+to_string(i)+"' value = '"+res->getString("camera_device_number")+"'><input type='hidden' id = 'plate_image"+to_string(i)+"' value = '"+res->getString("plate_image_name")+"'></td>"<<endl;                              
+                Php::out<<"<td>"+res->getString("initial_plate_number")+"</td>"<<endl;                    
+                Php::out<<"<td>"+res->getString("plate_number")+"</td>"<<endl;                    
+                Php::out<<"<td> "+res->getString("plate_area")+" </td>"<<endl;                                                             
+                Php::out<<"<td>"+res->getString("plate_country")+"</td>"<<endl;    
+                Php::out<<"<td>"+res->getString("user_name")+"</td>"<<endl;    
+		Php::out<<"<td><img src='"+ImageURL+"\\"+res->getString("camera_device_number")+"\\"+plate_date+"\\Crop_"+plate_image+"' width='100' ; height='50' ;></td>"<<endl;
+                Php::out<<"<td><input type='button' data-value = "+to_string(i)+" data-toggle='modal' data-target='#image-modal' value='View' class='btn btn-link'></td>"<<endl;                   
+                           
+		Php::out<<"</tr>"<<endl;                
+                }  
+            Php::out<<"</tbody></table>"<<endl;
+            }
+        else
+            {
+                
+		Php::out<<"<div class='p-0'>"<<label["no_records"]<<"</div>"<<endl;
+            }
+
+        delete rStmt;
+        delete res;       
+        rCon->close();
+        delete rCon;
+        }
+    catch(const std::exception& e)
+        {
+        writeParkingReportException("platescapturedReport",e.what());        
+        }
+    }
+
 void ParkingReport::getanprImage(Php::Value json)
 {
 	string plate_image=json["plate_image"]; 
@@ -2121,7 +2136,7 @@ void ParkingReport::trafficReport(Php::Value json)
 		}
 		else 
 		{
-			Php::out<<"<div class='card p-3'>"+toString(label["no_records"])+"</div>"<<endl;
+			Php::out<<"<div class='p-0'>"+toString(label["no_records"])+"</div>"<<endl;
 		}        
         //echo html_data;   
 
@@ -2458,7 +2473,7 @@ void ParkingReport::parkingDuration(Php::Value json)
             html_data += "</div>";
 
         } else {
-            html_data="<div class='card'><div class='p-3'>"+toString(label["no_records"])+"</div></div>";
+            html_data="<div class='p-3'>"+toString(label["no_records"])+"</div>";
         }
         Php::out<<html_data<<endl;
 

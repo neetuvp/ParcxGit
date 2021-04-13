@@ -124,8 +124,8 @@ include('../../../includes/sidebar.php');
         <div class="card-body" id="report-content">          
           <?php 
           $current_date=date("Y-m-d");    
-          $data["from"]=$current_date;
-          $data["to"]=$current_date;           
+          $data["from"]=$current_date." ".DAY_CLOSURE_START;
+          $data["to"]=$current_date." ".DAY_CLOSURE_END;         
           $data["carpark"]="";    
           $data["device"]="";	
           $data["payment-category"]=[];	

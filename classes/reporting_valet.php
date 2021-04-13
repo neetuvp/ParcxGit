@@ -982,15 +982,16 @@ function revenue_lastdays() {
         $query_string="select COALESCE(SUM(gross_amount),0) as gross_amount,COALESCE(SUM(parking_fee),0) as parking_fee,COALESCE(SUM(vat_amount),0) as vat_amount,COALESCE(SUM(lost_fee+admin_fixed_charges+ticket_replacement_fee),0) as lost_fee,COALESCE(SUM(discount_amount),0) as discount_amount from revenue_payments where DATE(payment_date_time)=CURDATE()";                        
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         if ($data = mysqli_fetch_assoc($result)) {
-            $response["gross_amount"] = $data["gross_amount"];
+            $response["gross_amount"] = $data["gross_amount"];            
             $response["parking_fee"] = $data["parking_fee"]-$data["discount_amount"];
             $response["vat_amount"] = $data["vat_amount"];
             $response["lost_fee"] = $data["lost_fee"];            
         }
-        $query_string="select COALESCE(SUM(gross_amount),0) as product_sale_amount from revenue_payments where  payment_category='ProductSale' and DATE(payment_date_time)=CURDATE()";
+        $query_string="select COALESCE(SUM(gross_amount),0) as product_sale_amount,COALESCE(SUM(parking_fee),0) as parking_fee from revenue_payments where  payment_category='ProductSale' and DATE(payment_date_time)=CURDATE()";
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         if ($data = mysqli_fetch_assoc($result)) {
             $response["product_sale_amount"] = $data["product_sale_amount"];
+            $response["parking_fee"]=$response["parking_fee"]-$data["parking_fee"];
         }
         mysqli_close($con);
         echo json_encode($response);

@@ -63,7 +63,7 @@ Php::Value Anpr::getPlateDetails(int cameraId, int delay, int id) {
     Php::Value response;
     response["result"] = "plate_unavailable";
     response["result_description"] = "Plate unavailable";
-    response["plate_captured_id"] = 0;
+    response["plate_captured_id"] = "0";
     response["current_plate_number"] = "###";  
     response["plate_image_name"]="";           
     try {

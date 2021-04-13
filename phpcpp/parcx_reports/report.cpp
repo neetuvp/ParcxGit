@@ -54,8 +54,10 @@ Php::Value parcxReport(Php::Parameters &params)
         case 11:pObj.manualmovementReport(data);
                 break;
         case 12:pObj.platescapturedReport(data);
-                break;
-        case 13:response = pObj.getApplicationLabel(data);
+                break;        
+//        case 13:response = General.getApplicationLabels(data);
+//                break;
+        case 13:pObj.platesCorrectedReport(data);
                 break;
         case 14:pObj.getanprImage(data);
                 break;
@@ -91,6 +93,8 @@ Php::Value parcxReport(Php::Parameters &params)
                         break;
         case 30:pObj.parkingDuration(data);
                         break;
+        case 31:pObj.liveParking(data);
+                break;
 	}
 	return response;
 	}

@@ -785,8 +785,24 @@ Php::Value exitPlateCheck() {
     return response;
 }
 
-void insertIntoTicketCheck(string result, string description) {
+void insertIntoPlateMismatch(string entry_plate_number,string exit_plate_number,string id1,string id2) {
+    try {
+        reportCon = General.mysqlConnect(ReportingDB);
+        if (reportCon != NULL) {
+            stmt = reportCon->createStatement();
+            query="insert into plate_mismatch(date_time,device_number,device_name,entry_plate_number,exit_plate_number,ticket_id,entry_plate_captured_id,exit_plate_captured_id)values(CURRENT_TIMESTAMP," + to_string(deviceNumber) + ",'" + deviceName + "','" +entry_plate_number + "','" + exit_plate_number + "','" + ticketId + "',"+id1+","+id2+")";
+            stmt->executeUpdate(query);
+            delete stmt;
+            delete reportCon;
+        }
+    } catch (const std::exception& e) {
+        writeException("insertIntoPlateMismatch", e.what());
+        writeException("insertIntoPlateMismatch",query);
+    }
+}
 
+
+void insertIntoTicketCheck(string result, string description) {
     try {
         reportCon = General.mysqlConnect(DashboardDB);
         if (reportCon != NULL) {
@@ -917,6 +933,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                     plateArea = toString(plate_details["plate_area"]);                    
                     plateCountry = toString(plate_details["plate_country"]);
                     plateType = toString(plate_details["plate_type"]);
+                    plateCapturedId=plate_details["plate_captured_id"];
                 } 
             } 
 
@@ -1018,14 +1035,22 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                 if (toString(response["result"]) == "ticketcheck_access_allowed" && deviceType > 2)
                     response["result"] = toString(response["ticketcheck_result"]);
 
-                if (deviceType == 2 && anpr_mismatch_check == 1) //anpr plate mismatch
+                if ((deviceType == 2 || deviceType == 3) && anprEnabled == 1) //anpr plate mismatch
                 {
                     string entry_plate = response["entry_plate_number"];
                     string current_plate = response["current_plate_number"];
+                    string open_transaction_check=response["open_transaction_check"];
                     writeLog("parcxTicketCheck", "Entry plate: " + entry_plate + " Current Plate:" + current_plate);
 
-                    if (entry_plate != current_plate)
+                    if ( (entry_plate.length() >0 && current_plate.length() >0 && entry_plate != current_plate)||(plateCapturedId>0 && open_transaction_check=="false"))
+                        {
                         insertIntoTicketCheck("plate_msmatch", "Plate mismatch");
+                        string id1=response["entry_plate_captured_id"];
+                        string id2=response["plate_captured_id"];
+                        if(id1=="")
+                            id1="0";
+                        insertIntoPlateMismatch(entry_plate,current_plate,id1,id2);
+                        }                    
                 }
             } else
                 writeLog("parcxTicketCheck", "No exit ticket check");

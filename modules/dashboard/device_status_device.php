@@ -154,6 +154,7 @@ include('../../includes/sidebar.php');
             <div class="additional-menu-right row align-items-center">               
                 <button class="btn btn-danger" data-toggle="modal" data-target="#alarm-modal"><i class="fas fa-bell mr-1"></i><span id="alarm_notification">Alarms:100</span></button>                
             </div>
+            
         </div>
     </div>    
     <section class="content">

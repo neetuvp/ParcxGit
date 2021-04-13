@@ -366,11 +366,18 @@ include('../../includes/sidebar.php');
 
             amount = JSON.parse(data);
 
-            pieValues[0] = amount["parking_fee"];
-            pieValues[1] = amount["lost_fee"];
-            pieValues[2] = amount["product_sale_amount"]
-
-            // console.log("pV = " + pieValues);
+            if(amount["gross_amount"]>0)
+                {
+                pieValues[0] = amount["parking_fee"];                
+                pieValues[1] = amount["lost_fee"];
+                pieValues[2] = amount["product_sale_amount"]
+                }
+            else
+                {
+                pieValues[0]=0;
+                pieValues[1]=0;
+                pieValues[2]=0;
+                }
 
             pieChart.update();
             
@@ -491,7 +498,7 @@ include('../../includes/sidebar.php');
         });
 
     }
-
+    rev7days();
     revenueSources();
 
     //////////////////////////////
@@ -680,7 +687,7 @@ include('../../includes/sidebar.php');
         });
     }
 
-    rev7days();
+    
 
     //////////////////////////////
     // update data settimeout

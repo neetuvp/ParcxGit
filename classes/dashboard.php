@@ -1282,6 +1282,263 @@ class dashboard {
 
 
     /* DASHBOARD OCCUPANCY FUNCTIONS */
+    
+   
+    
+     function get_occupancy_facility() {
+        $con = $this->db_connect();
+        $query_string = "select facility_number,carpark_name,total_spaces,current_level,last_updated_datetime from counters where counter_type=0 ORDER BY dashboard_order ASC";
+       
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));        
+                
+        if (mysqli_num_rows($result) == 1) 
+            {
+            $data = mysqli_fetch_assoc($result);
+            $facility_number=$data["facility_number"];           
+            mysqli_close($con);            
+            $this->get_occupancy_carpark($facility_number);
+            } 
+        else 
+            {
+            $html_data = "";
+            while ($data = mysqli_fetch_assoc($result)) 
+                {
+               
+                $gauge_value = ($data['current_level'] / $data['total_spaces']) * 100;
+                $html_data .= ' <div class="col-lg-3 col-sm-6 col-xs-12">';
+                $html_data .= ' <div class="chart-box text-center">';                
+                $html_data .= '<p class="text-center chart-header" id="gauge1_name">' . $data['carpark_name'] . '</p>';                
+                $html_data .= ' <input  type="hidden" class="knob" data-thickness="0.3" data-angleArc="250" data-angleOffset="-125"
+                                value="' . $gauge_value . '" data-width="250" data-height="150" data-fgColor="' . $this->choose_bg_color($gauge_value, 1) . '" data-readonly="true">';
+                $html_data .= '<p class="gauge-val" ><span>' . $data['current_level'] . '</span>/<span>' . $data['total_spaces'] . '</span></p>';
+                $html_data .= '<div class="card-body">';
+                $html_data .= '</div>';
+                $html_data .= '<button type="button" class="btn btn-block btn-outline-secondary btn-sm show-facility-details" facility_number=' . $data['facility_number'] . '>More <i class="fa fa-arrow-circle-right"></i></button>';
+                $html_data .= '</div>';
+                $html_data .= '</div>';                
+            }//wend  
+            echo $html_data;
+            mysqli_close($con);
+        }//end if                         
+    }
+    
+
+    function get_occupancy_carpark($facility_number) {
+       
+        $con = $this->db_connect();
+        $query_string = "select last_updated_datetime,carpark_name,carpark_number,total_spaces,current_level,shortterm_current_level,total_shortterm_spaces,access_current_level,total_access_spaces,reservation_current_level,total_reservation_spaces";
+        $query_string .= " from counters where counter_type=1 and facility_number=" . $facility_number . " ORDER BY carpark_number ASC";                       
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        
+        if (mysqli_num_rows($result) == 1) 
+            {
+            //If only one carpark show the car park list directly 
+            $data = mysqli_fetch_assoc($result);                        
+            $carpark_number=$data["carpark_number"];
+            mysqli_close($con);
+            $html="<input type='hidden' id='facility_number' value='".$facility_number."'>";
+            $html.="<input type='hidden' id='carpark_number' value='".$carpark_number."'>";
+            echo $html;            
+            } 
+        else 
+            {
+            $html_data = "";        
+            $occupancy_percentage = 0;             
+            while ($data = mysqli_fetch_assoc($result)) 
+                {               
+                $gauge_value = ($data['current_level'] / $data['total_spaces']) * 100;
+                $color = $this->choose_bg_color($gauge_value, 1);
+
+                $html_data .= ' <div class="col-lg-3 col-sm-6 col-xs-12">';
+                $html_data .= ' <div class="chart-box text-center">';                
+                $html_data .= '<h1 class="text-left chart-header" id="gauge1_name">' . $data['carpark_name'] . '</h1>';                
+                $html_data .= ' <input  type="hidden" class="knob" data-thickness="0.3" data-angleArc="250" data-angleOffset="-125"
+                                value="' . $gauge_value . '" data-width="250" data-height="150" data-fgColor="' . $color . '" data-readonly="true">';
+                $html_data .= '<p class="gauge-val" ><span>' . $data['current_level'] . '</span>/<span>' . $data['total_spaces'] . '</span></p>';
+                $html_data .= '<div class="card-body">';
+
+                // $html_data .= '<div id="row">';
+                $html_data .= '<div id="row">';
+                $html_data .= '<div class="col-5 text-left" style="float:left;" id="category">ShortTerm</div>';
+                $html_data .= ' <div class="col text-right" >' . $data['shortterm_current_level'] . '/' . $data['total_shortterm_spaces'] . '</div>';
+                $occupancy_percentage = ($data['shortterm_current_level'] / $data['total_shortterm_spaces']) * 100;
+                $html_data .= '</div>'; //end row
+                $html_data .= '<div class="progress mb-3">';
+                $html_data .= '<div class="progress-bar bg-' . $this->choose_bg_color($occupancy_percentage, 2) . '" id="shortterm-progress-' . $i . '" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:' . $occupancy_percentage . '%">';
+                $html_data .= '</div>'; //end progress-bar
+                $html_data .= '</div>'; // end progress mb-3
+                //$html_data .= '</div>';//end row
+                //$html_data .= '<div id="row">';
+                $html_data .= '<div id="row">';
+                $html_data .= '<div class="col-5 text-left" style="float:left;" id="category">Access</div>';
+                $html_data .= '<div class="col text-right" >' . $data['access_current_level'] . '/' . $data['total_access_spaces'] . '</div>';
+                $occupancy_percentage = ($data['access_current_level'] / $data['total_access_spaces']) * 100;
+                $html_data .= '</div>'; //end row count
+                $html_data .= ' <div class="progress mb-3">';
+                $html_data .= '<div class="progress-bar bg-' . $this->choose_bg_color($occupancy_percentage, 2) . '" id="access-progress-' . $i . '" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:' . $occupancy_percentage . '%">';
+                $html_data .= '</div>'; //end row
+                $html_data .= '</div>';
+                //$html_data .= '</div>';//end row
+                // $html_data .= '<div id="row">';
+                $html_data .= '<div id="row">';
+                $html_data .= '<div class="col-5 text-left" style="float:left;" id="category">Reservation </div>';
+                echo $data['reservation_current_level'];
+                $html_data .= '<div class="col text-right" >' . $data['reservation_current_level'] . '/' . $data['total_reservation_spaces'] . '</div>';
+                $html_data .= '</div>'; //end row count
+                $html_data .= ' <div class="progress mb-3">';
+                 
+                $occupancy_percentage = ($data['reservation_current_level'] / $data['total_reservation_spaces']) * 100;
+               
+                $html_data .= '<div class="progress-bar bg-' . $this->choose_bg_color($occupancy_percentage, 2) . '" id="reservation-progress-' . $i . '" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width:' . $occupancy_percentage . '%">';
+                $html_data .= '</div>'; //end row
+                $html_data .= '</div>';
+                // $html_data .= '</div>';//end row
+
+                $html_data .= '</div>';
+                $html_data .= '<button type="button" class="btn btn-block bg-secondary-gradient show-carpark-details" facility_number="' . $facility_number . '" carpark_number="' . $data['carpark_number'] . '">More <i class="fa fa-arrow-circle-right"></i></button>';
+                $html_data .= '</div>';
+
+                $html_data .= '</div>';               
+            }//wend
+            mysqli_close($con);
+        echo $html_data;
+        }//end if         
+        
+    }
+    
+    
+    function get_occupancy_device($facility_number, $carpark_number) {
+        $con = $this->db_connect();
+        $query_string = "select * from counters where counter_type=1 and facility_number=" . $facility_number . " AND carpark_number=" . $carpark_number;        
+        $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        $html_data = "";
+        $i = 1;
+        $shortterm_occupancy=0;
+        $access_occupancy=0;
+        $reservation_occupancy=0;
+        $gauge_percentage=0;
+        $data = mysqli_fetch_assoc($result);
+        
+        if($data['total_spaces']>0)
+            $gauge_percentage = ($data['current_level'] / $data['total_spaces']) * 100;
+        if($data['total_shortterm_spaces']>0)
+            $shortterm_occupancy = ($data['shortterm_current_level'] / $data['total_shortterm_spaces']) * 100;
+        if($data['total_access_spaces']>0)
+            $access_occupancy = ($data['access_current_level'] / $data['total_access_spaces']) * 100;
+        if($data['total_reservation_spaces']>0)
+            $reservation_occupancy = ($data['reservation_current_level'] / $data['total_reservation_spaces']) * 100;  
+                
+
+        $html_data .= '<div class="container-fluid">';
+        $html_data .= '<div class="row mb-2">';
+        $html_data .= '<div class="col-sm-6">';
+        $html_data .= '<h1 id="gauge1_name">' . $data['carpark_name'] . '</h1>';
+        //$html_data .= '<h5>' . $_SESSION['facility_name'] . '</h5>';
+        $html_data .= '</div>';
+        $html_data .= '</div>';
+        $html_data .= '</div>';
+
+        //The Occupancy Gauge - Total 
+        $html_data .= '<div class="col-md-4">';
+        $html_data .= ' <div class="chart-box text-center">';
+        $html_data .= '<p class="text-center chart-header" id="gauge1_name"></p>';
+        $html_data .= ' <input id="carpark" type="hidden" class="knob" data-thickness="0.3" data-angleArc="250" data-angleOffset="-125"
+        value="' . $gauge_percentage . '" data-width="250" data-height="150" data-fgColor="' . $this->choose_bg_color($gauge_percentage, 1) . '" data-readonly="true">';
+        $html_data .= '<p class="gauge-val" id="gauge-value"><span>' . $data['current_level'] . '</span>/<span>' . $data['total_spaces'] . '</span></p>';
+        $html_data .= '  </div>';
+        $html_data .= '  </div>'; //col md 4
+        //Occupancy progress bar by type 
+
+        $html_data .= '<div class="col-md-4">';
+        $html_data .= '<div class="card">';
+        $html_data .= '<div class="card-body p-0">';
+        $html_data .= '<table class="table table-striped">';
+        $html_data .= '<tr  style="height: 25%">';
+        $html_data .= '<td style="width: 10px"></td>';        
+        $html_data .= '<td style="width: 50%">Occupancy</td>';
+        $html_data .= '<td style="width: 20%">Current/Total</td>';
+        $html_data .= '</tr>';
+
+        $html_data .= '<tr>';
+        $html_data .= '<td>ShortTerm</td>';
+        $html_data .= '<td>';
+        $html_data .= '<div class="progress progress-xs">';
+        $html_data .= ' <div id="progress-shortterm" class="progress-bar bg-' . $this->choose_bg_color($shortterm_occupancy, 2) . '" style="width: ' . $shortterm_occupancy . '%"></div>';
+        $html_data .= '</div>';
+        $html_data .= '</td>';
+        $html_data .= '<td><span id="badge-shortterm" class="badge bg-' . $this->choose_bg_color($shortterm_occupancy, 2) . '">' . $data['shortterm_current_level'] . '/' . $data['total_shortterm_spaces'] . '</span></td>';
+        $html_data .= '</tr>';
+
+        $html_data .= '<tr>';
+        $html_data .= '<td>Access</td>';
+        $html_data .= '<td>';
+        $html_data .= '<div class="progress progress-xs">';
+
+        $html_data .= ' <div id="progress-access" class="progress-bar bg-' . $this->choose_bg_color($access_occupancy, 2) . '" style="width: ' . $access_occupancy . '%"></div>';
+        $html_data .= '</div>';
+        $html_data .= '</td>';
+        $html_data .= '   <td><span id="badge-access" class="badge bg-' . $this->choose_bg_color($access_occupancy, 2) . '">' . $data['access_current_level'] . '/' . $data['total_access_spaces'] . '</span></td>';
+        $html_data .= '  </tr>';
+
+        $html_data .= '  <tr>';
+        $html_data .= '  <td>Reservation</td>';
+        $html_data .= '  <td>';
+        $html_data .= '  <div class="progress progress-xs">';
+
+        $html_data .= ' <div id="progress-reservation" class="progress-bar bg-' . $this->choose_bg_color($reservation_occupancy, 2) . '" style="width: ' . $reservation_occupancy . '%"></div>';
+        $html_data .= '</div>';
+        $html_data .= '</td>';
+        $html_data .= '   <td><span id="badge-reservation" class="badge bg-' . $this->choose_bg_color($reservation_occupancy, 2) . '">' . $data['reservation_current_level'] . '/' . $data['total_reservation_spaces'] . '</span></td>';
+        $html_data .= '  </tr>';
+
+
+        $html_data .= '  </table>';
+        $html_data .= ' </div>';
+
+        $html_data .= '  </div>';
+        $html_data .= '  </div>'; //col md 4
+        //Entries and Exits By type
+        $html_data .= '<div class="col-md-4">';
+        $html_data .= '<div class="card">';
+        $html_data .= '<div class="card-body p-0">';
+        $html_data .= '<table class="table table-striped">';
+        $html_data .= '  <tr>';
+        $html_data .= '   <th></th>';
+        $html_data .= '   <th>Entries</th>';
+        $html_data .= '   <th>Exits</th>';
+        $html_data .= '  </tr>';
+        $html_data .= '  <tr>';
+        $html_data .= '   <td>ShortTerm</td>';
+        $html_data .= '   <td id="shortterm-entry">' . $data['shortterm_entry'] . '</td>';
+        $html_data .= '   <td id="shortterm-exit">' . $data['shortterm_exit'] . '</td>';
+        $html_data .= '  </tr>';
+        $html_data .= '  <tr>';
+        $html_data .= '   <td>Access</td>';
+        $html_data .= '   <td id="access-entry">' . $data['access_entry'] . '</td>';
+        $html_data .= '   <td id="access-exit">' . $data['access_exit'] . '</td>';
+        $html_data .= '  </tr>';
+
+        $html_data .= '  <tr>';
+        $html_data .= '   <td>Reservation</td>';
+        $html_data .= '   <td id="reservation-entry">' . $data['reservation_entry'] . '</td>';
+        $html_data .= '   <td id="reservation-exit">' . $data['reservation_exit'] . '</td>';
+        $html_data .= '  </tr>';
+
+        $html_data .= '  <tr>';
+        $html_data .= '   <td>Manual</td>';
+        $html_data .= '   <td id="manual-entry">' . $data['total_manual_entry'] . '</td>';
+        $html_data .= '   <td id="manual-exit">' . $data['total_manual_exit'] . '</td>';
+        $html_data .= '  </tr>';
+
+
+        $html_data .= '  </table>';
+        $html_data .= ' </div>';
+
+        $html_data .= '  </div>';
+        $html_data .= '  </div>'; //col md 4     
+        mysqli_close($con);
+        echo $html_data;
+    }
 
     function OccupancyFacilityCounters() {
         $con = $this->db_connect();

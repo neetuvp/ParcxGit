@@ -189,7 +189,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
         string payment_category;
 	string lang = json["language"];
 
-        string labels="total_revenue,transactions,ticket_id,device_name,payment_date_time,duration,category,payment_type,discount_name,discount_amount,gross_amount,no_records";
+        string labels="grace_period,entry_date_time,total_revenue,transactions,ticket_id,device_name,payment_date_time,duration,category,payment_type,discount_name,discount_amount,gross_amount,no_records";
         Php::Value label=General.getLabels(lang,labels);
 
 
@@ -227,7 +227,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
                 if(iter.second==3)
                     sql_query=sql_query+" discount_amount>0";
                 if(iter.second==4)
-                    sql_query=sql_query+" (discount_amount=0 AND gross_amount=0)";
+                    sql_query=sql_query+" (discount_amount=0 AND gross_amount=0 and validation_value="")";
                 if(iter.second==5)  
                     sql_query=sql_query+" payment_category='ProductSale'";              
                 }
@@ -269,6 +269,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
             Php::out<<"<th>#</th>"<<endl; 
             Php::out<<"<th>"+toString(label["ticket_id"])+"</th>"<<endl; 
             Php::out<<"<th>"+toString(label["device_name"])+"</th>"<<endl;        
+            Php::out<<"<th>"+toString(label["entry_date_time"])+"</th>"<<endl;  
             Php::out<<"<th>"+toString(label["payment_date_time"])+"</th>"<<endl;  
             Php::out<<"<th>"+toString(label["duration"])+"</th>"<<endl;  
             Php::out<<"<th>"+toString(label["category"])+"</th>"<<endl;    
@@ -289,7 +290,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
                     payment_category="Discount";
                 else if(res->getInt("lost_fee")>0)
                     payment_category="Lost";
-                else if(res->getInt("discount_amount")==0 &&res->getInt("gross_amount")==0)
+                else if(res->getInt("discount_amount")==0 && res->getInt("gross_amount")==0 && res->getString("validation_value")=="")
                     payment_category="Grace Period";
                 else if(res->getString("payment_category")=="ProductSale")
                     payment_category="Product Sale";
@@ -312,7 +313,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
                     Php::out<<"<td>" +res->getString("ticket_id")+ "<br>Void Reason:" +res->getString("void_reason")+"</td>"<<endl;
                     Php::out<<"<td>" +res->getString("device_name")+" <br>User:" +res->getString("void_user")+"</td>"<<endl;
                     }
-
+                Php::out<<"<td>"+res->getString("entry_date_time")+"</td>"<<endl; 
                 Php::out<<"<td>"+res->getString("payment_date_time")+"</td>"<<endl; 
                 Php::out<<"<td>"+res->getString("parking_duration")+"</td>"<<endl;   
                 Php::out<<"<td>"+payment_category+"</td>"<<endl;   

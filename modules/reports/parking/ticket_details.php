@@ -50,7 +50,13 @@ include('../../../includes/sidebar.php');
 
       <div class="flex-grow-1 row additional-menu-left">
         
-
+        <!-- devices multiselect-->
+        <div class="col-md-2">
+          <select class="form-control" id="deviceNumber">
+          <?php echo parcxSettings(array("task"=>"14","type"=>"2,3"));?>
+          </select>
+        </div>
+        
         <!-- plate -->
         <div class="col-md-2">
           <input type="text" id="ticket_id" class="form-control" placeholder="<?=$json["ticket_id"]?>">
@@ -77,8 +83,7 @@ include('../../../includes/sidebar.php');
 
   <section class="content">
     <div class="container-wide">      
-      <div class="p-2 col-md-5" id="page-content">       
-        
+      <div class="col-md-6" id="page-content">               
        
       </div>   
     </div>
@@ -88,27 +93,44 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
-//$('#view-report-button').click(function (event) 
-var load_report = 0;
+var body='<div class="card">'+
+              '<div class="card-header">'+
+                '<h3 class="card-title p-2">Danger Outline</h3>'+
+             '</div>'+
+              '<div class="card-body"><dl class="row"></dl></div>'+
+            '</div>';
 function callReport()
 { 
-
+if($("#ticket_id").val()=="")
+    alert("Please enter ticket id");
+else
+    {
     var data={};            
     data["ticket_id"]=$("#ticket_id").val();   
-	data["language"] = $("#language").val();	
+    data["device_number"]=$("#deviceNumber").val();   
+    data["language"] = $("#language").val();	
     data["task"]=9;
     var temp = JSON.stringify(data);        
     $.post("../../ajax/reports.php", temp)
       .done(function (result) {           
-        $("#page-content").html(result);
-        $("#page-content").addClass("card");
-        reportSuccess();
-		load_report=1;
+        $("#page-content").html(body);           
+       var json=JSON.parse(result);
+       if(json.access_allowed=="true")
+           $(".card").addClass("card-success");
+       else
+           $(".card").addClass("card-danger");
+       
+       $(".card-title").html(json.result_description);
+       
+       for( let prop in json ){
+            
+            $("dl").append("<dt class='col-sm-4'>"+prop+"</dt><dd class='col-sm-8'>"+json[prop]+"</dd>");
+        }
 
       }, "json");
 
 
-    event.preventDefault();
+        }
   }
   //}); 
 
@@ -122,6 +144,7 @@ function loadReportLabels()
     $.post("../../ajax/reports.php",json,function(data)
         {		
         var json=JSON.parse(data);
+        
         date_range_message=json.choose_datetime_range;
         $("#reservationtime").attr('placeholder',json.choose_datetime_range);        
         $("#pdf-report-header").html(json.ticket_details);   
@@ -154,9 +177,7 @@ $('#export_excel_report').click(function (event)
   export_to_excel("#page-content", "Ticket_Details")
   });
 
-$( document ).ready(function() {
-	loadheadingreport("ticket_details");
-});
+
 $('body').on('click', "[data-target='#image-modal']", function () 
   {
   var name = $(this).data('value');      

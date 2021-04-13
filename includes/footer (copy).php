@@ -84,7 +84,44 @@ function loadDataTable()
                 },					            
         });   	  
     }
-		
+	
+	
+function setLabel(label,element)
+    {
+    var data={};
+    data["task"]=13;
+    data["language"]=$("#language").val();
+    data["label"]=label;
+    var json = JSON.stringify(data);
+    $.post("<?=URL?>modules/ajax/reports.php",json,function(data)
+        {		      
+        $("#"+element).html(data);        
+        });     
+    }
+    
+function changeLanguage()
+    { 
+    var data={};    
+    data["language"]=$("#language").val();    
+    var json = JSON.stringify(data);
+    $.post("<?=URL?>modules/ajax/updatelanguage.php",json,function(data)
+        {        
+        console.log(data); 
+        });        
+    }
+
+function loadheading(label)
+    {
+    setLabel(label,"pdf-report-header");
+    }
+
+
+function loadheadingreport(label)
+    {
+    setLabel(label,"pdf-report-header");
+    setLabel("view_report","view-report-button");
+    setLabel("view_details","view-details-button");
+    }
 </script>
 
 </div>

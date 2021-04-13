@@ -15,45 +15,15 @@ include('../../includes/header.php');
 <?php
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
-
-include('../../classes/dashboard.php');
-$dashboard = new dashboard();
 ?>
 
-<div class="content-wrapper">
-    <!-- tab-link header -->
-    <div class="additional-menu row m-0 bg-white border-bottom">
-        <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-left" id="BreadcrumbNavigation">
-                <li class="breadcrumb-item"><a href="#">Dashboards</a></li>
-                <li class="breadcrumb-item"><a href="occupancy.php">Occupancy</a></li>
-
-            </ol>
-        </div>
-
-        <div class="col-sm-6">
-            <div class="nav-details float-sm-right">
-                <span class="text-bold m-0">
-                    Last Updated:
-                </span>
-                <span id="last-updated">
-
-                </span>
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- end / tab-link header -->
+<div class="content-wrapper">        
 
     <section class="content">
         <div class="container-wide container-fix">
 
             <div class="row text-dark" id="occupancy_content">
-                <?php
-                $dashboard->OccupancyFacilityCounters();
-                ?>          
+
             </div> <!-- End. Row text Dark -->
 
             <!-- entry exit chart -->
@@ -98,15 +68,10 @@ $dashboard = new dashboard();
         </div>
 
     </section>
+    
 </div>
 
-<script src="../../plugins/flot/jquery.flot.min.js"></script>
-<script src="../../plugins/flot/jquery.flot.categories.min.js"></script>
-
-<script src="../../dist/js/dashboard.js"></script>
-<!-- jQuery Knob -->
 <script src="../../plugins/knob/jquery.knob.js"></script>
-
 
 <!-- save day_closure_start as js variable for use in graphs -->
 <div id="dom-target" style="display: none;">
@@ -118,54 +83,21 @@ $dashboard = new dashboard();
 </div>
 
 <script>
-    $("#HourlyOccupancyGraph").hide();
-    
-    var current_level = $("#dashboard_level").attr('level');
-    var carpark = $("#dashboard_level").attr('carpark_number');
-    var facility = $("#dashboard_level").attr('facility_number');
+    var facility_number = <?php echo $_GET["facility_number"]; ?>;
+    var carpark_number =<?php echo $_GET["carpark_number"]; ?>;        
     var hourly_occ_chart;
-
-    LoadKnob();
-    $('#last-updated').html($("#last_updated_datetime").val());
-    loadOccupancyGraph();
-
-
-    setInterval(function ()
+    
+    
+    function get_live_occupancy()
     {
-        current_level = $("#dashboard_level").attr('level');
-        facility = $("#dashboard_level").attr('facility_number');
-        carpark = $("#dashboard_level").attr('carpark_number');
-
-        if (current_level == "facility")
-        {
-            UpdateFacilityCounters();
-        } else if (current_level == "carparks")
-        {
-            UpdateCarparkCounters(facility);
-        } else if (current_level == "carpark_detail")
-        {
-            UpdateCarparkDetail(facility, carpark);
-            if ($("#HourlyOccupancyGraph").is(":hidden"))
-            {
-                $("#HourlyOccupancyGraph").show();
-                hourlyOccupancy();
-            } else
-                updateHourlyOccupancy()
-        }
-
-    }, 1000 * 10);
-
-    function loadOccupancyGraph()
-    {        
-        if (current_level == "carpark_detail")
-        {            
-            if ($("#HourlyOccupancyGraph").is(":hidden"))
-            {
-                $("#HourlyOccupancyGraph").show();
-                hourlyOccupancy();
-            }
-        }
+    $.get("../ajax/dashboard.php?task=3&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) {
+        $('#occupancy_content').html(data);                
+           LoadKnob();
+    });
     }
+    
+    get_live_occupancy();
+    hourlyOccupancy();    
 
     /* jQueryKnob */
     function LoadKnob()
@@ -223,81 +155,6 @@ $dashboard = new dashboard();
     } // end LoadKnob
     /* END JQUERY KNOB */
 
-
-
-    $('body').on('click', '#ShowCarparks', function ()
-    {
-        var facility_number = $(this).attr('facility_number');
-        var temp = JSON.stringify({facility_number: facility_number});
-
-        $.ajax(
-                {
-                    type: "post",
-                    url: "../ajax/dashboard.php?task=18",
-                    cache: false,
-                    data: temp,
-                    contentType: "application/json",
-                    success: function (data)
-                    {
-                        $("#occupancy_content").html(data);
-                        LoadKnob();
-
-                        current_level = $("#dashboard_level").attr('level');
-                        if (current_level == "carpark_detail")
-                        {
-                            if ($("#HourlyOccupancyGraph").is(":hidden"))
-                            {
-                                facility = $("#dashboard_level").attr('facility_number');
-                                carpark = $("#dashboard_level").attr('carpark_number');
-                                $("#HourlyOccupancyGraph").show();
-                                hourlyOccupancy();
-                            }
-                        }
-                        UpdateCarparkCounters(facility_number);
-                    },
-                    error: function (jqXHR, textStatus, errorThrown)
-                    {
-                        alert(textStatus);
-                        alert(errorThrown);
-                    } //end of error
-                }); //end of ajax    
-
-        event.preventDefault();
-    }); // end .Get Carparks corresponding to the facility
-
-    $('body').on('click', '#ShowCarparkDetail', function ()
-    {
-        var carpark_number = $(this).attr('carpark_number');
-        var facility_number = $(this).attr('facility_number');
-        var temp = JSON.stringify({carpark_number: carpark_number, facility_number: facility_number});
-
-        $.ajax(
-                {
-                    type: "post",
-                    url: "../ajax/dashboard.php?task=2",
-                    cache: false,
-                    data: temp,
-                    contentType: "application/json",
-                    success: function (data)
-                    {
-                        $("#occupancy_content").html(data);
-                        LoadKnob();
-                        facility = $("#dashboard_level").attr('facility_number');
-                        carpark = $("#dashboard_level").attr('carpark_number');
-                        current_level = "carpark_detail";
-                        $("#HourlyOccupancyGraph").show();
-                        hourlyOccupancy();
-                    },
-                    error: function (jqXHR, textStatus, errorThrown)
-                    {
-                        alert(textStatus);
-                        alert(errorThrown);
-                    } //end of error
-                }); //end of ajax            
-        event.preventDefault();
-    }); // end .Get Carparks corresponding to the facility
-
-
     function hourlyOccupancy()
     {
         // set up multiselect
@@ -317,9 +174,7 @@ $dashboard = new dashboard();
 
             /* occupancy data */
             maxdata = getoccupancy("Max");
-            mindata = getoccupancy("Min");
-            console.log("maxdata " + maxdata);
-            console.log("mindata " + mindata);
+            mindata = getoccupancy("Min");           
             $(function () {
                 'use strict'
 
@@ -431,12 +286,11 @@ $dashboard = new dashboard();
     {
         var tmp = [];
         var dt = {};
-        dt['facility'] = facility;
-        dt['carpark'] = carpark;
+        dt['facility'] = facility_number;
+        dt['carpark'] = carpark_number;
         dt['type'] = type;
         dt['task'] = 4;
-        var jsondata = JSON.stringify(dt);
-        console.log(jsondata);
+        var jsondata = JSON.stringify(dt);        
         $.ajax({
             type: 'post',
             url: "../ajax/dashboard-ajax.php",
@@ -462,8 +316,8 @@ $dashboard = new dashboard();
     {
         var tmp = [];
         var dt = {};
-        dt['carpark'] = carpark;
-        dt['facility'] = facility;
+        dt['carpark'] = carpark_number;
+        dt['facility'] = facility_number;
         dt['seloption'] = $('#linechart-select').find("option:selected").val();
         dt['task'] = 5;
 
@@ -488,33 +342,21 @@ $dashboard = new dashboard();
         return tmp;
     }
 
-    function GetDashboardInfo()
-    {
-        current_level = $("#dashboard_level").attr('level');
 
-        if (current_level == "carparks")
-        {
-            facility = $("#dashboard_level").attr('facility_number');
-        }
-        if (current_level == "carpark_detail")
-        {
-            facility = $("#dashboard_level").attr('facility_number');
-            carpark = $("#dashboard_level").attr('carpark_number');
-        }
-    }// End Get Dashboard Info
 
     function updateHourlyOccupancy()
     {
-        // reset barchart data
         hourly_occ_chart.data.datasets[0].data = getoccupancy("Min");
         hourly_occ_chart.data.datasets[1].data = getoccupancy("Max");
-
-        // reset linechart data
-        // hourly_occ_chart.data.datasets[2].data = getaverageoccupancy();
-
         hourly_occ_chart.update();
-
     }
+    
+    setInterval(function ()
+    {
+    get_live_occupancy(); 
+    updateHourlyOccupancy;
+   
+    }, 10000);
 
 </script>
 

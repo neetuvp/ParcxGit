@@ -184,7 +184,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "cash_levels,all_devices,select_devices";
                     break;
             case 9://apm_refill_report
-                label = reportlabels + "apm_refill_report,all_carparks,select_carparks,all_devices,select_devices";
+                label = reportlabels + "all_carparks,select_carparks,all_devices,select_devices";
                     break;
             case 10://apm_payout_report
                 label = reportlabels + "apm_payout_report,all_carparks,select_carparks,all_devices,select_devices";
@@ -230,7 +230,10 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                     break;
             
             case 24://anpr_entry_plate_correction
-                label = reportlabels + "anpr_plate_correction";
+                label = reportlabels + "anpr_plate_correction,all_devices,select_devices";
+                    break;
+            case 25://live_parking
+                label = reportlabels + "live_parking";
                     break;
 
 }

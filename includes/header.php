@@ -45,7 +45,7 @@ function getLabel($label)
   <!-- plugin css -->
   <link rel="stylesheet" href="<?=URL?>plugins/daterangepicker/daterangepicker-bs3.css">
 
-  <!-- theme css -->
+  <!-- theme css -->  
   <link rel="stylesheet" href="<?=URL?>dist/css/parcx.min.css">
 
   <!-- custom css -->
