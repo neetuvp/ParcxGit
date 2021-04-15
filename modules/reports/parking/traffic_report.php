@@ -145,7 +145,7 @@ function callReport()
             $("#report-content").addClass("card")    ;
           $("#report-content").html(result);
           reportSuccess();
-		  loadMultipleDataTable();
+		  //loadMultipleDataTable();
 		  load_report=1;
 
           if (result.indexOf("No records/transactions available for the current search criteria") === -1) {

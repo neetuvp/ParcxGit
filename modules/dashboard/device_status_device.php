@@ -319,6 +319,7 @@ include('../../includes/sidebar.php');
         var jsondata = JSON.stringify(data);
         $.post("../ajax/dashboard.php?task=16", jsondata, function (result) {
             get_alarmlist();
+            get_device_status_by_device();
         });
     });
 

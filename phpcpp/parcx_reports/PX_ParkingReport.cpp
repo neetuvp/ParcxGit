@@ -1713,7 +1713,7 @@ void ParkingReport::trafficReport(Php::Value json)
 		//Php::out<<from<<endl;
 		//Php::out<<to<<endl;
 		int *d = General.differenceDateTime(to,from,"%Y-%m-%d");
-                string labels="entries,short_term,exits,manual_operation,entry_exit,report_date,shortterm_entries,shortterm_exits,contract_entries,contract_exits,manual_entry,manual_exit,from,to,total,no_records";
+                string labels="traffic_report,report_by_date,entries,short_term,exits,manual_operation,entry_exit,report_date,shortterm_entries,shortterm_exits,contract_entries,contract_exits,manual_entry,manual_exit,from,to,total,no_records";
                 Php::Value label=General.getLabels(lang,labels);
 		//Php::out<<d[1]<<endl;
 //Php::out<<from<<endl;
@@ -1964,6 +1964,7 @@ void ParkingReport::trafficReport(Php::Value json)
             {
                 //header = "<table width='100%' class='jspdf-table'>";
                 //header += "<tr class='card-header d-flex justify-content-between align-items-center'>";
+                header+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["report_by_date"])+"</div>";
                 header+="<table id='TABLE_1' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
                 header += "<thead><tr><th>"+toString(label["report_date"])+"</th>";            
                 header += "<th>"+toString(label["shortterm_entries"])+"</th>";
@@ -2055,7 +2056,8 @@ void ParkingReport::trafficReport(Php::Value json)
 				//html_data = "";
 				
 				//header = "<table width='100%' class='jspdf-table'>";
-				header="";
+				
+                                header="<div class='header pl-0 mt-4 mb-3'>"+toString(label["traffic_report"])+"</div>";
 				header += "<table id='TABLE_2' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
 				header += "<thead><tr>";
 				

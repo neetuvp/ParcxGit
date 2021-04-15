@@ -2062,7 +2062,7 @@ void RevenueReport::revenueReport(Php::Value json)
             data+="<th>#</th>"; 
             data+="<th>"+toString(label["device_name"])+"</th>";
             data+="<th>"+toString(label["payable_entries"])+"</th>";
-            data+="<th>"+toString(label["lost_ticket"])+"</th>";
+            data+="<th>"+toString(label["lost_ticket_count"])+"</th>";
             data+="<th>"+toString(label["discounts"])+"</th>";
             data+="<th>"+toString(label["product_sales"])+"</th>";
             data+="<th>"+toString(label["cash"])+"</th>";

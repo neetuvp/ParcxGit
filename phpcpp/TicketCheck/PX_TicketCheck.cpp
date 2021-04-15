@@ -21,7 +21,7 @@ Anpr AnprObj;
 int paymentExit, deductMoneyFromWallet, carparkNumber, facilityNumber, deviceNumber, deviceType, task, entryGrace, exitGrace, reservationEnabled, accessEnabled, deviceFunction, seconds, anprEnabled, cameraId, plateCapturedInterval, plateCapturedId, validationEnabled, walletEnabled, entryType;
 string deviceName, carpakName, facilityName, ticketId, plateNumber, parkingZone, query, entryDateTime, maxEntryGrace, maxExitGrace, currentDateTime, plateType, plateArea, plateCountry;
 string timeValidationId, percentageValidationId, validationDuration, userId, accessExpiry, reservationExpiry, paymentDateTime, accessResult, accessResultDescription, reservationResult, reservationStart, reservationResultDescription;
-int offlineTimeValidation, offlinePercentageValidation, timeValidation, percentageValidation, parkingDuration, validationSeconds, validationHours, rate_type = 0;
+int test,offlineTimeValidation, offlinePercentageValidation, timeValidation, percentageValidation, parkingDuration, validationSeconds, validationHours, rate_type = 0;
 double startparkingFee, parkingFee, vat_percentage = 0, amountPaid = 0, grossAmount, vatAmount, reservationFee, walletBalance;
 sql::Connection *reportCon, *serverCon;
 sql::Statement *stmt, *serverStmt;
@@ -889,6 +889,9 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
     writeLog("===========================", "===========================");
     try {
         Php::Value json = params[0];
+        
+        test=json["test"];
+        
         deviceNumber = json["device_number"];                
         writeLog("deviceNumber", to_string(deviceNumber));
         
@@ -1035,7 +1038,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                 if (toString(response["result"]) == "ticketcheck_access_allowed" && deviceType > 2)
                     response["result"] = toString(response["ticketcheck_result"]);
 
-                if ((deviceType == 2 || deviceType == 3) && anprEnabled == 1) //anpr plate mismatch
+                if ((deviceType == 2 || deviceType == 3) && anprEnabled == 1 && test==0) //anpr plate mismatch
                 {
                     string entry_plate = response["entry_plate_number"];
                     string current_plate = response["current_plate_number"];
@@ -1059,7 +1062,8 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
 
         string result = response["result"];
         string result_description = response["result_description"];
-        insertIntoTicketCheck(result, result_description);
+        if(test==0)
+            insertIntoTicketCheck(result, result_description);
         writeLog("parcxTicketCheck", "Result: " + result + "\tDescription:" + result_description + "\n");
     } catch (exception &e) {
         writeException("parcxTicketCheck", e.what());

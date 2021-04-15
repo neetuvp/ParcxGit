@@ -146,7 +146,7 @@ function callReport()
       $("#report-content").html(data);
       reportSuccess();
       createChart();
-	  //loadDataTable1();
+	  loadDataTable1();
 	  load_report=1;
       })
     .fail(function(jqxhr,status,error)
@@ -168,11 +168,11 @@ function loadDataTable1()
 	  {
 	  "paging": true,
 	  "lengthChange":true,
-	  "searching": false,
+	  "searching": true,
 	  "ordering": true,
 	  "info": true,
 	  "autoWidth": false,
-	  "lengthMenu": [[ -1], [ "All"]],
+	  "lengthMenu": [[5,10, 25, 50, -1], [5,10, 25, 50, "All"]],
 	  "aaSorting": [],
 		"language": {
 			search: search_label,

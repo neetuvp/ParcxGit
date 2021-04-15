@@ -108,6 +108,7 @@ else
     var data={};            
     data["ticket_id"]=$("#ticket_id").val();   
     data["device_number"]=$("#deviceNumber").val();   
+    data["test"]="1";
     data["language"] = $("#language").val();	
     data["task"]=9;
     var temp = JSON.stringify(data);        

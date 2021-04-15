@@ -479,7 +479,7 @@ class dashboard {
     
     function get_alarm_count($facility,$carpark,$device, $alarmseverity1, $alarmseverity2) {
         $con = $this->db_connect_reporting();
-        $query_string = "select count(*) as count from watchdog_device_alarms where alarm_severity between " . $alarmseverity1 . " and " . $alarmseverity2 . " and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -7 DAY)";
+        $query_string = "select count(*) as count from watchdog_device_alarms where alarm_code%2=1 and dismiss=0 and alarm_severity between " . $alarmseverity1 . " and " . $alarmseverity2 . " and alarm_date_time>=DATE_ADD(CURDATE(),INTERVAL -7 DAY)";
         
         if($facility>0)
             $query_string.=" and facility_number='" . $facility . "'";
@@ -488,8 +488,11 @@ class dashboard {
         if($device>0)
             $query_string.=" and device_number in (".$device.")";
         
+        $query_string.=" GROUP by device_number,alarm_code";
+        
         //echo $query_string."<br>";
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        $rows=0;
         if ($data = mysqli_fetch_assoc($result))                  
             $rows = $data["count"];
         
@@ -511,9 +514,15 @@ class dashboard {
 
     function dismiss_alarm($id) {
         $con = $this->db_connect_reporting();
-        $query_string = "update watchdog_device_alarms set dismiss=1 where id=" . $id;
-        //echo $query_string;
+        $query_string ="select alarm_code,device_number from watchdog_device_alarms where id=" . $id;
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+        if($data = mysqli_fetch_assoc($result)) 
+            {
+            $device_number=$data["device_number"];
+            $code=$data["alarm_code"];
+            $query_string = "update watchdog_device_alarms set dismiss=1 where device_number=".$device_number." and alarm_code=".$code;        
+            $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
+            }
         mysqli_close($con);
     }
 
@@ -530,6 +539,8 @@ class dashboard {
             $query_string.=" and carpark_number=".$carpark;
         if($device>0)
             $query_string.=" and device_number in (".$device.")";
+        
+        $query_string.=" GROUP by device_number,alarm_code";
             
         $result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $htmldata = "";
@@ -631,15 +642,22 @@ class dashboard {
         $html="";
         $facility_number=0;
         $con = $this->db_connect();
-        $query_string = "select facility_number,facility_name from watchdog_device_status group by facility_number";        
+        $query_string = "select facility_number,facility_name,count(DISTINCT carpark_number) as carparks from watchdog_device_status group by facility_number";        
         $facility_result = mysqli_query($con, $query_string) or die(mysqli_error($con));
         $rows=mysqli_num_rows($facility_result);        
         if($rows==1)
             {
             $data = mysqli_fetch_assoc($facility_result);
             $facility_number=$data["facility_number"];
-            mysqli_close($con);            
-            $this->get_device_status_by_carpark($facility_number);
+            $carparks=$data["carparks"];
+            mysqli_close($con);              
+            if($carparks>1)
+                {
+                $html="<input type='hidden' id='facility_number' value='".$facility_number."'>";            
+                echo $html;
+                }
+            else
+                $this->get_device_status_by_carpark($facility_number);           
             }
         else
             {
@@ -730,7 +748,7 @@ class dashboard {
             echo $html;
             }
         else
-            {
+            {            
             while ($carpark = mysqli_fetch_assoc($carpark_result)) 
                 {
                 $carpark_number=$carpark["carpark_number"];
