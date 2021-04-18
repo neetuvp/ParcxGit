@@ -102,7 +102,7 @@ class dashboard {
     function show_live_revenue_facility()
         {        
         $con = $this->db_connect();
-        $query_string = "select facility_number,facility_name,count(*) as devices,sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,"
+        $query_string = "select count(distinct carpark_number) as carparks,facility_number,facility_name,count(*) as devices,sum(gross_amount) as gross_amount,sum(parking_fee-discount_amount) as parking_fee,"
                 . "sum(vat_amount) as vat_amount,sum(lost_ticket_fee+admin_fixed_charges+ticket_replacement_fee) as lost_fee,"
                 . "sum(discount_amount) as discount_amount,sum(product_sale_amount) as product_sale_amount from parking_revenue group by facility_number";
         
@@ -112,8 +112,15 @@ class dashboard {
             {            
             $data = mysqli_fetch_assoc($result);
             $facility_number=$data["facility_number"];
-            mysqli_close($con);            
-            $this->show_live_revenue_carpark($facility_number);
+            $carparks=$data["carparks"];
+            mysqli_close($con);              
+            if($carparks>1)
+                {
+                $html="<input type='hidden' id='facility_number' value='".$facility_number."'>";            
+                echo $html;
+                }
+            else                            
+                $this->show_live_revenue_carpark($facility_number);
             }
         else
             {  
@@ -1313,8 +1320,18 @@ class dashboard {
             {
             $data = mysqli_fetch_assoc($result);
             $facility_number=$data["facility_number"];           
-            mysqli_close($con);            
-            $this->get_occupancy_carpark($facility_number);
+             
+            $query_string = "select * from counters where counter_type=1 and facility_number=" . $facility_number . " ORDER BY carpark_number ASC";                       
+            $result = mysqli_query($con, $query_string) or die(mysqli_error($con)); 
+            $row=mysqli_num_rows($result);
+            mysqli_close($con);  
+            if ($row > 1) 
+                {                
+                $html="<input type='hidden' id='facility_number' value='".$facility_number."'>";            
+                echo $html;
+                }
+            else                            
+                $this->get_occupancy_carpark($facility_number);
             } 
         else 
             {

@@ -424,6 +424,7 @@ string secondsToParkingDuration(int n) {
 Php::Value openTransactionCheck(int getDetails) {
     Php::Value response;
     response["access_allowed"] = "false";
+    response["open_transaction_check"] = "false";
     try {
         if (ticketId != "") {
             if (ticketId.length() == 20)
@@ -435,11 +436,15 @@ Php::Value openTransactionCheck(int getDetails) {
 
         res = stmt->executeQuery(query);
         if (res->next()) {
-            response["open_transaction_check"] = "true";
             response["entry_plate_number"] = "###";            
 
             if (res->getString("plate_captured_id") != "")
                 response = AnprObj.getEntryPlateDetails(res->getInt("plate_captured_id"));
+
+            response["open_transaction_check"] = "true";
+            
+
+            
 
 
 
@@ -726,6 +731,7 @@ Php::Value openTransactionCheck(int getDetails) {
             response["result"] = "already_exited";
             response["result_description"] = "Already exited";
         }
+       
     }    catch (const std::exception& e) {
         writeException("openTransactionCheck", e.what());
         writeException("openTransactionCheck", query);
@@ -785,19 +791,19 @@ Php::Value exitPlateCheck() {
     return response;
 }
 
-void insertIntoPlateMismatch(string entry_plate_number,string exit_plate_number,string id1,string id2) {
+void insertIntoPlateMismatch(string entry_plate_number,string exit_plate_number,string id1,string id2,string result,string description,string dismiss) {
     try {
         reportCon = General.mysqlConnect(ReportingDB);
         if (reportCon != NULL) {
             stmt = reportCon->createStatement();
-            query="insert into plate_mismatch(date_time,device_number,device_name,entry_plate_number,exit_plate_number,ticket_id,entry_plate_captured_id,exit_plate_captured_id)values(CURRENT_TIMESTAMP," + to_string(deviceNumber) + ",'" + deviceName + "','" +entry_plate_number + "','" + exit_plate_number + "','" + ticketId + "',"+id1+","+id2+")";
+            query="insert into plates_mismatch(date_time,device_number,device_name,entry_plate_number,exit_plate_number,ticket_id,entry_plate_captured_id,exit_plate_captured_id,result,result_description,dismiss)values(CURRENT_TIMESTAMP," + to_string(deviceNumber) + ",'" + deviceName + "','" +entry_plate_number + "','" + exit_plate_number + "','" + ticketId + "',"+id1+","+id2+",'"+result+"','"+description+"','"+dismiss+"')";
             stmt->executeUpdate(query);
             delete stmt;
             delete reportCon;
         }
     } catch (const std::exception& e) {
         writeException("insertIntoPlateMismatch", e.what());
-        writeException("insertIntoPlateMismatch",query);
+        //writeException("insertIntoPlateMismatch",query);
     }
 }
 
@@ -842,6 +848,8 @@ void getDeviceDetails() {
                 writeLog("cameraId", to_string(cameraId));
                 paymentExit = res->getInt("payment_enabled_exit");
                 writeLog("paymentExit", to_string(paymentExit));
+                anpr_mismatch_check = res->getInt("anpr_mismatch_check");
+                writeLog("anpr_mismatch_check", to_string(anpr_mismatch_check));
                
             }
             delete res;            
@@ -857,9 +865,7 @@ void getDeviceDetails() {
                 if (settings->getString("setting_name") == "vat_type")
                     vat_type = settings->getString("setting_value");
                 if (settings->getString("setting_name") == "vat_percentage")
-                    vat_percentage = settings->getDouble("setting_value");
-                if (settings->getString("setting_name") == "anpr_mismatch_check")
-                    anpr_mismatch_check = settings->getInt("setting_value");
+                    vat_percentage = settings->getDouble("setting_value");                
                 if (settings->getString("setting_name") == "facility_number")
                     facilityNumber = settings->getInt("setting_value");
                 if (settings->getString("setting_name") == "facility_name")
@@ -871,8 +877,7 @@ void getDeviceDetails() {
         writeLog( "wallet_webservice", wallet_webservice);
         writeLog( "validationEnabled", to_string(validationEnabled));
         writeLog( "vat_type", vat_type);
-        writeLog( "vat_percentage", to_string(vat_percentage));
-        writeLog( "anpr_mismatch_check", to_string(anpr_mismatch_check));
+        writeLog( "vat_percentage", to_string(vat_percentage));        
         writeLog("facility",to_string(facilityNumber));
         writeLog("facilityName",facilityName);      
         delete stmt;
@@ -885,13 +890,15 @@ void getDeviceDetails() {
 
 Php::Value parcxTicketCheck(Php::Parameters &params) {
     Php::Value response;
-    Php::Value anprSettings;
-    writeLog("===========================", "===========================");
+    Php::Value anprSettings;    
     try {
         Php::Value json = params[0];
         
+        test=0;
+
         test=json["test"];
-        
+        writeLog("test", to_string(test));
+
         deviceNumber = json["device_number"];                
         writeLog("deviceNumber", to_string(deviceNumber));
         
@@ -1014,6 +1021,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                 delete stmt;
                 delete reportCon;
             }
+
             if (toString(response["access_allowed"]) == "false" && deviceType != 1) {
                 offlinePercentageValidation = json["offline_validation_percentage"];
                 offlineTimeValidation = json["offline_validation_hours"];
@@ -1036,35 +1044,50 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                 }
 
                 if (toString(response["result"]) == "ticketcheck_access_allowed" && deviceType > 2)
-                    response["result"] = toString(response["ticketcheck_result"]);
-
-                if ((deviceType == 2 || deviceType == 3) && anprEnabled == 1 && test==0) //anpr plate mismatch
-                {
-                    string entry_plate = response["entry_plate_number"];
-                    string current_plate = response["current_plate_number"];
-                    string open_transaction_check=response["open_transaction_check"];
-                    writeLog("parcxTicketCheck", "Entry plate: " + entry_plate + " Current Plate:" + current_plate);
-
-                    if ( (entry_plate.length() >0 && current_plate.length() >0 && entry_plate != current_plate)||(plateCapturedId>0 && open_transaction_check=="false"))
-                        {
-                        insertIntoTicketCheck("plate_msmatch", "Plate mismatch");
-                        string id1=response["entry_plate_captured_id"];
-                        string id2=response["plate_captured_id"];
-                        if(id1=="")
-                            id1="0";
-                        insertIntoPlateMismatch(entry_plate,current_plate,id1,id2);
-                        }                    
-                }
+                    response["result"] = toString(response["ticketcheck_result"]);                
             } else
                 writeLog("parcxTicketCheck", "No exit ticket check");
         }
-
 
         string result = response["result"];
         string result_description = response["result_description"];
         if(test==0)
             insertIntoTicketCheck(result, result_description);
-        writeLog("parcxTicketCheck", "Result: " + result + "\tDescription:" + result_description + "\n");
+
+        writeLog("parcxTicketCheck", "Result: " + result + "\tDescription:" + result_description);
+        
+        string open_transaction_check=response["open_transaction_check"];
+        
+        if (toString(response["access_allowed"]) == "true" && deviceType !=1 && anprEnabled == 1 && test==0 && open_transaction_check=="true") //anpr plate mismatch
+            {
+                string entry_plate = response["entry_plate_number"];
+                string current_plate = response["current_plate_number"];
+                
+                writeLog("parcxTicketCheck", "Entry plate: " + entry_plate + " Current Plate:" + current_plate);
+
+                if ( (entry_plate.length() >0 && current_plate.length() >0 && entry_plate != current_plate)||(plateCapturedId>0 ))
+                    {
+                    insertIntoTicketCheck("plate_mismatch", "Plate mismatch");
+                    string id1=response["entry_plate_captured_id"];
+                    string id2=response["plate_captured_id"];
+                    if(id1=="")
+                        id1="0";
+                    string dismiss="1";
+                    if(anpr_mismatch_check==1 && deviceType==2)
+                        {
+                        dismiss="0";  
+                        response["result"]="plate_mismatch";
+                        response["result_description"]="Plate mismatch.Entry Plate: "+entry_plate+" Current Plate:"+current_plate; 
+                        writeLog("parcxTicketCheck", "Result:plate_mismatch\tDescription:Plate mismatch.Entry Plate: "+entry_plate+" Current Plate:"+current_plate); 
+                        }
+                    insertIntoPlateMismatch(entry_plate,current_plate,id1,id2,result,result_description,dismiss);
+                    
+                    }                    
+            }
+
+        
+        
+        
     } catch (exception &e) {
         writeException("parcxTicketCheck", e.what());
     }

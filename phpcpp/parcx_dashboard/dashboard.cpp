@@ -105,13 +105,14 @@ void getPlateMismatchTable() {
     try {      
         rCon = General.mysqlConnect(ReportingDB);
         rStmt = rCon->createStatement();
-        query = "select * from plates_mismatch where dismiss=0 and entry_plate_captured_id>0 and exit_plate_captured_id>0 order by id desc limit 10";
+        query = "SELECT  * FROM plates_mismatch T1 JOIN (Select device_number, max(id) id from plates_mismatch where dismiss=0 and entry_plate_captured_id>0 and exit_plate_captured_id>0 group by device_number) T2 on T1.device_number = T2.device_number and T1.id = T2.id ORDER by T1.id desc";
         res = rStmt->executeQuery(query);
         if (res->rowsCount() > 0) {
             Php::out << "<thead>" << endl;
             Php::out << "<tr>" << endl;
             Php::out << "<th>Date Time</th>" << endl;           
-             Php::out << "<th>Ticket id</th>" << endl;           
+            Php::out << "<th>Device name</th>" << endl;           
+            Php::out << "<th>Ticket id</th>" << endl;           
             Php::out << "<th>Entry Plate Number</th>" << endl;
             Php::out << "<th>Exit Plate Number</th>" << endl;            
             Php::out << "<th>Action</th>" << endl;
@@ -122,10 +123,11 @@ void getPlateMismatchTable() {
 
                 Php::out << "<tr'>" << endl;
                 Php::out << "<td >" + res->getString("date_time") + "</td>" << endl;
+                Php::out << "<td >" + res->getString("device_name") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("ticket_id") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("entry_plate_number") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("exit_plate_number") + "</td>" << endl;                
-                Php::out << "<td><button type='button' class='btn  btn-info col btn-plate-mismatch' data-entry-id='" + res->getString("entry_plate_captured_id") + "' data-exit-id='" + res->getString("exit_plate_captured_id") + "' data-id='" + res->getString("id") + "'>Update</button></td>" << endl;
+                Php::out << "<td><button type='button' class='btn  btn-info col btn-plate-mismatch'  data-id='" + res->getString("id") + "'>Update</button></td>" << endl;
                 Php::out << "</tr>" << endl;
             }
             Php::out << "</tbody>" << endl;
@@ -232,10 +234,18 @@ Php::Value getMismatchPlateDetails(Php::Value data)
     Php::Value response;
     try
         {        
-        string entry_id=data["entry_id"];
-        string exit_id=data["exit_id"];
+        string id=data["id"];
+        string entry_id,exit_id;        
         con = General.mysqlConnect(ReportingDB);
         stmt = con->createStatement();
+        query="select * from plates_mismatch where id="+id;
+        res=stmt->executeQuery(query);
+        if(res->next())
+            {
+            entry_id=res->getString("entry_plate_captured_id");
+            exit_id=res->getString("exit_plate_captured_id");   
+            response["result_description"]=string(res->getString("result_description"));
+            }
         query = "select* from plates_captured where id="+entry_id;
         res=stmt->executeQuery(query);
         if(res->next())

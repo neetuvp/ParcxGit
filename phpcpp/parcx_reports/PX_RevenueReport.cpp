@@ -187,7 +187,9 @@ void RevenueReport::paymentTransactions(Php::Value json)
         string discount=json["discount"];   
         int showvoid=json["showvoid"]; 
         string payment_category;
-	string lang = json["language"];
+		string lang = json["language"];
+		string currency = getCurrency();
+			
 
         string labels="grace_period,entry_date_time,total_revenue,transactions,ticket_id,device_name,payment_date_time,duration,category,payment_type,discount_name,discount_amount,gross_amount,no_records";
         Php::Value label=General.getLabels(lang,labels);
@@ -247,7 +249,8 @@ void RevenueReport::paymentTransactions(Php::Value json)
             Php::out<<"<div class='col-lg-3 col-6'>"<<endl;                       
             Php::out<<"<div class='small-box bg-success'>"<<endl;
             Php::out<<"<div class='inner'>"<<endl;
-            Php::out<<"<h3>"<<total<<"</h3>"<<endl;
+            //Php::out<<"<h3>"<<total<<"</h3>"<<endl;
+			Php::out<<"<h3>"<<currency<<" "<<SetDoublePrecision(total)<<"</h3>"<<endl;
             Php::out<<"<h6>"+toString(label["total_revenue"])+"</h6>"<<endl;
             Php::out<<"</div>"<<endl;            
             Php::out<<"</div>"<<endl;
