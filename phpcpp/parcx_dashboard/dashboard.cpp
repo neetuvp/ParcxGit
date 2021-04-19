@@ -2,6 +2,7 @@
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include<phpcpp.h>
+#include <netdb.h>
 
 #define ServerDB "parcx_server"
 #define ReportingDB "parcx_reporting"
@@ -105,7 +106,7 @@ void getPlateMismatchTable() {
     try {      
         rCon = General.mysqlConnect(ReportingDB);
         rStmt = rCon->createStatement();
-        query = "SELECT  * FROM plates_mismatch T1 JOIN (Select device_number, max(id) id from plates_mismatch where dismiss=0 and entry_plate_captured_id>0 and exit_plate_captured_id>0 group by device_number) T2 on T1.device_number = T2.device_number and T1.id = T2.id ORDER by T1.id desc";
+        query = "SELECT  * FROM plates_mismatch T1 JOIN (Select device_number, max(id) id from plates_mismatch where date_time >= DATE_SUB(NOW(),INTERVAL 1 HOUR) and dismiss=0 and entry_plate_captured_id>0 and exit_plate_captured_id>0 group by device_number) T2 on T1.device_number = T2.device_number and T1.id = T2.id ORDER by T1.id desc";
         res = rStmt->executeQuery(query);
         if (res->rowsCount() > 0) {
             Php::out << "<thead>" << endl;
@@ -227,6 +228,122 @@ void getPlateCorrectedTable() {
         writeException("getPlateCorrectedTable", e.what());
         writeException("getPlateCorrectedTable", query);
     }
+}
+
+int sendDataToPort(string ip,int port,string message) {
+    
+    try {        
+        int sockfd; // socket file descriptor 	
+        struct sockaddr_in serv_addr;
+        struct hostent *server;
+
+        sockfd = socket(AF_INET, SOCK_STREAM, 0); // generate file descriptor 
+            if (sockfd < 0) 
+                    {
+                    writeException("sendDataToPort","ERROR opening socket "+ip+":"+to_string(port));
+                    return 0;
+                    }
+
+            server = gethostbyname(ip.c_str()); //the ip address (or server name) of the listening server.
+            if (server == NULL) 
+                    {
+                    writeException("sendDataToPort","ERROR, no such host "+ip+":"+to_string(port));
+                    return 0;
+                    }
+
+            bzero((char *) &serv_addr, sizeof(serv_addr));
+            serv_addr.sin_family = AF_INET;
+            bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
+            serv_addr.sin_port = htons(port);
+            struct timeval tv;
+            tv.tv_sec = 2;
+            tv.tv_usec = 0;
+            setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, (const char*)&tv, sizeof tv);
+
+            if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0)
+                    {
+                    writeException("sendDataToPort","ERROR connecting "+ip+":"+to_string(port));                     
+                    return 0;
+                    } 
+
+            /* write to port*/
+            int n;
+            char * wbuff; 
+            string str = message+"\n";
+            wbuff = (char *)str.c_str(); // convert from string to c string, has to have \0 terminal 
+
+            n = write(sockfd, wbuff, strlen(wbuff));
+            if(n < 0) 
+                    writeException("sendDataToPort","Cannot write to socket");
+            else
+                    writeException("sendDataToPort",message +" -command send to "+ip+":"+to_string(port));
+
+            close(sockfd);	
+            }
+	catch (exception &e)
+            {
+            writeException("sendDataToPort",e.what());            
+            }
+        return 1;
+	}
+
+
+void correctPlateMismatch(Php::Value data) {
+    try {              
+        string id=data["id"];
+        con = General.mysqlConnect(ReportingDB);
+        stmt = con->createStatement();
+        query="select * from plates_mismatch where id="+id;
+        res=stmt->executeQuery(query);
+        if(res->next())
+            {
+            string entry_id=res->getString("entry_plate_captured_id");
+            string exit_id=res->getString("exit_plate_captured_id"); 
+            string device_number=res->getString("device_number");
+            string user_id=data["user_id"];
+            string user_name=data["user_name"];
+            string plate_number1=data["plate_number1"];
+            string plate_number2=data["plate_number2"];
+            string corrected_plate_number1=data["corrected_plate_number1"];
+            string corrected_plate_number2=data["corrected_plate_number2"];
+            if(plate_number1!=corrected_plate_number1)
+                {
+                query = "update plates_captured set plate_corrected_date_time=CURRENT_TIMESTAMP,initial_plate_number='" + plate_number1 + "',plate_number='" + corrected_plate_number1 + "',user_id='" + user_id+ "',user_name='" +user_name + "' where id='" + entry_id + "'";
+                stmt->executeUpdate(query);
+                query = "update open_transactions set plate_number='" + corrected_plate_number1 + "' where plate_captured_id='" + entry_id+ "'";
+                rStmt->executeUpdate(query);
+                }
+            if(plate_number2!=corrected_plate_number2)
+                {
+                query = "update plates_captured set plate_corrected_date_time=CURRENT_TIMESTAMP,initial_plate_number='" + plate_number2 + "',plate_number='" + corrected_plate_number2 + "',user_id='" + user_id+ "',user_name='" +user_name + "' where id='" + exit_id + "'";
+                stmt->executeUpdate(query);
+                }            
+            delete res;
+            query="select device_ip from parcx_server.system_devices where device_number="+device_number;
+            res=stmt->executeQuery(query);
+            if(res->next())
+                {
+                string ip=res->getString("device_ip");
+                string message="C0"+exit_id+"C1P0"+corrected_plate_number2+"P1";
+                if(sendDataToPort(ip,8091,message)==1)                    
+                    query="update plates_mismatch set dismiss=2 where id="+id;
+                else
+                    query="update plates_mismatch set dismiss=1 where id="+id;
+                
+                    stmt->executeUpdate(query);
+                    
+                delete res;
+                }
+            }
+        
+                
+        delete stmt;
+        con->close();
+        delete con;
+    }    catch (const std::exception& e) {
+        writeException("correctPlateMismatch", e.what());
+    }
+
 }
 
 Php::Value getMismatchPlateDetails(Php::Value data)
@@ -422,6 +539,8 @@ Php::Value parcxDashboard(Php::Parameters &params) {
             break;
         case 7:response=getMismatchPlateDetails(data);
             break;
+        case 8:correctPlateMismatch(data);
+        break;
     }
     return response;
 }

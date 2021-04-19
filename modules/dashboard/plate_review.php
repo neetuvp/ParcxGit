@@ -51,7 +51,7 @@ include('../../includes/sidebar.php');
                     <h4 class="alert-heading" id="alert-heading"></h4>
                     <p>Please review the list of number plates which require corrections or confirmation</p>
                     <hr>
-                    <p class="mb-0"> Click update in the list and make the required required correction after reviewing the image of the entry plate </p>
+                    <p class="mb-0"> Click update in the list and make the required correction after reviewing the image of the plate </p>
                 </div>                    
             </div> <!-- End . Modal Body -->
             <div class="modal-footer">
@@ -65,7 +65,7 @@ include('../../includes/sidebar.php');
 <!-- Modal -->
 <div class="modal fade text-dark" id="plate-mismatch-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Manual plate correction</h5>
@@ -74,10 +74,10 @@ include('../../includes/sidebar.php');
                 </button>
             </div>
             <div class="modal-body p-4">      
-                <div id="alert-div-edit-plate" class="alert bg-danger d-none">
+                <div id="alert-div" class="alert bg-danger d-none">
                     <h5> Plates are not matching!</h5>                                            
                 </div>                 
-
+                <label id="result"></label> 
                 <div class="row mb-4">
                     <div class="col">
                         <div class="border-simple p-1" id="plate_image1">
@@ -94,16 +94,7 @@ include('../../includes/sidebar.php');
                 <!-- end / info -->
 
                 <!-- info -->
-                <div class="row mb-4" id="plate_secondary_modal">
-                    <div class="col">
-                        <div class="border-simple h-100 p-3">                                                
-                            <label for="PlateNumber">Exit PlateNumber</label>
-                            <input class="form-control form-control-lg" type="text" placeholder="Plate Number" id="plate_number1" disabled="">
-                            <br/>
-                            <label for="PlateNumber">Enter Corrected PlateNumber</label>
-                            <input class="form-control form-control-lg" type="text" placeholder="Plate Number" id="corrected_plate_number1">
-                        </div>
-                    </div>
+                <div class="row mb-4">
                     <div class="col">
                         <div class="border-simple h-100 p-3">
                             <label for="PlateNumber">Entry PlateNumber</label>
@@ -113,11 +104,19 @@ include('../../includes/sidebar.php');
                             <input class="form-control form-control-lg" type="text" placeholder="Plate Number" id="corrected_plate_number2">                                                        
                         </div>
                     </div>
+                    <div class="col">
+                        <div class="border-simple h-100 p-3">                                                
+                            <label for="PlateNumber">Exit PlateNumber</label>
+                            <input class="form-control form-control-lg" type="text" placeholder="Plate Number" id="plate_number1" disabled="">
+                            <br/>
+                            <label for="PlateNumber">Enter Corrected PlateNumber</label>
+                            <input class="form-control form-control-lg" type="text" placeholder="Plate Number" id="corrected_plate_number1">
+                        </div>
+                    </div>                    
                 </div>                 
             </div>
             <div class="modal-footer">   
-                <!--                <button type="button" class="btn btn-success" id="btn-allow">Allow</button>-->
-                <button type="button" class="btn btn-primary" id="btn-save-plate-mismatch">Save changes</button>                
+                <button type="button" class="btn btn-success" id="btn-allow">Allow</button>                
             </div>
         </div>
     </div>
@@ -192,6 +191,12 @@ include('../../includes/sidebar.php');
         $.post("../ajax/dashboard-ajax.php", json, function (data)
         {
             $("#plate-mismatch").html(data);
+            var count = $('#plate-mismatch tr').length;
+            if (count > 0)
+            {
+                $("#alert-heading").html((count - 1) + "Plate Mismatch!");
+                $('#PopUpAlertModal').modal('show');
+            }
         });
     }
 
@@ -222,6 +227,7 @@ include('../../includes/sidebar.php');
                 if (withoutEvent >= 60 * 3)
                 {
                     correction_required();
+                    plate_mismatch();
                 }
             }
         }, 1000 * 30);
@@ -269,8 +275,7 @@ include('../../includes/sidebar.php');
         var data = {};
         data["task"] = 7;
         data["id"]=id;        
-        var json = JSON.stringify(data);
-        console.log(json);
+        var json = JSON.stringify(data);        
         $.post("../ajax/dashboard-ajax.php", json, function (data)
         {
             var response = JSON.parse(data);
@@ -282,6 +287,7 @@ include('../../includes/sidebar.php');
             $('#plate_image2').html('<img src ="' + image_url + '/' + response["exit_image"] + '" width="100%"; height="100%";>');
             $('#plate_number2').val(response["exit_plate_number"]);
             $('#corrected_plate_number2').val(response["exit_plate_number"]);
+            $('#result').html("<h5>"+response["result_description"]+"</h5>");
         });
 
 
@@ -289,40 +295,33 @@ include('../../includes/sidebar.php');
 
     $(document).on('click', '#btn-allow', function ()
     {
-        var data = {};
-        data["task"] = 2;
-        data["id"] = id;
-        data["plate_number"] = plate;
-        data["update"] = 2;
-        data["user_id"] = $("#user-id").val();
-        data["user_name"] = $("#user-name").val();
-        var json = JSON.stringify(data);
-        $.post("../ajax/dashboard-ajax.php", json, function (data)
-        {
-            location.reload();
-        });
-
-
-    });
-
-    $(document).on('click', '#btn-save-plate-mismatch', function ()
-    {
-        id = $(this).data('id');
+        $("#alert-div-edit-plate").addClass("d-none");    
         var data = {};
         data["task"] = 8;
-        data["entry_id"] = $(this).data('entry-id');
-        data["exit_id"] = $(this).data('exit-id');
-        data["entry_plate"] = $("#corrected_plate_number1").val();
-        data["exit_plate"] = $("#corrected_plate_number2").val();
-        var json = JSON.stringify(data);
+        data["id"] = id;
+        data["plate_number1"] = $('#plate_number1').val();
+        data["plate_number2"] = $('#plate_number2').val();
+        data["corrected_plate_number1"] = $('#corrected_plate_number1').val();
+        data["corrected_plate_number2"] = $('#corrected_plate_number2').val();
+        
+        data["user_id"] = $("#user-id").val();
+        data["user_name"] = $("#user-name").val();                
+        
+        if(data["corrected_plate_number1"]!=data["corrected_plate_number2"])
+            {        
+            $("#alert-div").removeClass("d-none");
+            }
+        else
+            {
+            var json = JSON.stringify(data);
+            console.log(json);
+            $.post("../ajax/dashboard-ajax.php", json, function (data)
+            {
+                location.reload();
+            });
+        }
 
-        $.post("../ajax/dashboard-ajax.php", json, function (data)
-        {
-            location.reload();
-        });
-
-
-    });
+    });   
 
 </script>
 <?php include '../../includes/footer.php'; ?>

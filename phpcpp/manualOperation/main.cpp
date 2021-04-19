@@ -144,7 +144,7 @@ Php::Value sendDataToPort(Php::Parameters &params)
 			write_log("Cannot read from socket");
 		else
 			write_log("Response:"+string(rbuff));	
-		
+		close(sockfd);
 		return string(rbuff);		
 		}
 	catch (exception &e)

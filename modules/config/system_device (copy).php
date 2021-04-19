@@ -78,37 +78,20 @@ include('../../includes/sidebar.php');
                         </select>
                     </div> 
                 </div> 
-                <div class="div-camera div-device">
-                    <div class="row">	
-                        <div class="col form-group">
-                            <label for="">Camera Index</label>
-                            <select id="camera_index">  
-                                <option value="0">Select camera index</option>                
-                                <?php
-                                for ($i = 1; $i <= 10; $i++)
-                                    echo "<option value='" . $i . "'>Camera " . $i . "</option>";
-                                ?>
-                            </select>
-                        </div> 
-                        <div class="col form-group">
-                            <label for="">ANPR COM port</label>
-                            <input type="number" class="form-control" id="anpr_com_port" placeholder=""  value="8091" required name="anpr_com_port">
-                        </div>                         
+                <div class="row div-camera div-device">	
+                    <div class="col form-group">
+                        <label for="">Camera Index</label>
+                        <select id="camera_index">  
+                            <option value="0">Select camera index</option>                
+                            <?php
+                            for ($i = 1; $i <= 10; $i++)
+                                echo "<option value='" . $i . "'>Camera " . $i . "</option>";
+                            ?>
+                        </select>
                     </div> 
-                    <div class="row">
-                        <div class="col form-group">
-                            <label for="">ANPR Image Path</label>
-                            <input type="text" class="form-control" id="anpr_image_path" placeholder=""  value="/opt/lampp/htdocs/ANPR/Images" required name="anpr_image_path">
-                        </div>
-                    </div>
-                    <div class="row">                        
-                        <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="cropped_picture_required">
-                            <label class="custom-control-label" for="cropped_picture_required">Cropped picture required</label>
-                        </div> 
-                    </div>
-                </div>
+                </div>               
                 <div class="div-rate div-device">
+
                     <div class="row">						     
                         <div class="col form-group">
                             <label >Device function</label>
@@ -124,28 +107,26 @@ include('../../includes/sidebar.php');
                         </div>
                     </div>
                 </div>
-                                               
-                    <div class="row">
-                        <div class="col form-group div-device div-manual-cashier div-terminal">
+                <div class="div-terminal div-device">
+                    <div class="row ">						     
+                        <div class="col form-group">
                             <label for="">Camera</label>
                             <select id="camera_id"> 
                                 <option value="0">Select Camera</option>                 
                                 <?php echo parcxSettings(array("task" => "14", "type" => "8")); ?>
                             </select>
                         </div> 
-                        <div class="col form-group div-device div-entry">
-                            <label for="">Plate capturing wait delay</label>
-                            <input type="number" class="form-control" id="plate_capturing_wait_delay" value="7"  required >
-                            <small class="form-text text-muted">Wait to get plate number in seconds for entry ticket</small>
-                        </div>  
-                        <div class="col form-group div-device div-manual-cashier">
-                            <label for="">Plate captured interval</label>
-                            <input type="number" class="form-control" id="plate_captured_interval" value="10"  required >
-                            <small class="form-text text-muted">Plate captured delay for ticket check</small>
-                        </div>  
-                    </div>
-                  <div class="div-terminal div-device">      
-                    <div class="row ">						     
+                        <div class="col form-group">
+                            <label for="">Barrier open hold duration</label>
+                            <input type="number" class="form-control" id="duration_hold_barrier_open" value="100"  required >
+                            <small class="form-text text-muted">Wait to open barrier for ticketless entry in milliseconds</small>
+                        </div>
+
+
+
+                    </div> 
+
+                    <div class="row ">						                      
                         <div class="col form-group">
                             <label >Barrier open status type</label>
                             <select id="barrier_open_status_type"> 
@@ -158,12 +139,16 @@ include('../../includes/sidebar.php');
                             <input type="number" class="form-control" id="barrier_open_time_limit" value="10"  required >
                             <small class="form-text text-muted">Time limit in seconds for barrier to stay open </small>
                         </div>
-                        <div class="col form-group">
-                            <label for="">Barrier open hold duration</label>
-                            <input type="number" class="form-control" id="duration_hold_barrier_open" value="100"  required >
-                            <small class="form-text text-muted">Wait to open barrier for ticketless entry in milliseconds</small>
-                        </div>
-                    </div>     
+                    </div> 
+
+                    <div class="row">
+                        <div class="col form-group div-device div-entry">
+                            <label for="">Plate capturing wait delay</label>
+                            <input type="number" class="form-control" id="plate_capturing_wait_delay" value="7"  required >
+                            <small class="form-text text-muted">Wait to get plate number in seconds for entry ticket</small>
+                        </div>   
+
+                    </div>
 
                     <div class="row">	
                         <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
@@ -197,52 +182,10 @@ include('../../includes/sidebar.php');
                             <label class="custom-control-label" for="payment_enabled_exit">Payment Enabled exit</label>
                         </div>                                                 
                     </div> 
-                </div>
-                <div class="div-device div-manual-cashier">
-                   <div class="row">	
-                        <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="allow_manual_open_close">
-                            <label class="custom-control-label" for="allow_manual_open_close">Allow manual barrier operation</label>
-                        </div> 
-                       <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="activate_product_sale">
-                            <label class="custom-control-label" for="activate_product_sale">Allow product sale</label>
-                        </div> 
-                   </div>
-                    <div class="row">	
-                        <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="activate_subscription">
-                            <label class="custom-control-label" for="activate_subscription">Allow Subscription</label>
-                        </div> 
-                       <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="print_entry_ticket">
-                            <label class="custom-control-label" for="print_entry_ticket">Print entry ticket</label>
-                        </div> 
-                   </div>
-                    <div class="row">	
-                        <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="lost_including_parkingfee">
-                            <label class="custom-control-label" for="lost_including_parkingfee">Lost including parking fee</label>
-                        </div> 
-                       <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="float_amount_required">
-                            <label class="custom-control-label" for="float_amount_required">Float amount required for shift opening</label>
-                        </div> 
-                   </div>
-                    <div class="row">	
-                        <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="print_operator_logo">
-                            <label class="custom-control-label" for="print_operator_logo">Print operator logo</label>
-                        </div> 
-                       <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
-                            <input type="checkbox" class="custom-control-input" id="central_cashier">
-                            <label class="custom-control-label" for="central_cashier">Central cashier</label>
-                        </div> 
-                   </div>
-                    
-                </div>
 
 
+
+                </div>
                 <div class="div-device div-cashier">
                     <div class="row">	
                         <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
@@ -267,7 +210,9 @@ include('../../includes/sidebar.php');
                     </div>             
                 </div>
                 <div class="div-rate div-device">
-                    <div class="row">	                        
+
+
+                    <div class="row">	
                         <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
                             <input type="checkbox" class="custom-control-input" id="anpr_enabled">
                             <label class="custom-control-label" for="anpr_enabled">ANPR Enabled</label>
@@ -305,7 +250,8 @@ include('../../includes/sidebar.php');
                     </div>                 
 
                 </div> 
-                
+
+
                 <input type="submit" class="signUp btn btn-block btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
             </form>
 
@@ -336,7 +282,6 @@ include('../../includes/sidebar.php');
     {
         var cat = $("#device_category").val();
         $(".div-device").hide();
-        
         if (cat == 1 || cat == 2)
         {
             $('.div-terminal').show();
@@ -354,8 +299,6 @@ include('../../includes/sidebar.php');
         {
             $('.div-cashier').show();
             $('.div-rate').show();
-            if(cat==3)
-                $('.div-manual-cashier').show();
         } else if (cat == 8)
         {
             $('.div-camera').show();
