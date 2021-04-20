@@ -9,11 +9,12 @@
 #define Username "parcxservice"
 #define Password "1fromParcx!19514"
 #define dateTimeFormat "%Y-%m-%d %H:%M:%S"
+#define dateFormat "%Y-%m-%d"
 
 using namespace std;
 
 string logpath="/opt/parcx/Logs/";
-//string logpath="/var/log/parcx/";
+
 
 string GeneralOperations::currentDateTime(string format)
 {
@@ -48,7 +49,7 @@ sql::Connection* GeneralOperations::mysqlConnect(string database)
 	}
     catch(exception &e)
 	{
-        writeLog("DBException/Log_"+currentDateTime(dateTimeFormat),"mysqlConnect",e.what());  				      
+        writeLog("DBException/DaemonStatus-"+currentDateTime(dateFormat),"mysqlConnect",e.what());  				      
 	}
     return con;
 }//end of  mysqlConnect

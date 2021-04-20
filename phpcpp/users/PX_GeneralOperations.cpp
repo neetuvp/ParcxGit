@@ -46,7 +46,7 @@ sql::Connection* GeneralOperations::mysqlConnect(string database)
 	}
     catch(exception &e)
 	{
-        writeLog("DBException/Log_"+currentDateTime(dateFormat),"mysqlConnect",e.what());  				      
+        writeLog("DBException/Users-"+currentDateTime(dateFormat),"mysqlConnect",e.what());  				      
 	}
     return con;
 }//end of  mysqlConnect
