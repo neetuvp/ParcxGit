@@ -9,7 +9,7 @@ define("IMAGEURL","/Parcx/uploads/");
 define("TOTALPARKING","200");
 define("CURRENCY","AED");
 // Database Connection . BEGINS -------------------//
-date_default_timezone_set('Asia/Dubai');
+//date_default_timezone_set('Asia/Dubai');
 ///local variables 
 define ("DB_HOST", "DBServer");
 define ("DB_HOST2", "DBServer2");

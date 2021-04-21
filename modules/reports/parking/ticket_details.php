@@ -125,7 +125,7 @@ else
        
        for( let prop in json ){
             
-            $("dl").append("<dt class='col-sm-4'>"+prop+"</dt><dd class='col-sm-8'>"+json[prop]+"</dd>");
+            $("dl").append("<dt class='col-sm-6'>"+prop+"</dt><dd class='col-sm-6'>"+json[prop]+"</dd>");
         }
 
       }, "json");

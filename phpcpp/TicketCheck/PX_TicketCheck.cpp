@@ -38,6 +38,7 @@ int parkingFeeDuration = 0;
 int anpr_mismatch_check = 0;
 int cooperate_parker = 0;
 int short_term_entry_after_contract_parking_space_exceeded = 0;
+int no_entry_contract_parking_allow_exit=1;
 
 void writeLog(string function, string message) {
     General.writeLog("Services/PXTicketCheck/ApplicationLog-PX-TicketCheck-" + General.currentDateTime("%Y-%m-%d"), function, message);
@@ -441,12 +442,7 @@ Php::Value openTransactionCheck(int getDetails) {
             if (res->getString("plate_captured_id") != "")
                 response = AnprObj.getEntryPlateDetails(res->getInt("plate_captured_id"));
 
-            response["open_transaction_check"] = "true";
-            
-
-            
-
-
+            response["open_transaction_check"] = "true";                
 
             ticketId = res->getString("ticket_id");
             plateNumber = res->getString("plate_number");
@@ -728,8 +724,21 @@ Php::Value openTransactionCheck(int getDetails) {
                 }
             }
         } else {
-            response["result"] = "already_exited";
-            response["result_description"] = "Already exited";
+            if(accessResult!="" && accessResult!="not_in_access_whitelist")
+                {
+                if(accessResult=="allow_access" && no_entry_contract_parking_allow_exit==1)
+                    response["access_allowed"]="true"; 
+                else
+                    {
+                    response["result"]=accessResult;
+                    response["result_description"]=accessResultDescription;
+                    }
+                }
+            else
+                {
+                response["result"] = "already_exited";
+                response["result_description"] = "Already exited";
+                }                                                                                                     
         }
        
     }    catch (const std::exception& e) {
@@ -869,7 +878,9 @@ void getDeviceDetails() {
                 if (settings->getString("setting_name") == "facility_number")
                     facilityNumber = settings->getInt("setting_value");
                 if (settings->getString("setting_name") == "facility_name")
-                    facilityName = settings->getString("setting_value");                                                
+                    facilityName = settings->getString("setting_value");                   
+                if (settings->getString("setting_name") == "no_entry_contract_parking_allow_exit")
+                    no_entry_contract_parking_allow_exit = settings->getInt("setting_value");                           
             }
         delete settings;
 
@@ -951,6 +962,8 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
             response["ticket_id"] = ticketId;
             response["plate_number"] = plateNumber;
             response["open_transaction_check"] = "false";
+            accessExpiry="";
+            accessResult="";            
             if (accessEnabled == 1) {
                 cooperate_parker = 0;
                 short_term_entry_after_contract_parking_space_exceeded = 0;
