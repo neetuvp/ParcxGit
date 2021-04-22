@@ -200,7 +200,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "traffic_report,all_carparks,select_carparks,all_days,select_days,sunday,monday,tuesday,wednesday,thursday,friday,saturday";
                     break;
             case 14://ticket_details
-                label = reportlabels + "ticket_details,ticket_id,view_details";
+                label = reportlabels + "ticket_details,ticket_id,view_details,plate_number";
                     break;
             case 15://visitor_frequency_realtime
                 label = reportlabels + "visitor_frequency_realtime,short_term,contract,select,ANPR,tag,search,ticket_id,view_details";

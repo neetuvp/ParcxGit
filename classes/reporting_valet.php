@@ -162,7 +162,7 @@ class reporting_valet {
             $html_data .= $this->valet_parking_summary($FromDateTime, $ToDateTime, $carpark, 0);
 
 
-            $header = " <table id='valet_table' class='table table-blue table-bordered table-striped jspdf-table'>";
+            $header = " <table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>";
             $header .= "<thead>";
             $header .= "<tr>";
             $header .= "<th>#</th>";

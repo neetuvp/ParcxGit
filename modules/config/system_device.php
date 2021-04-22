@@ -51,17 +51,17 @@ include('../../includes/sidebar.php');
                 <div class="row">
                     <div class="col form-group">
                         <label for="">Device name</label>
-                        <input type="text" class="form-control" id="device_name" placeholder=""  required name="device_name">
+                        <input type="text" class="form-control" id="device_name" placeholder=""  required >
                     </div>
                 </div>				                                                  
                 <div class="row">	
                     <div class="col form-group">
                         <label for="">Device number</label>
-                        <input type="number" class="form-control" id="device_number" value="0" min="0" required name="device_number">
+                        <input type="number" class="form-control" id="device_number" value="0" min="0" required >
                     </div> 
                     <div class="col form-group">
                         <label>Device IP</label>                  
-                        <input type="text" class="form-control" id="device_ip" required name="device_ip">                  
+                        <input type="text" class="form-control" id="device_ip" required >                  
                     </div> 
                 </div>                             
                 <div class="row">	
@@ -92,13 +92,13 @@ include('../../includes/sidebar.php');
                         </div> 
                         <div class="col form-group">
                             <label for="">ANPR COM port</label>
-                            <input type="number" class="form-control" id="anpr_com_port" placeholder=""  value="8091" required name="anpr_com_port">
+                            <input type="number" class="form-control" id="anpr_com_port" placeholder=""  value="8091" required >
                         </div>                         
                     </div> 
                     <div class="row">
                         <div class="col form-group">
                             <label for="">ANPR Image Path</label>
-                            <input type="text" class="form-control" id="anpr_image_path" placeholder=""  value="/opt/lampp/htdocs/ANPR/Images" required name="anpr_image_path">
+                            <input type="text" class="form-control" id="anpr_image_path" placeholder=""  value="/opt/lampp/htdocs/ANPR/Images" required >
                         </div>
                     </div>
                     <div class="row">                        
@@ -199,7 +199,65 @@ include('../../includes/sidebar.php');
                     </div> 
                 </div>
                 <div class="div-device div-manual-cashier">
-                   <div class="row">	
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="">Plate captured interval</label>
+                            <input type="number" class="form-control" id="plate_captured_interval" value="500" min="0" required >
+                        </div>   
+                        <div class="col form-group">
+                            <label for="">Receipt printer type</label>
+                            <select id="receipt_printer_type"> 
+                                <option value="0">Generic printer</option>
+                                <option value="1">Star Printer</option>                                
+                            </select>
+                        </div>   
+                    </div>
+                    <div class="row">
+                         <div class="col form-group">
+                            <label for="">Entry printer type</label>
+                            <select id="entry_printer_type"> 
+                                <option value="0">Generic printer</option>
+                                <option value="1">Star Printer</option>                                
+                            </select>
+                        </div>  
+                        <div class="col form-group">
+                            <label for="">Entry printer port name</label>
+                            <input type="text" class="form-control" id="entry_printer_port_name" value="lp0"  required >
+                        </div> 
+                        <div class="col form-group">
+                            <label for="">Receipt printer port name</label>
+                            <input type="text" class="form-control" id="receipt_printer_port_name" value="lp0"  required >
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="">Receipt Primary language</label>
+                            <select id="receipt_primary_language"> 
+                                <option value="english">English</option>
+                                <option value="arabic">Arabic</option>
+                                <option value="spanish">Spanish</option>
+                            </select>
+                        </div> 
+                         <div class="col form-group">
+                            <label for="">Receipt Secondary language</label>
+                            <select id="receipt_secondary_language"> 
+                                <option value="english">English</option>
+                                <option value="arabic">Arabic</option>
+                                <option value="spanish">Spanish</option>
+                            </select>
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="">Barrier open command</label>
+                            <input type="text" class="form-control" id="barrier_open_command" value="opena"  required >
+                        </div> 
+                        <div class="col form-group">
+                            <label for="">Barrier close command</label>
+                            <input type="text" class="form-control" id="barrier_close_command" value="openb"  required >
+                        </div> 
+                    </div>
+                    <div class="row">	
                         <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
                             <input type="checkbox" class="custom-control-input" id="allow_manual_open_close">
                             <label class="custom-control-label" for="allow_manual_open_close">Allow manual barrier operation</label>
@@ -208,7 +266,7 @@ include('../../includes/sidebar.php');
                             <input type="checkbox" class="custom-control-input" id="activate_product_sale">
                             <label class="custom-control-label" for="activate_product_sale">Allow product sale</label>
                         </div> 
-                   </div>
+                    </div>
                     <div class="row">	
                         <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
                             <input type="checkbox" class="custom-control-input" id="activate_subscription">
@@ -238,6 +296,12 @@ include('../../includes/sidebar.php');
                             <input type="checkbox" class="custom-control-input" id="central_cashier">
                             <label class="custom-control-label" for="central_cashier">Central cashier</label>
                         </div> 
+                   </div>
+                    <div class="row">	
+                        <div class="col form-group custom-control custom-checkbox mt-3 mb-3">
+                            <input type="checkbox" class="custom-control-input" id="enable_port_communication">
+                            <label class="custom-control-label" for="enable_port_communication">Enable port communication</label>
+                        </div>                        
                    </div>
                     
                 </div>

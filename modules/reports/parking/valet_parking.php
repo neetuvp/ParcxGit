@@ -167,18 +167,20 @@ include('../../../includes/sidebar.php');
                         $("#report-content").html(result);
                         createChart(result);
 
-                        reportSuccess();
-//                        $('#valet_table').DataTable(
-//                            {
-//                            "paging": true,
-//                            "lengthChange":true,
-//                            "searching": true,
-//                            "ordering": true,
-//                            "info": true,
-//                            "autoWidth": false,
-//                            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-//                            "aaSorting": [],        				            
-//                            });   	  
+                        $("#action-buttons").css("visibility", "visible");
+                        $("#loader").css("visibility", "hidden");      
+                        if($("#report-content").find('#RecordsTable').length!=0) 
+                        $('#RecordsTable').DataTable(
+                            {
+                            "paging": true,
+                            "lengthChange":true,
+                            "searching": true,
+                            "ordering": true,
+                            "info": true,
+                            "autoWidth": false,
+                            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                            "aaSorting": [],        				            
+                            });   	  
 
                     }, "json");
         } // end if 

@@ -1,8 +1,4 @@
 <?php
-
-$page_title="Application Home";
-
-//# Import application layout.
 include('../../../includes/header.php');
 include('../../../includes/navbar-start.php');
 
@@ -16,36 +12,14 @@ $json=parcxReport($data);
 </ul>
 
 <div class="header text-dark" id="pdf-report-header"><?=$json["ticket_details"]?></div>
-
 <?php
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
-
-//# App Function Classes
-
 ?>
-<!-- Modal -->
-<div class="modal fade" id="image-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">ANPR Image</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body p-4" id="image-content-modal">                                           
-              
-            </div>
-        </div>
-    </div>
-</div>
-<!-- / end modal -->
 
 <div class="content-wrapper">
   <!-- additional menu -->
-  <div class="additional-menu row m-0 bg-white border-bottom">
+  <div class="additional-menu row m-0 bg-white border-bottom" >
     <div class="col d-flex pl-1 align-items-center">
 
       <div class="flex-grow-1 row additional-menu-left">
@@ -53,14 +27,19 @@ include('../../../includes/sidebar.php');
         <!-- devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber">
-          <?php echo parcxSettings(array("task"=>"14","type"=>"2,3"));?>
+          <?php echo parcxSettings(array("task"=>"14","type"=>"1,2,3"));?>
           </select>
         </div>
+        
+        
         
         <!-- plate -->
         <div class="col-md-2">
           <input type="text" id="ticket_id" class="form-control" placeholder="<?=$json["ticket_id"]?>">
-        </div>        
+        </div>    
+        <div class="col-md-2">
+          <input type="text" id="plate_number" class="form-control" placeholder="<?=$json["plate_number"]?>">
+        </div>
        
 
         <!-- search -->
@@ -101,12 +80,13 @@ var body='<div class="card">'+
             '</div>';
 function callReport()
 { 
-if($("#ticket_id").val()=="")
-    alert("Please enter ticket id");
+if($("#ticket_id").val()=="" && $("#plate_number").val()=="")
+    alert("Please enter ticket id or plate_number");
 else
     {
     var data={};            
     data["ticket_id"]=$("#ticket_id").val();   
+    data["plate_number"]=$("#plate_number").val();   
     data["device_number"]=$("#deviceNumber").val();   
     data["test"]="1";
     data["language"] = $("#language").val();	
@@ -179,11 +159,5 @@ $('#export_excel_report').click(function (event)
   });
 
 
-$('body').on('click', "[data-target='#image-modal']", function () 
-  {
-  var name = $(this).data('value');      
-  var image="<img src='http://localhost/ANPR/Images/Scene/"+name+"' width='1000' height='700'>";    
-  $("#image-content-modal").html(image);      
-  });
 
 </script>
