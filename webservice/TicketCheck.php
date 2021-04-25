@@ -1,4 +1,5 @@
 <?php
+$general->write_log($filename,"START","====================================================");
 ini_set("display_errors","1");
 header("Content-Type: application/json; charset=UTF-8");
 include("../classes/general.php"); 
@@ -18,6 +19,6 @@ $response['transaction_id']=$data['transaction_id'];
 http_response_code(200);
 
 $general->write_log($filename,"TicketCheck","Json output: ".json_encode($response)."\n");
-$general->write_log($filename,"===================================","====================================================");
+$general->write_log($filename,"END","====================================================");
 echo json_encode($response);
 ?>

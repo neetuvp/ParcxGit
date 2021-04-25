@@ -6,6 +6,8 @@
 #include <cppconn/statement.h>
 #include <curl/curl.h>
 #include<jsoncpp/json/json.h>
+#include <sstream>
+#include <iomanip>
 
 #define ServerDB "parcx_server"
 #define ReportingDB "parcx_reporting"
@@ -831,6 +833,33 @@ void insertIntoTicketCheck(string result, string description) {
     }
 }
 
+void insertIntoOpenTransaction(string result) {
+    try {                        
+        if(result=="allow_access")
+            entryType=2;
+        else if(result=="reservation_allow_access")
+            entryType=3;
+        else
+            entryType=1;
+            
+        serverCon = General.mysqlConnect(ServerDB);
+        setParkingRateConfiguration();
+        delete serverCon;
+                
+        reportCon = General.mysqlConnect(ReportingDB);
+        if (reportCon != NULL) {
+            stmt = reportCon->createStatement();                                    
+            query = "INSERT into open_transactions(device_name,device_number,ticket_id,carpark_number,facility_number,entry_date_time,plate_number,chip_utid,operation_mode,entry_grace_period,entry_type,plate_captured_id,carpark_name,movement_type) VALUES('" + deviceName + "'," + to_string(deviceNumber) + ",'" + ticketId + "'," + to_string(carparkNumber) + "," + to_string(facilityNumber) + ",CURRENT_TIMESTAMP,'" + plateNumber + "','','',  DATE_ADD(CURRENT_TIMESTAMP,INTERVAL " + to_string(entry_grace_period_minuts) + " MINUTE) ,"+to_string(entryType)+"," + to_string(plateCapturedId) + ",'" + carpakName + "',1)";
+            
+            stmt->executeUpdate(query);
+            delete stmt;
+            delete reportCon;
+        }
+    } catch (const std::exception& e) {
+        writeException("insertIntoOpenTransaction", e.what());
+    }
+}
+
 void getDeviceDetails() {
     try {
         serverCon = General.mysqlConnect(ServerDB);
@@ -899,6 +928,43 @@ void getDeviceDetails() {
     }
 }
 
+string convertToString(int number,int length,int hex)
+    {
+    stringstream ss;
+    if(hex==1)        
+		ss << setw(length) << setfill('0') <<std::hex << number;		
+    else
+        ss << setw(length) << setfill('0') << number;
+    return ss.str();
+    }
+
+void generateTicketNumber()
+    {
+    string facility=convertToString(facilityNumber,6,0);							    		
+    string hexCarpark= convertToString(carparkNumber,2,1);
+    string hexDevice= convertToString(deviceNumber,2,1);
+    string hexTicketType= "01";
+    																				
+    //number of seconds from 2018 jan 01 00:00:00 to now+1415926535
+    struct tm tm;
+    string startDate="2018-01-01 00:00:00";    
+
+    strptime(startDate.c_str(),"%Y-%m-%d %H:%M:%S",&tm);		
+    time_t t=mktime(&tm);
+
+    time_t now=time(NULL);
+    long seconds=difftime(now,t);
+
+    seconds=seconds+1415926535;			
+			
+    std::stringstream ss;				
+    ss << std::hex << seconds;
+    std::string ticket(ss.str());									
+    
+    ticketId=facility+hexCarpark+hexDevice+hexTicketType+ticket;
+    writeLog("ticketId",ticketId);     
+    }
+
 Php::Value parcxTicketCheck(Php::Parameters &params) {
     Php::Value response;
     Php::Value anprSettings;    
@@ -906,7 +972,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
         Php::Value json = params[0];
         
         test=0;
-
+        writeLog("parcxTicketCheck","--------------START-----------------");
         test=json["test"];
         writeLog("test", to_string(test));
 
@@ -1066,6 +1132,25 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
         string result_description = response["result_description"];
         if(test==0)
             insertIntoTicketCheck(result, result_description);
+        else
+            {            
+            if(deviceType==1)
+                {
+                int create_entry=json["add_test_entry"];                
+                if(create_entry==1)
+                    {
+                    ticketId=toString(response["ticket_id"]);
+                    plateNumber = toString(response["plate_number"]);
+                    if(ticketId=="")
+                        {
+                        generateTicketNumber();
+                        response["ticket_id"]=ticketId;
+                        }
+                    insertIntoOpenTransaction(result);
+                    }
+                }
+            insertIntoTicketCheck(result, "Test: "+result_description);                        
+            }
 
         writeLog("parcxTicketCheck", "Result: " + result + "\tDescription:" + result_description);
         
@@ -1100,7 +1185,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
 
         
         
-        
+     writeLog("parcxTicketCheck","--------------END-----------------");   
     } catch (exception &e) {
         writeException("parcxTicketCheck", e.what());
     }

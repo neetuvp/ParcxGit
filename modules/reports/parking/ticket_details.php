@@ -12,6 +12,12 @@ $json=parcxReport($data);
 </ul>
 
 <div class="header text-dark" id="pdf-report-header"><?=$json["ticket_details"]?></div>
+<div class="row hidden-sm-down">
+    <div class="col tab-header d-flex justify-content-center">
+        <div class="tab-link active" data-target="entry">Entry</div>
+        <div class="tab-link" data-target="exit">Exit/Cashier</div>
+    </div>
+</div>
 <?php
 include('../../../includes/navbar-end.php');
 include('../../../includes/sidebar.php');
@@ -27,7 +33,10 @@ include('../../../includes/sidebar.php');
         <!-- devices multiselect-->
         <div class="col-md-2">
           <select class="form-control" id="deviceNumber">
-          <?php echo parcxSettings(array("task"=>"14","type"=>"1,2,3"));?>
+          <?php echo parcxSettings(array("task"=>"14","type"=>"1"));?>
+          </select>
+            <select class="form-control" id="deviceNumber2">
+          <?php echo parcxSettings(array("task"=>"14","type"=>"2,3"));?>
           </select>
         </div>
         
@@ -40,7 +49,10 @@ include('../../../includes/sidebar.php');
         <div class="col-md-2">
           <input type="text" id="plate_number" class="form-control" placeholder="<?=$json["plate_number"]?>">
         </div>
-       
+       <div class="col-md-2 form-group custom-control custom-checkbox mt-2" id="entry_test">
+            <input type="checkbox" class="custom-control-input" id="add_test_entry">
+            <label class="custom-control-label" for="add_test_entry">Add test entry</label>
+        </div> 
 
         <!-- search -->
         <div class="col-md-1">
@@ -62,7 +74,8 @@ include('../../../includes/sidebar.php');
 
   <section class="content">
     <div class="container-wide">      
-      <div class="col-md-6" id="page-content">               
+      <div class="col-md-6" id="page-content">              
+           
        
       </div>   
     </div>
@@ -72,9 +85,34 @@ include('../../../includes/sidebar.php');
 <?php include('../../../includes/footer.php');?>
 
 <script>
+var $target="entry";
+$("#deviceNumber2").hide();
+$("* [data-target]").on('click', function ()
+    {
+    
+     $target= $(this).data('target');
+    if ($target == "entry")
+        {
+        $("#entry_test").show();
+        $("#deviceNumber2").hide();
+        $("#deviceNumber").show();
+        }
+    else
+        {
+        $("#entry_test").hide();
+        $("#deviceNumber2").show();
+        $("#deviceNumber").hide();    
+        }
+
+    $('.tab-link').removeClass('active');
+    $(this).addClass('active');
+    });
+        
+    
 var body='<div class="card">'+
               '<div class="card-header">'+
-                '<h3 class="card-title p-2">Danger Outline</h3>'+
+                '<h3 class="card-title p-2"></h3>'+
+               
              '</div>'+
               '<div class="card-body"><dl class="row"></dl></div>'+
             '</div>';
@@ -87,8 +125,17 @@ else
     var data={};            
     data["ticket_id"]=$("#ticket_id").val();   
     data["plate_number"]=$("#plate_number").val();   
-    data["device_number"]=$("#deviceNumber").val();   
+    if ($target == "entry")
+        data["device_number"]=$("#deviceNumber").val();   
+    else
+        data["device_number"]=$("#deviceNumber2").val();   
     data["test"]="1";
+    
+    if ($('#add_test_entry').is(":checked"))
+        data["add_test_entry"] = "1";
+    else
+        data["add_test_entry"] = "0";
+                
     data["language"] = $("#language").val();	
     data["task"]=9;
     var temp = JSON.stringify(data);        
@@ -102,6 +149,11 @@ else
            $(".card").addClass("card-danger");
        
        $(".card-title").html(json.result_description);
+       if(json.device_type==1)
+           $("#add_entry_btn").show();
+       else
+           $("#add_entry_btn").hide();
+              
        
        for( let prop in json ){
             

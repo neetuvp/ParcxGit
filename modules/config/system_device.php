@@ -199,11 +199,7 @@ include('../../includes/sidebar.php');
                     </div> 
                 </div>
                 <div class="div-device div-manual-cashier">
-                    <div class="row">
-                        <div class="col form-group">
-                            <label for="">Plate captured interval</label>
-                            <input type="number" class="form-control" id="plate_captured_interval" value="500" min="0" required >
-                        </div>   
+                    <div class="row">                         
                         <div class="col form-group">
                             <label for="">Receipt printer type</label>
                             <select id="receipt_printer_type"> 
@@ -211,15 +207,16 @@ include('../../includes/sidebar.php');
                                 <option value="1">Star Printer</option>                                
                             </select>
                         </div>   
-                    </div>
-                    <div class="row">
-                         <div class="col form-group">
+                        <div class="col form-group">
                             <label for="">Entry printer type</label>
                             <select id="entry_printer_type"> 
                                 <option value="0">Generic printer</option>
                                 <option value="1">Star Printer</option>                                
                             </select>
                         </div>  
+                    </div>
+                    <div class="row">
+                         
                         <div class="col form-group">
                             <label for="">Entry printer port name</label>
                             <input type="text" class="form-control" id="entry_printer_port_name" value="lp0"  required >
@@ -463,7 +460,7 @@ include('../../includes/sidebar.php');
 
         formElement.find('input[type=text]').each(function ()
         {
-            var name = $(this).attr('name');
+            var name = $(this).attr('id');
             rules_set[name] = 'required';
         });
 
@@ -596,7 +593,68 @@ include('../../includes/sidebar.php');
                     data["issue_lost"] = "1";
                 else
                     data["issue_lost"] = "0";
-
+                
+                data["plate_captured_interval"]=$("#plate_captured_interval").val();
+                data["entry_printer_port_name"]=$("#entry_printer_port_name").val();
+                data["receipt_printer_port_name"]=$("#receipt_printer_port_name").val();
+                data["receipt_printer_type"]=$("#receipt_printer_type").val();
+                data["entry_printer_type"]=$("#entry_printer_type").val();
+                data["barrier_open_command"]=$("#barrier_open_command").val();
+                data["barrier_close_command"]=$("#barrier_close_command").val();
+                data["receipt_primary_language"]=$("#receipt_primary_language").val();
+                data["receipt_secondary_language"]=$("#receipt_secondary_language").val();
+                if ($('#allow_manual_open_close').is(":checked"))
+                    data["allow_manual_open_close"] = "1";
+                else
+                    data["allow_manual_open_close"] = "0";
+                
+                if ($('#activate_product_sale').is(":checked"))
+                    data["activate_product_sale"] = "1";
+                else
+                    data["activate_product_sale"] = "0";
+                
+                if ($('#activate_subscription').is(":checked"))
+                    data["activate_subscription"] = "1";
+                else
+                    data["activate_subscription"] = "0";
+                
+                if ($('#print_entry_ticket').is(":checked"))
+                    data["print_entry_ticket"] = "1";
+                else
+                    data["print_entry_ticket"] = "0";
+                
+                if ($('#lost_including_parkingfee').is(":checked"))
+                    data["lost_including_parkingfee"] = "1";
+                else
+                    data["lost_including_parkingfee"] = "0";
+                
+                if ($('#float_amount_required').is(":checked"))
+                    data["float_amount_required"] = "1";
+                else
+                    data["float_amount_required"] = "0";
+                
+                if ($('#print_operator_logo').is(":checked"))
+                    data["print_operator_logo"] = "1";
+                else
+                    data["print_operator_logo"] = "0";
+                
+                if ($('#print_operator_logo').is(":checked"))
+                    data["print_operator_logo"] = "1";
+                else
+                    data["print_operator_logo"] = "0";
+                
+                if ($('#central_cashier').is(":checked"))
+                    data["central_cashier"] = "1";
+                else
+                    data["central_cashier"] = "0";
+                
+                if ($('#enable_port_communication').is(":checked"))
+                    data["enable_port_communication"] = "1";
+                else
+                    data["enable_port_communication"] = "0";
+                
+                
+                
                 data["user_id"] = $("#user_id").val();
                 data["task"] = "15";
                 var jsondata = JSON.stringify(data);

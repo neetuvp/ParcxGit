@@ -1,14 +1,18 @@
 function export_to_excel(container, filename) {
 
-  // get current date
-
-  var d = new Date();
-  var month = d.getMonth() + 1;
-  var day = d.getDate();
-  var todays_date = d.getFullYear() + '_' +
-    (month < 10 ? '0' : '') + month + '_' +
-    (day < 10 ? '0' : '') + day; 
-
+var report_date;
+if(!daterange)
+    {
+    // get current date
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    report_date = d.getFullYear() + '_' +
+      (month < 10 ? '0' : '') + month + '_' +
+      (day < 10 ? '0' : '') + day; 
+    }
+    else
+        report_date=daterange;
   // export to Excel
   var RecordsTable_length;
   var excel_data=$(container).html();
@@ -24,9 +28,7 @@ function export_to_excel(container, filename) {
     else
         excel_data=$("#RecordsTable_wrapper").children().eq(1).html();  
     }   
-    
- 
-  
+       
     
   let file = new Blob([excel_data], {
     type: "application/vnd.ms-excel"
@@ -36,7 +38,7 @@ function export_to_excel(container, filename) {
 
   let a = $("<a />", {
       href: url,
-      download: filename + " " + todays_date + ".xls"
+      download: filename + " " + report_date + ".xls"
     })
     .appendTo("body")
     .get(0)

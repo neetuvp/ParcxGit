@@ -484,16 +484,21 @@ $(document).ready(function () {
           addHeader();
           addFooter();
         }
-
-        // get current date for filename
-        var d = new Date();
-        var month = d.getMonth() + 1;
-        var day = d.getDate();
-        var current_date = d.getFullYear() + '_' + (month < 10 ? '0' : '') + month + '_' + (day < 10 ? '0' : '') +
-          day;
+        var report_date;
+        if(!daterange)
+            {
+            // get current date for filename
+            var d = new Date();
+            var month = d.getMonth() + 1;
+            var day = d.getDate();
+            current_date = d.getFullYear() + '_' + (month < 10 ? '0' : '') + month + '_' + (day < 10 ? '0' : '') +
+              day;
+            }
+        else
+            report_date=daterange;
 
         // create filename
-        var filename = page_title + " " + current_date;
+        var filename = page_title + " " + report_date;        
 
         // save page
         doc.save(filename + ".pdf");
