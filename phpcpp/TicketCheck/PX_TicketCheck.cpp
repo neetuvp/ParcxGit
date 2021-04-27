@@ -20,27 +20,29 @@ Reservation ReservationObj;
 Access AccessObj;
 Anpr AnprObj;
 
-int paymentExit, deductMoneyFromWallet, carparkNumber, facilityNumber, deviceNumber, deviceType, task, entryGrace, exitGrace, reservationEnabled, accessEnabled, deviceFunction, seconds, anprEnabled, cameraId, plateCapturedInterval, plateCapturedId, validationEnabled, walletEnabled, entryType;
-string deviceName, carpakName, facilityName, ticketId, plateNumber, parkingZone, query, entryDateTime, maxEntryGrace, maxExitGrace, currentDateTime, plateType, plateArea, plateCountry;
+int couponEnabled,paymentExit, deductMoneyFromWallet, carparkNumber, facilityNumber, deviceNumber, deviceType, task, entryGrace, exitGrace, reservationEnabled, accessEnabled, deviceFunction, seconds, anprEnabled, cameraId, plateCapturedInterval, plateCapturedId, validationEnabled, walletEnabled, entryType;
+string couponId,deviceName, carpakName, facilityName, ticketId, plateNumber, parkingZone, query, entryDateTime, maxEntryGrace, maxExitGrace, currentDateTime, plateType, plateArea, plateCountry;
 string timeValidationId, percentageValidationId, validationDuration, userId, accessExpiry, reservationExpiry, paymentDateTime, accessResult, accessResultDescription, reservationResult, reservationStart, reservationResultDescription;
 int test,offlineTimeValidation, offlinePercentageValidation, timeValidation, percentageValidation, parkingDuration, validationSeconds, validationHours, rate_type = 0;
 double startparkingFee, parkingFee, vat_percentage = 0, amountPaid = 0, grossAmount, vatAmount, reservationFee, walletBalance;
 sql::Connection *reportCon, *serverCon;
 sql::Statement *stmt, *serverStmt;
-sql::ResultSet *res, *validation, *settings, *device, *rate;
+sql::ResultSet *res, *validation, *settings, *device, *rate,*coupon;
 CURL *curl;
 CURLcode curl_res;
 string wallet_webservice, webservice_response, vat_type = "", parking_duration;
 Json::FastWriter fw;
 Json::Reader jsonReader;
 Json::Value jsonResponse;
-string validation_value, parking_rate = "", parking_rate_label = "", entry_grace_period, entry_grace_period_mins, entry_grace_period_hours, exit_grace_period_mins, exit_grace_period_hours, exit_grace_period;
+string coupon_id,validation_value, parking_rate = "", parking_rate_label = "", entry_grace_period, entry_grace_period_mins, entry_grace_period_hours, exit_grace_period_mins, exit_grace_period_hours, exit_grace_period;
 int entry_grace_period_minuts, exit_grace_period_minuts;
 int parkingFeeDuration = 0;
 int anpr_mismatch_check = 0;
 int cooperate_parker = 0;
 int short_term_entry_after_contract_parking_space_exceeded = 0;
 int no_entry_contract_parking_allow_exit=1;
+int coupon_percentage,coupon_amount;
+string coupon_array;
 
 void writeLog(string function, string message) {
     General.writeLog("Services/PXTicketCheck/ApplicationLog-PX-TicketCheck-" + General.currentDateTime("%Y-%m-%d"), function, message);
@@ -82,6 +84,98 @@ void getValidations() {
         delete validation;
     } catch (const std::exception& e) {
         writeException("getValidations", e.what());
+    }
+}
+
+Php::Value couponCheck() {
+    Php::Value response;
+    try {                
+        response["result"] = "invalid_coupon";
+        response["result_description"] = "Invalid coupon";
+        response["coupon_ticket"]="false";
+        reportCon = General.mysqlConnect(ReportingDB);
+        if (reportCon != NULL) {
+            stmt = reportCon->createStatement();                        
+            query="SELECT a.discount_id,a.status as coupon_status,coupon_usage,discount_option,discount_value,discount_type,b.status as discount_status,carpark_number FROM parcx_server.revenue_coupons_whitelist a,parcx_server.revenue_discounts b where a.discount_id=b.discount_id and coupon_id='"+ticketId+"'";
+            res = stmt->executeQuery(query);
+            if(res->next())
+                {
+                response["coupon_ticket"]="true";
+                if(res->getInt("discount_status")==0 || res->getInt("coupon_status")==0)
+                    {
+                    response["result"] = "disabled_coupon";
+                    response["result_description"] ="Inactive coupon";
+                    }
+                else if(res->getInt("coupon_usage")==1)
+                    {
+                    response["result"] = "used_coupon";
+                    response["result_description"] ="Used coupon";
+                    }
+                else if (carparkNumber != res->getInt("carpark_number")) 
+                    {
+                    response["result"] = "coupon_invalid_carpark";
+                    response["result_description"] = "Coupon from another carpark";
+                    }
+                else if (res->getString("discount_option")=="coupon") 
+                    {                                  
+                    response["result"] = "valid_coupon";
+                    response["result_description"] = "Valid coupon";                        
+                    response["coupon_id"]=ticketId;                                                    
+                    }
+                string result = response["result"];
+                string result_description = response["result_description"];                
+                writeLog("couponCheck", "Result: " + result + "\tDescription:" + result_description + "\n");                
+                }                                                              
+            delete res;
+            delete stmt;
+            delete reportCon;
+            }
+        }
+        catch (const std::exception& e) {
+        writeException("couponCheck", e.what());
+    }
+    return response;
+}
+
+void getCouponDiscounts() {
+    try 
+        {
+        coupon_percentage=0;
+        coupon_amount=0;
+        coupon_id="";         
+        if(couponId!="")
+            {
+            if(coupon_array=="")
+                coupon_array=couponId;                    
+            else
+               coupon_array=coupon_array+","+ couponId;
+            }
+        std::stringstream ss(coupon_array);
+        
+        while( ss.good() )
+            {            
+            getline( ss, couponId, ',' );    
+            writeLog("couponId",couponId);
+            query="SELECT coupon_id,discount_value,discount_type FROM parcx_server.revenue_coupons_whitelist a,parcx_server.revenue_discounts b where a.discount_id=b.discount_id and carpark_number="+to_string(carparkNumber)+" and a.status=1 and b.status=1 and coupon_usage=0 and discount_option='coupon' and coupon_id='"+couponId+"'";
+            coupon = stmt->executeQuery(query);
+            if(coupon->next())
+                {
+                if(coupon_id=="")
+                    coupon_id=couponId;
+                else
+                    coupon_id=coupon_id+","+couponId;
+                
+                if(coupon->getString("discount_type")=="percentage")
+                    coupon_percentage=coupon_percentage+coupon->getInt("discount_value");
+                if(coupon->getString("discount_type")=="amount")
+                    coupon_amount=coupon_amount+coupon->getInt("discount_value");
+                delete coupon;
+                }
+            }
+        writeLog("total coupon_amount",to_string(coupon_amount));
+        writeLog("total coupon_percentage",to_string(coupon_percentage));
+        } catch (const std::exception& e) {
+        writeException("getCouponDiscounts", e.what());
     }
 }
 
@@ -548,6 +642,13 @@ Php::Value openTransactionCheck(int getDetails) {
 
                     validationSeconds = timeValidation * 3600;
                 }
+                if(couponEnabled==1)
+                    {
+                    getCouponDiscounts();
+                    response["coupon_percentage"]=coupon_percentage;
+                    response["coupon_amount"]=coupon_amount;
+                    response["valid_coupons"]=coupon_id;
+                    }
                 response["entry_grace_time_remaining"] = "0";
                 response["exit_grace_time_remaining"] = "0";
 
@@ -658,7 +759,15 @@ Php::Value openTransactionCheck(int getDetails) {
                         writeLog("openTransactionCheck", "calculate parking fee after validation hours");
                         startparkingFee = calculateParkingFee();
                     }
-
+                    
+                    if(coupon_percentage>=100 ||(coupon_amount>0 && startparkingFee<=coupon_amount))
+                        {
+                        response["ticketcheck_result"] = "valid_coupon_applied";
+                        response["result"] = "ticketcheck_access_allowed";
+                        response["access_allowed"] = "true";
+                        response["result_description"] = "coupon Applied";
+                        return response;
+                        }                   
 
                     if (deviceType >= 2 || walletEnabled == 1 || paymentExit == 1) {
                         calculateAmountToPay();
@@ -750,28 +859,37 @@ Php::Value openTransactionCheck(int getDetails) {
     return response;
 }
 
+
+
 Php::Value exitTicketCheck() {
     Php::Value response;
     try {
         response["access_allowed"] = "false";
+        response["coupon_ticket"]="false";
         reportCon = General.mysqlConnect(ReportingDB);
         if (reportCon != NULL) {
             stmt = reportCon->createStatement();
+                    
+            //blacklist
             if (ticketId.length() == 20)
                 query = "SELECT * from parking_blacklist where ticket_id = '" + ticketId + "'";
             else
                 query = "SELECT * from parking_blacklist where ticket_id like '%" + ticketId + "'";
             res = stmt->executeQuery(query);
-            if (res->next()) {
+            if (res->next()) 
+                {
                 response["result"] = "blacklisted";
                 response["result_description"] = string(res->getString("blacklisting_description"));
                 writeLog("exitTicketCheck", "Blacklisted");
-            } else {
+                } 
+            else 
+                {
                 writeLog("exitTicketCheck", "Not blacklisted");
                 serverCon = General.mysqlConnect(ServerDB);
                 response = openTransactionCheck(0);
                 delete serverCon;
-            }
+                }
+                
             delete res;
             delete stmt;
             delete reportCon;
@@ -888,6 +1006,8 @@ void getDeviceDetails() {
                 writeLog("paymentExit", to_string(paymentExit));
                 anpr_mismatch_check = res->getInt("anpr_mismatch_check");
                 writeLog("anpr_mismatch_check", to_string(anpr_mismatch_check));
+                couponEnabled=res->getInt("coupon_enabled");
+                writeLog("couponEnabled", to_string(couponEnabled));
                
             }
             delete res;            
@@ -1000,14 +1120,14 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
             userId = toString(json["user_id"]);
             response = updateWalletPayment();
         } else {
-
+            
             plateCapturedInterval = json["plate_captured_interval"];
             writeLog("plateCapturedInterval", to_string(plateCapturedInterval));
             anprSettings = "";
             ticketId = toString(json["ticket_id"]);
             writeLog("ticketId", ticketId);
             plateNumber = toString(json["plate_number"]);
-            writeLog("plateNumber", plateNumber);
+            writeLog("plateNumber", plateNumber);            
             plateType = "";
             plateCountry = "";
             plateArea = "";
@@ -1029,7 +1149,37 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
             response["plate_number"] = plateNumber;
             response["open_transaction_check"] = "false";
             accessExpiry="";
-            accessResult="";            
+            accessResult="";     
+            if(couponEnabled==1 && deviceType!=1)
+                {
+                coupon_array=toString(json["coupon_id"]);   
+                writeLog("coupon_array", coupon_array);
+                
+                couponId="";                
+                Php::Value coupon =couponCheck();
+                for (auto &iter : coupon)
+                    response[iter.first] = iter.second;    
+                string coupon_ticket=response["coupon_ticket"];                
+                if(coupon_ticket=="true")
+                    {
+                    string result=response["result"];
+                    if(result=="valid_coupon")
+                        {                        
+                        if(toString(json["coupon_ticket_id"])!="")
+                            {
+                            couponId=ticketId;                                
+                            ticketId=toString(json["coupon_ticket_id"]);
+                            writeLog("couponId",couponId);
+                            writeLog("ticketId",ticketId);
+                            }
+                        else 
+                            return response;
+                        }
+                    else
+                        return response;
+                    }
+                                
+                }
             if (accessEnabled == 1) {
                 cooperate_parker = 0;
                 short_term_entry_after_contract_parking_space_exceeded = 0;
@@ -1048,7 +1198,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                 short_term_entry_after_contract_parking_space_exceeded = response["short_term_entry_after_contract_parking_space_exceeded"];
                 //if(toString(response["access_allowed"])=="true" && cooperate_parker>1 && short_term_entry_after_contract_parking_space_exceeded==1 && deviceType!=1)
 
-                if (toString(response["access_allowed"]) == "true" && deviceType != 1) {
+                if (toString(response["access_allowed"]) == "true" && deviceType != 1 ) {                                        
                     Php::Value ticket_details = exitPlateCheck();
                     for (auto &iter : ticket_details)
                         response[iter.first] = iter.second;
@@ -1057,6 +1207,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                     string result_description = response["result_description"];
                     insertIntoTicketCheck(result, result_description);
                     writeLog("parcxTicketCheck", "Result: " + result + "\tDescription:" + result_description + "\n");
+                    writeLog("parcxTicketCheck","--------------END-----------------"); 
                     return response;
                 }
 
@@ -1102,6 +1253,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
             }
 
             if (toString(response["access_allowed"]) == "false" && deviceType != 1) {
+                
                 offlinePercentageValidation = json["offline_validation_percentage"];
                 offlineTimeValidation = json["offline_validation_hours"];
 

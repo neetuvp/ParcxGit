@@ -1,5 +1,5 @@
 <?php
-$general->write_log($filename,"START","====================================================");
+
 ini_set("display_errors","1");
 header("Content-Type: application/json; charset=UTF-8");
 include("../classes/general.php"); 
@@ -7,7 +7,7 @@ $general = new General_Oprations();
 $filename="PXTicketCheck/ApplicationLog-PX-TicketCheck-";
 $request_ip_address=$_SERVER['REMOTE_ADDR']; 
 //$request_proxy_ip_address=$_SERVER['HTTP_X_FORWARDED_FOR'];// To be logged 	
-
+$general->write_log($filename,"START","====================================================");
 $json= file_get_contents("php://input");		
 $general->write_log($filename,"TicketCheck","Json input: ".$json);
 $general->write_log($filename,"TicketCheck","Request IP:".$request_ip_address);

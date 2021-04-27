@@ -1479,6 +1479,7 @@ void ParkingReport::platescapturedReport(Php::Value json)
             Php::out<<"</tr></thead>"<<endl;
             Php::out<<"<tbody>"<<endl;
             i=0;
+            string plate_image,plate_date;
             while(res->next())
                 { 
                 i++;                   
@@ -1489,21 +1490,21 @@ void ParkingReport::platescapturedReport(Php::Value json)
 				
 		Php::out<<res->getString("camera_name")<<endl;		                
                 
-                string plate_image=res->getString("plate_image_name");
+                plate_image=res->getString("plate_image_name");
                 plate_image=str_replace(plate_image," ","%20");
                 plate_image=str_replace(plate_image,"#","%23");	
 
-                string plate_date=res->getString("capture_date_time");
+                plate_date=res->getString("capture_date_time");
                 plate_date=plate_date.substr(0,10);
 
 
-                Php::out<<"</td>"<<endl;                              
-                Php::out<<"<td>"+res->getString("capture_date_time")+"<input type='hidden' id = 'date"+to_string(i)+"' value = '"+plate_date+"'><input type='hidden' id = 'camera_no"+to_string(i)+"' value = '"+res->getString("camera_device_number")+"'><input type='hidden' id = 'plate_image"+to_string(i)+"' value = '"+res->getString("plate_image_name")+"'></td>"<<endl;                              
+                Php::out<<"</td>"<<endl;                                             
+                Php::out<<"<td>"+res->getString("capture_date_time")+"</td>"<<endl;                              
                 Php::out<<"<td>"+res->getString("plate_number")+"</td>"<<endl;                    
                 Php::out<<"<td> "+res->getString("plate_area")+" </td>"<<endl;                                                             
                 Php::out<<"<td>"+res->getString("plate_country")+"</td>"<<endl;    
-		Php::out<<"<td><img src='"+ImageURL+"\\"+res->getString("camera_device_number")+"\\"+plate_date+"\\Crop_"+plate_image+"' width='100' ; height='50' ;></td>"<<endl;
-                Php::out<<"<td><input type='button' data-value = "+to_string(i)+" data-toggle='modal' data-target='#image-modal' value='View' class='btn btn-link'></td>"<<endl;                   
+		Php::out<<"<td><img src='"+ImageURL+"\\"+res->getString("camera_device_number")+"\\"+plate_date+"\\Crop_"+plate_image+"' width='100' ; height='50' ;></td>"<<endl;                
+                Php::out<<"<td><input type='button' data-value = "+ImageURL+"\\"+res->getString("camera_device_number")+"\\"+plate_date+"\\Scene_"+plate_image+" data-toggle='modal' data-target='#image-modal' value='View' class='btn btn-link'></td>"<<endl;                   
                            
 		Php::out<<"</tr>"<<endl;                
                 }  

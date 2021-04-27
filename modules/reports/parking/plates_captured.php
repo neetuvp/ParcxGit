@@ -278,22 +278,7 @@ $("#language").change(function()
 
 $('body').on('click', "[data-target='#image-modal']", function () {
 var id = $(this).data('value');
-var camera_no = $('#camera_no'+id).val();
-var plate_image = $('#plate_image'+id).val();	
-var date = $('#date'+id).val();	
-    var imageurl = $("#imageurl").val();
-var data = {
-    camera_no:camera_no,
-    plate_image:plate_image,
-    date:date,
-            imageurl:imageurl,
-            task:14
-};
-var json = JSON.stringify(data)    
-$.post("../../ajax/reports.php", json)
-.done(function (result) {        
-$("#image-content-modal").html(result);
-}, "json");
+$("#image-content-modal").html("<img src='"+id+"' width='100%' height='700'>");
 });
 
 
