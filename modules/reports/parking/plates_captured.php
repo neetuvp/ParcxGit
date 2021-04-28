@@ -159,7 +159,7 @@ $(function()
  });
 function callReport()
 {  
-    var device = $("#device").val();
+    var device = $("#deviceNumber").val().toString();
     var daterange = $("#reservationtime").val();
     var from = daterange.substring(0, 19);
     var to = daterange.substring(22, 41);
@@ -183,6 +183,7 @@ function callReport()
         task:12
     };
     var temp = JSON.stringify(data);
+    console.log(temp);
     $.post("../../ajax/reports.php", temp)
         .done(function (result) {                    
             //$("#report-content").html(result);

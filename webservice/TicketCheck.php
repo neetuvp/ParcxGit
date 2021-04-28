@@ -1,6 +1,6 @@
 <?php
 
-ini_set("display_errors","1");
+ini_set("display_errors","0");
 header("Content-Type: application/json; charset=UTF-8");
 include("../classes/general.php"); 
 $general = new General_Oprations();

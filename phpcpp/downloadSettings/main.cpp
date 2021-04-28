@@ -149,7 +149,9 @@ Php::Value downloadSettings(string device_number) {
             
             if (res->getString("setting_name") == "validation_enabled")
                     jsonrow["validation_enabled"] = string(res->getString("setting_value"));
-
+            
+            if (res->getString("setting_name") == "currency")
+                    jsonrow["currency"] = string(res->getString("setting_value"));
 
             if (category == 3 || category == 4 || category == 5) {
                 if (res->getString("setting_name") == "vat_percentage")
@@ -163,9 +165,7 @@ Php::Value downloadSettings(string device_number) {
 
                 if (res->getString("setting_name") == "ticket_validity")
                     jsonrow["ticket_validity"] = string(res->getString("setting_value"));
-
-                if (res->getString("setting_name") == "currency")
-                    jsonrow["currency"] = string(res->getString("setting_value"));
+               
 
                 if (res->getString("setting_name") == "dayclosure_endtime")
                     jsonrow["dayclosure_endtime"] = string(res->getString("setting_value"));

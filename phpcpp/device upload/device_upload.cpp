@@ -105,7 +105,7 @@ void setCloudFlag() {
             delete conn;
         }
 
-    }    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         WriteToLog("****setCloudFlag*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -163,8 +163,7 @@ Php::Value UploadParkingMovements(Php::Value request) {
                         if ((plate_number.find("no plate") != std::string::npos) || (plate_number.find("noplate") != std::string::npos)) {
                             query = "insert into parcx_dashboard.ticket_check(date_time,device_number,device_name,carpark_number,carpark_name,device_type,ticket_id,plate_number,result,facility_number,result_description)values(CURRENT_TIMESTAMP," + device_number + ",'" + device_name + "'," + carpark_number + ",'" + carpark_name + "',1,'" + ticket_id + "','" + plate_number + "','entry_with_no_plate','" + facility_number + "','ANPR entry with no plate')";
                             stmt->executeUpdate(query);
-                        }
-                        else if (res->getInt("confidence_rate") <= plate_review_confidence_rate) {
+                        } else if (res->getInt("confidence_rate") <= plate_review_confidence_rate) {
                             query = "insert into parcx_dashboard.ticket_check(date_time,device_number,device_name,carpark_number,carpark_name,device_type,ticket_id,plate_number,result,facility_number,result_description)values(CURRENT_TIMESTAMP," + device_number + ",'" + device_name + "'," + carpark_number + ",'" + carpark_name + "',1,'" + ticket_id + "','" + plate_number + "','entry_with_less_confidence_rate','" + facility_number + "','ANPR entry with less confidence rate')";
                             stmt->executeUpdate(query);
                         }
@@ -187,15 +186,15 @@ Php::Value UploadParkingMovements(Php::Value request) {
                 // query="update track_ticket set exit_date_time='"+date_time+"',exit_device_number='"+device_number+"',exit_device_name='"+device_name+"' where ticket_id = '"+ticket_id+"' and entry_type=1 ORDER BY id DESC LIMIT 1";
                 // result = stmt->executeUpdate(query);
             }
-
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadParkingMovements*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -301,14 +300,14 @@ Php::Value UploadParkingAccessMovements(Php::Value request) {
                     }
                 }
             }
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
         }
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadParkingAccessMovements*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -357,14 +356,15 @@ Php::Value UploadWatchdogDeviceAlarms(Php::Value request) {
                 stmt->executeUpdate(query);
             }
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****WatchdogDeviceAlarms*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -407,14 +407,15 @@ Php::Value UploadParkingBlacklists(Php::Value request) {
             if (result == 1) {
                 jsonresponse[i] = id;
             }
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
 
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadParkingBlacklist*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -456,14 +457,14 @@ Php::Value UploadParkingValidations(Php::Value request) {
             if (result == 1) {
                 jsonresponse[i] = id;
             }
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
-        }
 
+        }
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadParkingValidation*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -474,14 +475,14 @@ Php::Value UploadParkingValidations(Php::Value request) {
     return result;
 }
 
-Php::Value UploadPayments(Php::Value request) {    
-    sql::Statement *stmt;    
+Php::Value UploadPayments(Php::Value request) {
+    sql::Statement *stmt;
     Php::Value result;
     Json::Value jsonresponse;
     try {
         conn = DBConnection(DATABASE);
-        stmt = conn->createStatement(); 
-        int j=0;
+        stmt = conn->createStatement();
+        int j = 0;
         for (int i = 0; i < request.size(); i++) {
             string device_number = request[i]["device_number"];
             string device_name = request[i]["device_name"];
@@ -533,104 +534,93 @@ Php::Value UploadPayments(Php::Value request) {
             string coupon_category = request[i]["coupon_category"];
             string coupon_source = request[i]["coupon_source"];
             string payment_type = request[i]["payment_type"];
-            
+
             string validation_value = request[i]["validation_value"];
             string validation_id = request[i]["validation_id"];
-            string validator_id=request[i]["validator_id"];
-            string validation_type=request[i]["validation_type"];
-            
-            
-            
-                    
+            string validator_id = request[i]["validator_id"];
+            string validation_type = request[i]["validation_type"];
+
+
+
+
             string balance_returned = request[i]["balance_returned"];
             string credit_note = request[i]["credit_note"];
             string bank_notes = request[i]["bank_notes"];
             string receipt_number = request[i]["receipt_number"];
             string authentication_code = request[i]["authentication_code"];
             string entry_plate_number = request[i]["entry_plate_number"];
-            string exit_plate_number = request[i]["exit_plate_number"];            
-            string wallet_points = request[i]["wallet_points"];  
-            int operation_type= request[i]["operation_type"]; 
-            
-            if(validator_id!="")
-                {
-                string offline_validator_id,offline_validation_type,offline_validation_value,offline_validation_id="";
+            string exit_plate_number = request[i]["exit_plate_number"];
+            string wallet_points = request[i]["wallet_points"];
+            int operation_type = request[i]["operation_type"];
+
+            if (validator_id != "") {
+                string offline_validator_id, offline_validation_type, offline_validation_value, offline_validation_id = "";
                 istringstream ss_id(validator_id);
                 istringstream ss_type(validation_type);
                 istringstream ss_value(validation_value);
-                sql::ResultSet *res;                
+                sql::ResultSet *res;
                 string v_id;
-                int hour=0,percentage=0;
-                        
-                while(getline(ss_id, offline_validator_id, ',')) 
-                    {
+                int hour = 0, percentage = 0;
+
+                while (getline(ss_id, offline_validator_id, ',')) {
                     getline(ss_type, offline_validation_type, ',');
                     getline(ss_value, offline_validation_value, ',');
-                    
-                    if (offline_validation_type == "1")
-                        {
+
+                    if (offline_validation_type == "1") {
                         offline_validation_type = "Time Value";
-                        hour=hour+stoi(offline_validation_value);
-                        }
-                    if (offline_validation_type == "2")
-                        {
-                        offline_validation_type = "Percentage Value";                                        
-                        percentage=percentage+stoi(offline_validation_value);
-                        }
-                    
-                    query = "INSERT into parking_validation(product_name,carpark_number,carpark_name,facility_number,ticket_id,plate_number,validation_value,validation_type,validator_id,date_time)VALUES('Offline'," + carpark_number + ",'" + carpark_name + "'," + facility_number + ",'" + ticket_id + "','"+entry_plate_number+"'," + offline_validation_value + ",'" + offline_validation_type + "','" + offline_validator_id + "',CURRENT_TIMESTAMP)";
-                    result = stmt->executeUpdate(query);
-                    query="SELECT LAST_INSERT_ID() as id";
-                    res = stmt->executeQuery(query);
-                    if(res->next())
-                        v_id=res->getString("id"); 
-                    offline_validation_id=v_id+","+offline_validation_id;
-                    delete res;
+                        hour = hour + stoi(offline_validation_value);
                     }
-                
-                //online exist
-                if(getline(ss_value, offline_validation_value, ','))                    
-                    hour=hour+stoi(offline_validation_value);
-                    
-                if(getline(ss_value, offline_validation_value, ','))                    
-                    percentage=percentage+stoi(offline_validation_value);
-                
-                if(validation_id!="")
-                    validation_id=offline_validation_id+validation_id;
-                else
-                    validation_id=offline_validation_id.substr(0, offline_validation_id.size()-1);     
-                
-                validation_value=to_string(hour)+","+to_string(percentage);
+                    if (offline_validation_type == "2") {
+                        offline_validation_type = "Percentage Value";
+                        percentage = percentage + stoi(offline_validation_value);
+                    }
+
+                    query = "INSERT into parking_validation(product_name,carpark_number,carpark_name,facility_number,ticket_id,plate_number,validation_value,validation_type,validator_id,date_time)VALUES('Offline'," + carpark_number + ",'" + carpark_name + "'," + facility_number + ",'" + ticket_id + "','" + entry_plate_number + "'," + offline_validation_value + ",'" + offline_validation_type + "','" + offline_validator_id + "',CURRENT_TIMESTAMP)";
+                    result = stmt->executeUpdate(query);
+                    query = "SELECT LAST_INSERT_ID() as id";
+                    res = stmt->executeQuery(query);
+                    if (res->next())
+                        v_id = res->getString("id");
+                    offline_validation_id = v_id + "," + offline_validation_id;
+                    delete res;
                 }
-            
-            if(operation_type==4)
-                {                
-                query="update valet_parking set paid_status=1,payment_date_time='"+payment_date_time+"' where ticket_number='"+ticket_id+"'";
-                result = stmt->executeUpdate(query);                
-                if (result == 1)
-                    {
+
+                //online exist
+                if (getline(ss_value, offline_validation_value, ','))
+                    hour = hour + stoi(offline_validation_value);
+
+                if (getline(ss_value, offline_validation_value, ','))
+                    percentage = percentage + stoi(offline_validation_value);
+
+                if (validation_id != "")
+                    validation_id = offline_validation_id + validation_id;
+                else
+                    validation_id = offline_validation_id.substr(0, offline_validation_id.size() - 1);
+
+                validation_value = to_string(hour) + "," + to_string(percentage);
+            }
+
+            if (operation_type == 4) {
+                query = "update valet_parking set paid_status=1,payment_date_time='" + payment_date_time + "' where ticket_number='" + ticket_id + "'";
+                result = stmt->executeUpdate(query);
+                if (result == 1) {
                     query = "INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,operator_id,operator_name,shift_id,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,lost_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,gross_amount,amount_received,discount_id,discount_category,discount_name,coupon_id,coupon_category,coupon_source,payment_type,validation_value,validation_id,receipt_number,bank_notes,balance_returned,credit_note,authentication_code,entry_plate_number,exit_plate_number,wallet_points)VALUES('" + device_number + "','" + device_name + "'," + carpark_number + ",'" + carpark_name + "','" + facility_number + "'," + operator_id + ",'" + operator_name + "','" + shift_id + "','" + parking_rate_label + "','" + parking_rate_name + "','" + entry_grace_period + "','" + exit_grace_period + "','" + vat_type + "','" + vat_percentage + "','" + ticket_id + "'," + entry_date_time + ",'" + payment_date_time + "'," + max_exit_date_time + ",'" + parking_duration + "','" + payment_category + "','" + parking_fee + "','" + vat_amount + "','" + lost_fee + "','" + admin_fixed_charges + "','" + ticket_replacement_fee + "','" + discount_amount + "','" + gross_amount + "','" + amount_received + "','" + discount_id + "','" + discount_category + "','" + discount_name + "','" + coupon_id + "','" + coupon_category + "','" + coupon_source + "','" + payment_type + "','" + validation_value + "','" + validation_id + "','" + receipt_number + "','" + bank_notes + "','" + balance_returned + "','" + credit_note + "','" + authentication_code + "','" + entry_plate_number + "','" + exit_plate_number + "'," + wallet_points + ")";
                     result = stmt->executeUpdate(query);
 
-                    if (result == 1)                         
-                        jsonresponse[j++] = id;                                                                           
-                    }
-                else
-                    {
-                    sql::ResultSet *res; 
-                    query="select id from valet_parking where ticket_number='"+ticket_id+"'";
+                    if (result == 1)
+                        jsonresponse[j++] = id;
+                } else {
+                    sql::ResultSet *res;
+                    query = "select id from valet_parking where ticket_number='" + ticket_id + "'";
                     res = stmt->executeQuery(query);
-                    if(res->next())
-                        {
-                        jsonresponse[j++] = id;  
+                    if (res->next()) {
+                        jsonresponse[j++] = id;
                         delete res;
-                        }                    
                     }
                 }
-            else
-                {
+            } else {
                 query = "INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,operator_id,operator_name,shift_id,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,lost_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,gross_amount,amount_received,discount_id,discount_category,discount_name,coupon_id,coupon_category,coupon_source,payment_type,validation_value,validation_id,receipt_number,bank_notes,balance_returned,credit_note,authentication_code,entry_plate_number,exit_plate_number,wallet_points)VALUES('" + device_number + "','" + device_name + "'," + carpark_number + ",'" + carpark_name + "','" + facility_number + "'," + operator_id + ",'" + operator_name + "','" + shift_id + "','" + parking_rate_label + "','" + parking_rate_name + "','" + entry_grace_period + "','" + exit_grace_period + "','" + vat_type + "','" + vat_percentage + "','" + ticket_id + "'," + entry_date_time + ",'" + payment_date_time + "'," + max_exit_date_time + ",'" + parking_duration + "','" + payment_category + "','" + parking_fee + "','" + vat_amount + "','" + lost_fee + "','" + admin_fixed_charges + "','" + ticket_replacement_fee + "','" + discount_amount + "','" + gross_amount + "','" + amount_received + "','" + discount_id + "','" + discount_category + "','" + discount_name + "','" + coupon_id + "','" + coupon_category + "','" + coupon_source + "','" + payment_type + "','" + validation_value + "','" + validation_id + "','" + receipt_number + "','" + bank_notes + "','" + balance_returned + "','" + credit_note + "','" + authentication_code + "','" + entry_plate_number + "','" + exit_plate_number + "'," + wallet_points + ")";
-                result = stmt->executeUpdate(query);                
+                result = stmt->executeUpdate(query);
 
                 if (result == 1) {
                     jsonresponse[i] = id;
@@ -642,18 +632,19 @@ Php::Value UploadPayments(Php::Value request) {
                 }
                 query = "update open_transactions set last_payment_date_time='" + payment_date_time + "',max_exit_date_time=" + max_exit_date_time + ",total_amount_paid=total_amount_paid+" + gross_amount + ",parking_rate='" + parking_rate_name + "' where ticket_id='" + ticket_id + "'";
                 result = stmt->executeUpdate(query);
-                }
-            
+            }
+
             // query="update track_ticket set payment_date_time='"+payment_date_time+"',payment_device_number='"+device_number+"',payment_device_name='"+device_name+"',max_exit_date_time="+max_exit_date_time+",total_amount_paid=total_amount_paid+"+gross_amount+" where ticket_id = '"+ticket_id+"' and entry_type=1 ORDER BY id DESC LIMIT 1";
             // result = stmt->executeUpdate(query);
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
 
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
 
         WriteToLog("****UploadPayments*****");
         WriteToLog(e.what());
@@ -712,15 +703,16 @@ Php::Value UpdateCashLevels(Php::Value request, int type) {
             if (result == 1) {
                 jsonresponse[i] = denomination;
             }
-            Json::FastWriter fw;
-            string respone = fw.write(jsonresponse);
-            result = respone;
+
 
         }
 
+        Json::FastWriter fw;
+        string respone = fw.write(jsonresponse);
+        result = respone;
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UpdateCashLevels*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -759,14 +751,15 @@ Php::Value UploadApmCashPayout(Php::Value request) {
             if (result == 1) {
                 jsonresponse[i] = id;
             }
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
 
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadApmCashPayout*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -805,14 +798,15 @@ Php::Value UploadApmCashRefill(Php::Value request) {
             if (result == 1) {
                 jsonresponse[i] = id;
             }
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadApmCashRefill*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -868,14 +862,15 @@ Php::Value UploadParkingReservationMovements(Php::Value request) {
             }
             result = stmt->executeUpdate(query);
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadParkingReservationMovements*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -917,14 +912,15 @@ Php::Value UploadWaletTransaction(Php::Value request) {
 
             result = stmt->executeUpdate(query);
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadWaletTransaction*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -996,14 +992,16 @@ Php::Value UploadRevenueShifts(Php::Value request) {
             if (result == 1 || result == 0)
                 jsonresponse[i] = id;
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
 
         WriteToLog("****UploadRevenueShifts*****");
         WriteToLog(e.what());
@@ -1055,14 +1053,16 @@ Php::Value UploadRevenuePhysicalCashCollected(Php::Value request) {
             if (result == 1)
                 jsonresponse[i] = id;
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
 
         WriteToLog("****UploadRevenuePhysicalCashCollected*****");
         WriteToLog(e.what());
@@ -1107,14 +1107,16 @@ Php::Value UploadRevenueTransactionExceptions(Php::Value request) {
             if (result == 1)
                 jsonresponse[i] = id;
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
 
         WriteToLog("****UploadRevenueTransactionExceptions*****");
         WriteToLog(e.what());
@@ -1156,14 +1158,16 @@ Php::Value UploadParkingManualMovements(Php::Value request) {
                 jsonresponse[i] = id;
             }
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadParkingManualMovements*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -1203,14 +1207,16 @@ Php::Value UploadParkingMovementExceptions(Php::Value request) {
                 jsonresponse[i] = id;
             }
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadParkingMovementExceptions*****");
         WriteToLog(e.what());
         WriteToLog(query);
@@ -1287,15 +1293,72 @@ Php::Value UploadContractPrkingsubscriptions(Php::Value request) {
                 jsonresponse[i] = id;
             }
 
-            Json::FastWriter fw;
-            string res = fw.write(jsonresponse);
-            result = res;
+
         }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
 
         delete stmt;
         delete conn;
-    }    catch (sql::SQLException &e) {
+    } catch (sql::SQLException &e) {
         WriteToLog("****UploadContractPrkingsubscriptions*****");
+        WriteToLog(e.what());
+        WriteToLog(query);
+        delete conn;
+        return e.what();
+    }
+
+    return result;
+
+}
+
+Php::Value UploadRevenueCouponUsage(Php::Value request) {
+    sql::Statement *stmt;
+    Php::Value result;
+    string couponId, coupon_array;
+
+    Json::Value jsonresponse;
+    try {
+        conn = DBConnection(DATABASE);
+        stmt = conn->createStatement();
+        for (int i = 0; i < request.size(); i++) {
+            string id = request[i]["id"];
+            string date_time = request[i]["date_time"];
+            string ticket_id = request[i]["ticket_id"];
+            string coupon_id = request[i]["coupon_id"];
+
+            std::stringstream ss(coupon_id);
+            coupon_array = "";
+            while (ss.good()) {
+                getline(ss, couponId, ',');
+                if (coupon_array == "")
+                    coupon_array = "'" + couponId + "'";
+                else
+                    coupon_array = coupon_array + ",'" + couponId + "'";
+            }
+
+            query = "update parcx_server.revenue_coupons_whitelist set coupon_usage=1,ticket_id='" + ticket_id + "',coupon_usage_datetime='" + date_time + "' where coupon_id in(" + coupon_array + ")";
+            WriteToLog(query);
+            result = stmt->executeUpdate(query);
+
+            if (result >= 0)
+                jsonresponse[i] = id;
+
+
+        }
+
+        Json::FastWriter fw;
+        string res = fw.write(jsonresponse);
+        result = res;
+
+
+
+        delete stmt;
+        delete conn;
+    } catch (sql::SQLException &e) {
+        WriteToLog("****UploadParkingMovementExceptions*****");
         WriteToLog(e.what());
         WriteToLog(query);
         delete conn;
@@ -1308,7 +1371,7 @@ Php::Value UploadContractPrkingsubscriptions(Php::Value request) {
 
 Php::Value uploadToServer(Php::Parameters &params) {
     Php::Value data = params[0];
-    int task = data["task"];   
+    int task = data["task"];
     Php::Value request = data["data"];
     Php::Value response;
     switch (task) {
@@ -1365,6 +1428,9 @@ Php::Value uploadToServer(Php::Parameters &params) {
             break;
         case 18:
             response = UploadContractPrkingsubscriptions(request);
+            break;
+        case 19:
+            response = UploadRevenueCouponUsage(request);
             break;
     }
     return response;
