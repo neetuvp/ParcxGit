@@ -143,7 +143,25 @@ void getCouponDiscounts() {
         coupon_percentage=0;
         coupon_amount=0;
         valid_coupon_id=""; 
-        coupon_value="";        
+        coupon_value="";    
+        
+        if(maxExitGrace!="")
+            {
+            query="SELECT group_concat(coupon_id) as coupon_id FROM revenue_coupons_whitelist where ticket_id='"+ticketId+"'";
+            coupon = stmt->executeQuery(query);
+            if(coupon->next())
+                {
+                if(coupon->getString("coupon_id")!="")
+                    {
+                    if(coupon_array=="")
+                        coupon_array=coupon->getString("coupon_id");                    
+                    else
+                       coupon_array=coupon_array+","+ coupon->getString("coupon_id"); 
+                    }
+                }
+            delete coupon;
+            }
+        
         if(current_coupon_id!="")
             {
             if(coupon_array=="")
@@ -164,8 +182,8 @@ void getCouponDiscounts() {
             }
         writeLog("coupon_array",coupon_array);
         if(coupon_array!="")
-            {
-            query="SELECT coupon_id,discount_value,discount_type FROM parcx_server.revenue_coupons_whitelist a,parcx_server.revenue_discounts b where a.discount_id=b.discount_id and carpark_number="+to_string(carparkNumber)+" and a.status=1 and b.status=1 and coupon_usage=0 and discount_option='coupon' and coupon_id in("+coupon_array+")";
+            {            
+            query="SELECT coupon_id,discount_value,discount_type FROM parcx_server.revenue_coupons_whitelist a,parcx_server.revenue_discounts b where a.discount_id=b.discount_id and carpark_number="+to_string(carparkNumber)+" and a.status=1 and b.status=1 and (coupon_usage=0 or ticket_id='"+ticketId+"') and discount_option='coupon' and coupon_id in("+coupon_array+")";            
             coupon = stmt->executeQuery(query);
             while(coupon->next())
                 {
@@ -669,16 +687,7 @@ Php::Value openTransactionCheck(int getDetails) {
 
                     validationSeconds = timeValidation * 3600;
                 }
-                coupon_percentage=0;
-                coupon_amount=0;
-                if(couponEnabled==1)
-                    {
-                    getCouponDiscounts();
-                    response["coupon_percentage"]=coupon_percentage;
-                    response["coupon_amount"]=coupon_amount;
-                    response["valid_coupons"]=valid_coupon_id;
-                    response["coupon_value"]=coupon_value;
-                    }
+                
                 response["entry_grace_time_remaining"] = "0";
                 response["exit_grace_time_remaining"] = "0";
 
@@ -789,6 +798,17 @@ Php::Value openTransactionCheck(int getDetails) {
                         writeLog("openTransactionCheck", "calculate parking fee after validation hours");
                         startparkingFee = calculateParkingFee();
                     }
+                    
+                    coupon_percentage=0;
+                    coupon_amount=0;
+                    if(couponEnabled==1)
+                        {
+                        getCouponDiscounts();
+                        response["coupon_percentage"]=coupon_percentage;
+                        response["coupon_amount"]=coupon_amount;
+                        response["valid_coupons"]=valid_coupon_id;
+                        response["coupon_value"]=coupon_value;
+                        }
                     
                     if(coupon_percentage>=100 ||(coupon_amount>0 && startparkingFee<=coupon_amount))
                         {

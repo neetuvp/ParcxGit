@@ -229,7 +229,7 @@ void RevenueReport::paymentTransactions(Php::Value json)
                 if(iter.second==3)
                     sql_query=sql_query+" discount_amount>0";
                 if(iter.second==4)
-                    sql_query=sql_query+" (discount_amount=0 AND gross_amount=0 and validation_value="")";
+                    sql_query=sql_query+" (discount_amount=0 AND gross_amount=0 and validation_value='')";
                 if(iter.second==5)  
                     sql_query=sql_query+" payment_category='ProductSale'";              
                 }
@@ -584,7 +584,7 @@ void RevenueReport::getPaymentDetails(Php::Value json)
 		arr = getFacilityfeatures();
 		string html_data = "";
 
-        string labels="ticket_id,device_name,parking_rate,entry_grace_period,exit_grace_period,vat,entry_date_time,no_records,payment_date_time,maximum_exit_date_time,duration,category,validations,parking_fee,lost_fee,discounts,discount_name,gross_amount,validation_hours,amount_received,balance_returned,credit_note,banknotes,pdf_receipt";
+        string labels="coupons,ticket_id,device_name,parking_rate,entry_grace_period,exit_grace_period,vat,entry_date_time,no_records,payment_date_time,maximum_exit_date_time,duration,category,validations,parking_fee,lost_fee,discounts,discount_name,gross_amount,validation_hours,amount_received,balance_returned,credit_note,banknotes,pdf_receipt";
         Php::Value label=General.getLabels(lang,labels);
 
 
@@ -610,9 +610,12 @@ void RevenueReport::getPaymentDetails(Php::Value json)
 			
 			if(res->getString("validation_id")!="")
 			{
-				std::vector<std::string> outputArr = split (res->getString("validation_value"),','); 
-				//html_data+="<tr><td>Validations</td><td>";           
+				std::vector<std::string> outputArr = split (res->getString("validation_value"),','); 				
 				html_data+="<tr><td>"+toString(label["validations"])+"</td><td>"+outputArr[0]+" Hour "+outputArr[1]+" %</td></tr>";                  
+			}
+			if(res->getString("coupon_id")!="")
+			{				
+				html_data+="<tr><td>"+toString(label["coupons"])+"</td><td>"+res->getString("coupon_value")+"</td></tr>";                  
 			}
 			html_data+="<tr><td>"+toString(label["parking_fee"])+"</td><td>"+SetDoublePrecision(res->getDouble("parking_fee"))+" "+currency+"</td></tr>";  
 			html_data+="<tr><td>"+toString(label["lost_fee"])+"</td><td>"+SetDoublePrecision(res->getDouble("lost_fee"))+" "+currency+"</td></tr>"; 
@@ -694,7 +697,7 @@ void RevenueReport::getPdfReceipt(Php::Value json)
 		arr = getFacilityfeatures();
 		string html_data = "";
 
-        string labels="trn_no,device_name,operator_name,payment_type,ticket_id,vat,entry_date_time,payment_date_time,duration,parking_duration,validations,parking_fee,payment_date_time,maximum_exit_date_time,duration,category,validations,parking_fee,lost_fee,discounts,discount_name,gross_amount,validation_hours,amount_received,balance_returned,credit_note,banknotes,pdf_receipt";
+        string labels="coupons,net_amount,trn_no,device_name,operator_name,payment_type,ticket_id,vat,entry_date_time,payment_date_time,duration,parking_duration,validations,parking_fee,payment_date_time,maximum_exit_date_time,duration,category,validations,parking_fee,lost_fee,discounts,discount_name,gross_amount,validation_hours,amount_received,balance_returned,credit_note,banknotes,pdf_receipt";
         Php::Value label=General.getLabels(lang,labels);
 
 
@@ -735,6 +738,12 @@ void RevenueReport::getPdfReceipt(Php::Value json)
 				html_data+="<tr><td></td>";           
 				html_data+="<td><strong>"+toString(label["validations"])+"</strong></td>";
 				html_data+="<td><span>"+outputArr[0]+" H "+outputArr[1]+" %</span></td></tr>";              
+			}
+			if(res->getString("coupon_id")!="")
+			{
+			html_data+="<tr><td></td>";
+			html_data+="<td><strong>"+toString(label["coupons"])+"</strong></td>";
+			html_data+="<td><span>"+res->getString("coupon_value")+"</span></td></tr>";	
 			}
 			html_data+="<tr><td></td>";
 			html_data+="<td><strong>"+toString(label["parking_fee"])+"</strong></td>";
