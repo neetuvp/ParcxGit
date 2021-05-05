@@ -66,7 +66,7 @@ string currentDate() {
 void WriteToLog(string msg) {
     cout << msg << endl;
     ofstream myfile;
-    myfile.open("/opt/parcx/Logs/Services/ApplicationLogs/PX-DeviceUpload-" + currentDate() + ".log", fstream::app);
+    myfile.open("/opt/parcx/Logs/Services/PXDeviceUpload/ApplicationLog-PXDeviceUpload-" + currentDate() + ".log", fstream::app);
     myfile << currentTime() + "   " << msg << endl;
     myfile.close();
 }
@@ -554,6 +554,22 @@ Php::Value UploadPayments(Php::Value request) {
             string wallet_points = request[i]["wallet_points"];
             int operation_type = request[i]["operation_type"];
 
+            if(coupon_id!="")
+                {
+                std::stringstream ss(coupon_id);
+                string couponId,coupon_array = "";
+                while (ss.good()) {
+                    getline(ss, couponId, ',');
+                    if (coupon_array == "")
+                        coupon_array = "'" + couponId + "'";
+                    else
+                        coupon_array = coupon_array + ",'" + couponId + "'";
+                }
+
+                query = "update parcx_server.revenue_coupons_whitelist set coupon_usage=1,ticket_id='" + ticket_id + "',coupon_usage_datetime='" + payment_date_time + "' where coupon_id in(" + coupon_array + ")";
+                
+                result = stmt->executeUpdate(query);                
+                }
             if (validator_id != "") {
                 string offline_validator_id, offline_validation_type, offline_validation_value, offline_validation_id = "";
                 istringstream ss_id(validator_id);
@@ -620,7 +636,7 @@ Php::Value UploadPayments(Php::Value request) {
                     }
                 }
             } else {
-                query = "INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,operator_id,operator_name,shift_id,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,lost_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,gross_amount,amount_received,discount_id,discount_category,discount_name,coupon_id,coupon_value,coupon_category,coupon_source,payment_type,validation_value,validation_id,receipt_number,bank_notes,balance_returned,credit_note,authentication_code,entry_plate_number,exit_plate_number,wallet_points)VALUES('" + device_number + "','" + device_name + "'," + carpark_number + ",'" + carpark_name + "','" + facility_number + "'," + operator_id + ",'" + operator_name + "','" + shift_id + "','" + parking_rate_label + "','" + parking_rate_name + "','" + entry_grace_period + "','" + exit_grace_period + "','" + vat_type + "','" + vat_percentage + "','" + ticket_id + "'," + entry_date_time + ",'" + payment_date_time + "'," + max_exit_date_time + ",'" + parking_duration + "','" + payment_category + "','" + parking_fee + "','" + vat_amount + "','" + lost_fee + "','" + admin_fixed_charges + "','" + ticket_replacement_fee + "','" + discount_amount + "','" + gross_amount + "','" + amount_received + "','" + discount_id + "','" + discount_category + "','" + discount_name + "','" + coupon_id + "','"+coupon_value+"'," + coupon_category + "','" + coupon_source + "','" + payment_type + "','" + validation_value + "','" + validation_id + "','" + receipt_number + "','" + bank_notes + "','" + balance_returned + "','" + credit_note + "','" + authentication_code + "','" + entry_plate_number + "','" + exit_plate_number + "'," + wallet_points + ")";
+                query = "INSERT into revenue_payments(device_number,device_name,carpark_number,carpark_name,facility_number,operator_id,operator_name,shift_id,parking_rate_label,parking_rate_name,entry_grace_period,exit_grace_period,vat_type,vat_percentage,ticket_id,entry_date_time,payment_date_time,max_exit_date_time,parking_duration,payment_category,parking_fee,vat_amount,lost_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,gross_amount,amount_received,discount_id,discount_category,discount_name,coupon_id,coupon_value,coupon_category,coupon_source,payment_type,validation_value,validation_id,receipt_number,bank_notes,balance_returned,credit_note,authentication_code,entry_plate_number,exit_plate_number,wallet_points)VALUES('" + device_number + "','" + device_name + "'," + carpark_number + ",'" + carpark_name + "','" + facility_number + "'," + operator_id + ",'" + operator_name + "','" + shift_id + "','" + parking_rate_label + "','" + parking_rate_name + "','" + entry_grace_period + "','" + exit_grace_period + "','" + vat_type + "','" + vat_percentage + "','" + ticket_id + "'," + entry_date_time + ",'" + payment_date_time + "'," + max_exit_date_time + ",'" + parking_duration + "','" + payment_category + "','" + parking_fee + "','" + vat_amount + "','" + lost_fee + "','" + admin_fixed_charges + "','" + ticket_replacement_fee + "','" + discount_amount + "','" + gross_amount + "','" + amount_received + "','" + discount_id + "','" + discount_category + "','" + discount_name + "','" + coupon_id + "','"+coupon_value+"','" + coupon_category + "','" + coupon_source + "','" + payment_type + "','" + validation_value + "','" + validation_id + "','" + receipt_number + "','" + bank_notes + "','" + balance_returned + "','" + credit_note + "','" + authentication_code + "','" + entry_plate_number + "','" + exit_plate_number + "'," + wallet_points + ")";
                 result = stmt->executeUpdate(query);
 
                 if (result == 1) {
@@ -1340,8 +1356,7 @@ Php::Value UploadRevenueCouponUsage(Php::Value request) {
                     coupon_array = coupon_array + ",'" + couponId + "'";
             }
 
-            query = "update parcx_server.revenue_coupons_whitelist set coupon_usage=1,ticket_id='" + ticket_id + "',coupon_usage_datetime='" + date_time + "' where coupon_id in(" + coupon_array + ")";
-            WriteToLog(query);
+            query = "update parcx_server.revenue_coupons_whitelist set coupon_usage=1,ticket_id='" + ticket_id + "',coupon_usage_datetime='" + date_time + "' where coupon_id in(" + coupon_array + ")";            
             result = stmt->executeUpdate(query);
 
             if (result >= 0)
@@ -1374,7 +1389,7 @@ Php::Value uploadToServer(Php::Parameters &params) {
     Php::Value data = params[0];
     int task = data["task"];
     Php::Value request = data["data"];
-    Php::Value response;
+    Php::Value response;    
     switch (task) {
         case 1:
             response = UploadParkingMovements(request);

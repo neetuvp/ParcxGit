@@ -144,7 +144,7 @@ class reporting_valet {
             if($interval->format('%h')>0)
                 return $interval->format('%h H %i M');
             else 
-                return $interval->format('%i M');
+                return $interval->format('%i M %s S');
             }
         else 
             return "0";
@@ -169,12 +169,12 @@ class reporting_valet {
             $header .= "<th>Plate Number</th>";
             $header .= "<th>Ticket Id</th>";            
             $header .= "<th>Customer Card Number</th>";            
-            $header .= "<th>Valet IN</th>";
-            $header .= "<th>Valet OUT</th>";
+            $header .= "<th>Valet IN</th>";            
             $header .= "<th>Key IN</th>";
-            $header .= "<th>Key OUT</th>";
-            $header .= "<th>Drop Off</th>";            
             $header .= "<th>Payment</th>";           
+            $header .= "<th>Key OUT</th>";
+            $header .= "<th>Drop Off</th>"; 
+            $header .= "<th>Valet OUT</th>";                       
             $header .= "<th>Parking Duration</th>";
             $header .= "<th>Pickup To Parking</th>";
             $header .= "<th>Parking To DropOff</th>";
@@ -194,16 +194,16 @@ class reporting_valet {
                 $html_data .= "<td>" .$data['plate_prefix']." ". $data['plate_number'] . "</td>"; 
                 $html_data .= "<td>" . $data['ticket_number'] . "</td>";    
                 $html_data .= "<td>" . $data['customer_card_number'] . "</td>";                    
-                $html_data .= "<td>" . $data['valet_in_datetime'] . "</td>";
-                $html_data .= "<td>" . $data['valet_out_datetime'] . "</td>"; 
+                $html_data .= "<td>" . $data['valet_in_datetime'] . "</td>";                
                 $html_data .= "<td>" . $data['parking_in_datetime'] . "</td>";
-                $html_data .= "<td>" . $data['parking_out_datetime'] . "</td>";                
-                $html_data .= "<td>" . $data['dropoff_datetime'] . "</td>";                
                 $html_data .= "<td>" . $data['payment_date_time'] . "</td>"; 
+                $html_data .= "<td>" . $data['parking_out_datetime'] . "</td>";                
+                $html_data .= "<td>" . $data['dropoff_datetime'] . "</td>";                                
+                $html_data .= "<td>" . $data['valet_out_datetime'] . "</td>"; 
                 
-                $html_data .= "<td>" . $this->get_duration($data['valet_out_datetime'], $data['valet_in_datetime']) . "</td>";
+                $html_data .= "<td>" . $this->get_duration($data['payment_date_time'], $data['valet_in_datetime']) . "</td>";
                 $html_data .= "<td>" . $this->get_duration($data['parking_in_datetime'], $data['valet_in_datetime']) . "</td>";
-                $html_data .= "<td>" . $this->get_duration($data['parking_out_datetime'], $data['parking_in_datetime']) . "</td>";
+                $html_data .= "<td>" . $this->get_duration($data['parking_out_datetime'], $data['payment_date_time']) . "</td>";
                 $html_data .= "<td>" . $this->get_duration($data['dropoff_datetime'], $data['parking_out_datetime']) . "</td>";
                 $html_data .= "<td><a href='#' class='view-img'  id=" . $data['id'] . ">View Images</a></td>";
                 $html_data .= "</tr>";

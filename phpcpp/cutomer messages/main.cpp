@@ -209,7 +209,7 @@ void GetMessageTextByLanguage(Php::Value data) {
                 Php::out << "<div class='col-2' id = '" + language + "2" + id + "'>" + res->getString(language + "_line2") + "</div>" << std::endl;
                 Php::out << "<div class='col-2' id = '" + language + "3" + id + "'>" + res->getString(language + "_line3") + "</div>" << std::endl;
                 //Php::out<< "<div class='col' id = 'media_path"+id+"'><a target='_blank' href='"+res->getString("media_path")+"'><img src='"+res->getString("media_path")+"' alt='Img'></a></div>"<< std::endl;
-                Php::out << "<div class='col' id = 'media_path" + id + "'><img class='openModal openImageDialog" + res->getString("message") + "' src='" + res->getString("media_path") + "' alt='Img' data-toggle='modal' data-target='#uploadModal' data-backdrop='false' data-id=" + res->getString("message") + "></div>" << std::endl;
+                Php::out << "<div class='col' id = 'media_path" + id + "'><img class='openModal openImageDialog" + res->getString("message") + "' src='" + res->getString("media_path") + "' alt='Img' width='100' height='100' data-toggle='modal' data-target='#uploadModal' data-backdrop='false' data-id=" + res->getString("message") + "></div>" << std::endl;
 
                 //Php::out << "<div class='col'><input data-toggle='modal' data-target='#uploadModal' data-backdrop='false' class='btn btn-info btn-edit-image' id ='editimage"+id+"'   type='button'  value='Upload'  data-id='"+res->getString("message")+"'  style='visibility:hidden' ></div>"<< std::endl;
                 Php::out << "<div class='col'>" << std::endl;

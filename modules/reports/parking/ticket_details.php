@@ -36,7 +36,7 @@ include('../../../includes/sidebar.php');
           <?php echo parcxSettings(array("task"=>"14","type"=>"1"));?>
           </select>
             <select class="form-control" id="deviceNumber2">
-          <?php echo parcxSettings(array("task"=>"14","type"=>"2,3"));?>
+          <?php echo parcxSettings(array("task"=>"14","type"=>"2,3,4,5"));?>
           </select>
         </div>
         

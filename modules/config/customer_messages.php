@@ -38,7 +38,7 @@ $result = GetMessageLanguages();
                 </button>
             </div>
             <div class="modal-body pt-4 pl-4 pr-4">
-                <img id = 'imgmodal' src='' alt='Img'  >
+                <img id = 'imgmodal' src='' alt='Img'  height="400" width="400">
                 <br>
                 <br>
                 <p>Change Image:</p>               

@@ -680,7 +680,7 @@ Php::Value openTransactionCheck(int getDetails) {
                     }
                     if (percentageValidation > 0) {
                         response["validation_percentage"] = to_string(percentageValidation);
-                        response["validation_id"] = (timeValidation > 0) ? timeValidationId + "," + percentageValidationId : percentageValidationId;
+                        response["validation_id"] = (timeValidationId!="") ? timeValidationId + "," + percentageValidationId : percentageValidationId;
                         response["validation_type"] = (timeValidation > 0) ? "Time,Percentage" : "Percentage";
                         validation_value = validation_value + to_string(percentageValidation) + " %";
                     }
