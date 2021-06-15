@@ -2587,10 +2587,10 @@ Php::Value GetDayclosureDaemonDetails()
 	return daemon;	
     }
 
-Php::Value startDaemon(string daemon,string path)
+int startDaemon(string daemon,string path)
     {       
-    Php::Value result;
-    result = "failed";
+   int result;
+    result = 256;
     string command;   
     writeParkingReportLog("startDaemon","Daemon:"+daemon);
     try
@@ -2606,7 +2606,7 @@ Php::Value startDaemon(string daemon,string path)
             }
         else
             {
-                result = "Process already exists";
+                result = 256;
             }
         }
     catch(const std::exception& e)
@@ -2645,7 +2645,8 @@ void ParkingReport::reprocessDayClosureReport(Php::Value json)
         daemon_name = toString(daemon["name"]);
         path = toString(daemon["path"]);
         stopDaemon(daemon_name);
-        startDaemon(daemon_name,path);
+        int result = startDaemon(daemon_name,path);
+        Php::out<<result<<endl;
     }
     catch(const std::exception& e)
     {

@@ -18,7 +18,7 @@ include('../../includes/navbar-start.php');
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
-<!-- Modal > Disable Valet Reason -->
+<!-- Modal > Reprocess confirm -->
 <div class="modal fade text-dark" id="reprocess_confirm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document" id="reprocess-confirm-content">
         <div class="modal-content">
@@ -36,9 +36,32 @@ include('../../includes/sidebar.php');
                 
             </div>
             <div class="modal-footer">
-                <button type='button' class='btn btn-info' name='ok_reprocess' id='ok_reprocess' value='OK'>Ok</button>
+                <button type='button' class='btn btn-info' name='ok_reprocess' id='ok_reprocess' value='OK'>Yes</button>
                 <button type='button' class='btn btn-info' name='cancel_reprocess' id='cancel_reprocess'
-                        value='Cancel'>Cancel</button>
+                        value='Cancel'>No</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end / Modal -->
+
+<!-- Modal > Message Modal-->
+<div class="modal fade text-dark" id="message_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body pt-4 pl-4 pr-4">
+                <h5 id="msg_txt"></h5>
+                <br>               
+            </div>
+            <div class="modal-footer">
+                <button type='button' class='btn btn-info' name='ok_message' id='ok_message' value='OK'>OK</button>
             </div>
         </div>
     </div>
@@ -94,7 +117,7 @@ include('../../includes/sidebar.php');
 // load report data
 //////////////////////////////
 var id;
-
+var date_message="Choose Date for Reprocessing";
 $(function() 
 {
 
@@ -107,7 +130,11 @@ $(function()
 });
 
 $('#reprocess-button').click(function(){
-     $('#reprocess_confirm').modal('show');
+     var dcdate = $("#dcdate").val();
+      if (!dcdate)		
+        alert(date_message);        		
+      else 
+        $('#reprocess_confirm').modal('show');
 });
 
 $('#ok_reprocess').click(function(){
@@ -118,7 +145,20 @@ $('#ok_reprocess').click(function(){
     var jsondata = JSON.stringify(datastring);  
     console.log(jsondata);
     $.post("../ajax/reports.php",jsondata,function(data)
-      {		
+      {	
+        if(data!=256)
+        {
+            $('#reprocess_confirm').modal('hide');
+            $('#message_modal').modal('show');
+            $('#msg_txt').html("<i class='icon fa fa-check'></i> Please check the day closure reports after 5 minutes");
+        }
+        else
+        {
+            $('#reprocess_confirm').modal('hide');
+            $('#message_modal').modal('show');
+            $('#msg_txt').html("Reprocessing Failed");
+            //alert("Failed to start daemon");
+        }
       /*$("#report-content").addClass("card")    
       $("#report-content").html(data);
       reportSuccess();
@@ -130,7 +170,9 @@ $('#ok_reprocess').click(function(){
       });  
 });
 
-
+$(document).on('click', '#ok_message', function (){
+        $('#message_modal').modal('hide');
+    });
  $(document).on('click', '#cancel_reprocess', function (){
         $('#reprocess_confirm').modal('hide');
     });
