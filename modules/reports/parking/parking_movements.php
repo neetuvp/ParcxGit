@@ -185,10 +185,11 @@ function loadReportLabels()
     }
 
 $("#language").change(function()
-    {	  
+{	  
+    update_session(); 
     loadReportLabels();    
     callReport();		
-    });       
+});       
     
   $('#export_excel_report').click(function (event) {
     export_to_excel("#report-content", "PMS_Parking_Movement_Report")

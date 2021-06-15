@@ -1,9 +1,16 @@
-var task, device_ip, device_number, carpark_number, device_name, description, movement_type, device_type, controller_task;
+var task, device_ip, device_number, carpark_number, device_name, description,description_text, movement_type, device_type, controller_task;
+var operation_mode=-1;
+var reason,reason_text;
+
+
 //$(".btn-open-barrier, .btn-close-barrier, .btn-restart-machine, .btn-barrier-status, .btn-close-lane, .btn-open-lane, .btn-free-passage,.btn-standard-operation").click(function () {
 $(document).on("click", ".btn-open-barrier, .btn-close-barrier, .btn-restart-machine, .btn-barrier-status, .btn-close-lane, .btn-open-lane, .btn-free-passage,.btn-standard-operation", function (){
-    var value = $(this).attr('value');   
+    var value = $(this).attr('data-value'); 
+    var operation = $(this).attr('value'); 
     device_number = $(this).attr('id');
-
+    operation_mode=-1;
+    description_text = $(this).attr('data-description'); 
+    reason_text = $(this).attr('data-reason');
 
         device_name = $("#device_details_" + device_number).attr('device_name');
         carpark_number = $("#device_details_" + device_number).attr('carpark_number');
@@ -16,39 +23,49 @@ $(document).on("click", ".btn-open-barrier, .btn-close-barrier, .btn-restart-mac
                 controller_task = 1;
                 movement_type = 3;
                 description = "Barrier Open From Server"
+                reason="Open barrier for "+device_name;
+                reason_text = reason_text +" "+ device_name;
                 break;
             case "Close Barrier":
                 task = "S02";
                 controller_task = 2;
                 movement_type = 4;
                 description = "Barrier Close From Server"
+                reason="Close barrier for "+device_name;
+                reason_text = reason_text +" "+ device_name;
                 break;
             case "Open Barrier1":
                 controller_task = 1;
                 movement_type = 3;
-                description = "Barrier Open1 From Server"
+                description = "Barrier Open1 From Server";
+                reason_text = reason_text +" "+ device_name;
                 break;
             case "Close Barrier1":
                 controller_task = 2;
                 movement_type = 4;
-                description = "Barrier Close1 From Server"
+                description = "Barrier Close1 From Server";
+                reason_text = reason_text +" "+ device_name;;
                 break;
             case "Open Barrier2":
                 controller_task = 3;
                 movement_type = 3;
-                description = "Barrier Open2 From Server"
+                description = "Barrier Open2 From Server";
+                reason_text = reason_text +" "+ device_name;
                 break;
             case "Close Barrier2":
                 controller_task = 4;
                 movement_type = 4;
-                description = "Barrier Close2 From Server"
+                description = "Barrier Close2 From Server";
+                reason_text = reason_text +" "+ device_name;
                 break;
 
             case "Restart":
                 controller_task = 3;
                 task = "S03";
                 movement_type = 0;
-                description = "Restart Machine From Server"
+                description = "Restart Machine From Server";
+                reason="Restart "+device_name;
+                reason_text = reason_text +" "+ device_name;
                 break;
 
 
@@ -56,7 +73,10 @@ $(document).on("click", ".btn-open-barrier, .btn-close-barrier, .btn-restart-mac
                 controller_task = 5;
                 task = "S05";
                 movement_type = 0;
-                description = "Lane Closed Mode From Server"
+                description = "Lane Closed Mode From Server";
+                operation_mode=2;
+                reason="Change operation mode to Lane closed for "+device_name;
+                reason_text = reason_text +" "+ device_name;
                 break;
 
 
@@ -64,17 +84,28 @@ $(document).on("click", ".btn-open-barrier, .btn-close-barrier, .btn-restart-mac
                 controller_task = 5;
                 task = "S04";
                 movement_type = 0;
-                description = "Free Passage Mode From Server"
+                description = "Free Passage Mode From Server";
+                operation_mode=1;
+                reason="Change operation mode to Free Passage for "+device_name;
+                reason_text = reason_text +" "+ device_name;
                 break;
 
             case "Standard Operation Mode":
                 controller_task = 5;
                 task = "S06";
                 movement_type = 0;
-                description = "Standard Operation Mode From Server"
+                description = "Standard Operation Mode From Server";
+                operation_mode=0;
+                reason="Change operation mode to Standard operation mode for "+device_name;
+                reason_text = reason_text +" "+ device_name;
                 break;
         }
+        $('#reasonempty').html("");
+        //$("#reason_heading").html(reason);
+        $("#reason_heading").html(reason_text);
+        $("#message-modal-heading").html(operation);
         $('#detailModal').modal('show');
+        
     
 
 });
@@ -85,6 +116,7 @@ $(function ()
     //modal cancel	
     $(document).on('click', '#cancel_reason', function (){
         $('#reason_text').val("");
+        $('#reasonempty').html("");
         $('#detailModal').modal('hide');
     });
     //modal ok
@@ -105,9 +137,11 @@ $(function ()
                 operator: operator,
                 reason: reason,
                 device_type: device_type,
-                movement_type: movement_type
-            };
+                movement_type: movement_type,
+                operation_mode:operation_mode};
             var jsontemp = JSON.stringify(data);
+            
+            console.log(jsontemp);
 
             if (device_type == 6 || device_type == 7)
             {
@@ -117,36 +151,101 @@ $(function ()
                 $.post(url, temp)
                         .done(function (result)
                         {
+                            
                             console.log(result);
                             if (result == 1)
                             {
                                 $.post("../ajax/operations.php?task=1", jsontemp)
                                         .done(function (result) {
                                             if (result == 0)
-                                                alert("Insert to Db failed");
+                                                alertMessage("Insert to Db failed");
                                             else
-                                                alert(device_name + " " + description + " Success");
+                                                alertMessage(device_name + " " + description + " Success");
                                         }, "json");
                             } else
-                                alert(device_name + " " + description + " Failed");
+                                alertMessage(device_name + " " + description + " Failed");
                         }, "json")
                         .fail(function () {
-                            alert("Not reachable");
+                            alertMessage("Not reachable");
                         });
             } else
             {
                 $.post("../ajax/operations.php?task=1", jsontemp)
                         .done(function (result) {
-                            if (result == 1)
-                                alert(device_name + " " + description + " Success");
-                            else
-                                alert(device_name + " " + description + " Failed");
+                            console.log(result);
+                               // alertMessage(device_name + " " + description +"  "+ result);
+                                alertMessage(device_name + " " + description_text +"  "+ result);
+                            
                         }, "json");
             }
             $('#reason_text').val("");
+            $('#reasonempty').html("");
         } else
         {
-            alert("Please enter a valid reason");
+           // $("#reasonempty").html("Please enter a valid reason");
+           $("#reasonempty").html(valid_reason_message);
         }
     });
+    
+$("#language").change(function()
+{	 
+    loadReportLabels(); 
+    loadManualOperationReport();
+    loadOperationList();
+    
+});
+function loadManualOperationReport()
+{
+    var data={};
+    data["carpark"] = "";
+    data["operation"] = "";
+    data["language"] = $("#language").val();  
+    data["task"] = 11;
+    data["limit"] = 10;
+    var json = JSON.stringify(data);
+    console.log(json);
+    $.post("../ajax/reports.php",json,function(data)
+    {
+        $("#latestmanualreport").html(data);
+    });   
+	
+}
+function loadOperationList()
+{
+    var data={};
+    data["language"] = $("#language").val();  
+    var json = JSON.stringify(data);
+    console.log(json);
+    $.post("../ajax/operations.php?task=2",json,function(data)
+    {
+        $("#manualoperationlist").html(data);
+    });   
+	
+}
+function loadReportLabels()    
+{
+    
+	var data={};
+	data["task"]=29;
+	data["language"]=$("#language").val();    
+	data["page"]=26;
+	var json = JSON.stringify(data);
+	//console.log(json);
+	$.post("../ajax/reports.php",json,function(data)
+	{	
+            //console.log(data);	            
+            var json=JSON.parse(data);
+            $("#pdf-report-header").html(json.manual_operation);  
+            $("#device_name_label").html(json.device_name);  
+            $("#device_ip_label").html(json.device_ip);  
+            $("#pdf-report-header").html(json.manual_operation);  
+            $("#logout").html(json.logout); 
+            $("#modal_title").html(json.manual_operation); 
+            $("#reason_label").html(json.reason); 
+            $("#ok_reason").html(json.ok);
+            $("#ok_sidebar_modal").html(json.ok);
+            $("#cancel_reason").html(json.cancel); 
+            valid_reason_message = json.enter_valid_reason;
+	});   
+}
 });

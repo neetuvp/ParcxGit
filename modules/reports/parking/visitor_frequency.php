@@ -27,7 +27,28 @@ include('../../../includes/sidebar.php');
 
 
 
-
+<!-- Modal > Void Reason -->
+<div class="modal fade text-dark" id="access_details" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document" id="void-reason-content">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Plate Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body pt-4 pl-4 pr-4">
+                
+                
+            </div>
+            <div class="modal-footer">
+                <button type='button' class='btn btn-info close' data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end / Modal -->
 
 <!-- Active Text Messages-->
 <div class="content-wrapper block-data" data-status="active_messages">
@@ -150,10 +171,29 @@ function loadReportLabels()
     }
 
 $("#language").change(function()
-    {	  
+    {	
+    update_session();   	    
     loadReportLabels();    
     callReport();		
     });   
+
+
+function tdclick(ticket_id)
+{	
+    var visit_type = $("#visit_type").val();       
+    var data={};
+    data["task"]=32;
+    data["ticket_id"] = ticket_id;
+    data["language"]=$("#language").val();
+    var temp = JSON.stringify(data);    
+	alert(temp);
+    $.post("../../ajax/reports.php", temp)
+      .done(function (result) {
+	$(".modal-body").html(result);
+        $('#access_details').modal('show');
+      }, "json");
+	        
+}
 
   $('#export_excel_report').click(function (event) 
     {

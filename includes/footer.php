@@ -6,9 +6,11 @@ var info_label="<?=$json["info_label"]?>";
 previous_label = '<?=$json["previous"]?>';
 next_label = '<?=$json["next"]?>';
 
+//Neetu
+ $("#language").val("<?php echo isset($_SESSION["language"])?$_SESSION["language"]:"English"; ?>");
+
 $(document).ready(function () 
-    {	         
-    $("#language").val("<?php echo isset($_SESSION["language"])?$_SESSION["language"]:"English"; ?>");
+{	         
     // check date is selected
     $(".applyBtn").click(function () 
         {
@@ -27,7 +29,7 @@ $(document).ready(function ()
     
     if($("#report-content").find('#RecordsTable').length!=0) 
        loadDataTable();    
-    });
+});
              
                               
   // button ui changes on successful report load
@@ -84,7 +86,21 @@ function loadDataTable()
                 },					            
         });   	  
     }
-		
+
+//Neetu	
+function update_session()
+{
+	var session_language = $("#language").val();
+	var req = {};
+	req["language"]=session_language;
+    	var json = JSON.stringify(req);
+    	$.post("/parcx/modules/ajax/sessionlanguage.php",json,function(data){ 
+		$("#language").val(session_language);
+	});
+	
+}
+
+
 </script>
 
 </div>

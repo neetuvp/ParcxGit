@@ -6,11 +6,16 @@ include('../../includes/header.php');
 
     <?php
     include('../../includes/navbar-start.php');
+$data = array();
+$data["task"] = 9;
+$data["language"] = $_SESSION["language"];
+$data["page"] = 4;
+$json = parcxDashboard($data);
     ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Occupancy</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["occupancy"]?></div>
 
 <?php
 include('../../includes/navbar-end.php');
@@ -30,14 +35,20 @@ include('../../includes/sidebar.php');
 </div>
 <script src="../../plugins/knob/jquery.knob.js"></script>
 </div>
-
+<?php include '../../includes/footer.php'; ?>
 <script>
 var facility_number =<?php echo $_GET["facility_number"] ;?>;
 var carpark_number = 0;
 
 function get_live_occupancy()
     {
-    $.get("../ajax/dashboard.php?task=2&facility_number=" + facility_number, function (data) {
+    //$.get("../ajax/dashboard.php?task=2&facility_number=" + facility_number, function (data) {
+    var req = {};
+    req["task"]=28;
+    req["language"]=$("#language").val();
+    req["facility_number"]=facility_number;
+    var json = JSON.stringify(req);
+    $.post("../ajax/dashboard-ajax.php",json,function(data){  
         $('#occupancy_content').html(data);         
         carpark_number=$("#carpark_number").val();        
         if (typeof carpark_number !== "undefined")
@@ -64,7 +75,31 @@ setInterval(function ()
     
 
     
-    
+$("#language").change(function()
+{	  
+    update_session();
+    loadReportLabels(); 
+    get_live_occupancy();
+});
+function loadReportLabels()    
+{
+	var data={};
+	data["task"]=9;
+	data["language"]=$("#language").val();    
+	data["page"]=4;
+	var json = JSON.stringify(data);
+	console.log(json);
+	$.post("../ajax/dashboard-ajax.php",json,function(data)
+	{	
+	console.log(data);	            
+	var json=JSON.parse(data);
+	$("#pdf-report-header").html(json.occupancy);   
+	$("#logout").html(json.logout); 
+
+	
+
+	 });   
+}
 
           
 
@@ -132,4 +167,4 @@ setInterval(function ()
 
 </script>
 
-<?php include '../../includes/footer.php'; ?>
+

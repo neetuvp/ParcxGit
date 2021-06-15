@@ -1,5 +1,7 @@
 <?php
-$json= '{"language":"Arabic","task":31}';
+//$json= '{"language":"Arabic","task":31}';
+//$json= '{"task":32,"ticket_id":20210520112820,"language":"English"}';
+$json= '{"reprocess_date":"2021-05-31","task":33}';
 $data=json_decode($json,TRUE);
 //echo parkingReport($data);
 //echo parcxReport(array("task"=>"6","visit_type"=>"all"));

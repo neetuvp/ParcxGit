@@ -237,14 +237,14 @@ function SaveRecord(id)
         }
     }
 
-    if($('#ssh_interface_text'+id).val() > 0)
+    /*if($('#ssh_interface_text'+id).val() > 0)
     {
         if($('#edit_ssh'+id+':checkbox:checked').length == 0)
         {
             alert("Please enable SSH");
             return;
         }
-    }
+    }*/
        
     if($('#edit_ftp'+id+':checkbox:checked').length > 0)
     {
@@ -255,14 +255,14 @@ function SaveRecord(id)
         }
     }
 
-    if($('#ftp_interface_text'+id).val() > 0)
+    /*if($('#ftp_interface_text'+id).val() > 0)
     {
         if($('#edit_ftp'+id+':checkbox:checked').length == 0)
         {
             alert("Please enable FTP");
             return;
         }
-    }
+    }*/
      
 
 
@@ -270,6 +270,11 @@ function SaveRecord(id)
     datastring['id'] = id;
     if($('#edit_export'+id+':checkbox:checked').length > 0)
     {
+        if($('#edit_ssh'+id+':checkbox:checked').length== 0 && $('#edit_ftp'+id+':checkbox:checked').length == 0)
+        {
+            alert("Please enable SSH/FTP Interface");
+            return;
+        }
         datastring['export_flag'] = 1;
     }
     else{
@@ -316,7 +321,7 @@ function SaveRecord(id)
 }
 function CancelEditExport()
 {
-    document.location = "exportsettings.php";
+    document.location = "export_settings.php";
 }
 </script>
 <?php include('../../includes/footer.php');?>

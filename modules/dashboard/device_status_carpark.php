@@ -6,12 +6,18 @@ include('../../includes/header.php');
 
 <?php
 include('../../includes/navbar-start.php');
+
+$data = array();
+$data["task"] = 9;
+$data["language"] = $_SESSION["language"];
+$data["page"] = 1;
+$json = parcxDashboard($data);
 ?>
 
 </ul>
 
 
-<div class="header text-dark" id="pdf-report-header">Device Status</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["device_status"]?></div>
 
 
 <?php
@@ -24,7 +30,7 @@ include('../../includes/sidebar.php');
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Alarms</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?=$json["alarms"]?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close-alarm-modal">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -59,14 +65,35 @@ include('../../includes/sidebar.php');
 
 </div>
 </div>
-
+<?php include('../../includes/footer.php'); ?>
 <script>
 var facility_number =<?php echo $_GET["facility_number"] ;?>;
 var carpark_number = 0;
 var alarm_count
 
-
 function get_device_status_by_carpark()
+    {
+   var req={};
+  req["task"]=11;
+  req["language"]=$("#language").val();
+  req["facility_number"]=facility_number;
+  var json = JSON.stringify(req);
+  $.post("../ajax/dashboard-ajax.php",json,function(data){
+        $('#device-status-block').html(data);  
+        carpark_number=$("#carpark_number").val();           
+        if (typeof carpark_number !== "undefined")
+            window.location="device_status_device.php?facility_number="+facility_number+"&carpark_number="+carpark_number;
+        else
+            {
+            alarm_count=$("#alarm_count").val();                    
+            if(alarm_count==0)      
+                $('#alarm_notification').html("No alarms");
+            else
+                $('#alarm_notification').html("Alarm Present:"+alarm_count);
+            }
+    });
+    }
+/*function get_device_status_by_carpark()
     {
     $.get("../ajax/dashboard.php?task=23&facility_number=" + facility_number, function (data) {
         $('#device-status-block').html(data);  
@@ -82,7 +109,7 @@ function get_device_status_by_carpark()
                 $('#alarm_notification').html("Alarm Present:"+alarm_count);
             }
     });
-    }
+    }*/
     
 $(document).on('click', '.show-carpark-details', function () {
     facility_number = $(this).attr("facility_number");
@@ -94,11 +121,13 @@ $(document).on('click', '.show-carpark-details', function () {
 function get_alarmlist()
     {
     var data = {};
-    data["device_number"]=0;
-    data["facility_number"]=facility_number;
-    data["carpark_number"]=carpark_number;    
+    data["device_number"] = 0;
+    data["facility_number"] = facility_number;
+    data["carpark_number"] = carpark_number;
+    data["language"]=$("#language").val();
+    data["task"] = 15;
     var jsondata = JSON.stringify(data);
-    $.post("../ajax/dashboard.php?task=13", jsondata, function (result) {         
+    $.post("../ajax/dashboard-ajax.php", jsondata, function (result) {         
             $('#latest-alarm-data').html(result);   
             if($("#latest-alarm-data").find('#RecordsTable').length!=0)
                 $('#RecordsTable').DataTable(
@@ -124,10 +153,11 @@ $(document).on('click', '.btn-dismis-alarm', function () {
     var id = $(this).attr('id'); 
     var data = {};        
     data["id"]=id;        
+    data["task"] = 16;
     var jsondata = JSON.stringify(data);
-    $.post("../ajax/dashboard.php?task=16", jsondata, function (result) {                            
-        get_alarmlist(); 
-        });     
+    $.post("../ajax/dashboard-ajax.php",jsondata,function(data){                    
+	get_alarmlist(); 
+	});     
     });
 
 
@@ -137,6 +167,36 @@ setInterval(function ()
     {
     get_device_status_by_carpark();    
     }, 30000);
+
+
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=9;
+    data["language"]=$("#language").val();    
+    data["page"]=1;
+    var json = JSON.stringify(data);
+	console.log(json);
+    $.post("../ajax/dashboard-ajax.php",json,function(data)
+        {	
+	console.log(data);	            
+        var json=JSON.parse(data);
+            
+        $("#pdf-report-header").html(json.device_status);   
+        $("#logout").html(json.logout); 
+	$("#exampleModalLabel").html(json.logout); 
+    
+        
+        });    
+    }
+
+$("#language").change(function()
+{
+    update_session();  
+    loadReportLabels();
+    get_device_status_by_carpark() ;
+    //callReport();		
+});
 </script>
 
-<?php include('../../includes/footer.php'); ?>
+

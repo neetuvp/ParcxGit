@@ -234,7 +234,9 @@ function loadReportLabels()
             selectAllNumber: false,
             allSelectedText: json.all_days
             });      
-            
+            duration_chart.data.datasets[0].label = shortterm_label;
+            duration_chart.data.datasets[1].label = contract_label;
+            duration_chart.update();  
             
         }); 
         
@@ -243,7 +245,8 @@ function loadReportLabels()
 
 
 $("#language").change(function()
-{	  
+{
+    update_session();   	  
     loadReportLabels();    
     callReport();		
 }); 
@@ -298,7 +301,7 @@ $("#language").change(function()
           labels: duration_labels,
           datasets: [{
               data: count_short_term,
-              label: 'Short-Term Parkers',
+              label: '<?=$json["shortterm_parkers"]?>',//'Short-Term Parkers',
 
               // transparent bar with normal border
               backgroundColor: "rgba(40,167,69, 0.5)",
@@ -307,7 +310,7 @@ $("#language").change(function()
             },
             {
               data: count_contract,
-              label: 'Contract Parkers',
+              label: '<?=$json["contract_parkers"]?>',//'Contract Parkers',
 
               // transparent bar with normal border
               backgroundColor: "rgba(0,123,255, 0.5)",

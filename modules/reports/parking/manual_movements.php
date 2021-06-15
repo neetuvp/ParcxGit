@@ -172,6 +172,7 @@ include('../../../includes/sidebar.php');
 
     $("#language").change(function ()
     {
+	update_session(); 
         loadReportLabels();
         callReport();
     });

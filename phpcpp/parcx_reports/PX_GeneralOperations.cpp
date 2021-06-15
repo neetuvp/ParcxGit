@@ -167,7 +167,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label=reportlabels+"payment_transactions,detailed_payment,receipt_details,close,print,tax_invoice,cash,credit_card,parking_fee,lost_ticket,discount,grace_period,product_sales,all_devices,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
                     break;
             case 3 ://revenue_summary
-                label = reportlabels+"earnings,sunday,monday,tuesday,wednesday,thursday,friday,saturday,total_revenue,revenue_report,all_carparks,select_carparks,select_days,all_days";
+                label = reportlabels+"earnings,sunday,monday,tuesday,wednesday,thursday,friday,saturday,total_revenue,revenue_report,all_carparks,select_carparks,select_days,all_days,product_sales,lost_fee,parking_fee";
                     break;
             case 4://shift_report
                 label = reportlabels + "shift_report,all_carparks,select_carparks,all_devices,select_devices,all_operators,select_operators";
@@ -176,7 +176,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "vat_report,cash,credit_card,detailed_payment,receipt_details,close,print,tax_invoice,all_devices,parking_fee,lost_ticket,discount,grace_period,product_sales,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
                     break;
             case 6://creditcard_payment_transactions
-                label = reportlabels + "creditcard_transactions,all_carparks,select_carparks,all_devices,select_devices,";
+                label = reportlabels + "creditcard_transactions,all_carparks,select_carparks,all_devices,select_devices";
                     break;
             case 7://payment_transaction_exceptions
                 label = reportlabels + "payment_transaction_exception,all_carparks,select_carparks,all_devices,select_devices,select_exception,blacklisted,already_paid_chipcoin,invalid_carpark,invalid_chipcoin,cancelled_transaction";
@@ -185,7 +185,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "cash_levels,all_devices,select_devices";
                     break;
             case 9://apm_refill_report
-                label = reportlabels + "all_carparks,select_carparks,all_devices,select_devices";
+                label = reportlabels + "apm_refill_report,all_carparks,select_carparks,all_devices,select_devices";
                     break;
             case 10://apm_payout_report
                 label = reportlabels + "apm_payout_report,all_carparks,select_carparks,all_devices,select_devices";
@@ -197,7 +197,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "blacklist_report,all_carparks,select_carparks";
                     break;
             case 13://traffic_report
-                label = reportlabels + "traffic_report,all_carparks,select_carparks,all_days,select_days,sunday,monday,tuesday,wednesday,thursday,friday,saturday";
+                label = reportlabels + "traffic_report,all_carparks,select_carparks,all_days,select_days,sunday,monday,tuesday,wednesday,thursday,friday,saturday,entries,exits";
                     break;
             case 14://ticket_details
                 label = reportlabels + "ticket_details,ticket_id,view_details,plate_number";
@@ -224,7 +224,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "validation_report,all_carparks,select_carparks,all_devices,select_devices,select_validator,all_validators,select_product,all_products,plate_ticket";
                     break;
             case 22://parking_duration
-                label = reportlabels + "parking_duration,all_devices,select_devices,all_carparks,all_days,select_days,select_carparks,sunday,monday,tuesday,wednesday,thursday,friday,saturday";
+                label = reportlabels + "parking_duration,all_devices,select_devices,all_carparks,all_days,select_days,select_carparks,sunday,monday,tuesday,wednesday,thursday,friday,saturday,shortterm_parkers,contract_parkers";
                     break;
             case 23://watchdog_network_logs
                 label = reportlabels + "watchdog_network_logs";
@@ -235,6 +235,9 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                     break;
             case 25://live_parking
                 label = reportlabels + "live_parking";
+                    break;
+            case 26://manual_operations page
+                label=reportlabels+"device_name,device_ip,manual_operation,reason,ok,cancel,standard_operation_mode_from_server,enter_valid_reason";
                     break;
 
 }

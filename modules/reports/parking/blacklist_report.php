@@ -177,7 +177,8 @@ function loadReportLabels()
     }
 
 $("#language").change(function()
-    {	  
+    {	
+    update_session();   
     loadReportLabels();    
     callReport();		
     });       

@@ -8,12 +8,19 @@ include('../../includes/header.php');
 
     <?php
     include('../../includes/navbar-start.php');
+$data = array();
+$data["task"] = 9;
+$data["language"] = $_SESSION["language"];
+$data["page"] = 2;
+$json = parcxDashboard($data);
+
+
     ?>
 
 </ul>
 
 
-<div class="header text-dark" id="pdf-report-header">Device Status</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["device_status"]?></div>
 
 
 <?php
@@ -28,7 +35,7 @@ include('../../includes/sidebar.php');
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Notifications</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?=$json["notifications"]?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -62,11 +69,11 @@ include('../../includes/sidebar.php');
                         <ul class="nav nav-tabs" >
 
                             <li class="nav-item">
-                                <a class="nav-link active"  data-toggle="pill" href="#alarm-data"   aria-selected="true">Alarms</a>
+                                <a class="nav-link active"  data-toggle="pill" href="#alarm-data" id="alarm_data"  aria-selected="true"><?=$json["alarms"]?></a>
                             </li>
 
                             <li class="nav-item " id="nav-item-cash-level">
-                                <a class="nav-link"  data-toggle="pill" href="#cash-level" aria-selected="false">Cash level</a>
+                                <a class="nav-link"  data-toggle="pill" href="#cash-level"  id="cash_level" aria-selected="false"><?=$json["cash_levels"]?></a>
                             </li>                                                        
 
                         </ul>
@@ -97,7 +104,7 @@ include('../../includes/sidebar.php');
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Alarms</h5>
+                <h5 class="modal-title" id="exampleModalLabel"><?=$json["alarms"]?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close-alarm-modal">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -117,19 +124,19 @@ include('../../includes/sidebar.php');
     <div class="modal-dialog" role="document" id="manual-reason-content">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Manual Operation Reason</h5>
+                <h5 class="modal-title" id="manual_title"><?=$json["manual_operation_reason"]?></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body pt-4 pl-4 pr-4">
-                <p>Reason:</p>
+                <p id="reason_title"><?=$json["reason"]?>:</p>
                 <textarea name='reason_text' id='reason_text' class="form-control mb-4"></textarea>
                 <span id="reasonempty"></span>
             </div>
             <div class="modal-footer">
-                <button type='button' class='btn btn-info' name='ok_reason' id='ok_reason' value='OK'>Ok</button>
-                <button type='button' class='btn btn-info' name='cancel_reason' id='cancel_reason' value='Cancel'>Cancel</button>
+                <button type='button' class='btn btn-info' name='ok_reason' id='ok_reason' value='OK'><?=$json["ok"]?></button>
+                <button type='button' class='btn btn-info' name='cancel_reason' id='cancel_reason' value='Cancel'><?=$json["cancel"]?></button>
             </div>
         </div>
     </div>
@@ -142,13 +149,13 @@ include('../../includes/sidebar.php');
         <div class="col d-flex justify-content-between pl-1 align-items-center ">
             <div class="flex-grow-1 row additional-menu-left">
                 <div class="col tab-header d-flex justify-content-left pl-1">
-                    <div class="tab-link active" data-target="all">View All</div>
-                    <div class="tab-link" data-target="payment_machines">Payment Machines</div>
-                    <div class="tab-link" data-target="columns">Entry/Exit Columns</div>
-                    <div class="tab-link" data-target="controllers">Controllers</div>
-                    <div class="tab-link" data-target="camera">Camera</div>
+                    <div class="tab-link active" data-target="all" id="view_all"><?=$json["view_all"]?></div>
+                    <div class="tab-link" data-target="payment_machines" id="payment_machines"><?=$json["payment_machines"]?></div>
+                    <div class="tab-link" data-target="columns" id="entry_exit_columns"><?=$json["entry_exit_columns"]?></div>
+                    <div class="tab-link" data-target="controllers" id="controllers"><?=$json["controllers"]?></div>
+                    <div class="tab-link" data-target="camera" id="camera"><?=$json["camera"]?></div>
                     <div class="tab-link" data-target="vms">VMS</div>
-                    <div class="tab-link" data-target="valet">Valet</div>
+                    <div class="tab-link" data-target="valet" id="valet"><?=$json["valet"]?></div>
                 </div>
             </div>   
             <div class="additional-menu-right row align-items-center">               
@@ -168,7 +175,7 @@ include('../../includes/sidebar.php');
 </div>
 </div>
 
-
+<?php include('../../includes/footer.php'); ?>
 <script src="../../dist/js/manualOperations.js"></script>
 
 <script>
@@ -203,7 +210,27 @@ include('../../includes/sidebar.php');
     });
 
     var alarm_count = 0;
+     
     function get_device_status_by_device()
+    {
+	  var req={};
+	  req["task"]=12;
+	  req["language"]=$("#language").val();
+	  req["facility_number"]=facility_number;
+	  req["carpark_number"]=carpark_number;
+	  var json = JSON.stringify(req);
+//console.log(json);
+	  $.post("../ajax/dashboard-ajax.php",json,function(data){
+	    $('#device-status-block').html(data);
+	    alarm_count = $("#alarm_count").val();           
+	    $('#alarm_notification').html("Alarms :" + alarm_count);
+	    display_target_devices();
+	});
+    }
+
+
+
+    /*function get_device_status_by_device()
     {
         $.get("../ajax/dashboard.php?task=24&facility_number=" + facility_number + "&carpark_number=" + carpark_number, function (data) {
             $('#device-status-block').html(data);
@@ -211,7 +238,7 @@ include('../../includes/sidebar.php');
             $('#alarm_notification').html("Alarms :" + alarm_count);
             display_target_devices();
         });
-    }
+    }*/
     var device_name;
     var device_ip;
     var device_img;
@@ -268,25 +295,60 @@ include('../../includes/sidebar.php');
 
     function get_device_details()
     {
-        $.post("../ajax/dashboard.php?task=25", jsondata, function (result) {
-            $('#device_details').html(result);
+	var data = {};
+        data["device_number"] = device_number;
+        data["facility_number"] = facility_number;
+        data["carpark_number"] = carpark_number;
+        data["device_category"] = device_category;
+	data["language"]=$("#language").val();
+	data["task"] = 13;
+	json = JSON.stringify(data);
+        $.post("../ajax/dashboard-ajax.php",json,function(data){
+            $('#device_details').html(data);
         });
     }
 
+   /* function get_device_details()
+    {
+        $.post("../ajax/dashboard.php?task=25", jsondata, function (result) {
+            $('#device_details').html(result);
+        });
+    }*/
+
     function get_cashbox_level()
     {
-        $.post("../ajax/dashboard.php?task=26", jsondata, function (result) {
-            $('#cash-level').html(result);
+	var data = {};
+        data["device_number"] = device_number;
+        data["facility_number"] = facility_number;
+        data["carpark_number"] = carpark_number;
+        data["device_category"] = device_category;
+	data["language"]=$("#language").val();
+	data["task"] = 14;
+        json = JSON.stringify(data);
+	
+	//console.log(json);
+        $.post("../ajax/dashboard-ajax.php",json,function(data){
+            $('#cash-level').html(data);
         });
     }
 
     function get_alarmlist()
     {
-        $.post("../ajax/dashboard.php?task=13", jsondata, function (result) {
+	var data = {};
+        data["device_number"] = device_number;
+        data["facility_number"] = facility_number;
+        data["carpark_number"] = carpark_number;
+        data["device_category"] = device_category;
+	data["language"]=$("#language").val();
+	data["task"] = 15;
+        json = JSON.stringify(data);
+	
+	//console.log(json);
+        $.post("../ajax/dashboard-ajax.php",json,function(data){
 
             if (device_number == 0)
             {
-                $('#latest-alarm-data').html(result);
+                $('#latest-alarm-data').html(data);
                 if ($("#latest-alarm-data").find('#RecordsTable').length != 0)
                     $('#latest-alarm-data #RecordsTable').DataTable(
                             {
@@ -295,7 +357,7 @@ include('../../includes/sidebar.php');
             } else
             {
                 var details = '<input type="hidden" device_type="' + device_type + '" id="device_details_' + device_number + '" device_ip="' + device_ip + '" device_name="' + device_name + '" carpark_number="' + carpark_number + '">';
-                $('#alarm-data').html(details + result);
+                $('#alarm-data').html(details + data);
                 if ($("#alarm-data").find('#RecordsTable').length != 0)
                     $('#alarm-data #RecordsTable').DataTable(
                             {
@@ -316,8 +378,9 @@ include('../../includes/sidebar.php');
         var id = $(this).attr('id');
         var data = {};
         data["id"] = id;
+	data["task"] = 16;
         var jsondata = JSON.stringify(data);
-        $.post("../ajax/dashboard.php?task=16", jsondata, function (result) {
+        $.post("../ajax/dashboard-ajax.php",jsondata,function(data){
             get_alarmlist();
             get_device_status_by_device();
         });
@@ -330,6 +393,47 @@ include('../../includes/sidebar.php');
     {
         get_device_status_by_device();
     }, 30000);
+
+
+function loadReportLabels()    
+    {
+    var data={};
+    data["task"]=9;
+    data["language"]=$("#language").val();    
+    data["page"]=2;
+    var json = JSON.stringify(data);
+	console.log(json);
+    $.post("../ajax/dashboard-ajax.php",json,function(data)
+        {	
+	console.log(data);	            
+        var json=JSON.parse(data);
+            
+        $("#pdf-report-header").html(json.device_status);   
+        $("#logout").html(json.logout); 
+    	$("#alarm_data").html(json.alarms); 
+	$("#cash_level").html(json.cash_levels); 
+	$("#exampleModalLabel").html(json.notifications); 
+        $("#manual_title").html(json.manual_operation_reason); 
+	$("#reason_title").html(json.reason); 
+	$("#ok_reason").html(json.ok); 
+	$("#cancel_reason").html(json.cancel); 
+	$("#view_all").html(json.view_all); 
+	$("#payment_machines").html(json.payment_machines); 
+	$("#entry_exit_columns").html(json.entry_exit_columns); 
+	$("#controllers").html(json.controllers); 
+	$("#camera").html(json.camera); 
+	$("#valet").html(json.valet); 
+	
+        });    
+    }
+
+$("#language").change(function()
+{
+    update_session();	  
+    loadReportLabels(); 
+    get_device_status_by_device();
+    //callReport();		
+});
 </script>
 
-<?php include('../../includes/footer.php'); ?>
+

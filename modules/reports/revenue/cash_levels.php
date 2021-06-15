@@ -183,11 +183,12 @@ echo parcxReport($data);
         });
     }
 
-    $("#language").change(function ()
-    {
-        loadReportLabels();
-        cash_levels();
-    });
+$("#language").change(function ()
+{
+	update_session();
+	loadReportLabels();
+	cash_levels();
+});
 
 </script>
 

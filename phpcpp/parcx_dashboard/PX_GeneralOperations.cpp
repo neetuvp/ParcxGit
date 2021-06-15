@@ -3,12 +3,16 @@
 #include <ctime>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <phpcpp.h>
+#include <sstream>
 #define Server "DBServer"
 #define Username "parcxservice"
 #define Password "1fromParcx!19514"
 #define timeFormat "%H:%M:%S"
 #define dateFormat "%Y-%m-%d"
-
+#define ServerDB "parcx_server"
 using namespace std;
 
 string logpath="/opt/parcx/Logs/";
@@ -81,3 +85,96 @@ int* GeneralOperations::differenceDateTime(string date1,string date2,string form
 	arr[4] = seconds;	
     return arr;
 } 
+Php::Value GeneralOperations::getLabels(string lang,string label)
+    {    
+    sql::Connection *con;
+    sql::Statement *stmt;
+    Php::Value result;
+    string query;
+    try
+        {  
+        if (label.find(',') != std::string::npos)
+            {
+            stringstream ss(label);
+            string substr;
+            label="";
+            while (getline(ss, substr, ',')) 
+                {                        
+                label=label+"'"+substr+"'"+",";
+                }
+            label=label.substr(0,label.size()-1);
+            query= "select "+lang+",message,english from web_application_labels where message in("+label+")";            
+            }
+        else
+            query= "select "+lang+",message,english from web_application_labels where message='"+label+"'";	 
+        sql::ResultSet *res; 
+        GeneralOperations g;
+        con = g.mysqlConnect(ServerDB);
+	stmt = con->createStatement();
+        
+        res=stmt->executeQuery(query);
+        
+        if(res->rowsCount()==1)
+            {
+            if(res->next())
+                {
+                if(res->getString(lang)!="")
+                    label=res->getString(lang);
+                else
+                    res->getString("english");                
+                }
+            result=label;
+            }
+        else
+            {
+            while(res->next())                
+                {
+                if(res->getString(lang)!="")
+                    result[res->getString("message").asStdString()]=res->getString(lang).asStdString();                
+                else
+                    result[res->getString("message").asStdString()]=res->getString("english").asStdString();                
+                }
+            }
+        delete res;
+	delete stmt;
+	delete con;	
+        return result;
+        }
+    catch(const std::exception& e)
+        {
+            //writeParkingReportException("getApplicationLabels",e.what());	
+            //writeLog("WebApplication/ApplicationLogs/PX-RevenueReport-"+currentDateTime("%Y-%m-%d"),"getApplicationLabels",e.what());   
+        }
+    return result;  
+    }
+
+
+Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
+    {
+    string lang=data["language"];  
+    int page=data["page"];                
+    string label=data["label"];    
+    if(page>0)
+        {
+        string reportlabels="logout,export,export_to_excel,export_to_pdf,";
+        switch(page)
+            {
+            case 1://device_status_facility,device_status_carpark
+                    label=reportlabels+"device_status,alarms";
+                    break;
+            case 2 ://device_status_device
+             		label=reportlabels+"view_all,payment_machines,entry_exit_columns,controllers,camera,valet,device_status,notifications,cash_levels,manual_operation_reason,reason,ok,cancel,device_status,alarms";
+                    break;
+            case 3 ://finance_facility,finance_carpark,finance_device
+                label = reportlabels+"finance,parking_fee,lost_fee,product_sale_amount,view_all,manual_cashiers,pay_on_foot_machines,handheld_pos,revenue_7_days,revenue_sources";
+                    break;
+            case 4://occupancy_facility,occupancy_carpark,occupancy_device
+                label = reportlabels + "occupancy,hourly_occupancy,this_day_last_week,last_week_average,last_week_average,all_time_average,maximum,minimum";
+                    break;
+            
+            
+
+}
+        }
+    return  getLabels(lang,label);
+    }

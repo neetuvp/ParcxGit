@@ -6,11 +6,16 @@ include('../../includes/header.php');
 
     <?php
     include('../../includes/navbar-start.php');
+$data = array();
+$data["task"] = 9;
+$data["language"] = $_SESSION["language"];
+$data["page"] = 4;
+$json = parcxDashboard($data);
     ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Occupancy</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["occupancy"]?></div>
 
 <?php
 include('../../includes/navbar-end.php');
@@ -38,7 +43,7 @@ include('../../includes/sidebar.php');
 
                                 <ul class="navbar-nav w-100 justify-content-center">
                                     <p class="text-center chart-header text-dark justify-content-middle">
-                                        Hourly Occupancy 
+                                        <?=$json["hourly_occupancy"]?>
 
                                     </p>
                                 </ul>
@@ -46,9 +51,9 @@ include('../../includes/sidebar.php');
                                 <div class="w-100 row m-0">
                                     <div class="col-4 ml-auto p-0">
                                         <select id="linechart-select">                                            
-                                            <option value="0">This day last week</option>
-                                            <option value="1">Last week's average</option>
-                                            <option value="2">All-time average</option>
+                                            <option value="0" id="option_1"><?=$json["this_day_last_week"]?></option>
+                                            <option value="1" id="option_2"><?=$json["last_week_average"]?></option>
+                                            <option value="2" id="option_3"><?=$json["all_time_average"]?></option>
                                         </select>
                                     </div>
                                 </div>
@@ -81,7 +86,7 @@ include('../../includes/sidebar.php');
     ?>
 </div>
 </div>
-
+<?php include '../../includes/footer.php'; ?>
 <script>
     var facility_number = <?php echo $_GET["facility_number"]; ?>;
     var carpark_number =<?php echo $_GET["carpark_number"]; ?>;        
@@ -90,9 +95,16 @@ include('../../includes/sidebar.php');
     
     function get_live_occupancy()
     {
-    $.get("../ajax/dashboard.php?task=3&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) {
-        $('#occupancy_content').html(data);                
-           LoadKnob();
+    //$.get("../ajax/dashboard.php?task=3&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) {
+	var req = {};
+	     req["task"]=29;
+	    req["language"]=$("#language").val();
+	    req["facility_number"]=facility_number;
+	    req["carpark_number"]=carpark_number;
+	    var json = JSON.stringify(req);
+	    $.post("../ajax/dashboard-ajax.php",json,function(data){  
+       		 $('#occupancy_content').html(data);                
+           	LoadKnob();
     });
     }
     
@@ -182,7 +194,7 @@ include('../../includes/sidebar.php');
                     labels: hours_label_reorder,
                     datasets: [{
                             data: mindata,
-                            label: 'Minimum',
+                            label: "<?=$json["minimum"]?>",//'Minimum',
 
                             // transparent bar with normal border
                             backgroundColor: "rgba(40,167,69, 0.5)",
@@ -191,7 +203,7 @@ include('../../includes/sidebar.php');
                         },
                         {
                             data: maxdata,
-                            label: 'Maximum',
+                            label: "<?=$json["maximum"]?>",//'Maximum',
 
                             // transparent bar with normal border
                             backgroundColor: "rgba(0,123,255, 0.5)",
@@ -200,7 +212,7 @@ include('../../includes/sidebar.php');
                         },
                         {
                             type: 'line',
-                            label: "This day last week",
+                            label: "<?=$json["this_day_last_week"]?>",//"This day last week",
                             borderColor: '#28a745',
                             borderWidth: 2,
                             fill: false,
@@ -348,6 +360,7 @@ include('../../includes/sidebar.php');
     {
         hourly_occ_chart.data.datasets[0].data = getoccupancy("Min");
         hourly_occ_chart.data.datasets[1].data = getoccupancy("Max");
+	hourly_occ_chart.data.datasets[1].data = getoccupancy("Max");
         hourly_occ_chart.update();
     }
     
@@ -358,6 +371,40 @@ include('../../includes/sidebar.php');
    
     }, 10000);
 
+
+$("#language").change(function()
+{	
+    update_session();  
+    loadReportLabels(); 
+    get_live_occupancy();
+});
+function loadReportLabels()    
+{
+	var data={};
+	data["task"]=9;
+	data["language"]=$("#language").val();    
+	data["page"]=4;
+	var json = JSON.stringify(data);
+	//console.log(json);
+	$.post("../ajax/dashboard-ajax.php",json,function(data)
+	{	
+	//console.log(data);	            
+	var json=JSON.parse(data);
+	$("#pdf-report-header").html(json.occupancy);   
+	$("#logout").html(json.logout); 
+	$(".chart-header").html(json.hourly_occupancy);
+	$("#option_1").html(json.this_day_last_week); 
+	$("#option_2").html(json.last_week_average); 
+	$("#option_3").html(json.all_time_average); 
+
+
+	hourly_occ_chart.data.datasets[0].label = json.minimum;
+        hourly_occ_chart.data.datasets[1].label = json.maximum;
+	hourly_occ_chart.data.datasets[2].label = json.this_day_last_week;
+        hourly_occ_chart.update();
+	 });   
+}
+
 </script>
 
-<?php include '../../includes/footer.php'; ?>
+

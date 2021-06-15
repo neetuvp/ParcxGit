@@ -24,6 +24,8 @@ class ParkingReport
     void watchdogNetworkLogs(Php::Value json);     
     void parkingDuration(Php::Value json);
     void liveParking(Php::Value json);
+    void getPlatesfromTicket(Php::Value json);
+    void reprocessDayClosureReport(Php::Value json);
     };
 
 #endif    

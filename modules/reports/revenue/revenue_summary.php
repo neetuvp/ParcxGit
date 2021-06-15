@@ -267,7 +267,11 @@ function loadReportLabels()
             selectAllNumber: false,
             allSelectedText: json.all_days
             });      
-            
+           
+	revenue_earnings_chart.data.labels[0]=json.parking_fee;
+    	revenue_earnings_chart.data.labels[1]=json.lost_fee;
+    	revenue_earnings_chart.data.labels[2]=json.product_sales;
+    	revenue_earnings_chart.update();
             
         }); 
         
@@ -277,6 +281,7 @@ function loadReportLabels()
 
 $("#language").change(function()
 {	  
+    update_session();
     loadReportLabels();    
     callReport();		
 }); 
@@ -365,9 +370,9 @@ function revenueEarningsChart()
         {
         labels: 
           [
-          'Parking Fee',
-          'Lost Ticket Fee',
-          'Product Sales',
+          '<?=$json["parking_fee"]?>',//'Parking Fee'
+          '<?=$json["lost_fee"]?>',//'Lost Ticket Fee'
+          '<?=$json["product_sales"]?>'//'Product Sales'
           //'VAT'
           ],
         datasets: 

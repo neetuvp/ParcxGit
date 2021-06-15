@@ -189,10 +189,11 @@ function loadReportLabels()
     }
 
 $("#language").change(function()
-    {	  
+{
+    update_session();	  
     loadReportLabels();    
     callReport();		
-    }); 
+}); 
 
     
   $('#export_excel_report').click(function (event) {

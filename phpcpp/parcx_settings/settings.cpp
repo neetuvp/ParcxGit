@@ -1425,6 +1425,91 @@ Php::Value insertUpdateSystemProduct(Php::Value json)
 	return msg;	
 	}
 
+
+void interfaceSettings()
+	{
+	try
+		{								
+		con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        res=stmt->executeQuery("select * from interface_settings order by id");					
+		
+		if(res->rowsCount()>0)			
+			{		
+			Php::out << "<thead>" << std::endl;
+                        Php::out << "<tr>" << std::endl;   
+                        Php::out << "<th>Interface Name</th>" << std::endl;								
+                        Php::out << "<th>Type</th>" << std::endl;
+                        Php::out << "<th>Host</th>" << std::endl;                        
+                        Php::out << "<th>Username</th>" << std::endl;
+                        Php::out << "<th>Password</th>" << std::endl;
+                        Php::out << "<th>FTP Url</th>" << std::endl;
+                        Php::out << "<th>SSH Path</th>" << std::endl;
+                        Php::out << "<th></th>" << std::endl;
+                        Php::out << "</tr>" << std::endl;
+                        Php::out << "</thead>" << std::endl;
+			
+			int no = 1;
+			while (res->next())
+				{								
+				Php::out << "<tr data-id='"<<res->getString("id")<<"'>"<< std::endl;
+                                Php::out << "<td>"<<res->getString("interface_name")<<"</td>"<< std::endl;				
+				Php::out << "<td>"<<res->getString("interface_type")<<"</td>"<< std::endl;
+				Php::out << "<td>"<<res->getString("host")<<"</td>"<< std::endl;
+				Php::out << "<td>"<<res->getString("username")<<"</td>"<< std::endl;
+                                Php::out << "<td>"<<res->getString("password")<<"</td>"<< std::endl;
+                                Php::out << "<td>"<<res->getString("url")<<"</td>"<< std::endl;
+                                Php::out << "<td>"<<res->getString("folder_path")<<"</td>"<< std::endl;
+				Php::out << "<td><button type='button' class='col btn btn-info interface-edit'><i class='fas fa-edit'></i>Edit</button></td>"<< std::endl;            	                
+                                Php::out << "</tr>"<< std::endl;	
+				no++;
+				}
+			}
+		delete res;	
+                delete stmt;	
+		delete con;		
+		}
+	catch (exception &e)
+		{
+		writeException("interfaceSettings", e.what());			
+		}
+	}
+
+Php::Value insertUpdateInterfaceSettings(Php::Value json)
+	{
+	string msg = "Failed";
+	try
+		{								
+		con= General.mysqlConnect(ServerDB);
+		if(ToString(json["id"])=="0")
+			prep_stmt = con->prepareStatement("insert into interface_settings(interface_name,interface_type,host,username,password,url,folder_path)VALUES(?,?,?,?,?,?,?)");
+		else
+			prep_stmt = con->prepareStatement("update interface_settings set interface_name=?,interface_type=?,host=?,username=?,password=?,url=?,folder_path=? where id=?");
+			
+		prep_stmt->setString(1, ToString(json["name"]));
+                prep_stmt->setString(2, ToString(json["interface_type"]));
+                prep_stmt->setString(3, ToString(json["host"]));	
+		prep_stmt->setString(4, ToString(json["username"]));
+		prep_stmt->setString(5, ToString(json["password"]));
+		prep_stmt->setString(6, ToString(json["url"]));
+		prep_stmt->setString(7, ToString(json["folder_path"]));
+							
+		if(ToString(json["id"])!="0")			
+			prep_stmt->setString(8, ToString(json["id"]));
+		
+
+		if (!prep_stmt->execute())
+				msg = "Successfull";	
+		delete prep_stmt;
+		delete con;
+		}
+	catch (exception &e)
+		{				
+		writeException("insertUpdateInterfaceSettings", e.what());				
+		}
+	return msg;	
+	}
+
 Php::Value parcxSettings(Php::Parameters &params)
 	{
 	Php::Value data=params[0];      
@@ -1503,6 +1588,12 @@ Php::Value parcxSettings(Php::Parameters &params)
         case 35:discountDropdown(); 
             break;
         case 36:parkingZoneDropdown(data);
+            break;
+        case 37:interfaceSettings();
+            break;
+        case 38:response=getDetails("interface_settings","id",data); 
+	    break;
+        case 39:response=insertUpdateInterfaceSettings(data);
             break;
 		}
 	return response;

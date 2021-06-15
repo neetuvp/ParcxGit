@@ -48,3 +48,28 @@ $userRollId=$_SESSION['userRollId'];
   </div>
   <!-- /.sidebar -->
 </aside>
+<div class="modal fade" id="message-modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content card-outline card-info">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="message-modal-heading"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="message-modal-body">
+                </div>
+               <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="ok_sidebar_modal"><?=$json["ok"]?></button>                
+              </div>
+                </div>
+            </div>
+        </div>
+<script>
+
+function alertMessage(data)
+    {
+    $("#message-modal-body").text(data);
+    $("#message-modal").modal('show');
+    }
+    </script>

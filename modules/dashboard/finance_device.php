@@ -8,11 +8,16 @@ include('../../includes/header.php');
 
 <?php
 include('../../includes/navbar-start.php');
+$data = array();
+$data["task"] = 9;
+$data["language"] = $_SESSION["language"];
+$data["page"] = 3;
+$json = parcxDashboard($data);
 ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Finance</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["finance"]?></div>
 
 <?php 
 include('../../includes/navbar-end.php');
@@ -27,26 +32,26 @@ include('../../includes/sidebar.php');
 
                 <div class="flex-grow-1 row additional-menu-left">
                     <div class="col tab-header d-flex justify-content-left pl-1">
-                        <div class="tab-link active" data-target="all">View All</div>
-                        <div class="tab-link" data-target="manual-cashier">Manual Cashiers</div>
-                        <div class="tab-link" data-target="payonfoot-machine">Pay on Foot Machines</div>
-                        <div class="tab-link" data-target="handheld-pos">Handheld POS</div>
+                        <div class="tab-link active" data-target="all" id="view_all_label"><?=$json["view_all"]?></div>
+                        <div class="tab-link" data-target="manual-cashier" id="manual_cashier_label"><?=$json["manual_cashiers"]?></div>
+                        <div class="tab-link" data-target="payonfoot-machine" id="pay_on_foot_label"><?=$json["pay_on_foot_machines"]?></div>
+                        <div class="tab-link" data-target="handheld-pos" id="handheld_label"><?=$json["handheld_pos"]?></div>
                     </div>
                 </div>
 
                 <div class="additional-menu-right row align-items-center">                
                     <div id="action-buttons">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-warning">Export</button>
+                            <button type="button" class="btn btn-warning" id="export"><?=$json["export"]?></button>
                             <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
                                 <span class="caret"></span>
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu" role="menu">
-                                <a class="dropdown-item" href="#" id="export_excel_report">Export to Excel</a>
+                                <a class="dropdown-item" href="#" id="export_excel_report"><?=$json["export_to_excel"]?></a>
 
                                 <a class="dropdown-item" href="#" id="export_pdf_report">
-                                    Export to PDF
+                                    <?=$json["export_to_pdf"]?>
                                 </a>
                             </div>
                         </div>
@@ -73,7 +78,7 @@ include('../../includes/sidebar.php');
                                 <!-- rev barchart -->
                                 <div class="col-lg-8 pl-0 pr-3">
                                     <div class="card barchart-box mt-0 h-100">
-                                        <p class="text-center chart-header text-dark">Revenue - Last 7 Days</p>
+                                        <p class="text-center chart-header text-dark" id="revenue_7_days_label"><?=$json["revenue_7_days"]?></p>
                                         <div class="">
                                             <div class="position-relative">
                                                 <canvas id="revenue-7days" height="269"></canvas>
@@ -87,7 +92,7 @@ include('../../includes/sidebar.php');
                                 <!-- donut chart - revenue sources -->
                                 <div class="col-lg-4 pr-0">
                                     <div class="card barchart-box mt-0" id="parking-duration">
-                                        <p class="text-center chart-header text-dark">Revenue Sources</p>
+                                        <p class="text-center chart-header text-dark" id="revenue_sources_label"><?=$json["revenue_sources"]?></p>
                                         <div class="">
                                             <div class="position-relative">
                                                 <canvas id="revenue_sources_chart" height="175"></canvas>
@@ -129,8 +134,15 @@ include('../../includes/sidebar.php');
     var carpark_number =<?php echo $_GET["carpark_number"]; ?>;
 function get_live_revenue_summary()
     {	
-    $.get( "../ajax/dashboard.php?task=5&facility_number="+facility_number+"&carpark_number="+carpark_number, function( data ) 
-        {  
+    //$.get( "../ajax/dashboard.php?task=5&facility_number="+facility_number+"&carpark_number="+carpark_number, function( data ) 
+	var req = {};
+  	req["task"]=24;
+  	req["language"]=$("#language").val();
+	req["facility_number"]=facility_number;
+	req["carpark_number"]=carpark_number;
+    	var json = JSON.stringify(req);
+  	$.post("../ajax/dashboard-ajax.php",json,function(data){ 
+	//console.log(data); 
         $('#live-revenue-summary-content').html(data);             
         $('[data-target="' + clicked_device_type + '"]').click();        
         });            
@@ -196,10 +208,16 @@ function rev7days()
     var revenue_amounts = {};
     var weekdays = [];
 
-    $.get("../ajax/dashboard.php?task=4&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) {                      
-
+    //$.get("../ajax/dashboard.php?task=4&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) {                      
+    var req = {};
+    req["task"]=25;
+    req["facility_number"]=facility_number;
+    req["carpark_number"]=carpark_number;
+    req["language"]=$("#language").val();
+    var json = JSON.stringify(req);
+    $.post("../ajax/dashboard-ajax.php",json,function(data){              
         /* chart variables */
-
+	//console.log(data);
         var weekdates = [];
         var date_string = [];
         var test = 0
@@ -389,9 +407,9 @@ function revenueSources()
                 backgroundColor : ['#00a65a','#00c0ef','#f56954', '#f39c12'],                                
             }],
             labels: [
-                'Parking Fee',
-                'Lost Fee',
-                'Product Sale',
+                '<?=$json["parking_fee"]?>',//'Parking Fee',
+                '<?=$json["lost_fee"]?>',//'Lost Fee',
+                '<?=$json["product_sale_amount"]?>',//'Product Sale',
                 'VAT'
             ]
         },
@@ -415,9 +433,30 @@ function revenueSources()
     }
 
 function updateRevenueSources() 
-    {
+{
+    var req = {};
+    req["task"]=26;
+    req["facility_number"]=facility_number;
+    req["carpark_number"]=carpark_number;
+    req["language"]=$("#language").val();
+    var json = JSON.stringify(req);
+    $.post("../ajax/dashboard-ajax.php",json,function(data){ 
+	//console.log(data);      
+	amount = JSON.parse(data);
+        pieValues[0] = amount["parking_fee"];
+        pieValues[1] = amount["lost_fee"];
+        pieValues[2] = amount["product_sale_amount"];        
+        pieValues[3] = amount["vat_amount"];        
+        pieChart.update();
+        //update barchart
+        revenue_data[7]=amount["gross_amount"];
+        rev_7_days.update();
+	});
+
+/*
     $.get("../ajax/dashboard.php?task=30&facility_number="+facility_number+"&carpark_number="+carpark_number, function (data) 
-        {        
+        {    
+	console.log(data);    
         amount = JSON.parse(data);
         pieValues[0] = amount["parking_fee"];
         pieValues[1] = amount["lost_fee"];
@@ -428,7 +467,45 @@ function updateRevenueSources()
         revenue_data[7]=amount["gross_amount"];
         rev_7_days.update();
         });
-    }
+*/
+}
+$("#language").change(function()
+{	  
+    update_session();
+    get_live_revenue_summary();
+    loadReportLabels(); 
+});
 
+function loadReportLabels()    
+{
+	var data={};
+	data["task"]=9;
+	data["language"]=$("#language").val();    
+	data["page"]=3;
+	var json = JSON.stringify(data);
+	//console.log(json);
+	$.post("../ajax/dashboard-ajax.php",json,function(data)
+	{	
+	//console.log(data);	            
+	var json=JSON.parse(data);
+	$("#pdf-report-header").html(json.finance);   
+	$("#logout").html(json.logout); 
+	$("#view_all_label").html(json.view_all); 
+	$("#manual_cashier_label").html(json.manual_cashiers); 
+	$("#pay_on_foot_label").html(json.pay_on_foot_machines); 
+	$("#handheld_label").html(json.handheld_pos); 
+	$("#revenue_7_days_label").html(json.revenue_7_days); 
+	$("#revenue_sources_label").html(json.revenue_sources); 
+	$("#export").html(json.export);   
+        $("#export_excel_report").html(json.export_to_excel);           
+        $("#export_pdf_report").html(json.export_to_pdf); 
+        $("#logout").html(json.logout);
+
+	pieChart.data.labels[0]=json.parking_fee;
+    	pieChart.data.labels[1]=json.lost_fee;
+    	pieChart.data.labels[2]=json.product_sale_amount;
+    	pieChart.update(); 
+	 });   
+}
 
 </script>

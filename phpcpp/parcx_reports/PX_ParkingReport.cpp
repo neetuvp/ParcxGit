@@ -6,7 +6,10 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
-
+#include <dirent.h>
+#include <sys/types.h>
+#include <signal.h>
+#include<fstream>
 #define ServerDB "parcx_server"
 #define ReportingDB "parcx_reporting"
 #define DashboardDB "parcx_dashboard"
@@ -720,9 +723,9 @@ void ParkingReport::visitorFrequencyReport(Php::Value json)
         rStmt=rCon->createStatement();
 		
 		if(visit_type=="all")		    
-			query = "Select * from visitor_frequency";			
+			query = "Select * from visitor_frequency where last_visited_date>=( CURDATE() - INTERVAL 180 DAY )";			
 		else            
-			query = "Select * from visitor_frequency where category = '"+visit_type+"'";					    		
+			query = "Select * from visitor_frequency where category = '"+visit_type+"' and last_visited_date>=( CURDATE() - INTERVAL 180 DAY )";					    		
         res = rStmt->executeQuery(query);
         if(res->rowsCount()>0)			
 	{
@@ -738,11 +741,12 @@ void ParkingReport::visitorFrequencyReport(Php::Value json)
             Php::out<<"</div>"<<endl;
             Php::out<<"<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>"<<endl; 
 			Php::out<<"<thead><tr>"<<endl;
-            Php::out<<"<th>#</th>"<<endl;	
-            Php::out<<"<th>"+toString(label["plate_number"])+"</th>"<<endl;                               
+            Php::out<<"<th>#</th>"<<endl;
+	    if(visit_type!="contract")		
+            	Php::out<<"<th>"+toString(label["plate_number"])+"</th>"<<endl;                               
             Php::out<<"<th>"+toString(label["ticket_id"])+"</th>"<<endl;	
-            if(visit_type!="shortterm")	            
-                Php::out<<"<th>"+toString(label["tag"])+"</th>"<<endl;
+            //if(visit_type!="shortterm")	            
+              //  Php::out<<"<th>"+toString(label["tag"])+"</th>"<<endl;
 
                 Php::out<<"<th>"+toString(label["last_7_days"])+"</th>"<< std::endl;
                 Php::out<<"<th>"+toString(label["last_30_days"])+"</th>"<< std::endl;
@@ -759,25 +763,30 @@ void ParkingReport::visitorFrequencyReport(Php::Value json)
 
                 while (res->next())
                     {		
-				Php::out<<"<tr>"<< std::endl;                
-                Php::out<< "<td>"+to_string(n)+"</td>"<< std::endl;
-				Php::out<< "<td>"+res->getString("plate_number")+"</td>"<< std::endl;			
+			Php::out<<"<tr>"<< std::endl;                
+        		Php::out<< "<td>"+to_string(n)+"</td>"<< std::endl;
+			//if(visit_type!="shortterm")				    
+				//Php::out<<"<td>"+res->getString("tag_id")+"</td>"<< std::endl;
+			if(visit_type!="contract")	
+				Php::out<< "<td>"+res->getString("plate_number")+"</td>"<< std::endl;	
+			if(res->getString("category")=="contract")
+				Php::out<<"<td onclick='tdclick("+res->getString("ticket_id")+");'>"+res->getString("ticket_id")+"</td>"<< std::endl;
+			else		
 				Php::out<<"<td>"+res->getString("ticket_id")+"</td>"<< std::endl;
-				if(visit_type!="shortterm")				    
-					Php::out<<"<td>"+res->getString("tag_id")+"</td>"<< std::endl;
-				    
-                Php::out<< "<td>"+res->getString("d7")+"</td>"<< std::endl;
-				Php::out<< "<td>"+res->getString("d30")+"</td>"<< std::endl;
-				Php::out<< "<td>"+res->getString("d60")+"</td>"<< std::endl;
-				Php::out<< "<td>"+res->getString("d90")+"</td>"<< std::endl;
-				Php::out<< "<td>"+res->getString("d120")+"</td>"<< std::endl;
-				Php::out<< "<td>"+res->getString("d150")+"</td>"<< std::endl;
-				Php::out<< "<td>"+res->getString("d180")+"</td>"<< std::endl;
-				if(visit_type=="all")				    
-					Php::out<< "<td>"+res->getString("category")+"</td>"<< std::endl;				    
-                Php::out<< "</tr>"<< std::endl;               
-                n++;		
-			    }
+			
+			    
+        		Php::out<< "<td>"+res->getString("d7")+"</td>"<< std::endl;
+			Php::out<< "<td>"+res->getString("d30")+"</td>"<< std::endl;
+			Php::out<< "<td>"+res->getString("d60")+"</td>"<< std::endl;
+			Php::out<< "<td>"+res->getString("d90")+"</td>"<< std::endl;
+			Php::out<< "<td>"+res->getString("d120")+"</td>"<< std::endl;
+			Php::out<< "<td>"+res->getString("d150")+"</td>"<< std::endl;
+			Php::out<< "<td>"+res->getString("d180")+"</td>"<< std::endl;
+			if(visit_type=="all")				    
+				Php::out<< "<td>"+res->getString("category")+"</td>"<< std::endl;				    
+			Php::out<< "</tr>"<< std::endl;               
+			n++;		
+		    }
 			Php::out<<"</tbody></table>"<<endl;
 	}
         else
@@ -800,115 +809,125 @@ void ParkingReport::visitorFrequencyReport(Php::Value json)
 void ParkingReport::visitorFrequencyRealTimeReport(Php::Value json)
     {		
 	string from_date = json["fromDate"];
-	string to_date = json["toDate"];
-	string visit_type = json["visit_type"];
-	string contract_type = json["contract_type"];
-	string search_text = json["search_text"];	
-	string lang = json["language"];
-    try
-        {
-        int n=0;
+    string to_date = json["toDate"];
+    string visit_type = json["visit_type"];
+    string contract_type = json["contract_type"];
+    string search_text = json["search_text"];
+    string lang = json["language"];
+    try {
+        int n = 0;
         string id = "0";
-        current_date_time=General.currentDateTime(dateTimeFormat); 
+        current_date_time = General.currentDateTime(dateTimeFormat);
 
-        string labels="plate_number,date_time,tag,device_name,ticket_id,no_of_visits,no_records,transactions";
-        Php::Value label=General.getLabels(lang,labels);
+        string labels = "plate_number,date_time,tag,device_name,ticket_id,no_of_visits,no_records,transactions";
+        Php::Value label = General.getLabels(lang, labels);
 
-        rCon=General.mysqlConnect(ReportingDB);
-        rStmt=rCon->createStatement();
-		if(visit_type=="shortterm")
-		    {
-			if(search_text=="")			    
-				query = "Select count(plate_number) as count,plate_number,ticket_id from parking_movements where date_time>='"+from_date+"' and date_time<='"+to_date+"' group by plate_number";			    
-			else                
-				query = "Select count(plate_number) as count,plate_number,ticket_id from parking_movements where date_time>='"+from_date+"' and date_time<='"+to_date+"' and plate_number='"+search_text+"'";			    
-		    }
-		else
+        rCon = General.mysqlConnect(ReportingDB);
+        rStmt = rCon->createStatement();
+        
+        if (visit_type == "shortterm") 
             {
-			if(contract_type=="anpr")
-			    {
-				if(search_text=="")				    
-					query = "Select count(plate_number) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='"+from_date+"' and date_time<='"+to_date+"'  group by ticket_id,tag";							    
-				else                    
-					query = "Select count(plate_number) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='"+from_date+"' and date_time<='"+to_date+"' and plate_number='"+search_text+"' group by ticket_id,tag";												    
-			    }
-			else if(contract_type=="ticketid")
-			    {
-				if(search_text=="")    
-	    			query = "Select count(ticket_id) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='"+from_date+"' and date_time<='"+to_date+"' group by ticket_id,plate_number";				                
-				else                    
-					query = "Select count(ticket_id) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='"+from_date+"' and date_time<='"+to_date+"' and ticket_id='"+search_text+"' group by ticket_id,plate_number";				    
-			    }
-			else if(contract_type=="tag")
-			    {
-				if(search_text=="")				
-					query = "Select count(tag) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='"+from_date+"' and date_time<='"+to_date+"'  and tag>'' group by tag,plate_number";							
-				else
-					query = "Select count(tag) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='"+from_date+"' and date_time<='"+to_date+"' and tag='"+search_text+"' and tag>'' group by tag,plate_number";							
-			    }
-			else
-                {				
-				query = "Select count(*) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='"+from_date+"' and date_time<='"+to_date+"' group by plate_number,ticket_id,tag";
-			    }
-		    }
-		
+            if (search_text == "")
+                query = "Select count(plate_number) as count,plate_number from parking_movements where date_time>='" + from_date + "' and date_time<='" + to_date + "' and plate_number>'' and movement_type=1 group by plate_number order by count desc";
+            else
+                query = "Select count(plate_number) as count,plate_number from parking_movements where date_time>='" + from_date + "' and date_time<='" + to_date + "' and movement_type=1 and plate_number='"  + search_text + "'";
+            } 
+        else 
+            {            
+            if (search_text == "")
+                query = "Select count(ticket_id) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='" + from_date + "' and date_time<='" + to_date + "' and movement_type=1 group by ticket_id order by count desc";
+            else
+                query = "Select count(ticket_id) as count,plate_number,ticket_id,tag from parking_movements_access where date_time>='" + from_date + "' and date_time<='" + to_date + "' and movement_type=1  and (plate_number='" + search_text + "' or ticket_id='"+search_text+"' or tag='"+search_text+"' )";            
+            }
+
         res = rStmt->executeQuery(query);
-        if(res->rowsCount()>0)			
-	{	
-            Php::out<<"<div class='row mb-4 jspdf-graph'>"<<endl;
-            Php::out<<"<div class='col-lg-3 col-6'>"<<endl;                       
-            Php::out<<"<div class='small-box bg-success'>"<<endl;
-            Php::out<<"<div class='inner'>"<<endl;
-            Php::out<<"<h3>"<<res->rowsCount()<<"</h3>"<<endl;
-            Php::out<<"<h6>"<<toString(label["transactions"])<<"</h6>"<<endl;
-            Php::out<<"</div>"<<endl;            
-            Php::out<<"</div>"<<endl;
-            Php::out<<"</div>"<<endl;
-            Php::out<<"</div>"<<endl;
+        if (res->rowsCount() > 0) {
+            Php::out << "<div class='row mb-4 jspdf-graph'>" << endl;
+            Php::out << "<div class='col-lg-3 col-6'>" << endl;
+            Php::out << "<div class='small-box bg-success'>" << endl;
+            Php::out << "<div class='inner'>" << endl;
+            Php::out << "<h3>" << res->rowsCount() << "</h3>" << endl;
+            Php::out << "<h6>" << toString(label["transactions"]) << "</h6>" << endl;
+            Php::out << "</div>" << endl;
+            Php::out << "</div>" << endl;
+            Php::out << "</div>" << endl;
+            Php::out << "</div>" << endl;
+
+
+            Php::out << "<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>" << endl;
+            Php::out << "<thead><tr>" << endl;
+            Php::out << "<th>#</th>" << std::endl;
+            Php::out << "<th>" << toString(label["plate_number"]) << "</th>" << std::endl;
             
-            
-            Php::out<<"<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>"<<endl; 
-			Php::out<<"<thead><tr>"<<endl;
-            Php::out<<"<th>#</th>"<< std::endl;				
-            Php::out<<"<th>"<<toString(label["plate_number"])<<"</th>"<< std::endl;
-            Php::out<<"<th>"<<toString(label["ticket_id"])<<"</th>"<< std::endl;			
-			if(visit_type=="contract")			
-				Php::out<<"<th>"<<toString(label["tag"])<<"</th>"<< std::endl;
-			
-            Php::out<<"<th>"<<toString(label["no_of_visits"])<<"</th>"<< std::endl;
-            Php::out<<"</tr></thead>"<<endl;
-			Php::out<<"<tbody>"<<endl;  
-			n=1;
-			
-			while (res->next())
-			    {		
-				Php::out<<"<tr>"<< std::endl;               
-                Php::out<< "<td>"+to_string(n)+"</td>"<< std::endl;				
-			    Php::out<< "<td>"+res->getString("plate_number")+"</td>"<< std::endl;
-				Php::out<<"<td>"+res->getString("ticket_id")+"</td>"<< std::endl;
-				
-				if(visit_type=="contract")				    
-					Php::out<<"<td>"+res->getString("tag")+"</td>"<< std::endl;				
-                Php::out<< "<td>"+res->getString("count")+"</td>"<< std::endl;                       
-                Php::out<< "</tr>"<< std::endl;                
-                n++;		
-			    }
-			 Php::out<<"</tbody></table>"<<endl;
+            if (visit_type == "contract")
+                {
+                Php::out << "<th>" << toString(label["ticket_id"]) << "</th>" << std::endl;
+                Php::out << "<th>" << toString(label["tag"]) << "</th>" << std::endl;                
+                }
+
+            Php::out << "<th>" << toString(label["no_of_visits"]) << "</th>" << std::endl;
+            Php::out << "</tr></thead>" << endl;
+            Php::out << "<tbody>" << endl;
+            n = 1;
+
+            while (res->next()) {
+                Php::out << "<tr>" << std::endl;
+                Php::out << "<td>" + to_string(n) + "</td>" << std::endl;
+                Php::out << "<td>" + res->getString("plate_number") + "</td>" << std::endl;
+                
+
+                if (visit_type == "contract")
+                    {
+                    Php::out << "<td>" + res->getString("ticket_id") + "</td>" << std::endl;                    
+                    Php::out << "<td>" + res->getString("tag") + "</td>" << std::endl;                    
+                    }
+                Php::out << "<td>" + res->getString("count") + "</td>" << std::endl;
+                Php::out << "</tr>" << std::endl;
+                n++;
             }
-        else
-            {
-            Php::out<<"<div class='p-0'>"+toString(label["no_records"])+"</div>"<<endl;
-            }
-		
-		delete res;
-		delete rStmt;
-		delete rCon;		
+            Php::out << "</tbody></table>" << endl;
+        } else {
+            Php::out << "<div class='p-0'>" + toString(label["no_records"]) + "</div>" << endl;
+        }
+
+        delete res;
+        delete rStmt;
+        delete rCon;
+    }    catch (const std::exception& e) {
+        writeParkingReportException("visitorFrequencyRealTimeReport", e.what());
+    }
+    }
+void ParkingReport::getPlatesfromTicket(Php::Value json)
+{
+	string ticket_id = json["ticket_id"];
+	try
+        {
+	con=General.mysqlConnect(ServerDB);
+	stmt=con->createStatement();
+        query="select plate_number from access_whitelist where ticket_id='"+ticket_id+"'";
+        res=stmt->executeQuery(query);
+	if(res->rowsCount()>0)
+	{
+		while(res->next())
+		{
+			Php::out<<res->getString("plate_number")<<endl;
+			Php::out<<"</br>"<<endl;
+		}
+	}
+	else{
+		Php::out<<"No plates found"<<endl;
+	}
+	delete res;
+	delete stmt;
+	delete con;
+       
         }
     catch(const std::exception& e)
         {
-        writeParkingReportException("visitorFrequencyRealTimeReport",e.what());
+        writeParkingReportException("getPlatesfromTicket",e.what());
         }    
-    }
+}
+
 
 void ParkingReport::ticketDetails(Php::Value json)
     {
@@ -1314,87 +1333,88 @@ void ParkingReport::watchDogDeviceAlarms(Php::Value json)
         } 
     }
 	
-void ParkingReport::manualmovementReport(Php::Value json)
-{
-    try
-        {        
-        string carpark=json["carpark"];
+void ParkingReport::manualmovementReport(Php::Value json) {
+    try {
+        string carpark = json["carpark"];
         string operation = json["operation"];
-        string lang=json["language"]; 
+        string lang = json["language"];
+        int limit = json["limit"];
 
-        string labels="date_time,operator_name,action,reason,description,device_name,no_records,transactions";
-        Php::Value label=General.getLabels(lang,labels);
+        string labels = "date_time,operator_name,action,reason,description,device_name,no_records,transactions";
+        Php::Value label = General.getLabels(lang, labels);
 
-        current_date_time=General.currentDateTime(dateTimeFormat); 
-        rCon=General.mysqlConnect(ReportingDB);
-        rStmt=rCon->createStatement();
-        query="select * from parking_movements_manual where date_time between '"+toString(json["from"])+"' and '"+toString(json["to"])+"'";
-        if(carpark.length()>0)
-            query=query+" AND carpark_number in("+carpark+")";   
+        current_date_time = General.currentDateTime(dateTimeFormat);
+        rCon = General.mysqlConnect(ReportingDB);
+        rStmt = rCon->createStatement();
 
-		if (operation.length() > 1)
-            query=query+" AND action LIKE '%" +operation + "%'";
-       
-        
-        query=query+" ORDER BY  date_time desc";
+        if (limit > 0)
+            query = "select * from parking_movements_manual ORDER BY  date_time desc LIMIT " + to_string(limit);
+        else {
+            query = "select * from parking_movements_manual where date_time between '" + toString(json["from"]) + "' and '" + toString(json["to"]) + "'";
+            if (carpark.length() > 0)
+                query = query + " AND carpark_number in(" + carpark + ")";
 
-        res= rStmt->executeQuery(query);
-        if(res->rowsCount()>0)
-            {
-            Php::out<<"<div class='row mb-4 jspdf-graph'>"<<endl;
-            Php::out<<"<div class='col-lg-3 col-6'>"<<endl;                       
-            Php::out<<"<div class='small-box bg-success'>"<<endl;
-            Php::out<<"<div class='inner'>"<<endl;
-            Php::out<<"<h3>"<<res->rowsCount()<<"</h3>"<<endl;
-            Php::out<<"<h6>"<<label["transactions"]<<"</h6>"<<endl;
-            Php::out<<"</div>"<<endl;            
-            Php::out<<"</div>"<<endl;
-            Php::out<<"</div>"<<endl;
-            Php::out<<"</div>"<<endl;
-            
-            Php::out<<"<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>"<<endl; 
-            Php::out<<"<thead><tr>"<<endl;
-            Php::out<<"<th>#</th>"<<endl;             
-            Php::out<<"<th>"<<label["date_time"]<<"</th>"<<endl;                         
-            Php::out<<"<th>"<<label["device_name"]<<"</th>"<<endl;	  
-            Php::out<<"<th>"<<label["operator_name"]<<"</th>"<<endl;             
-            Php::out<<"<th>"<<label["action"]<<"</th>"<<endl;
-            Php::out<<"<th>"<<label["reason"]<<"</th>"<<endl;
-	    Php::out<<"<th>"<<label["description"]<<"</th>"<<endl;	     
-            Php::out<<"</tr></thead>"<<endl;
-            Php::out<<"<tbody>"<<endl;
-            
-            i=0;
-            while(res->next())
-                { 
-                i++;                   
-				Php::out<<"<tr>"<<endl; 
-                Php::out<<"<td>"<<i<<"</td>"<<endl; 
-                Php::out<<"<td>"+res->getString("date_time")+"</td>"<<endl;                              
-                Php::out<<"<td>"+res->getString("device_name")+"</td>"<<endl;                    
-                Php::out<<"<td> "+res->getString("operator_name")+" </td>"<<endl;                                                             
-                Php::out<<"<td>"+res->getString("action")+"</td>"<<endl;                   
-                Php::out<<"<td>"+res->getString("reason")+"</td>"<<endl; 
-				Php::out<<"<td>"+res->getString("description")+"</td>"<<endl; 
-				Php::out<<"</tr>"<<endl;                
-                }  
-            Php::out<<"</tbody></table>"<<endl;
+            if (operation.length() > 1)
+                query = query + " AND action LIKE '%" + operation + "%'";
+
+
+            query = query + " ORDER BY  date_time desc";
+        }
+
+
+        res = rStmt->executeQuery(query);
+        if (res->rowsCount() > 0) {
+            if (limit == 0) {
+                Php::out << "<div class='row mb-4 jspdf-graph'>" << endl;
+                Php::out << "<div class='col-lg-3 col-6'>" << endl;
+                Php::out << "<div class='small-box bg-success'>" << endl;
+                Php::out << "<div class='inner'>" << endl;
+                Php::out << "<h3>" << res->rowsCount() << "</h3>" << endl;
+                Php::out << "<h6>" << label["transactions"] << "</h6>" << endl;
+                Php::out << "</div>" << endl;
+                Php::out << "</div>" << endl;
+                Php::out << "</div>" << endl;
+                Php::out << "</div>" << endl;
             }
-        else
-            {
 
-            Php::out<<"<div class='p-0'>"<<label["no_records"]<<"</div>"<<endl;
+            Php::out << "<table id='RecordsTable' class='table table-blue table-bordered table-striped jspdf-table'>" << endl;
+            Php::out << "<thead><tr>" << endl;
+            Php::out << "<th>#</th>" << endl;
+            Php::out << "<th>" << label["date_time"] << "</th>" << endl;
+            Php::out << "<th>" << label["device_name"] << "</th>" << endl;
+            Php::out << "<th>" << label["operator_name"] << "</th>" << endl;
+            Php::out << "<th>" << label["action"] << "</th>" << endl;
+            Php::out << "<th>" << label["reason"] << "</th>" << endl;
+            Php::out << "<th>" << label["description"] << "</th>" << endl;
+            Php::out << "</tr></thead>" << endl;
+            Php::out << "<tbody>" << endl;
+
+            i = 0;
+            while (res->next()) {
+                i++;
+                Php::out << "<tr>" << endl;
+                Php::out << "<td>" << i << "</td>" << endl;
+                Php::out << "<td>" + res->getString("date_time") + "</td>" << endl;
+                Php::out << "<td>" + res->getString("device_name") + "</td>" << endl;
+                Php::out << "<td> " + res->getString("operator_name") + " </td>" << endl;
+                Php::out << "<td>" + res->getString("action") + "</td>" << endl;
+                Php::out << "<td>" + res->getString("reason") + "</td>" << endl;
+                Php::out << "<td>" + res->getString("description") + "</td>" << endl;
+                Php::out << "</tr>" << endl;
             }
+            Php::out << "</tbody></table>" << endl;
+        } else {
+
+            Php::out << "<div class='p-0'>" << label["no_records"] << "</div>" << endl;
+        }
 
         delete rStmt;
-        delete res;       
+        delete res;
         rCon->close();
         delete rCon;
-        }
-    catch(const std::exception& e)
-        {
-        writeParkingReportException("manualmovmentReport",e.what());        
-        }
+    } catch (const std::exception& e) {
+        writeParkingReportException("manualmovmentReport", e.what());
+    }
 }
 
 string str_replace(string str,string find_str,string replace_str)
@@ -1656,7 +1676,8 @@ string Addtime(string sdate)
 	 // time_t e = mktime(&tm);
 		
 	  tm.tm_sec =  tm.tm_sec+3600;
-	  time_t t = mktime(&tm);
+          mktime(&tm);
+	  //time_t t = mktime(&tm);
 	  strftime(out,30,"%Y-%m-%d %H:%M:%S",&tm);
 	  string stime(out);
 	  addtime = stime;
@@ -1679,7 +1700,8 @@ string AddDate(string sdate)
 	  
 		
 	  tm.tm_sec += 86400;
-	  time_t t = mktime(&tm);
+          mktime(&tm);
+	  //time_t t = mktime(&tm);
 	  strftime(out,30,"%Y-%m-%d %H:%M:%S",&tm);
 	  string stime(out);
 	  adddate = stime;
@@ -1689,470 +1711,450 @@ string AddDate(string sdate)
 	  
 	
 }
-
-void ParkingReport::trafficReport(Php::Value json)
+string getDayClosureStartTime()
 {
-	int show_date_by_report=0;
-	Php::Value datearr,day_report;
-	int entry_count[24];
-	int exit_count[24];
-	int access_entry[24];
-	int access_exit[24];
-	int manualopen_count[24];
-	int manualclose_count[24];
-	int pushbutton_open_count[24];     
-	int count[24];
-	try
-	{  
-		string from =json["fromDate"];//"2020-12-01 00:00:00";
-		string to = json["toDate"];//"2020-12-30 00:00:00";
-		string carpark=json["carpark"];
-                string weekdays=json["weekdays"];
-		string dayclosure = "00:00:00";//json["dayclosureStart"];
-		string temp_date;
-		string lang = json["language"];
-		//Php::out<<from<<endl;
-		//Php::out<<to<<endl;
-		int *d = General.differenceDateTime(to,from,"%Y-%m-%d");
-                string labels="traffic_report,report_by_date,entries,short_term,exits,manual_operation,entry_exit,report_date,shortterm_entries,shortterm_exits,contract_entries,contract_exits,manual_entry,manual_exit,from,to,total,no_records";
-                Php::Value label=General.getLabels(lang,labels);
-		//Php::out<<d[1]<<endl;
-//Php::out<<from<<endl;
-		//AddDate("2019-06-01 00:00:00");
-		datearr[0]=from.substr(0,10);
-		
-		i = 1;
-		temp_date = from+" 00:00:00";
-		string date_add;
-		string from1;
-		while(i<=d[1])
+	sql::Connection *con;
+	sql::Statement *stmt;
+	sql::ResultSet *res;
+	string dayclosure_start = "00:00:00";
+	try{
+		con=General.mysqlConnect(ServerDB);
+	    	stmt=con->createStatement();
+	    	string query="select setting_value from system_settings where setting_name = 'dayclosure_start_time'";
+	    	res=stmt->executeQuery(query);
+		if(res->next())
 		{
-			//datearr[i] = AddDate(temp_date);
-			date_add = AddDate(temp_date);
-			from1 = date_add.substr(0,10);
-			datearr[i] =from1;
-			//Php::out<<from1<<endl;
-			temp_date=date_add;
-			i++;
-			
+			dayclosure_start = res->getString("setting_value");
 		}
-		for(int k=0;k<datearr.size();k++)
-		{
-			string key = datearr[k];
-			day_report[key]["short_term_entry"]=0;
-            day_report[key]["short_term_exit"]=0; 
-            day_report[key]["access_entry"]=0;
-            day_report[key]["access_exit"]=0; 
-            day_report[key]["manual_entry"]=0;
-            day_report[key]["manual_exit"]=0; 
-		}
-		//Php::out<<day_report["2020-12-08"]["short_term_entry"]<<endl;
-		//Php::out<<day_report["2020-12-06"]["short_term_entry"]<<endl;
-		
-		if(d[1]>1)
-		{
-			show_date_by_report=1;
-		}
-		
-		
-		
-		string current_date          = General.currentDateTime("%Y-%m-%d %H:%M:%S");
-        int total_entry           = 0;
-        int total_exit            = 0;
-        int total_mopen           = 0;
-        int total_mclose          = 0;
-        int access_entry_total    = 0;
-        int access_exit_total     = 0;
-        int total_pushbutton_open = 0;
-        
-        for (i = 0; i < 24; i++) 
-        {
-            entry_count[i]           = 0;
-            exit_count[i]            = 0;
-            manualopen_count[i]      = 0;
-            manualclose_count[i]     = 0;
-            pushbutton_open_count[i] = 0;
-            access_entry[i]          = 0;
-            access_exit[i]           = 0;
-        }
-		
-		
-		
-		
-		
-		rCon=General.mysqlConnect(ReportingDB);
-        rStmt=rCon->createStatement();
-        query="select * from summary_parking_movements where  report_date between '"+from+"' and '"+to+"'";
-		if(carpark.length()>0)
-		   query = query+" AND car_park_number IN ("+carpark+")";
+	delete res;
+	delete stmt;
+	delete con;
+	}
+	catch(const std::exception& e)
+	{
+		writeParkingReportException("getDayClosureStartTime",e.what());        
+	}
+	return dayclosure_start;
+}
 
-		if(weekdays.length()>0)
-		   query = query+" AND report_day IN ("+weekdays+")";
-	   
-	    res = rStmt->executeQuery(query);
-		//Php::out<<query<<endl;
-		int category;
-		int movement_type;
-		string day,field;
-		int temp=0;
-		string data="",summary="",header="",html_data="";
-	    if(res->rowsCount()>0)
-        {
-			while(res->next())
-			{
-				category = res->getInt("category");
-                movement_type=res->getInt("movement_type"); 
-                day=res->getString("report_date"); 
-				
-				
-				switch (category) 
-                {
+void ParkingReport::trafficReport(Php::Value json) {
+    int show_date_by_report = 0;
+    Php::Value datearr, day_report;
+    int entry_count[24];
+    int exit_count[24];
+    int access_entry[24];
+    int access_exit[24];
+    int manualopen_count[24];
+    int manualclose_count[24];
+    int pushbutton_open_count[24];
+    int count[24];
+    try {
+        string from = json["fromDate"]; //"2020-12-01 00:00:00";
+        string to = json["toDate"]; //"2020-12-30 00:00:00";
+        string carpark = json["carpark"];
+        string weekdays = json["weekdays"];
+        string dayclosure = getDayClosureStartTime();//"00:00:00"; //json["dayclosureStart"];
+        string temp_date;
+        string lang = json["language"];
+        //Php::out<<from<<endl;
+        //Php::out<<to<<endl;
+        int *d = General.differenceDateTime(to, from, "%Y-%m-%d");
+        string labels = "traffic_report,report_by_date,entries,short_term,exits,manual_operation,entry_exit,report_date,shortterm_entries,shortterm_exits,contract_entries,contract_exits,manual_entry,manual_exit,from,to,total,no_records";
+        Php::Value label = General.getLabels(lang, labels);
+        //Php::out<<d[1]<<endl;
+        //Php::out<<from<<endl;
+        //AddDate("2019-06-01 00:00:00");
+        datearr[0] = from.substr(0, 10);
+
+        i = 1;
+        temp_date = from + " 00:00:00";
+        string date_add;
+        string from1;
+        while (i <= d[1]) {
+            //datearr[i] = AddDate(temp_date);
+            date_add = AddDate(temp_date);
+            from1 = date_add.substr(0, 10);
+            datearr[i] = from1;
+            //Php::out<<from1<<endl;
+            temp_date = date_add;
+            i++;
+        }
+        for (int k = 0; k < datearr.size(); k++) {
+            string key = datearr[k];
+            day_report[key]["short_term_entry"] = 0;
+            day_report[key]["short_term_exit"] = 0;
+            day_report[key]["access_entry"] = 0;
+            day_report[key]["access_exit"] = 0;
+            day_report[key]["manual_entry"] = 0;
+            day_report[key]["manual_exit"] = 0;
+        }
+        //Php::out<<day_report["2020-12-08"]["short_term_entry"]<<endl;
+        //Php::out<<day_report["2020-12-06"]["short_term_entry"]<<endl;
+
+        if (d[1] > 1) {
+            show_date_by_report = 1;
+        }
+
+
+
+        string current_date = General.currentDateTime("%Y-%m-%d %H:%M:%S");
+        int total_entry = 0;
+        int total_exit = 0;
+        int total_mopen = 0;
+        int total_mclose = 0;
+        int access_entry_total = 0;
+        int access_exit_total = 0;
+        //int total_pushbutton_open = 0;
+
+        for (i = 0; i < 24; i++) {
+            entry_count[i] = 0;
+            exit_count[i] = 0;
+            manualopen_count[i] = 0;
+            manualclose_count[i] = 0;
+            pushbutton_open_count[i] = 0;
+            access_entry[i] = 0;
+            access_exit[i] = 0;
+        }
+
+
+
+
+
+        rCon = General.mysqlConnect(ReportingDB);
+        rStmt = rCon->createStatement();
+        query = "select * from summary_parking_movements where  report_date between '" + from + "' and '" + to + "'";
+        if (carpark.length() > 0)
+            query = query + " AND car_park_number IN (" + carpark + ")";
+
+        if (weekdays.length() > 0)
+            query = query + " AND report_day IN (" + weekdays + ")";
+
+        res = rStmt->executeQuery(query);
+        //Php::out<<query<<endl;
+        int category;
+        int movement_type;
+        string day, field;
+        int temp = 0;
+        string data = "", summary = "", header = "", html_data = "";
+        if (res->rowsCount() > 0) {
+            while (res->next()) {
+                category = res->getInt("category");
+                movement_type = res->getInt("movement_type");
+                day = res->getString("report_date");
+
+
+                switch (category) {
                     case 1:
-                        if(movement_type==1)
-						{
-							temp = day_report[day]["short_term_entry_count"];
-                            day_report[day]["short_term_entry_count"]=res->getInt("total_count")+temp;
-						}
-                        if(movement_type==2)
-						{
-							temp = day_report[day]["short_term_exit_count"];
-                            day_report[day]["short_term_exit_count"]=res->getInt("total_count")+temp;
-						}
+                        if (movement_type == 1) {
+                            temp = day_report[day]["short_term_entry_count"];
+                            day_report[day]["short_term_entry_count"] = res->getInt("total_count") + temp;
+                        }
+                        if (movement_type == 2) {
+                            temp = day_report[day]["short_term_exit_count"];
+                            day_report[day]["short_term_exit_count"] = res->getInt("total_count") + temp;
+                        }
                         break;
                     case 2:
-                        if(movement_type==1)
-						{
-							temp = day_report[day]["access_entry_count"];
-                            day_report[day]["access_entry_count"]=res->getInt("total_count")+temp;
-						}
-                        if(movement_type==2)
-						{
-							temp = day_report[day]["access_exit_count"];
-                            day_report[day]["access_exit_count"]=res->getInt("total_count")+temp;
-						}
+                        if (movement_type == 1) {
+                            temp = day_report[day]["access_entry_count"];
+                            day_report[day]["access_entry_count"] = res->getInt("total_count") + temp;
+                        }
+                        if (movement_type == 2) {
+                            temp = day_report[day]["access_exit_count"];
+                            day_report[day]["access_exit_count"] = res->getInt("total_count") + temp;
+                        }
                         break;
                     case 3:
-                        if(movement_type==1 ||movement_type==3)
-						{
-							temp = day_report[day]["manual_entry_count"];
-                            day_report[day]["manual_entry_count"]=res->getInt("total_count")+temp;
-						}
-                        if(movement_type==2 ||movement_type==4)
-						{
-							temp = day_report[day]["manual_exit_count"];
-                            day_report[day]["manual_exit_count"]=res->getInt("total_count")+temp;
-						}
-						break;
-				}
-				
-				
-				i = 0;
-				
-                while (i < 24) 
-                {
-                    field    = "h" + to_string(i) + "to" + to_string((i + 1));                                                  
-                    switch (category) 
-                    {
-                        case 1:
-                            if(movement_type==1)
-                                {
-                                entry_count[i] = res->getInt(field) + entry_count[i];
-                                total_entry = res->getInt(field) + total_entry;                                
-                                }
-                            if(movement_type==2)
-                                {
-                                exit_count[i] = res->getInt(field) + exit_count[i];
-                                total_exit = total_exit + res->getInt(field);                                
-                                }
-                            break;
-                        
-                        case 2:
-                            if(movement_type==1)
-                                {
-                                access_entry[i] = res->getInt(field)+access_entry[i] ;
-                                access_entry_total = access_entry_total + res->getInt(field);                                 
-                                }
-                            if(movement_type==2)
-                                {
-                                access_exit[i] = res->getInt(field)+access_exit[i];
-                                access_exit_total = access_exit_total + res->getInt(field);                                   
-                                }
-                            break;
-                        
-                        case 3:
-                            if(movement_type==1 ||movement_type==3)
-                                {
-                                manualopen_count[i] = res->getInt(field) + manualopen_count[i];
-                                total_mopen = total_mopen + res->getInt(field);                                
-                                }
-                            if(movement_type==2 ||movement_type==4)
-                                {
-                                manualclose_count[i] = res->getInt(field)+manualclose_count[i];
-                                total_mclose = res->getInt(field) + total_mclose;                                
-                                }
-                            break;
-                        
-                       
-                        
-                             /* 
-                            case 5:
-                            pushbutton_open_count[i] = res->getInt(field);
-                            total_pushbutton_open = total_pushbutton_open + res->getInt(field);
-                            break;                                                                                                   
-                            
-                            case 10:
-                            count[i]=(int)data[field];
-                            total=(int)data['total_count'];;
-                            break;
-                            
-                            
-                            case 50: // exit counts during grace period 
-                            count[i]=(int)data[field];
-                            total_exit_during_grace=(int)data['total_count'];;
-                            break;
-                            */
-                            
-                    }
-                    i++;                    
+                        if (movement_type == 1 || movement_type == 3) {
+                            temp = day_report[day]["manual_entry_count"];
+                            day_report[day]["manual_entry_count"] = res->getInt("total_count") + temp;
+                        }
+                        if (movement_type == 2 || movement_type == 4) {
+                            temp = day_report[day]["manual_exit_count"];
+                            day_report[day]["manual_exit_count"] = res->getInt("total_count") + temp;
+                        }
+                        break;
                 }
-				
-			}
 
-			summary = "<div class='row mb-4 jspdf-graph'>";
-            summary +="<div class='col-lg-3 col'>";        
-            summary +="<div class='small-box bg-success'>";
+
+                i = 0;
+
+                while (i < 24) {
+                    field = "h" + to_string(i) + "to" + to_string((i + 1));
+                    switch (category) {
+                        case 1:
+                            if (movement_type == 1) {
+                                entry_count[i] = res->getInt(field) + entry_count[i];
+                                total_entry = res->getInt(field) + total_entry;
+                            }
+                            if (movement_type == 2) {
+                                exit_count[i] = res->getInt(field) + exit_count[i];
+                                total_exit = total_exit + res->getInt(field);
+                            }
+                            break;
+
+                        case 2:
+                            if (movement_type == 1) {
+                                access_entry[i] = res->getInt(field) + access_entry[i];
+                                access_entry_total = access_entry_total + res->getInt(field);
+                            }
+                            if (movement_type == 2) {
+                                access_exit[i] = res->getInt(field) + access_exit[i];
+                                access_exit_total = access_exit_total + res->getInt(field);
+                            }
+                            break;
+
+                        case 3:
+                            if (movement_type == 1 || movement_type == 3) {
+                                manualopen_count[i] = res->getInt(field) + manualopen_count[i];
+                                total_mopen = total_mopen + res->getInt(field);
+                            }
+                            if (movement_type == 2 || movement_type == 4) {
+                                manualclose_count[i] = res->getInt(field) + manualclose_count[i];
+                                total_mclose = res->getInt(field) + total_mclose;
+                            }
+                            break;
+
+
+
+                            /* 
+                           case 5:
+                           pushbutton_open_count[i] = res->getInt(field);
+                           total_pushbutton_open = total_pushbutton_open + res->getInt(field);
+                           break;                                                                                                   
+                            
+                           case 10:
+                           count[i]=(int)data[field];
+                           total=(int)data['total_count'];;
+                           break;
+                            
+                            
+                           case 50: // exit counts during grace period 
+                           count[i]=(int)data[field];
+                           total_exit_during_grace=(int)data['total_count'];;
+                           break;
+                             */
+
+                    }
+                    i++;
+                }
+
+            }
+
+            summary = "<div class='row mb-4 jspdf-graph'>";
+            summary += "<div class='col-lg-3 col'>";
+            summary += "<div class='small-box bg-success'>";
             summary += "<div class='inner'>";
-            summary += "<h3>"+ to_string(total_entry) + "/" + to_string(access_entry_total) + "</h3>";
-            summary += "     <p>"+toString(label["entries"])+"<br>["+toString(label["short_term"])+"]</p>";
+            summary += "<h3>" + to_string(total_entry) + "/" + to_string(access_entry_total) + "</h3>";
+            summary += "     <p>" + toString(label["entries"]) + "<br>[" + toString(label["short_term"]) + "]</p>";
             summary += "    </div>";
             summary += "    <div class='icon'>";
             summary += "    <i class='ion ion-pie-graph'></i>";
-            summary += "   </div>";        
+            summary += "   </div>";
             summary += " </div>";
             summary += " </div>";
             summary += " <div class='col-lg-3 col'>";
             summary += "  <div class='small-box bg-success'>";
             summary += "    <div class='inner'>";
             summary += "     <h3>" + to_string(total_exit) + "/" + to_string(access_exit_total) + "</h3>";
-            summary += "    <p>"+toString(label["exits"])+"<br>["+toString(label["short_term"])+"]</p>";
+            summary += "    <p>" + toString(label["exits"]) + "<br>[" + toString(label["short_term"]) + "]</p>";
             summary += "  </div>";
             summary += "  <div class='icon'>";
             summary += "  <i class='ion ion-pie-graph'></i>";
-            summary += "  </div>";   
+            summary += "  </div>";
             summary += "</div>";
             summary += " </div>";
-            
+
             summary += "   <div class='col-lg-3 col'>";
             summary += "<div class='small-box bg-success'>";
             summary += "  <div class='inner'>";
-            summary += "     <h3>" +to_string(total_mopen) + "/" + to_string(total_mclose) + "</h3>";
-            summary += "   <p>"+toString(label["manual_operation"])+"<br>"+toString(label["entry_exit"])+"</p>";
+            summary += "     <h3>" + to_string(total_mopen) + "/" + to_string(total_mclose) + "</h3>";
+            summary += "   <p>" + toString(label["manual_operation"]) + "<br>" + toString(label["entry_exit"]) + "</p>";
             summary += " </div>";
             summary += " <div class='icon'>";
             summary += " <i class='ion ion-pie-graph'></i>";
-            summary += " </div>";        
+            summary += " </div>";
             summary += "</div>";
             summary += "</div>";
-            
+
             summary += "</div> <!--End. Row -->";
 
-            Php::out<<summary<<endl;
-            
+            Php::out << summary << endl;
+
             // End . Traffic Summary 
-			
-			 /*Date by report*/			 
-            if(show_date_by_report==true)
-            {
+
+            /*Date by report*/
+            if (show_date_by_report == true) {
                 //header = "<table width='100%' class='jspdf-table'>";
                 //header += "<tr class='card-header d-flex justify-content-between align-items-center'>";
-                header+="<div class='header pl-0 mt-4 mb-3'>"+toString(label["report_by_date"])+"</div>";
-                header+="<table id='TABLE_1' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
-                header += "<thead><tr><th>"+toString(label["report_date"])+"</th>";            
-                header += "<th>"+toString(label["shortterm_entries"])+"</th>";
-                header += "<th>"+toString(label["shortterm_exits"])+"</th>";
-                header += "<th>"+toString(label["contract_entries"])+"</th>";
-                header += "<th>"+toString(label["contract_exits"])+"</th>";
-                header += "<th>"+toString(label["manual_entry"])+"</th>";
-                header += "<th>"+toString(label["manual_exit"])+"</th>";            
+                header += "<div class='header pl-0 mt-4 mb-3'>" + toString(label["report_by_date"]) + "</div>";
+                header += "<table id='TABLE_1' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
+                header += "<thead><tr><th>" + toString(label["report_date"]) + "</th>";
+                header += "<th>" + toString(label["shortterm_entries"]) + "</th>";
+                header += "<th>" + toString(label["shortterm_exits"]) + "</th>";
+                header += "<th>" + toString(label["contract_entries"]) + "</th>";
+                header += "<th>" + toString(label["contract_exits"]) + "</th>";
+                header += "<th>" + toString(label["manual_entry"]) + "</th>";
+                header += "<th>" + toString(label["manual_exit"]) + "</th>";
                 header += "</tr></thead>";
-                //Php::out<<header<<endl;
-				html_data+=header;
-                html_data+="<tbody>";
+
+                html_data += header;
+                html_data += "<tbody>";
 
 
-
-                //day_report=array_reverse(day_report,true);
-
-                /*foreach(day_report as key=>value)
-                    {                
-                    html_data += "<tr class='card-text d-flex justify-content-between align-items-center'>";                
-                    html_data += "<td>" . key . " </td>";                
-                    html_data += "<td>" . day_report[key]["short_term_entry_count"] . " </td>";
-                    html_data += "<td>" . day_report[key]["short_term_exit_count"] . " </td>";
-                    html_data += "<td>" . day_report[key]["access_entry_count"] . " </td>";
-                    html_data += "<td>" . day_report[key]["access_exit_count"] . " </td>";
-                    html_data += "<td>" . day_report[key]["manual_entry_count"] . " </td>";
-                    html_data += "<td>" .day_report[key]["manual_exit_count"] . " </td>";
-                    
+                for (int k = datearr.size() - 1; k >= 0; k--) {
+                    html_data += "<tr>";
+                    string key = datearr[k];
+                    html_data += "<td>" + key + "</td>";
+                    if (toString(day_report[key]["short_term_entry_count"]) == "") {
+                        day_report[key]["short_term_entry_count"] = 0;
+                    }
+                    if (toString(day_report[key]["short_term_exit_count"]) == "") {
+                        day_report[key]["short_term_exit_count"] = 0;
+                    }
+                    if (toString(day_report[key]["access_entry_count"]) == "") {
+                        day_report[key]["access_entry_count"] = 0;
+                    }
+                    if (toString(day_report[key]["access_exit_count"]) == "") {
+                        day_report[key]["access_exit_count"] = 0;
+                    }
+                    if (toString(day_report[key]["manual_entry_count"]) == "") {
+                        day_report[key]["manual_entry_count"] = 0;
+                    }
+                    if (toString(day_report[key]["manual_exit_count"]) == "") {
+                        day_report[key]["manual_exit_count"] = 0;
+                    }
+                    html_data += "<td>" + toString(day_report[key]["short_term_entry_count"]) + "</td>";
+                    html_data += "<td>" + toString(day_report[key]["short_term_exit_count"]) + " </td>";
+                    html_data += "<td>" + toString(day_report[key]["access_entry_count"]) + " </td>";
+                    html_data += "<td>" + toString(day_report[key]["access_exit_count"]) + " </td>";
+                    html_data += "<td>" + toString(day_report[key]["manual_entry_count"]) + " </td>";
+                    html_data += "<td>" + toString(day_report[key]["manual_exit_count"]) + " </td>";
                     html_data += "</tr>";
-                    }*/
-				for(int k=datearr.size()-1;k>=0;k--)
-				{					
-					html_data+="<tr>";             
-					string key = datearr[k];
-                    html_data+="<td>"+key+"</td>"; 
-					if(toString(day_report[key]["short_term_entry_count"])=="")
-					{
-						day_report[key]["short_term_entry_count"]=0;
-					}
-					if(toString(day_report[key]["short_term_exit_count"])=="")
-					{
-						day_report[key]["short_term_exit_count"]=0;
-					}
-					if(toString(day_report[key]["access_entry_count"])=="")
-					{
-						day_report[key]["access_entry_count"]=0;
-					}
-					if(toString(day_report[key]["access_exit_count"])=="")
-					{
-						day_report[key]["access_exit_count"]=0;
-					}
-					if(toString(day_report[key]["manual_entry_count"])=="")
-					{
-						day_report[key]["manual_entry_count"]=0;
-					}
-					if(toString(day_report[key]["manual_exit_count"])=="")
-					{
-						day_report[key]["manual_exit_count"]=0;
-					}
-                    html_data+="<td>"+toString(day_report[key]["short_term_entry_count"])+"</td>";
-                    html_data+="<td>"+toString(day_report[key]["short_term_exit_count"])+" </td>";
-                    html_data+="<td>"+toString(day_report[key]["access_entry_count"])+" </td>";
-                    html_data+="<td>"+toString(day_report[key]["access_exit_count"])+" </td>";
-                    html_data+="<td>"+toString(day_report[key]["manual_entry_count"])+" </td>";
-                    html_data+="<td>"+toString(day_report[key]["manual_exit_count"])+" </td>";                 
-                    html_data+="</tr>";
-				}	
-					
-					
-					
-					
-                html_data += "<tr>";            
-                html_data += "<td>"+toString(label["total"])+"</td>";                   
+                }
+
+
+
+
+                html_data += "<tr>";
+                html_data += "<td>" + toString(label["total"]) + "</td>";
                 html_data += "<td>" + to_string(total_entry) + "</td>";
                 html_data += "<td>" + to_string(total_exit) + "</td>";
                 html_data += "<td>" + to_string(access_entry_total) + "</td>";
                 html_data += "<td>" + to_string(access_exit_total) + "</td>";
                 html_data += "<td>" + to_string(total_mopen) + "</td>";
-                html_data += "<td>" + to_string(total_mclose) + "</td>";                    
+                html_data += "<td>" + to_string(total_mclose) + "</td>";
                 html_data += "</tr>";
 
-                html_data += "</table><br>"; 
-                Php::out<<html_data<<endl;   
+                html_data += "</table><br>";
+                Php::out << html_data << endl;
             }
 
 
-				// Begin . Hourly Traffic Statistics a
-            
-				//html_data = "";
-				
-				//header = "<table width='100%' class='jspdf-table'>";
-				
-                                header="<div class='header pl-0 mt-4 mb-3'>"+toString(label["traffic_report"])+"</div>";
-				header += "<table id='TABLE_2' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
-				header += "<thead><tr>";
-				
-				header += "<th>"+toString(label["from"])+"</th>";
-				header += "<th>"+toString(label["to"])+"</th>";
-				header += "<th>"+toString(label["shortterm_entries"])+"</th>";
-				header += "<th>"+toString(label["shortterm_exits"])+"</th>";
-				header += "<th>"+toString(label["contract_entries"])+"</th>";
-				header += "<th>"+toString(label["contract_exits"])+"</th>";
-				header += "<th>"+toString(label["manual_entry"])+"</th>";
-				header += "<th>"+toString(label["manual_exit"])+"</th>";
-				
-				header += "</tr></thead>";
-				
-				html_data = header;
-				html_data += "<tbody>";
-				
-				Php::out<<html_data<<endl;
-				
-				html_data="";
-				i       = 0;
-				string time_from = "2020-01-01 "+dayclosure;
-				string time_to;
-				int entryData[24];
-				int exitData[24];
-				while (i < 24) 
-				{
-					// data for chart                
+            // Begin . Hourly Traffic Statistics a
 
-					entryData[i] = entry_count[i] + access_entry[i];
-					exitData[i] = exit_count[i] + access_exit[i];
-					//Php::out<<"Entrydata"<<entryData[i]<<endl;
-					//Php::out<<"Exitdata"<<exitData[i]<<endl;
-					html_data += "<span display='none' id='chartData_" +to_string(i)+ "' data-entry='" + to_string(entryData[i]) + "' data-exit='" + to_string(exitData[i]) + "'></span>";
+            //html_data = "";
 
-					// end / data for chart
-					time_to = Addtime(time_from);
-					//Php::out<<"to:"<<time_to<<endl;
+            //header = "<table width='100%' class='jspdf-table'>";
 
-					html_data += "<tr>";
-					
-					html_data += "<td>" + time_from.substr(11,8) + " </td>";
-					html_data += "<td>" + time_to.substr(11,8) + " </td>";
-					html_data += "<td>" + to_string(entry_count[i]) + " </td>";
-					html_data += "<td>" + to_string(exit_count[i]) + " </td>";
-					html_data += "<td>" + to_string(access_entry[i]) + " </td>";
-					html_data += "<td>" + to_string(access_exit[i]) + " </td>";
-					html_data += "<td>" + to_string(manualopen_count[i]) + " </td>";
-					html_data += "<td>" + to_string(manualclose_count[i]) + " </td>";
-					
-					html_data += "</tr>";
-					
-					time_from = time_to;
-					
-					i++;
-				}
-				
-				html_data += "<tr>";
-				
-				html_data += "<td>"+toString(label["total"])+"</td>";
-				html_data += "<td></td>";
-				html_data += "<td>" + to_string(total_entry) + "</td>";
-				html_data += "<td>" + to_string(total_exit) + "</td>";
-				html_data += "<td>" + to_string(access_entry_total) + "</td>";
-				html_data += "<td>" + to_string(access_exit_total) + "</td>";
-				html_data += "<td>" + to_string(total_mopen) + "</td>";
-				html_data += "<td>" + to_string(total_mclose) + "</td>";
-				
-				html_data += "</tr></tbody>";
-				
-				html_data += "</table>";
-				
-				//End . Hourly Traffic Statistics 
-				Php::out<<html_data<<endl;
+            header = "<div class='header pl-0 mt-4 mb-3'>" + toString(label["traffic_report"]) + "</div>";
+            header += "<table id='TABLE_2' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>";
+            header += "<thead><tr>";
 
-                   
+            header += "<th>" + toString(label["from"]) + "</th>";
+            header += "<th>" + toString(label["to"]) + "</th>";
+            header += "<th>" + toString(label["shortterm_entries"]) + "</th>";
+            header += "<th>" + toString(label["shortterm_exits"]) + "</th>";
+            header += "<th>" + toString(label["contract_entries"]) + "</th>";
+            header += "<th>" + toString(label["contract_exits"]) + "</th>";
+            header += "<th>" + toString(label["manual_entry"]) + "</th>";
+            header += "<th>" + toString(label["manual_exit"]) + "</th>";
 
-		}
-		else 
+            header += "</tr></thead>";
+
+            html_data = header;
+            html_data += "<tbody>";
+
+            Php::out << html_data << endl;
+
+            html_data = "";
+            i = 0;
+	    
+            string time_from = "2020-01-01 " + dayclosure;
+            string time_to;
+            int entryData[24];
+            int exitData[24];
+	    string first_hour = dayclosure.substr(0,2);
+	    int h=stoi(first_hour);
+            while (i < 24) {
+                // data for chart                
+
+                entryData[i] = entry_count[i] + access_entry[i];
+                exitData[i] = exit_count[i] + access_exit[i];
+                //Php::out<<"Entrydata"<<entryData[i]<<endl;
+                //Php::out<<"Exitdata"<<exitData[i]<<endl;
+                html_data += "<span display='none' id='chartData_" + to_string(h) + "' data-entry='" + to_string(entryData[i]) + "' data-exit='" + to_string(exitData[i]) + "'></span>";
+
+                // end / data for chart
+                time_to = Addtime(time_from);
+                //Php::out<<"to:"<<time_to<<endl;
+
+                html_data += "<tr>";
+
+                html_data += "<td>" + time_from.substr(11, 8) + " </td>";
+                html_data += "<td>" + time_to.substr(11, 8) + " </td>";
+                html_data += "<td>" + to_string(entry_count[i]) + " </td>";
+                html_data += "<td>" + to_string(exit_count[i]) + " </td>";
+                html_data += "<td>" + to_string(access_entry[i]) + " </td>";
+                html_data += "<td>" + to_string(access_exit[i]) + " </td>";
+                html_data += "<td>" + to_string(manualopen_count[i]) + " </td>";
+                html_data += "<td>" + to_string(manualclose_count[i]) + " </td>";
+
+                html_data += "</tr>";
+
+                time_from = time_to;
+
+                i++;
+		h++;
+		if(h==23)
 		{
-			Php::out<<"<div class='p-0'>"+toString(label["no_records"])+"</div>"<<endl;
-		}        
+			h=0;
+		}
+            }
+
+            html_data += "<tr>";
+
+            html_data += "<td>" + toString(label["total"]) + "</td>";
+            html_data += "<td></td>";
+            html_data += "<td>" + to_string(total_entry) + "</td>";
+            html_data += "<td>" + to_string(total_exit) + "</td>";
+            html_data += "<td>" + to_string(access_entry_total) + "</td>";
+            html_data += "<td>" + to_string(access_exit_total) + "</td>";
+            html_data += "<td>" + to_string(total_mopen) + "</td>";
+            html_data += "<td>" + to_string(total_mclose) + "</td>";
+
+            html_data += "</tr></tbody>";
+
+            html_data += "</table>";
+
+            //End . Hourly Traffic Statistics 
+            Php::out << html_data << endl;
+
+
+
+        } else {
+            Php::out << "<div class='p-0'>" + toString(label["no_records"]) + "</div>" << endl;
+        }
         //echo html_data;   
 
-		delete rStmt;
-        delete res;       
+        delete rStmt;
+        delete res;
         rCon->close();
         delete rCon;
-		
-	}
-    catch(const std::exception& e)
-	{
-		writeParkingReportException("trafficReport",e.what());        
-	}
+
+    }    catch (const std::exception& e) {
+        writeParkingReportException("trafficReport", e.what());
+    }
 
 }
 
@@ -2486,3 +2488,169 @@ void ParkingReport::parkingDuration(Php::Value json)
 		writeParkingReportException("parkingDuration",e.what());        
 	}
     } //END. Show parking duration report 
+
+int getProcIdByName(string procName)
+    {
+    int pid = -1;
+
+    // Open the /proc directory
+    DIR *dp = opendir("/proc");
+    if (dp != NULL)
+        {
+        // Enumerate all entries in directory until process found
+        struct dirent *dirp;
+        while (pid < 0 && (dirp = readdir(dp)))
+            {
+            // Skip non-numeric entries
+            int id = atoi(dirp->d_name);
+            if (id > 0)
+                {
+                // Read contents of virtual /proc/{pid}/cmdline file
+                string cmdPath = string("/proc/") + dirp->d_name + "/cmdline";
+                ifstream cmdFile(cmdPath.c_str());
+                string cmdLine;
+                getline(cmdFile, cmdLine);
+                if (!cmdLine.empty())
+                    {
+                    // Keep first cmdline item which contains the program path
+                    size_t pos = cmdLine.find('\0');
+                    if (pos != string::npos)
+                        cmdLine = cmdLine.substr(0, pos);
+                    // Keep program name only, removing the path
+                    pos = cmdLine.rfind('/');
+                    if (pos != string::npos)
+                        cmdLine = cmdLine.substr(pos + 1);
+                    // Compare against requested process name
+                    if (procName == cmdLine)
+                        pid = id;
+                    }
+                }
+            }
+        }
+
+    closedir(dp);
+    return pid;
+    }
+
+Php::Value stopDaemon(string daemon)
+    {       
+    Php::Value result;
+    result = "failed";
+    string command;  
+    writeParkingReportLog("stopDaemon","Daemon:"+daemon);
+    try
+        {
+        int pid = getProcIdByName(daemon);
+        if(pid>0)
+            {           
+            command = "sudo kill "+to_string(pid);
+            int n = system(command.c_str());
+            result =n;                       
+            }
+        else
+            {            
+            result = "Process does not exist";           
+            }
+        }
+    catch(const std::exception& e)
+        {
+        writeParkingReportException("stopDaemon",e.what());
+        }
+    return result;
+    }
+
+Php::Value GetDayclosureDaemonDetails()
+    {
+        Php::Value daemon;
+	string path="";
+	sql::Connection *conn;
+	sql::Statement *stmt;
+	sql::ResultSet *res;
+	try
+        {
+            conn = General.mysqlConnect(ServerDB);
+            stmt = conn->createStatement();
+            res = stmt->executeQuery("Select path,daemon_name from daemon_status where daemon_label ='Parcx Dayclosure Daemon'");
+            if(res->next())
+                {
+                    daemon["path"] = res->getString("path").asStdString();
+                    daemon["name"] = res->getString("daemon_name").asStdString();
+                }
+            delete res;
+            delete stmt;
+            delete conn;		
+        }
+        catch(sql::SQLException &e)
+        {
+            writeParkingReportException("GetDayclosureDaemonDetails",e.what());
+        }	
+	return daemon;	
+    }
+
+Php::Value startDaemon(string daemon,string path)
+    {       
+    Php::Value result;
+    result = "failed";
+    string command;   
+    writeParkingReportLog("startDaemon","Daemon:"+daemon);
+    try
+        {
+        
+        int pid = getProcIdByName(daemon);
+        if(pid==-1)
+            {    	
+		command = "cd "+path+" && sudo ./"+daemon;
+                writeParkingReportLog("startDaemon","Command:"+command);
+                int n = system(command.c_str());
+                result =n;                                   
+            }
+        else
+            {
+                result = "Process already exists";
+            }
+        }
+    catch(const std::exception& e)
+        {
+            writeParkingReportException("startDaemon",e.what());
+        }
+    return result;
+    }
+
+
+
+void ParkingReport::reprocessDayClosureReport(Php::Value json)
+{
+    Php::Value daemon;
+    string daemon_name,path;
+    try
+        {
+        string query_string="";
+        string reprocess_date = json["reprocess_date"];
+        rCon=General.mysqlConnect(ReportingDB);
+        rStmt=rCon->createStatement();
+        //Update parking_duration
+        query_string = "Update parking_duration set flag = 1 where report_date='"+reprocess_date+"'";
+        rStmt->executeUpdate(query_string);
+
+        query_string = "Update summary_parking_movements set flag = 1 where report_date='"+reprocess_date+"'";
+        rStmt->executeUpdate(query_string);
+
+        query_string = "Update summary_daily_revenue set reproccessing_flag = 1 where report_date='"+reprocess_date+"'";
+        rStmt->executeUpdate(query_string);
+
+        delete rStmt;
+        delete rCon;
+
+        daemon = GetDayclosureDaemonDetails();
+        daemon_name = toString(daemon["name"]);
+        path = toString(daemon["path"]);
+        stopDaemon(daemon_name);
+        startDaemon(daemon_name,path);
+    }
+    catch(const std::exception& e)
+    {
+        writeParkingReportException("reprocessDayClosureReport",e.what());
+    }
+
+
+}

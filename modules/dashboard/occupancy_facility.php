@@ -6,11 +6,16 @@ include('../../includes/header.php');
 
     <?php
     include('../../includes/navbar-start.php');
+$data = array();
+$data["task"] = 9;
+$data["language"] = $_SESSION["language"];
+$data["page"] = 4;
+$json = parcxDashboard($data);
     ?>
 
 </ul>
 
-<div class="header text-dark" id="pdf-report-header">Occupancy</div>
+<div class="header text-dark" id="pdf-report-header"><?=$json["occupancy"]?></div>
 
 <?php
 include('../../includes/navbar-end.php');
@@ -30,14 +35,18 @@ include('../../includes/sidebar.php');
 </div>
 <script src="../../plugins/knob/jquery.knob.js"></script>
 </div>
-
+<?php include '../../includes/footer.php'; ?>
 <script>
 var facility_number = 0;
 var carpark_number=0;
 
 function get_live_occupancy()
-    {
-    $.get("../ajax/dashboard.php?task=1", function (data) {
+ {
+    var req = {};
+    req["task"]=27;
+    req["language"]=$("#language").val();
+    var json = JSON.stringify(req);
+    $.post("../ajax/dashboard-ajax.php",json,function(data){     
         $('#occupancy_content').html(data);         
         carpark_number=$("#carpark_number").val();
         facility_number=$("#facility_number").val();       
@@ -48,7 +57,7 @@ function get_live_occupancy()
        else
            LoadKnob();
     });
-    }
+}
     
 
 $(document).on('click', '.show-facility-details', function () {
@@ -57,6 +66,34 @@ $(document).on('click', '.show-facility-details', function () {
 });
 
 get_live_occupancy();
+
+$("#language").change(function()
+{	  
+    update_session();
+    loadReportLabels(); 
+    get_live_occupancy();
+});
+function loadReportLabels()    
+{
+	var data={};
+	data["task"]=9;
+	data["language"]=$("#language").val();    
+	data["page"]=4;
+	var json = JSON.stringify(data);
+	//console.log(json);
+	$.post("../ajax/dashboard-ajax.php",json,function(data)
+	{	
+	console.log(data);	            
+	var json=JSON.parse(data);
+	$("#pdf-report-header").html(json.occupancy);   
+	$("#logout").html(json.logout); 
+
+	
+
+	 });   
+}
+
+
 
 setInterval(function ()
     {
@@ -134,4 +171,4 @@ setInterval(function ()
 
 </script>
 
-<?php include '../../includes/footer.php'; ?>
+

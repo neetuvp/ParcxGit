@@ -95,6 +95,10 @@ Php::Value parcxReport(Php::Parameters &params)
                         break;
         case 31:pObj.liveParking(data);
                 break;
+	case 32:pObj.getPlatesfromTicket(data);
+		break;
+        case 33:pObj.reprocessDayClosureReport(data);
+                break;
 	}
 	return response;
 	}

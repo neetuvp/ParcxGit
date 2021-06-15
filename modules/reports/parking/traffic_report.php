@@ -139,6 +139,7 @@ function callReport()
 		task:23
       };
       var temp = JSON.stringify(data);
+	console.log(temp);
       $.post("../../ajax/reports.php", temp)
         .done(function (result) {
 
@@ -184,91 +185,12 @@ function callReport()
 
     event.preventDefault();
 }
-  //}); // end traffic report by day 
- /*$('#view-report-button').click(function (event) {
 
-   var weekdays=$("#days").val().toString();
-    var carpark = $("#multiselect").val().toString();
-    if ((!daterange)) {
-      alert("choose date range");
-    } else {
-      var data = {
-        toDate: to,
-        fromDate: from,
-        weekdays: weekdays,
-        carpark: carpark,
-		task:23
-      };
-      var temp = JSON.stringify(data);
-       alert(temp);
-      $.post("../../ajax/reports.php", temp)
-        .done(function (result) {
-
-          $("#report-content").html(result);
-
-          reportSuccess();
-
-          if (result.indexOf("No records/transactions available for the current search criteria") === -1) {
-
-            // show chart when report first loads
-            $("#chart_container").removeClass("d-none");
-
-            // clear previous array data
-            entries_data = [];
-            exits_data = [];
-
-            getChartData();
-
-            // for first click
-            if (click_count === 0) {
-
-              // load chart
-              // note - chart *must* be visible first
-              trafficSummaryChart();
-
-              click_count += 1;
-
-            } else {
-
-              // for all other clicks
-              updateTrafficSummaryChart()
-
-            }
-
-          } else {
-            $("#chart_container").addClass("d-none");
-          }
-
-        }, "json");
-    } // end if 
-
-    event.preventDefault();
-
-  }); // end traffic report by day */
   
 
 function loadMultipleDataTable()
 {
-	/*var search_label="";
-	var entries_label = "";
-	var info_label="";
-	if($("#language").val()=="Arabic")
-	{
-		search_label =  'بحث';
-		entries_label = 'عرض الإدخالات _MENU_ ';
-		info_label = 'إظهار _START_ إلى _END_ من _TOTAL_ من الإدخالات';
-		previous_label = 'السابق';
-		next_label = 'التالى';
-		
-	} 
-	else{
-		search_label = "Search";
-		entries_label = 'Show _MENU_ entries';
-		info_label = 'Showing _START_ to _END_ of _TOTAL_ entries';
-		previous_label = 'Previous';
-		next_label = 'Next';
-		
-	}*/
+	
   $("table[id^='TABLE']").DataTable(
 	  {
 	  "paging": true,
@@ -366,7 +288,11 @@ function loadReportLabels()
             nonSelectedText:json.select_days,
             selectAllNumber: false,
             allSelectedText: json.all_days
-            });      
+            });
+
+	traffic_summary_chart.data.datasets[0].label = json.entries;
+	traffic_summary_chart.data.datasets[1].label = json.exits;
+	traffic_summary_chart.update();      
             
             
         }); 
@@ -376,7 +302,8 @@ function loadReportLabels()
 
 
 $("#language").change(function()
-{	  
+{	
+    update_session();   
     loadReportLabels();    
     callReport();		
 }); 
@@ -426,7 +353,7 @@ $("#language").change(function()
           labels: hours_label,
           datasets: [{
               data: entries_data,
-              label: 'Entries',
+              label: '<?=$json["entries"]?>',//'Entries',
 
               // transparent bar with normal border
               backgroundColor: "rgba(40,167,69, 0.5)",
@@ -435,7 +362,7 @@ $("#language").change(function()
             },
             {
               data: exits_data,
-              label: 'Exits',
+              label: '<?=$json["exits"]?>',//'Exits',
 
               // transparent bar with normal border
               backgroundColor: "rgba(0,123,255, 0.5)",

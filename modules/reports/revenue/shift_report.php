@@ -282,9 +282,10 @@ $('#view-report-button').click(function (event)
     }
 
 $("#language").change(function()
-    {	  
+{   	  
+    update_session();	  
     loadReportLabels();    
     callReport();		
-    }); 
+}); 
 
 </script>

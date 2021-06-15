@@ -21,12 +21,12 @@ else
     }
 
 function getLabel($label)
-    {
+{
     $data["label"]=$label;
     $data["language"] = $_SESSION["language"];
     $data["task"]=13; 
     echo parcxReport($data);
-    }
+}
 
 ?>
 

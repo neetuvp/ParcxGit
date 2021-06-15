@@ -45,7 +45,7 @@ include('../../../includes/sidebar.php');
         </div>
 		
 		
-        <div class="col-md-2">          
+        <div class="col-md-2 d-none">          
 		      <select class="form-control" id="contract_type">
 	    <option value="" id="sel"><?=$json["select"]?></option>
             <option value="anpr" id="anpr">ANPR</option>
@@ -186,6 +186,7 @@ function loadReportLabels()
 
 $("#language").change(function()
     {	  
+    update_session();
     loadReportLabels();    
     callReport();		
     });   
