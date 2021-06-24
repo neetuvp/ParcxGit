@@ -1,0 +1,514 @@
+09:57:28	********************************Create********************************
+09:57:28	Request:{
+    "Action":1,
+	"TransactionID":"12345",
+	"ReservationStart":"2021-06-13T15:30:00Z",
+	"ReservationEnd":"2021-06-13T16:30:00Z",
+	"CustomerName":"Jeena",
+	"CustomerEmail":"jeena@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"P68974",
+	"TicketID":"452214",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+09:57:49	********************************Create********************************
+09:57:49	Request:{
+    "Action":1,
+	"TransactionID":"12345",
+	"ReservationStart":"2021-06-13T15:30:00Z",
+	"ReservationEnd":"2021-06-13T16:30:00Z",
+	"CustomerName":"Jeena",
+	"CustomerEmail":"jeena@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"P68974",
+	"TicketID":"452214",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+09:57:49	Response:
+09:59:34	********************************Create********************************
+09:59:34	Request:{
+    "Action":1,
+	"TransactionID":"12345",
+	"ReservationStart":"2021-06-13T15:30:00Z",
+	"ReservationEnd":"2021-06-13T16:30:00Z",
+	"CustomerName":"Jeena",
+	"CustomerEmail":"jeena@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"P68974",
+	"TicketID":"452214",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+09:59:34	Response:
+10:06:18	********************************Create********************************
+10:06:18	Request:{
+    "Action":1,
+	"TransactionID":"12346",
+	"ReservationStart":"2021-06-14T15:30:00Z",
+	"ReservationEnd":"2021-06-14T16:30:00Z",
+	"CustomerName":"Maria",
+	"CustomerEmail":"maria@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"T77974",
+	"TicketID":"452224",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:06:18	Response:Array
+10:09:49	********************************Create********************************
+10:09:49	Request:{
+    "Action":1,
+	"TransactionID":"12346",
+	"ReservationStart":"2021-06-14T15:30:00Z",
+	"ReservationEnd":"2021-06-14T16:30:00Z",
+	"CustomerName":"Maria",
+	"CustomerEmail":"maria@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"T77974",
+	"TicketID":"452224",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:09:49	Response:{"status":701,"message":"Unable To Process transaction.Duplicate Entry","TransactionID":"12346"}
+10:13:27	********************************Create********************************
+10:13:27	Request:{
+    "Action":1,
+	"TransactionID":"12346",
+	"ReservationStart":"2021-06-14T15:30:00Z",
+	"ReservationEnd":"2021-06-14T16:30:00Z",
+	"CustomerName":"Maria",
+	"CustomerEmail":"maria@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"T77974",
+	"TicketID":"452224",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:13:27	Response:{"status":701,"message":"Unable To Process transaction.Duplicate Entry","TransactionID":"12346"}
+10:16:13	********************************Create********************************
+10:16:13	Request:{
+    "Action":1,
+	"TransactionID":"12346",
+	"ReservationStart":"2021-06-14T15:30:00Z",
+	"ReservationEnd":"2021-06-14T16:30:00Z",
+	"CustomerName":"Test",
+	"CustomerEmail":"test@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"T77974",
+	"TicketID":"952224",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:16:13	Response:{"status":701,"message":"Unable To Process transaction.Duplicate Entry","TransactionID":"12346"}
+10:18:53	********************************Create********************************
+10:18:53	Request:{
+    "Action":1,
+	"TransactionID":"12346",
+	"ReservationStart":"2021-06-14T15:30:00Z",
+	"ReservationEnd":"2021-06-14T16:30:00Z",
+	"CustomerName":"Test",
+	"CustomerEmail":"test@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"T77974",
+	"TicketID":"952224",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:18:53	Response:{"status":200,"message":"Success","TransactionID":"12346"}
+10:19:15	********************************Create********************************
+10:19:15	Request:{
+    "Action":1,
+	"TransactionID":"12346",
+	"ReservationStart":"2021-06-14T15:30:00Z",
+	"ReservationEnd":"2021-06-14T16:30:00Z",
+	"CustomerName":"Maria",
+	"CustomerEmail":"maria@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"T77974",
+	"TicketID":"952224",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:19:15	Response:{"status":701,"message":"Unable To Process transaction.Duplicate Entry","TransactionID":"12346"}
+10:20:07	********************************Create********************************
+10:20:07	Request:{
+    "Action":1,
+	"TransactionID":"12346",
+	"ReservationStart":"2021-06-15T15:30:00Z",
+	"ReservationEnd":"2021-06-15T16:30:00Z",
+	"CustomerName":"Maria",
+	"CustomerEmail":"maria@gmail.com",
+	"CustomerTelephone":"044563245",
+	"PlateNumber":"T77974",
+	"TicketID":"952224",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:20:07	Response:{"status":200,"message":"Success","TransactionID":"12346"}
+10:44:10	********************************Create********************************
+10:44:10	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2019-06-24T15:30:00Z",
+	"ReservationEnd":"2019-06-24T16:30:00Z",
+	"CustomerName":"Neetu VP",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:44:10	Response:
+10:44:44	********************************Create********************************
+10:44:44	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-06-24T15:30:00Z",
+	"ReservationEnd":"2021-06-24T16:30:00Z",
+	"CustomerName":"Neetu VP",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:44:44	Response:
+10:50:07	********************************Create********************************
+10:50:07	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-06-24T15:30:00Z",
+	"ReservationEnd":"2021-06-24T16:30:00Z",
+	"CustomerName":"Neetu VP",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+10:50:07	Response:{"status":701,"message":"Unable To Process transaction"}
+11:05:41	********************************Create********************************
+11:05:41	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-06-24T15:30:00Z",
+	"ReservationEnd":"2021-06-24T16:30:00Z",
+	"CustomerName":"Neetu VP",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:05:41	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+11:13:57	********************************Create********************************
+11:13:57	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-06-24 15:30:00",
+	"ReservationEnd":"2021-06-24 16:30:00",
+	"CustomerName":"Neetu VP",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:13:57	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+11:23:44	********************************Create********************************
+11:23:44	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-06-25 15:30:00",
+	"ReservationEnd":"2021-06-25 16:30:00",
+	"CustomerName":"Neetu VP",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:23:44	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+11:49:14	********************************Create********************************
+11:49:14	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-06-25 15:30:00",
+	"ReservationEnd":"2021-06-25 16:30:00",
+	"CustomerName":"Neetu VP",
+
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:49:14	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+11:50:02	********************************Create********************************
+11:50:02	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-07-25 15:30:00",
+	"ReservationEnd":"2021-07-25 16:30:00",
+	
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:50:02	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+11:50:23	********************************Create********************************
+11:50:23	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-07-25 15:30:00",
+	"ReservationEnd":"2021-07-25 16:30:00",
+	"CustomerName":"Neetu V Pillai",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:50:23	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+11:52:54	********************************Create********************************
+11:52:54	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-07-25 15:30:00",
+	"ReservationEnd":"2021-07-25 16:30:00",
+	"CustomerName":"",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:52:54	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+11:53:56	********************************Create********************************
+11:53:56	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-07-25 15:30:00",
+	"ReservationEnd":"2021-07-25 16:30:00",
+	
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:53:56	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+11:54:32	********************************Create********************************
+11:54:32	Request:{
+    "Action":3,
+	"TransactionID":"898979",
+	"ReservationStart":"2021-07-25 15:30:00",
+	"ReservationEnd":"2021-07-25 16:30:00",
+	"CustomerName":"Neetu V Pillai",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+11:54:32	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+12:19:18	********************************Create********************************
+12:19:18	Request:{  
+    "Action":2,
+    "StartDateTime":"2019-06-23T18:30:00Z",
+    "EndDateTime":"2019-12-24T16:30:00Z",
+    "CustomerName":"Neetu",
+    "CustomerEmail":"defg@gmail.com",
+    "CustomerTelephone":"04905955",
+    "PlateNumber":"M747474",
+    "TicketID":"5543234",
+    "ParkingZoneID":"P1",
+    "ParkingZoneName":"P1",
+    "ParcxToken":"P2222" 
+} 
+12:19:18	Response:{"status":702,"message":"Invalid Data","TransactionID":""}
+12:20:17	********************************Create********************************
+12:20:17	Request:{  
+    "Action":2,
+    "StartDateTime":"2019-06-23 18:30:00",
+    "EndDateTime":"2019-12-24 16:30:00",
+    "CustomerName":"Neetu",
+    "CustomerEmail":"defg@gmail.com",
+    "CustomerTelephone":"04905955",
+    "PlateNumber":"M747474",
+    "TicketID":"5543234",
+    "ParkingZoneID":"P1",
+    "ParkingZoneName":"P1",
+    "ParcxToken":"P2222" 
+} 
+12:20:17	Response:{"status":704,"message":"No data available","TransactionID":""}
+12:20:31	********************************Create********************************
+12:20:31	Request:{  
+    "Action":2,
+    "StartDateTime":"2021-06-23 18:30:00",
+    "EndDateTime":"2021-12-24 16:30:00",
+    "CustomerName":"Neetu",
+    "CustomerEmail":"defg@gmail.com",
+    "CustomerTelephone":"04905955",
+    "PlateNumber":"M747474",
+    "TicketID":"5543234",
+    "ParkingZoneID":"P1",
+    "ParkingZoneName":"P1",
+    "ParcxToken":"P2222" 
+} 
+12:20:31	Response:[{"Transaction Id":"898979","Reservation Start Date and Time":"2021-07-25 15:30:00","Reservation End Date and Time":"2021-07-25 16:30:00","Customer Name":"Neetu V Pillai","CustomerEmail":"defg@gmail.com","CustomerTelephone":"04905955","Plate Number":"M747474","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"5543234","ReservationStatus":0}]
+12:20:46	********************************Create********************************
+12:20:46	Request:{  
+    "Action":2,
+    "StartDateTime":"2021-06-23 18:30:00",
+    "EndDateTime":"2021-12-24 16:30:00",
+    
+    "ParcxToken":"P2222" 
+} 
+12:20:46	Response:[{"Transaction Id":"898979","Reservation Start Date and Time":"2021-07-25 15:30:00","Reservation End Date and Time":"2021-07-25 16:30:00","Customer Name":"Neetu V Pillai","CustomerEmail":"defg@gmail.com","CustomerTelephone":"04905955","Plate Number":"M747474","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"5543234","ReservationStatus":0}]
+12:20:56	********************************Create********************************
+12:20:56	Request:{  
+    "Action":2,
+    "StartDateTime":"2021-01-23 18:30:00",
+    "EndDateTime":"2021-12-24 16:30:00",
+    
+    "ParcxToken":"P2222" 
+} 
+12:20:56	Response:[{"Transaction Id":"000043203130000031363733","Reservation Start Date and Time":"2021-02-23 01:00:00","Reservation End Date and Time":"2021-02-23 02:00:00","Customer Name":"Neetu Pillai","CustomerEmail":"npillai@alfalakme.com","CustomerTelephone":"0508066467","Plate Number":"KUW 44 566776","Parking Zone Id":"","Parking Zone Name":"","Ticket ID":"5a4e258e","ReservationStatus":0},{"Transaction Id":"000043532039000031353538","Reservation Start Date and Time":"2021-02-20 10:00:00","Reservation End Date and Time":"2021-02-20 11:01:00","Customer Name":"Ravin Bernard","CustomerEmail":"rbernard@alfalakme.com","CustomerTelephone":"0566743205","Plate Number":"DUB Q 35058","Parking Zone Id":"","Parking Zone Name":"","Ticket ID":"5a4bcc52","ReservationStatus":0},{"Transaction Id":"898979","Reservation Start Date and Time":"2021-07-25 15:30:00","Reservation End Date and Time":"2021-07-25 16:30:00","Customer Name":"Neetu V Pillai","CustomerEmail":"defg@gmail.com","CustomerTelephone":"04905955","Plate Number":"M747474","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"5543234","ReservationStatus":0},{"Transaction Id":"12345","Reservation Start Date and Time":"2021-06-13 15:30:00","Reservation End Date and Time":"2021-06-13 16:30:00","Customer Name":"Jeena","CustomerEmail":"jeena@gmail.com","CustomerTelephone":"044563245","Plate Number":"P68974","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"452214","ReservationStatus":0},{"Transaction Id":"12346","Reservation Start Date and Time":"2021-06-14 15:30:00","Reservation End Date and Time":"2021-06-14 16:30:00","Customer Name":"Maria","CustomerEmail":"maria@gmail.com","CustomerTelephone":"044563245","Plate Number":"T77974","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"452224","ReservationStatus":0},{"Transaction Id":"12346","Reservation Start Date and Time":"2021-06-14 15:30:00","Reservation End Date and Time":"2021-06-14 16:30:00","Customer Name":"Test","CustomerEmail":"test@gmail.com","CustomerTelephone":"044563245","Plate Number":"T77974","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"952224","ReservationStatus":0},{"Transaction Id":"12346","Reservation Start Date and Time":"2021-06-15 15:30:00","Reservation End Date and Time":"2021-06-15 16:30:00","Customer Name":"Maria","CustomerEmail":"maria@gmail.com","CustomerTelephone":"044563245","Plate Number":"T77974","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"952224","ReservationStatus":0}]
+12:32:05	********************************Create********************************
+12:32:05	Request:{
+    "Action" : 4,
+    "ParkingZoneID":"P1",
+    "StartDateTime":"2018-12-10T14:00:00+05:00",
+    "EndDateTime":"2019-12-15T17:00:00+05:00"
+}
+12:32:05	Response:{"status":702,"message":"Invalid Data","TransactionID":"13062021123205"}
+12:32:33	********************************Create********************************
+12:32:33	Request:{
+    "Action" : 4,
+    "ParkingZoneID":"P1",
+    "StartDateTime":"2018-12-10 14:00:00",
+    "EndDateTime":"2019-12-15 17:00:00"
+}
+12:32:33	Response:{"status":701,"message":"Unable To Process transaction","TransactionID":"13062021123233"}
+12:33:38	********************************Create********************************
+12:33:38	Request:{
+    "Action" : 4,
+    "ParkingZoneID":"P1",
+    "StartDateTime":"2018-12-10 14:00:00",
+    "EndDateTime":"2019-12-15 17:00:00"
+}
+12:33:38	Response:{"status":200,"message":"Success","TransactionID":"13062021123338","ParkingZone":"P1","ReservationCount":0}
+12:33:58	********************************Create********************************
+12:33:58	Request:{
+    "Action" : 4,
+    "ParkingZoneID":"P1",
+    "StartDateTime":"2021-06-10 14:00:00",
+    "EndDateTime":"2021-12-15 17:00:00"
+}
+12:33:58	Response:{"status":200,"message":"Success","TransactionID":"13062021123358","ParkingZone":"P1","ReservationCount":5}
+12:40:44	********************************Create********************************
+12:40:44	Request:{
+	"TransactionID":"898979",
+	"CustomerEmail":"neetu@gmail.com",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParcxToken":"P2222"
+12:40:44	Response:
+12:41:22	********************************Create********************************
+12:41:22	Request:{
+	"TransactionID":"898979",
+	"CustomerEmail":"neetu@gmail.com",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParcxToken":"P2222"
+12:41:22	Response:
+12:41:48	********************************Create********************************
+12:41:48	Request:{
+    "Action":5,
+	"TransactionID":"898979",
+	"CustomerEmail":"neetu@gmail.com",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParcxToken":"P2222"
+12:41:48	Response:
+12:41:50	********************************Create********************************
+12:41:50	Request:{
+    "Action":5,
+	"TransactionID":"898979",
+	"CustomerEmail":"neetu@gmail.com",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParcxToken":"P2222"
+12:41:50	Response:
+12:42:12	********************************Create********************************
+12:42:12	Request:{
+    "Action":5,
+	"TransactionID":"898979",
+	"CustomerEmail":"neetu@gmail.com",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParcxToken":"P2222"
+12:42:12	Response:
+12:44:01	********************************Create********************************
+12:44:01	Request:{
+    "Action":5,
+	"TransactionID":"898979",
+	"CustomerEmail":"neetu@gmail.com",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParcxToken":"P2222"
+}
+12:44:01	Response:{"status":200,"message":"Success","TransactionID":"898979"}
+12:47:32	********************************Create********************************
+12:47:32	Request:{  
+    "Action":2,
+    "StartDateTime":"2021-06-23 18:30:00",
+    "EndDateTime":"2021-12-24 16:30:00",
+    "CustomerName":"Neetu",
+    "CustomerEmail":"defg@gmail.com",
+    "CustomerTelephone":"04905955",
+    "PlateNumber":"M747474",
+    "TicketID":"5543234",
+    "ParkingZoneID":"P1",
+    "ParkingZoneName":"P1",
+    "ParcxToken":"P2222" 
+} 
+12:47:32	Response:[{"Transaction Id":"898979","Reservation Start Date and Time":"2021-07-25 15:30:00","Reservation End Date and Time":"2021-07-25 16:30:00","Customer Name":"Neetu V Pillai","CustomerEmail":"defg@gmail.com","CustomerTelephone":"04905955","Plate Number":"M747474","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"5543234","ReservationStatus":1}]

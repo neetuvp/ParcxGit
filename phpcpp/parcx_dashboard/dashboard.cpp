@@ -59,8 +59,12 @@ string SetDoublePrecision(double amt,int precision)
 	
 }
 
-void getPlateCorrectionRequiredTable() {
+void getPlateCorrectionRequiredTable(Php::Value data) {
     try {
+        string lang = data["language"];
+        string labels="plate_number,entry_date_time,confidence_rate,action,no_plate_for_correction";
+        Php::Value label=General.getLabels(lang,labels);
+
         if (plate_review_confidence_rate == "0") {
             con = General.mysqlConnect(ServerDB);
             stmt = con->createStatement();
@@ -78,13 +82,14 @@ void getPlateCorrectionRequiredTable() {
         query = "select a.id,a.plate_number,plate_image_name,capture_date_time,camera_device_number,confidence_rate,entry_date_time from plates_captured a INNER JOIN open_transactions b ON a.id=b.plate_captured_id where initial_plate_number is null and (b.plate_number like '%no plate%'  or confidence_rate<=" + plate_review_confidence_rate + " or b.plate_number like '%noplate%')";
         res = rStmt->executeQuery(query);
         if (res->rowsCount() > 0) {
-            Php::out << "<thead>" << endl;
+            Php::out <<"<table id='TABLE_1' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>" <<endl;
+            Php::out << "<thead class='thead-light'>" << endl;
             Php::out << "<tr>" << endl;
-            Php::out << "<th>Plate Number</th>" << endl;
-            Php::out << "<th>Entry Date Time</th>" << endl;
-            Php::out << "<th>Confidence Rate</th>" << endl;
+            Php::out << "<th>"<<label["plate_number"]<<"</th>" << endl;
+            Php::out << "<th>"<<label["entry_date_time"]<<"</th>" << endl;
+            Php::out << "<th>"<<label["confidence_rate"]<<"</th>" << endl;
             //Php::out<<"<th>Plate Image</th>"<<endl;		
-            Php::out << "<th>Action</th>" << endl;
+            Php::out << "<th>"<<label["action"]<<"</th>" << endl;
             Php::out << "</tr>" << endl;
             Php::out << "</thead>" << endl;
             Php::out << "<tbody>" << endl;
@@ -101,17 +106,17 @@ void getPlateCorrectionRequiredTable() {
                 croppedImage = res->getString("camera_device_number") + "/" + datefolder + "/Crop_" + image;
                 sceneImage = res->getString("camera_device_number") + "/" + datefolder + "/Scene_" + image;
 
-                Php::out << "<tr'>" << endl;
+                Php::out << "<tr>" << endl;
                 Php::out << "<td >" + res->getString("plate_number") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("entry_date_time") + "</td>" << endl;
                 Php::out << "<td ><span class='badge bg-danger'>" + res->getString("confidence_rate") + "</span></td>" << endl;
                 //Php::out<<"<td ><img src='http://localhost/ANPR/Images/Cropped/"+croppedImage+"' width='100' height='50'></td>"<<endl;                
-                Php::out << "<td><button type='button' class='btn  btn-info col' data-toggle='modal' data-target='#UpdatePlateModal' data-plate='" + res->getString("plate_number") + "' data-id='" + res->getString("id") + "' data-update='0' data-value ='" + sceneImage + "'>Update</button></td>" << endl;
+                Php::out << "<td><button type='button' class='btn  btn-info' data-toggle='modal' data-target='#UpdatePlateModal' data-plate='" + res->getString("plate_number") + "' data-id='" + res->getString("id") + "' data-update='0' data-value ='" + sceneImage + "'><i class='fas fa-edit'></i></button></td>" << endl;
                 Php::out << "</tr>" << endl;
             }
-            Php::out << "</tbody>" << endl;
+            Php::out << "</tbody></table>" << endl;
         } else {
-            Php::out << "<div class='p-3'>No plates available for correction</div>" << endl;
+            Php::out << "<div class='p-3'>"<<label["no_plate_for_correction"]<<"</div>" << endl;
         }
 
         delete rStmt;
@@ -124,38 +129,42 @@ void getPlateCorrectionRequiredTable() {
     }
 }
 
-void getPlateMismatchTable() {
-    try {      
+void getPlateMismatchTable(Php::Value data) {
+    try {  
+        string lang = data["language"];
+        string labels="device_name,date_time,ticket_id,entry_plate_number,exit_plate_number,action,no_plate_mismatch";
+        Php::Value label=General.getLabels(lang,labels);
         rCon = General.mysqlConnect(ReportingDB);
         rStmt = rCon->createStatement();
         query = "SELECT  * FROM plates_mismatch T1 JOIN (Select device_number, max(id) id from plates_mismatch where date_time >= DATE_SUB(NOW(),INTERVAL 1 HOUR) and dismiss=0 and entry_plate_captured_id>0 and exit_plate_captured_id>0 group by device_number) T2 on T1.device_number = T2.device_number and T1.id = T2.id ORDER by T1.id desc";
         res = rStmt->executeQuery(query);
         if (res->rowsCount() > 0) {
-            Php::out << "<thead>" << endl;
+            Php::out <<"<table id='TABLE_2' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>" <<endl;
+            Php::out << "<thead class='thead-light'>" << endl;
             Php::out << "<tr>" << endl;
-            Php::out << "<th>Date Time</th>" << endl;           
-            Php::out << "<th>Device name</th>" << endl;           
-            Php::out << "<th>Ticket id</th>" << endl;           
-            Php::out << "<th>Entry Plate Number</th>" << endl;
-            Php::out << "<th>Exit Plate Number</th>" << endl;            
-            Php::out << "<th>Action</th>" << endl;
+            Php::out << "<th>"<<label["date_time"]<<"</th>" << endl;           
+            Php::out << "<th>"<<label["device_name"]<<"</th>" << endl;           
+            Php::out << "<th>"<<label["ticket_id"]<<"</th>" << endl;           
+            Php::out << "<th>"<<label["entry_plate_number"]<<"</th>" << endl;
+            Php::out << "<th>"<<label["exit_plate_number"]<<"</th>" << endl;            
+            Php::out << "<th>"<<label["action"]<<"</th>" << endl;
             Php::out << "</tr>" << endl;
             Php::out << "</thead>" << endl;
             Php::out << "<tbody>" << endl;
             while (res->next()) {                
 
-                Php::out << "<tr'>" << endl;
+                Php::out << "<tr>" << endl;
                 Php::out << "<td >" + res->getString("date_time") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("device_name") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("ticket_id") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("entry_plate_number") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("exit_plate_number") + "</td>" << endl;                
-                Php::out << "<td><button type='button' class='btn  btn-info col btn-plate-mismatch'  data-id='" + res->getString("id") + "'>Update</button></td>" << endl;
+                Php::out << "<td><button type='button' class='btn  btn-info btn-plate-mismatch'  data-id='" + res->getString("id") + "'><i class='fas fa-edit'></i></button></td>" << endl;
                 Php::out << "</tr>" << endl;
             }
-            Php::out << "</tbody>" << endl;
+            Php::out << "</tbody></table>" << endl;
         } else {
-            Php::out << "<div class='p-3'>No Plate Mismatch</div>" << endl;
+            Php::out << "<div class='p-3'>"<<label["no_plate_mismatch"]<<"</div>" << endl;
         }
 
         delete rStmt;
@@ -194,22 +203,26 @@ void correctPlateNumber(Php::Value data) {
 
 }
 
-void getPlateCorrectedTable() {
+void getPlateCorrectedTable(Php::Value data) {
     try {
+        string lang = data["language"];
+        string labels="plate_number,corrected_plate_number,entry_date_time,confidence_rate,username,action,no_plates_corrected";
+        Php::Value label=General.getLabels(lang,labels);
         rCon = General.mysqlConnect(ReportingDB);
         rStmt = rCon->createStatement();
         query = "SELECT capture_date_time,a.id,initial_plate_number,a.plate_number,plate_corrected_date_time,user_name,plate_image_name,camera_device_number,confidence_rate,entry_date_time FROM plates_captured a,open_transactions b where a.id=b.plate_captured_id and initial_plate_number is not null";
         res = rStmt->executeQuery(query);
         if (res->rowsCount() > 0) {
-            Php::out << "<thead>" << endl;
+            Php::out <<"<table id='TABLE_3' class='table table-blue table-bordered table-striped jspdf-table RecordsTableclass'>" <<endl;
+           Php::out << "<thead class='thead-light'>" << endl;
             Php::out << "<tr>" << endl;
-            Php::out << "<th>Plate Number</th>" << endl;
-            Php::out << "<th>Corrected Plate Number</th>" << endl;
-            Php::out << "<th>Entry Date Time</th>" << endl;
-            Php::out << "<th>Confidence Rate</th>" << endl;
+            Php::out << "<th>"<<label["plate_number"]<<"</th>" << endl;
+            Php::out << "<th>"<<label["corrected_plate_number"]<<"</th>" << endl;
+            Php::out << "<th>"<<label["entry_date_time"]<<"</th>" << endl;
+            Php::out << "<th>"<<label["confidence_rate"]<<"</th>" << endl;
             //Php::out<<"<th>Plate Image</th>"<<endl;	
-            Php::out << "<th>User name</th>" << endl;
-            Php::out << "<th>Action</th>" << endl;
+            Php::out << "<th>"<<label["username"]<<"</th>" << endl;
+            Php::out << "<th>"<<label["action"]<<"</th>" << endl;
             Php::out << "</tr>" << endl;
             Php::out << "</thead>" << endl;
             Php::out << "<tbody>" << endl;
@@ -227,19 +240,19 @@ void getPlateCorrectedTable() {
                 sceneImage = res->getString("camera_device_number") + "/" + datefolder + "/Scene_" + image;
 
 
-                Php::out << "<tr'>" << endl;
+                Php::out << "<tr>" << endl;
                 Php::out << "<td >" + res->getString("initial_plate_number") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("plate_number") + "</td>" << endl;
                 Php::out << "<td >" + res->getString("entry_date_time") + "</td>" << endl;
                 Php::out << "<td ><span class='badge bg-danger'>" + res->getString("confidence_rate") + "</span></td>" << endl;
                 // Php::out<<"<td ><img src='http://localhost/ANPR/Images/Cropped/"+croppedImage+"' width='100' height='50'></td>"<<endl;                
                 Php::out << "<td >" + res->getString("user_name") + "</td>" << endl;
-                Php::out << "<td><button type='button' class='col btn btn-info' data-toggle='modal' data-target='#UpdatePlateModal' data-plate='" + res->getString("plate_number") + "' data-update='1' data-id='" + res->getString("id") + "' data-value ='" + sceneImage + "'>Update</button></td>" << endl;
+                Php::out << "<td><button type='button' class='btn btn-info' data-toggle='modal' data-target='#UpdatePlateModal' data-plate='" + res->getString("plate_number") + "' data-update='1' data-id='" + res->getString("id") + "' data-value ='" + sceneImage + "'><i class='fas fa-edit'></i></button></td>" << endl;
                 Php::out << "</tr>" << endl;
             }
-            Php::out << "</tbody>" << endl;
+            Php::out << "</tbody></table>" << endl;
         } else {
-            Php::out << "<div class='p-3'>No plates corrected</div>" << endl;
+            Php::out << "<div class='p-3'>"<<label["no_plates_corrected"]<<"</div>" << endl;
         }
 
         delete rStmt;
@@ -430,6 +443,7 @@ Php::Value getMismatchPlateDetails(Php::Value data)
         }
     return response;
     }
+
 
 Php::Value hourlyOccupancyReport(Php::Value data) {
     try {
@@ -2128,17 +2142,17 @@ Php::Value parcxDashboard(Php::Parameters &params) {
     int task = data["task"];
     Php::Value response;
     switch (task) {
-        case 1:getPlateCorrectionRequiredTable();
+        case 1:getPlateCorrectionRequiredTable(data);
             break;
         case 2:correctPlateNumber(data);
             break;
-        case 3:getPlateCorrectedTable();
+        case 3:getPlateCorrectedTable(data);
             break;
         case 4:response = hourlyOccupancyReport(data);
             break;
         case 5:response = averageHourlyOccupancyReport(data);
             break;
-        case 6:getPlateMismatchTable();
+        case 6:getPlateMismatchTable(data);
             break;
         case 7:response=getMismatchPlateDetails(data);
             break;

@@ -1,0 +1,75 @@
+1.Create Reservation:
+	Method : POST
+	Data : {
+	"TransactionID":"898979",
+	"ReservationStart":"2019-06-24T15:30:00Z",
+	"ReservationEnd":"2019-06-24T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+
+2.Search :
+	Method : GET
+	Data : json={  "StartDateTime":"2019-06-23T18:30:00Z",  "EndDateTime":"2019-12-24T16:30:00Z",  "CustomerName":"Neetu",  "CustomerEmail":"defg@gmail.com",  "CustomerTelephone":"04905955",  "PlateNumber":"M747474",  "TicketID":"5543234",  "ParkingZoneID":"P1",  "ParkingZoneName":"P1",  "ParcxToken":"P2222" } 
+
+
+3.Update : 
+	Method : PUT
+	Data: {
+	"TransactionID":"898979",
+	"ReservationStart":"2019-06-24T15:30:00Z",
+	"ReservationEnd":"2019-06-24T16:30:00Z",
+	"CustomerName":"Neetu VP",
+	"CustomerEmail":"defg@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+
+4.Cancel :
+	Method : PATCH
+	Data : {
+	"TransactionID":"898979",
+	"CustomerEmail":"defg@gmail.com",
+	"PlateNumber":"M747474",
+	"TicketID":"5543234",
+	"ParcxToken":"P2222"
+}
+
+5.Count : 
+	Method : GET	
+	Data : json={"ParkingZoneID":"P1","StartDateTime":"2018-12-10T14:00:00+05:00","EndDateTime":"2019-12-15T17:00:00+05:00"}
+
+6. EAIServices:
+Task 1 : EAISignage
+
+	Method : POST
+	Data : {
+	"task":"1",
+	"customerName":"Neetu Pillai",
+	"vehicleLicensePlate":"M72702",
+	"deviceId":"22",
+	"signType" : "P102",
+	"reservationZone":"P1"
+}
+
+
+Task 2 : EAIParkingRevenue
+	Method : POST
+	Data : {
+	"task":"2",
+	"customerName":"Neetu Pillai",
+	"vehicleLicensePlate":"M72702",
+	"deviceId":"22",
+	"signType" : "P102",
+	"reservationZone":"P1"
+}

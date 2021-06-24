@@ -1,0 +1,49 @@
+1. CreateReservation:
+	Mandatory fields:   
+		1.TransactionID
+		2.ReservationStart
+		3.ReservationEnd
+		4.CustomerName
+		5.CustomerEmail
+		6.CustomerTelephone
+		7.PlateNumber
+		8.TicketID
+		9.ParkingZoneID
+		10.ParkingZoneName
+		
+
+2. UpdateReservation   : Update based on TicketID
+	Mandatory fields:   
+		1.TransactionID
+		2.CustomerEmail
+		3.PlateNumber
+		4.TicketID
+		
+	Non-Mandatory fields:
+		1.ReservationStart
+		2.ReservationEnd
+		3.CustomerName
+		4.CustomerTelephone
+		5.ParkingZoneID
+		6.ParkingZoneName
+		
+3. CountReservation
+	Mandatory fields:   
+	1.StartDateTime
+	2.EndDateTime
+	3.ParkingZoneID
+	
+4. SearchReservation
+	Mandatory fields:   No mandatory fields
+	
+	
+	Fields used for Search criteria:
+	1.StartDateTime
+	2.EndDateTime
+	3.CustomerName
+	4.CustomerEmail
+	5.CustomerTelephone
+	6.PlateNumber
+	7.TicketID
+	8.ParkingZoneID
+	8.ParkingZoneName

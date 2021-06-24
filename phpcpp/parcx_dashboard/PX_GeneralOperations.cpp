@@ -156,7 +156,7 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
     string label=data["label"];    
     if(page>0)
         {
-        string reportlabels="logout,export,export_to_excel,export_to_pdf,";
+        string reportlabels="logout,export,export_to_excel,export_to_pdf,search,entries_label,info_label,previous,next,";
         switch(page)
             {
             case 1://device_status_facility,device_status_carpark
@@ -170,6 +170,9 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                     break;
             case 4://occupancy_facility,occupancy_carpark,occupancy_device
                 label = reportlabels + "occupancy,hourly_occupancy,this_day_last_week,last_week_average,last_week_average,all_time_average,maximum,minimum";
+                    break;
+            case 5://anpr_review
+                label = reportlabels + "plate_correction_required,plate_mismatch,plates_corrected,update_plate_number,current_plate_number,plate_number,enter_corrected_plate_number,entry_plate_number,exit_plate_number,anpr_review,save_changes,cancel,allow,plate_review_text,click_update_text,ok,plates_require_attention,manual_plate_correction,plates_not_matching";
                     break;
             
             

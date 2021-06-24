@@ -1,0 +1,55 @@
+1.tar -zxvf Log_2020-09-201.gz   to unzip .gz file
+2.install libssh and libssh-devel
+
+
+
+Operations in Maintenance Daemon
+1.DBBackup
+	dbbackup_enabled         -Enable/Disable DB Backup
+	db_list_for_backup       -The databases for backup needs to be mentioned as csv in db_list_for_backup
+	db_backup_path_primary   -DB Backup path primary
+	db_ssh_enabled           -To enable ssh transfer for secondary backup
+	db_backup_path_secondary -DB Backup path secondary
+	db_ssh_enabled           -Enable/Disable ssh export
+	ssh_interface_id 	 -Interface id from interface_settings table (This is required for ssh export) - The host details are taken from the interface_settings table
+
+2.LogBackup
+	logbackup_enabled        -To enable/disable Log Backup
+	log_file_backup_path_primary-Log Backup primary
+	log_ssh_enabled          -To enable ssh transfer for secondary backup
+	log_file_backup_path_secondary-Log Backup path secondary
+	log_ssh_enabled          -Enable/Disable ssh export
+	ssh_interface_id 	 -Interface id from interface_settings table (This is required for ssh export) - The host details are taken from the interface_settings table
+
+3.DeleteOpenTransactions
+	deleteOpenTransactions_enabled - To enable Opentransaction deletion
+	open_transaction_retention  - retention period in days for deletion
+	
+4.DeleteOldDBBackup
+	deleteOldDBBackup_enabled -To enable/disable deletion of DB Backup from primary
+	db_backup_retention_period - delete files older than retention days
+
+5.DeleteOldLogBackup
+	deleteOldLogBackup_enabled  -To enable/disable deletion of Log Backup from primary
+	log_backup_retention_period - delete files older than retention days
+
+6.DeleteOldLogFile
+	deleteOldLogFile_enabled  -To enable/disable deletion of Log Files
+	log_file_retention_period - delete files older than retention days
+	actual_log_path           -Folder that contains the 'Log' folder in primary (eg: /opt/parcx)
+
+7.DeleteOldTransactions
+	deleteOldTransactions_enabled - To enable/disable deletion of transactions from tables
+	db_for_transaction_deletion   - DB name for transaction deletion
+	list_tables_for_transaction_deletion_raw - list of tables for transaction deletion in csv (raw eg: revenue_payments,parking_movements,parking_movements_access)
+	transaction_retention_raw     - retention period in days for deletion
+	list_tables_for_transaction_deletion_summary - list of tables for transaction deletion in csv of summary type(summary eg: summary_daily_revenue,summary_parking_movements,parking_duration)
+	transaction_retention_summary - retention period in days for deletion
+
+8.DeleteOldANPRImages
+	deleteOldANPRImages_enabled -To enable/disable deletion of ANPR Images
+	anpr_image_path             - ANPR Image Folder(eg : /opt/parcx/Logs/ANPR)
+	anpr_retention              - retention period in days for deletion
+	Image folder eg :  /opt/parcx/Logs/ANPR/78/2020-06-29
+
+9.ssh_interface_id : Interface id from interface_settings table (This is required for ssh export) - The host details are taken from the interface_settings table

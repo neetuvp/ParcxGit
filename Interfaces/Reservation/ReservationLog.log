@@ -1,0 +1,32 @@
+Date : 10-06-2021 12:54:59
+********************************Search********************************
+Date : 10-06-2021 13:01:28
+********************************Search********************************
+Date : 10-06-2021 13:01:28
+Request:{  "StartDateTime":"2019-06-23T18:30:00Z",  "EndDateTime":"2019-12-24T16:30:00Z",  "CustomerName":"Neetu",  "CustomerEmail":"defg@gmail.com",  "CustomerTelephone":"04905955",  "PlateNumber":"M747474",  "TicketID":"5543234",  "ParkingZoneID":"P1",  "ParkingZoneName":"P1",  "ParcxToken":"P2222" } 
+Date : 10-06-2021 13:01:28
+Response:{"status":701,"message":"Unable To Process transactionss","TransactionID":""}
+Date : 10-06-2021 13:03:00
+********************************Search********************************
+Date : 10-06-2021 13:03:00
+Request:{  "StartDateTime":"2019-06-23T18:30:00Z",  "EndDateTime":"2019-12-24T16:30:00Z",  "CustomerName":"Neetu",  "CustomerEmail":"defg@gmail.com",  "CustomerTelephone":"04905955",  "PlateNumber":"M747474",  "TicketID":"5543234",  "ParkingZoneID":"P1",  "ParkingZoneName":"P1",  "ParcxToken":"P2222" } 
+Date : 10-06-2021 13:03:00
+Response:{"status":701,"message":"Unable To Process transactionss","TransactionID":""}
+Date : 10-06-2021 13:04:28
+********************************Search********************************
+Date : 10-06-2021 13:04:28
+Request:{  "StartDateTime":"2019-06-23T18:30:00Z",  "EndDateTime":"2019-12-24T16:30:00Z",  "CustomerName":"Neetu",  "CustomerEmail":"defg@gmail.com",  "CustomerTelephone":"04905955",  "PlateNumber":"M747474",  "TicketID":"5543234",  "ParkingZoneID":"P1",  "ParkingZoneName":"P1",  "ParcxToken":"P2222" } 
+Date : 10-06-2021 13:04:28
+Response:{"status":701,"message":"Unable To Process transactionss","TransactionID":""}
+Date : 13-06-2021 08:27:09
+********************************Search********************************
+Date : 13-06-2021 08:27:09
+Request:{  "StartDateTime":"2019-06-23T18:30:00Z",  "EndDateTime":"2019-12-24T16:30:00Z",  "CustomerName":"Neetu",  "CustomerEmail":"defg@gmail.com",  "CustomerTelephone":"04905955",  "PlateNumber":"M747474",  "TicketID":"5543234",  "ParkingZoneID":"P1",  "ParkingZoneName":"P1",  "ParcxToken":"P2222" } 
+Date : 13-06-2021 08:27:09
+Response:{"status":701,"message":"Unable To Process transactionss","TransactionID":""}
+Date : 13-06-2021 08:28:31
+********************************Search********************************
+Date : 13-06-2021 08:28:31
+Request:{  "StartDateTime":"2019-06-23T18:30:00Z",  "EndDateTime":"2019-12-24T16:30:00Z",  "CustomerName":"Neetu",  "CustomerEmail":"defg@gmail.com",  "CustomerTelephone":"04905955",  "PlateNumber":"M747474",  "TicketID":"5543234",  "ParkingZoneID":"P1",  "ParkingZoneName":"P1",  "ParcxToken":"P2222" } 
+Date : 13-06-2021 08:28:31
+Response:[{"Transaction Id":"898979","Reservation Start Date and Time":"2019-06-24 15:30:00","Reservation End Date and Time":"2019-06-24 16:30:00","Customer Name":"Neetu","CustomerEmail":"defg@gmail.com","CustomerTelephone":"04905955","Plate Number":"M747474","Parking Zone Id":"P1","Parking Zone Name":"P1","Ticket ID":"5543234","ReservationStatus":0}]

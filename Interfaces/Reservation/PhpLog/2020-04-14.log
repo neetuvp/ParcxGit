@@ -1,0 +1,178 @@
+00:01:26	********************************Create********************************
+00:01:26	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:02:58	********************************Create********************************
+00:02:58	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:02:58	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+00:03:39	********************************Create********************************
+00:03:39	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:03:39	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+00:04:35	********************************Create********************************
+00:04:35	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:04:35	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+00:05:31	********************************Create********************************
+00:05:31	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:06:40	********************************Create********************************
+00:06:40	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:06:40	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+00:10:10	********************************Create********************************
+00:10:10	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:10:10	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+00:11:08	********************************Create********************************
+00:11:08	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:11:08	Response:{"status":702,"message":"Invalid Data","TransactionID":"898979"}
+00:13:31	********************************Create********************************
+00:13:31	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:13:31	Response:{"status":701,"message":"Unable To Process transaction.Duplicate Entry","TransactionID":"898979"}
+00:13:44	********************************Create********************************
+00:13:44	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-14T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp133@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"55432345",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:13:44	Response:{"status":701,"message":"Unable To Process transaction.Duplicate Entry","TransactionID":"898979"}
+00:13:59	********************************Create********************************
+00:13:59	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-14T15:30:00Z",
+	"ReservationEnd":"2020-04-15T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp133@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"554323454",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:13:59	Response:{"status":701,"message":"Unable To Process transaction.Duplicate Entry","TransactionID":"898979"}
+00:14:05	********************************Create********************************
+00:14:05	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-15T15:30:00Z",
+	"ReservationEnd":"2020-04-15T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetuvp133@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"554323454",
+	"ParkingZoneID":"P2",
+	"ParkingZoneName":"P2",
+	"ParcxToken":"P2222"
+}
+00:14:05	Response:{"status":200,"message":"Success","TransactionID":"898979"}

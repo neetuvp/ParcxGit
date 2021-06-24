@@ -1,0 +1,71 @@
+1.Create Reservation:
+	Method : POST
+	Data : {
+	    	"Action":1,
+		"TransactionID":"12346",
+		"ReservationStart":"2021-06-15 15:30:00",
+		"ReservationEnd":"2021-06-15 16:30:00",
+		"CustomerName":"Maria",
+		"CustomerEmail":"maria@gmail.com",
+		"CustomerTelephone":"044563245",
+		"PlateNumber":"T77974",
+		"TicketID":"952224",
+		"ParkingZoneID":"P1",
+		"ParkingZoneName":"P1",
+		"ParcxToken":"P2222"
+	}
+
+2.Search :
+	Method : GET
+	Data : {  
+	    "Action":2,
+	    "StartDateTime":"2021-06-23 18:30:00",
+	    "EndDateTime":"2021-12-24 16:30:00",
+	    "CustomerName":"Neetu",
+	    "CustomerEmail":"defg@gmail.com",
+	    "CustomerTelephone":"04905955",
+	    "PlateNumber":"M747474",
+	    "TicketID":"5543234",
+	    "ParkingZoneID":"P1",
+	    "ParkingZoneName":"P1",
+	    "ParcxToken":"P2222" 
+	} 
+
+3.Update : 
+	Method : PUT
+	Data: {
+	    	"Action":3,
+		"TransactionID":"898979",
+		"ReservationStart":"2021-07-25 15:30:00",
+		"ReservationEnd":"2021-07-25 16:30:00",
+		"CustomerName":"Neetu V Pillai",
+		"CustomerEmail":"defg@gmail.com",
+		"CustomerTelephone":"04905955",
+		"PlateNumber":"M747474",
+		"TicketID":"5543234",
+		"ParkingZoneID":"P1",
+		"ParkingZoneName":"P1",
+		"ParcxToken":"P2222"
+	}
+
+4.Cancel :
+	Method : PATCH
+	Data : {
+	    	"Action":5,
+		"TransactionID":"898979",
+		"CustomerEmail":"neetu@gmail.com",
+		"PlateNumber":"M747474",
+		"TicketID":"5543234",
+		"ParcxToken":"P2222"
+	}
+
+5.Count : 
+	Method : GET	
+	Data : {
+		    "Action" : 4,
+		    "ParkingZoneID":"P1",
+		    "StartDateTime":"2021-06-10 14:00:00",
+		    "EndDateTime":"2021-12-15 17:00:00"
+		}
+
+

@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "4ca7c338-52b4-42bf-ba26-3bf12804195f",
+		"name": "Reservation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Reservation",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Action\":1,\n\t\"TransactionID\":\"12346\",\n\t\"ReservationStart\":\"2021-06-15 15:30:00\",\n\t\"ReservationEnd\":\"2021-06-15 16:30:00\",\n\t\"CustomerName\":\"Maria\",\n\t\"CustomerEmail\":\"maria@gmail.com\",\n\t\"CustomerTelephone\":\"044563245\",\n\t\"PlateNumber\":\"T77974\",\n\t\"TicketID\":\"952224\",\n\t\"ParkingZoneID\":\"P1\",\n\t\"ParkingZoneName\":\"P1\",\n\t\"ParcxToken\":\"P2222\"\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/Interfaces/Reservation/operations.php",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"Interfaces",
+						"Reservation",
+						"operations.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Reservation",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{  \n    \"Action\":2,\n    \"StartDateTime\":\"2021-01-23 18:30:00\",\n    \"EndDateTime\":\"2021-12-24 16:30:00\",\n    \n    \"ParcxToken\":\"P2222\" \n} "
+				},
+				"url": {
+					"raw": "http://localhost/Interfaces/Reservation/operations.php",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"Interfaces",
+						"Reservation",
+						"operations.php"
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateReservation",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Action\":3,\n\t\"TransactionID\":\"898979\",\n\t\"ReservationStart\":\"2021-07-25 15:30:00\",\n\t\"ReservationEnd\":\"2021-07-25 16:30:00\",\n\t\"CustomerName\":\"Neetu V Pillai\",\n\t\"CustomerEmail\":\"defg@gmail.com\",\n\t\"CustomerTelephone\":\"04905955\",\n\t\"PlateNumber\":\"M747474\",\n\t\"TicketID\":\"5543234\",\n\t\"ParkingZoneID\":\"P1\",\n\t\"ParkingZoneName\":\"P1\",\n\t\"ParcxToken\":\"P2222\"\n}",
+					"options": {
+						"raw": {}
+					}
+				},
+				"url": {
+					"raw": "http://localhost/Interfaces/Reservation/operations.php",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"Interfaces",
+						"Reservation",
+						"operations.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Count Reservation",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Action\" : 4,\n    \"ParkingZoneID\":\"P1\",\n    \"StartDateTime\":\"2021-06-10 14:00:00\",\n    \"EndDateTime\":\"2021-12-15 17:00:00\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost/Interfaces/Reservation/operations.php",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"Interfaces",
+						"Reservation",
+						"operations.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancel Reservation",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Action\":5,\n\t\"TransactionID\":\"898979\",\n\t\"CustomerEmail\":\"neetu@gmail.com\",\n\t\"PlateNumber\":\"M747474\",\n\t\"TicketID\":\"5543234\",\n\t\"ParcxToken\":\"P2222\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost/Interfaces/Reservation/operations.php",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"Interfaces",
+						"Reservation",
+						"operations.php"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,0 +1,28 @@
+22:11:54	********************************Create********************************
+22:11:54	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-12T15:30:00Z",
+	"ReservationEnd":"2020-04-12T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetu@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
+22:11:56	********************************Create********************************
+22:11:56	Request:{
+	"TransactionID":"898979",
+	"ReservationStart":"2020-04-12T15:30:00Z",
+	"ReservationEnd":"2020-04-12T16:30:00Z",
+	"CustomerName":"Neetu",
+	"CustomerEmail":"neetu@gmail.com",
+	"CustomerTelephone":"04905955",
+	"PlateNumber":"M 72702",
+	"TicketID":"5543234",
+	"ParkingZoneID":"P1",
+	"ParkingZoneName":"P1",
+	"ParcxToken":"P2222"
+}
