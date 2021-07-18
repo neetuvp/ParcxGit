@@ -68,8 +68,8 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                 //response["tag_tid"]=string(res->getString("tag_tid"));
                 response["ticket_id"]=string(res->getString("ticket_id"));
                 response["whitelist_present"]="true";
-                int cooperate_parker=res->getInt("corporate_parker");
-                response["cooperate_parker"]=cooperate_parker;
+                int corporate_parker=res->getInt("corporate_parker");
+                response["corporate_parker"]=corporate_parker;
                 response["entry_type_contract_parking_space_exceeded"]=2;
 			
                 string zone=res->getString("access_zones");
@@ -78,14 +78,7 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                 string currentDate=General.currentDateTime(dateFormat);
                 string carparkNumber=res->getString("carpark_number");
                 response["expiry_date"]=expiry_date;
-                if(movementType==2)
-                {
-                    response["access_allowed"]="true";		
-                    response["result"]= "allow_access";		
-                    response["result_description"]="Access allowed at exit.whitelist available";
-                }
-                else
-                {
+                
                     if(res->getInt("status")==0)
                         {
                         response["result_description"]="Access disabled";    
@@ -95,16 +88,20 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                         {
                         response["result_description"]="Invalid parking zone";    
                         response["result"]="invalid_access_parking_zone";
+                        response["customer_message_line1"]="Invalid Parking Zone";
                         }
                     else if(!presentInString(carparkNumber,to_string(carpark)))                  
                         {
                         response["result_description"]="Invalid access carpark";    
                         response["result"]="invalid_access_carpark";
+                        response["customer_message_line1"]="Invalid Access Carpark";
                         }
                     else if(facility!=res->getInt("facility_numbers"))
                         {
                         response["result_description"]="Invalid access facility";    
                         response["result"]="invalid_access_facility";
+                        response["customer_message_line1"]="";
+                        
                         }
                     else if(expiry_date.compare(currentDate)<0)
                         {
@@ -157,11 +154,21 @@ Php::Value Access::checkAccess(string ticketId,string parkingZone,int carpark,in
                         } */             
                     else							
                         {
-                        response["access_allowed"]="true";		
-                        response["result"]= "allow_access";		
-                        response["result_description"]="Access allowed.whitelist available";
+                            if(movementType==1)
+                            {
+                                response["access_allowed"]="true";		
+                                response["result"]= "allow_access";		
+                                response["result_description"]="Access allowed.whitelist available";
+                                
+                            }
+                            else
+                            {
+                                response["access_allowed"]="true";		
+                                response["result"]= "allow_access";		
+                                response["result_description"]="Access allowed at exit.whitelist available";
+                            }
                         }
-                }
+                
                     
                 /*writeAccessLog("checkAccess","cooperate_parker : "+to_string(cooperate_parker));
                 response["short_term_entry_after_contract_parking_space_exceeded"]=0;

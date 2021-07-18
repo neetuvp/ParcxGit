@@ -1298,7 +1298,7 @@ Php::Value parcxTicketCheck(Php::Parameters &params) {
                 reportCon = General.mysqlConnect(ReportingDB);
                 if (reportCon != NULL) {
                     stmt = reportCon->createStatement();
-                    Php::Value entry_details = openTransactionCheck(1);
+                    Php::Value entry_details = ticket_id1);
                     for (auto &iter : entry_details)
                         response[iter.first] = iter.second;
                 }

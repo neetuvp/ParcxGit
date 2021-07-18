@@ -190,7 +190,7 @@ void setParkingRateConfiguration(int carpark_id) {
     sql::Connection *conn;
     sql::Statement *stmt;
     sql::ResultSet *res;
-    //int rate_plan_id = 1,entry_grace_period_minutes,exit_grace_period_minutes;
+    int rate_plan_id = 1,entry_grace_period_minutes,exit_grace_period_minutes;
     string parking_rate = "", parking_rate_label = "",query;
     try {
         conn = General.mysqlConnect(CloudDB);
@@ -320,7 +320,6 @@ float calculateParkingFee(int duration)
         {
             stmt = conn->createStatement();
             if(hours>0){
-                writeLog("calculateParkingFee", "SELECT parking_rate,time_duration from  revenue_parking_rates where Lower(time_unit)='hours' and time_duration>"+to_string(hours)+" and parking_rate_id = "+to_string(rate_plan_id)+" and status=1 order by time_duration limit 1");
                 res = stmt->executeQuery("SELECT parking_rate,time_duration from  revenue_parking_rates where Lower(time_unit)='hours' and time_duration>"+to_string(hours)+" and parking_rate_id = "+to_string(rate_plan_id)+" and status=1 order by time_duration limit 1");
                 if(res->next())
                 {
@@ -384,8 +383,6 @@ Php::Value checkAppUser(string ticket_id,int carpark,int facility,int device,int
                         response["access_allowed"]="true";
                         response["result"] = "shortterm_entry";
                         response["result_description"] = "Shortterm Entry";   
-                        response["customer_message_line1"]="Access allowed";
-                        response["customer_message_line2"]="Shortterm Entry";
                                            
                     }
                     else
@@ -393,8 +390,6 @@ Php::Value checkAppUser(string ticket_id,int carpark,int facility,int device,int
                         response["access_allowed"]="false";
                         response["result_description"]="Access disabled.Wallet balance is negative";    
                         response["result"]="access_disabled";
-                        response["customer_message_line1"]="Access denied";
-                        response["customer_message_line2"]="Wallet balance negative";
                     }
                 }
                 else
@@ -431,8 +426,6 @@ Php::Value checkAppUser(string ticket_id,int carpark,int facility,int device,int
                         response["access_allowed"]="false";
                         response["result_description"]="Not in Open Transaction";    
                         response["result"]="access_disabled";
-                        response["customer_message_line1"]="Access denied";
-                        response["customer_message_line2"]="Shortterm Entry";
                     }
                     delete res1;
                 }
@@ -442,8 +435,6 @@ Php::Value checkAppUser(string ticket_id,int carpark,int facility,int device,int
                 response["access_allowed"]="false";
                 response["result_description"]="Access disabled.No ewallet record found";    
                 response["result"]="access_disabled";
-                response["customer_message_line1"]="Access denied";
-                response["customer_message_line2"]="No ewallet record";
             }
             delete res;
             delete stmt;
@@ -458,26 +449,30 @@ Php::Value checkAppUser(string ticket_id,int carpark,int facility,int device,int
 }
 
 Php::Value parcxTicketCheck(Php::Parameters &params) {
-int device_number,carpark_number,facility_number,movement_type=1;
+int device_number,carpark_number,facility_number,movement_type;
 string qr_code,parking_zone;
-Json::Reader reader;
 Php::Value response;
-Json::Value json,validation_rules;
-response["customer_message_line1"]="";
-response["customer_message_line2"]="";
-response["customer_message_line3"]="";
-response["customer_message_line4"]="";
+Json::Value validation_json,validation_rules;
+response["customer_message_line1"]="Message Line1";
+response["customer_message_line2"]="Message Line2";
+response["customer_message_line3"]="Message Line3";
+response["customer_message_line4"]="Message Line4";
 try {
-    string request = params[0];
-    reader.parse(request,json,true);
+    Php::Value json = params[0];
     writeLog("parcxTicketCheck","--------------START-----------------");
-    device_number = json["device_number"].asInt();
-    carpark_number = json["carpark_number"].asInt();
-    facility_number = json["facility_number"].asInt();
-    parking_zone = json["parking_zone"].asString();
-    qr_code = json["qr_code"].asString();
+    device_number = json["device_number"];
+    carpark_number = json["carpark_number"];
+    facility_number = json["facility_number"];
+    parking_zone = toString(json["parking_zone"]);
+    qr_code = toString(json["qr_code"]);
 
-    /*validation_rules["device_number_type"] = "int";
+    validation_json["device_number"] = device_number;
+    validation_json["carpark_number"]=carpark_number;
+    validation_json["facility_number"] = facility_number;
+    validation_json["parking_zone"] = parking_zone;
+    validation_json["qr_code"] = qr_code;
+
+    validation_rules["device_number_type"] = "int";
     validation_rules["device_number_length"] = 0;
     validation_rules["carpark_number_type"] = "int";
     validation_rules["carpark_number_length"] = 0;
@@ -488,7 +483,7 @@ try {
     validation_rules["qr_code_type"] = "varchar";
     validation_rules["qr_code_length"] = 30;
 
-    Json::Value validation_response = validation.checkValidation(json,validation_rules);
+    Json::Value validation_response = validation.checkValidation(validation_json,validation_rules);
 
     if(validation_response["result"]=="failed")
     {
@@ -499,7 +494,7 @@ try {
         response["validation_details"] = fw.write(validation_response);
     }
     else
-    {*/
+    {
         int carpark_id = getCarparkID(carpark_number,facility_number);
         int device_type = getDeviceCategory(device_number,carpark_id);
         writeLog("parcxTicketCheck","device category:"+to_string(device_type));
@@ -518,8 +513,6 @@ try {
         {
             for (auto &iter : whitelist_details)
                 response[iter.first] = iter.second;
-            response["customer_message_line1"]="Access allowed";
-            response["customer_message_line2"]="Whitelist available";
 
         }
         else //Check Reservation
@@ -531,9 +524,6 @@ try {
             {
                 for (auto &iter : reservation_details)
                     response[iter.first] = iter.second;
-                response["customer_message_line1"]="Access allowed";
-                response["customer_message_line2"]="Reservation available";
-                    
             }
             else if(toString(reservation_details["access_allowed"]) == "false" && toString(reservation_details["result"]) =="reservation_exit_grace_period_exceeded")
             {
@@ -545,7 +535,6 @@ try {
                 writeLog("parcxTicketCheck","checkAppUser Response:"+toString(app_user_details["result_description"]));
                 for (auto &iter : app_user_details)
                     response[iter.first] = iter.second;
-                
             }
         }
         string result = response["result"];
@@ -563,7 +552,7 @@ try {
             for (auto &iter : ticket_details)
                 response[iter.first] = iter.second;
         }*/
-    //}
+    }
     
     //writeLog("parcxTicketCheck", "Result: " + result + "\tDescription:" + result_description + "\n");
     writeLog("parcxTicketCheck","--------------END-----------------"); 

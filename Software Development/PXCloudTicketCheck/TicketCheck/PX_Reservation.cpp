@@ -39,14 +39,22 @@ Php::Value Reservation::checkReservation(string ticketId,int entryGrace,int exit
                 int reservation_facility,reservation_carpark;
                             double fee;
                 struct tm tm;	
-                            time_t now = time(NULL);	
-                            time_t start,end;
+                time_t now = time(NULL);	
+                time_t start,end;
 
-                query="select * from parking_reservation where ticket_id='"+ticketId+"' and cancel_flag=0 and used_flag=0 and to_time>NOW() limit 1";
+                //query="select * from parking_reservation where ticket_id='"+ticketId+"' and cancel_flag=0 and used_flag=0 and to_time>NOW() limit 1";
+               /* if(movement_type==1)
+                    query = "select * from parking_reservation where ticket_id='"+ticketId+"' and cancel_flag=0 and used_flag=0 and to_time > NOW() order by to_time limit 1";
+                else if(movement_type==2)
+                    query = "select * from parking_reservation where ticket_id='"+ticketId+"' and cancel_flag=0 and used_flag=0 and from_time < NOW() order by from_time desc limit 1";
+                */
+                query = "select * from parking_reservation where ticket_id='"+ticketId+"' and cancel_flag=0 and used_flag=0 limit 1";
                 res=stmt->executeQuery(query);   
                 if(res->next())
                 {
-                    writeReservationLog("checkReservation","Reservation present");	
+                    int id = res->getInt("reservation_id");
+                    writeReservationLog("checkReservation","Reservation present");
+                    writeReservationLog("checkReservation","movement type:"+to_string(movement_type));		
                     response["reservation_present"] = "true";
                     response["plate_number"]=string(res->getString("plate_number"));	
                     parking_to=res->getString("to_time");
@@ -81,6 +89,11 @@ Php::Value Reservation::checkReservation(string ticketId,int entryGrace,int exit
                                 response["result"]= "already_used_reservation";
                                 response["result_description"]="Already used reservation";
                             }
+                            if(res->getInt("cancel_flag")>0)
+                            {					
+                                response["result"]= "cancelled_reservation";
+                                response["result_description"]="Cancelled reservation";
+                            }
                             else
                             {																							
                                 strptime(parking_from.c_str(),"%Y-%m-%d %H:%M:%S",&tm);	
@@ -92,7 +105,8 @@ Php::Value Reservation::checkReservation(string ticketId,int entryGrace,int exit
                                 mktime(&tm);
                                 end=mktime(&tm);  
 
-                                if(difftime(now,start)>=0 && difftime(now,end)>0)
+                               // if(difftime(now,start)>=0 && difftime(now,end)>0)
+                               if(difftime(now,start)>=0 && difftime(end,now)>0)
                                 {
                                     response["result_description"]="Reservation access allowed";	
                                     response["result"]= "reservation_allow_access";	
@@ -106,7 +120,8 @@ Php::Value Reservation::checkReservation(string ticketId,int entryGrace,int exit
                             }
                         }//devicetype 1
                         else
-                        {                    
+                        {        
+                            writeReservationLog("checkReservation","To:"+parking_to);
                             if(res->getInt("used_flag")==2)
                             {
                                 response["result"]= "already_exited_reservation";
@@ -126,6 +141,7 @@ Php::Value Reservation::checkReservation(string ticketId,int entryGrace,int exit
                                     start=mktime(&tm); 
                                     if(difftime(now,start)>=0)
                                     {	
+                                        stmt->executeUpdate("Update parking_reservation set used_flag=1 where reservation_id="+to_string(id));
                                         response["result_description"]="Reservation access allowed";									
                                         response["result"]= "reservation_allow_access";
                                         response["access_allowed"] = "true";	

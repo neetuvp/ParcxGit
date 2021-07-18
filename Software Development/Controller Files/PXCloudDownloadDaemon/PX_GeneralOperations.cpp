@@ -10,7 +10,6 @@
 #define Password "1fromParcx!19514"
 #define dateTimeFormat "%Y-%m-%d %H:%M:%S"
 
-
 using namespace std;
 
 string logpath="/opt/parcx/Logs/";
@@ -33,7 +32,7 @@ void GeneralOperations::writeLog(string path,string function,string txt)
     ofstream fp;
     fp.open(logpath+path+".log", ios::app);
     fp<<currentDateTime(dateTimeFormat)<<" "<<function<<":: "<<txt<<endl;
-    fp.close();
+    fp.close();    
 }//end of .writeLog
 
 sql::Connection* GeneralOperations::mysqlConnect(string database)
