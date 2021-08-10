@@ -7,6 +7,10 @@ Added parking_ewallet in download
 Add download_flag=0 in parking_ewallet
 Updated downloaddata based on pxcloud_download_settings in local server
 
+
+Added Validation features 
+Added parking_movements,parking_movements_reservation for IOT
+Added valet_parking posting
  */
 
 #include <phpcpp.h>
@@ -554,7 +558,7 @@ Json::Value UpdateOpenTransactions(Json::Value json,string facility_number,strin
     }
 
 Json::Value UpdateParkingMovementsAccess(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name) {    
-    sql::Connection *con_write;
+    sql::Connection *con_write=NULL;
     sql::Statement *stmt_write;
     Json::Value data, jsonresponse;
     string sql = "";
@@ -1048,7 +1052,7 @@ Json::Value UpdateParkingMovementsSummary(Json::Value json,string facility_numbe
                 report_day = data[i]["report_day"].asString();
                 category = stoi(data[i]["category"].asString());
                 movement_type = data[i]["movement_type"].asInt();
-                carpark_number = data[i]["carpark_number"].asInt();            
+                carpark_number = data[i]["car_park_number"].asInt();            
 
                 string carpark_name =cloud_carpark_name[carpark_number];           
                 int carpark_id = cloud_carpark_id[carpark_number];                         
@@ -1356,6 +1360,8 @@ Json::Value UpdateParkingMovementsManual(Json::Value json,string facility_number
                 action = data[i]["action"].asString();
                 reason = data[i]["reason"].asString();
                 description = data[i]["description"].asString();
+                if(create_date_time=="")
+                    create_date_time = date_time;
 
                 sql = "INSERT INTO parking_movements_manual (carpark_id,device_number, device_name, operator_id, operator_name, carpark_name, carpark_number,facility_name,facility_number,movement_type,date_time,create_date_time,action,reason,description) Values (" + to_string(carpark_id) + "," + to_string(device_number) + ",'" + device_name + "','" + operator_id + "','" + operator_name + "','" + carpark_name + "'," + to_string(carpark_number) + ",'" + facility_name + "'," + facility_number + "," + to_string(movement_type) + ",'" + date_time + "','" + create_date_time + "','" + action + "','" + reason + "','" + description + "')";            
                 result = stmt_write->executeUpdate(sql);
@@ -1809,6 +1815,447 @@ Json::Value UpdateParkingSubscription(Json::Value json,string facility_number,st
     return jsonresponse;
     }
 
+Json::Value UpdateParkingMovements(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name) {
+    sql::Connection *con_write;
+    sql::Statement *stmt_write;
+    
+
+    Json::Value data, jsonresponseid, jsonresponse,table_rules;
+    string sql = "";
+    int id, result = 0, j = 0;    
+    int device_number,movement_type,plate_capture_id,carpark_number;
+    string date_time, device_name, plate_number,ticket_id,chip_utid;
+    try 
+        {
+        table_rules = GetTableRules("parking_movements");
+        con_write = general.DBConnectionWrite(DBServer);
+        stmt_write = con_write->createStatement();
+        data = json["data"];
+        for (int i = 0; i < (signed)data.size(); i++) 
+        {
+             data[i] = validation.checkSpecialCharacters(data[i],table_rules);
+           // WriteToLog("UpdateParkingSubscription", fw.write(data[i]));
+            Json::Value validation_response = validation.checkValidation(data[i],table_rules);           
+            
+            //WriteToLog("UpdateParkingSubscription", fw.write(validation_response));
+            if(validation_response["result"]=="failed")
+            {
+                WriteException("UpdateParkingMovements", fw.write(validation_response));
+                jsonresponse["validation"] = "failed";
+                jsonresponse["validation_details"] = validation_response["validation_details"];
+            }
+            else
+            {
+                id = data[i]["id"].asInt();
+                date_time = data[i]["date_time"].asString();
+                ticket_id = data[i]["ticket_id"].asString();
+                device_number = data[i]["device_number"].asInt();
+                device_name = data[i]["device_name"].asString();
+                movement_type = data[i]["movement_type"].asInt();
+                chip_utid = data[i]["chip_utid"].asString();
+                plate_number = data[i]["plate_number"].asString();                  
+                plate_capture_id = data[i]["plate_capture_id"].asInt();
+                carpark_number = data[i]["carpark_number"].asInt();
+                int carpark_id = cloud_carpark_id[carpark_number];                         
+                string carpark_name =cloud_carpark_name[carpark_number];
+
+
+
+                sql = "Insert into parking_movements(date_time,ticket_id,device_number,device_name,movement_type,carpark_number,facility_number,chip_utid,plate_number,create_date_time,plate_captured_id,carpark_name,carpark_id) Values ('"+date_time+"','"+ticket_id+"',"+to_string(device_number)+",'"+device_name+"',"+to_string(movement_type)+","+to_string(carpark_number)+","+facility_number+",'"+chip_utid+"','"+plate_number+"','"+date_time+"',"+to_string(plate_capture_id)+",'"+carpark_name+"',"+to_string(carpark_id)+")";
+                result = stmt_write->executeUpdate(sql);
+                if (result == 1) 
+                {
+                    jsonresponseid[j] = id;
+                    j++;
+                }
+            }
+
+        }
+        jsonresponse["message"] = "success";        
+        
+        delete stmt_write;
+        delete con_write;
+        } 
+    catch (const std::exception &e) 
+        {
+        WriteException("UpdateParkingMovements", e.what());
+        jsonresponse["message"] = "failed";
+        jsonresponse["error"] = e.what();    
+        }
+    jsonresponse["data"] = jsonresponseid;
+    jsonresponse["table"] = "parking_movements";
+    return jsonresponse;
+    }
+
+Json::Value UpdateParkingMovementsReservation(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name) {
+    sql::Connection *con_write;
+    sql::Statement *stmt_write;
+
+    Json::Value data, jsonresponseid, jsonresponse,table_rules;
+    string sql = "";
+    int id, result = 0, j = 0;    
+    int device_number,movement_type,plate_capture_id,carpark_number;
+    string date_time, device_name, plate_number,ticket_id,chip_utid;
+    try 
+        {
+        table_rules = GetTableRules("parking_movements_reservation");
+        con_write = general.DBConnectionWrite(DBServer);
+        stmt_write = con_write->createStatement();
+        data = json["data"];
+        for (int i = 0; i < (signed)data.size(); i++) 
+        {
+             data[i] = validation.checkSpecialCharacters(data[i],table_rules);
+           // WriteToLog("UpdateParkingSubscription", fw.write(data[i]));
+            Json::Value validation_response = validation.checkValidation(data[i],table_rules);           
+            
+            //WriteToLog("UpdateParkingSubscription", fw.write(validation_response));
+            if(validation_response["result"]=="failed")
+            {
+                WriteException("UpdateParkingMovementsReservation", fw.write(validation_response));
+                jsonresponse["validation"] = "failed";
+                jsonresponse["validation_details"] = validation_response["validation_details"];
+            }
+            else
+            {
+                id = data[i]["id"].asInt();
+                date_time = data[i]["date_time"].asString();
+                ticket_id = data[i]["ticket_id"].asString();
+                device_number = data[i]["device_number"].asInt();
+                device_name = data[i]["device_name"].asString();
+                movement_type = data[i]["movement_type"].asInt();
+                plate_number = data[i]["plate_number"].asString();                  
+                plate_capture_id = data[i]["plate_capture_id"].asInt();
+                carpark_number = data[i]["carpark_number"].asInt();
+                int carpark_id = cloud_carpark_id[carpark_number];                         
+                string carpark_name =cloud_carpark_name[carpark_number];
+
+
+
+                sql = "Insert into parking_movements_reservation(date_time,ticket_id,device_number,device_name,movement_type,carpark_number,facility_number,plate_number,plate_captured_id,carpark_name,carpark_id) Values ('"+date_time+"','"+ticket_id+"',"+to_string(device_number)+",'"+device_name+"',"+to_string(movement_type)+","+to_string(carpark_number)+","+facility_number+",'"+plate_number+"',"+to_string(plate_capture_id)+",'"+carpark_name+"',"+to_string(carpark_id)+")";
+                result = stmt_write->executeUpdate(sql);
+                if (result == 1) 
+                {
+                    jsonresponseid[j] = id;
+                    j++;
+                }
+            }
+
+        }
+        jsonresponse["message"] = "success";        
+        
+        delete stmt_write;
+        delete con_write;
+        } 
+    catch (const std::exception &e) 
+        {
+        WriteException("UpdateParkingMovementsReservation", e.what());
+        jsonresponse["message"] = "failed";
+        jsonresponse["error"] = e.what();    
+        }
+    jsonresponse["data"] = jsonresponseid;
+    jsonresponse["table"] = "parking_movements_reservation";
+    return jsonresponse;
+    }
+
+Json::Value UpdateValetParking(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name) {
+    sql::Connection *con;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    Json::Value data, jsonresponse,table_rules;   
+    Json::Value jsonresponseid;
+    int result = 0;
+    int j = 0, rowid;
+    string sql;
+    string id,customer_name,mobile_no,plate_number,plate_prefix,plate_country,plate_emirate;
+    string front_plate,left_plate,right_plate,back_plate,ticket_number,customer_card_number,customer_card_id;
+    string key_card_id,key_card_number,key_position,parking_bay,paid_status,payment_date_time,valet_out,parking_in;
+    string parking_out,dropoff_datetime,ready_for_delivery,valet_in_datetime,valet_out_datetime,parking_in_datetime;
+    string parking_out_datetime, pickup_driver_id,pickup_driver_name,delivery_driver_id,delivery_driver_name;
+    string duration_pickup_parking,duration_parking,duration_payment_parking,duration_parking_dropoff,duration_dropoff_delivery;
+    string device_number,operator_id,operator_name,car_brand,car_color,car_model,record_creation_datetime;
+    string carpark_number,disable_flag,disable_reason,disable_datetime;    
+    
+    try 
+    {
+        table_rules = GetTableRules("valet_parking");
+        con = general.DBConnectionWrite(DBServer);
+        stmt = con->createStatement();               
+       
+        data = json["data"];
+        for (int i = 0; i < (signed)data.size(); i++) 
+        {
+            data[i] = validation.checkSpecialCharacters(data[i],table_rules);
+           // WriteToLog("UpdateParkingSubscription", fw.write(data[i]));
+            Json::Value validation_response = validation.checkValidation(data[i],table_rules);           
+            
+            //WriteToLog("UpdateParkingSubscription", fw.write(validation_response));
+            if(validation_response["result"]=="failed")
+            {
+                WriteException("UpdateValetParking", fw.write(validation_response));
+                jsonresponse["validation"] = "failed";
+                jsonresponse["validation_details"] = validation_response["validation_details"];
+            }
+            else
+            {
+                device_number = data[i]["device_number"].asString();
+                pickup_driver_name = data[i]["pickup_driver_name"].asString();
+                delivery_driver_id = data[i]["delivery_driver_id"].asString();
+                delivery_driver_name = data[i]["delivery_driver_name"].asString();
+                duration_pickup_parking = data[i]["duration_pickup_parking"].asString();
+                duration_parking = data[i]["duration_parking"].asString();
+                duration_payment_parking = data[i]["duration_payment_parking"].asString();
+                duration_parking_dropoff = data[i]["duration_parking_dropoff"].asString();
+                duration_dropoff_delivery = data[i]["duration_dropoff_delivery"].asString();
+                operator_id = data[i]["operator_id"].asString();
+                operator_name = data[i]["operator_name"].asString();
+                car_brand = data[i]["car_brand"].asString();
+                car_color = data[i]["car_color"].asString();
+                car_model = data[i]["car_model"].asString();
+                record_creation_datetime = data[i]["record_creation_datetime"].asString();
+
+
+                parking_out = data[i]["parking_out"].asString();
+                dropoff_datetime = data[i]["dropoff_datetime"].asString();
+                valet_in_datetime = data[i]["valet_in_datetime"].asString();
+                valet_out_datetime = data[i]["valet_out_datetime"].asString();
+                ready_for_delivery = data[i]["ready_for_delivery"].asString();
+                parking_in_datetime = data[i]["parking_in_datetime"].asString();
+                parking_out_datetime = data[i]["parking_out_datetime"].asString();
+                pickup_driver_id = data[i]["pickup_driver_id"].asString();
+
+                key_card_id = data[i]["key_card_id"].asString();
+                key_card_number = data[i]["key_card_number"].asString();
+                key_position = data[i]["key_position"].asString();
+                parking_bay = data[i]["parking_bay"].asString();
+                paid_status = data[i]["paid_status"].asString();
+                payment_date_time = data[i]["payment_date_time"].asString();
+                valet_out = data[i]["valet_out"].asString();
+                parking_in = data[i]["parking_in"].asString();
+
+                id = data[i]["id"].asString();
+                carpark_number = data[i]["carpark_number"].asString(); 
+
+                string carpark_name =cloud_carpark_name[stoi(carpark_number)];           
+                string carpark_id = cloud_carpark_id[stoi(carpark_number)];                        
+
+                customer_name = data[i]["customer_name"].asString();
+                mobile_no = data[i]["mobile_no"].asString();
+                plate_number = data[i]["plate_number"].asString();            
+                plate_prefix = data[i]["plate_prefix"].asString();
+                plate_country = data[i]["plate_country"].asString();
+                plate_emirate = data[i]["plate_emirate"].asString();            
+                front_plate = data[i]["front_plate"].asString();            
+                left_plate = data[i]["left_plate"].asString();
+                right_plate = data[i]["right_plate"].asString();
+                back_plate = data[i]["back_plate"].asString();
+                ticket_number = data[i]["ticket_number"].asString();            
+                customer_card_number = data[i]["customer_card_number"].asString();
+                customer_card_id = data[i]["customer_card_id"].asString();
+                disable_flag = data[i]["disable_flag"].asString();
+                disable_reason = data[i]["disable_reason"].asString();
+                disable_datetime = data[i]["disable_datetime"].asString();
+
+
+                rowid=0;   
+                result=1;
+                sql="Select * from valet_parking where carpark_id=" + carpark_id + " and ticket_number='" + ticket_number + "'";            
+                res = stmt->executeQuery(sql);
+                if (res->next())                 
+                    rowid = res->getInt("id");  
+
+
+                if (stoi(valet_out)==1) 
+                    {
+                    if(rowid>0 && res->getInt("valet_out")==0)
+                        {
+                        sql="Delete from live_valet_parking where carpark_id=" + carpark_id + " and ticket_number='" + ticket_number + "'";
+                        stmt->executeUpdate(sql);                
+                        }
+                    }
+
+                if(rowid==0)                
+                    {
+                    if (stoi(valet_out)==0 && stoi(disable_flag)==0) 
+                        {
+                        sql="INSERT INTO live_valet_parking(carpark_number,carpark_name,facility_number,facility_name,carpark_id,customer_name,mobile_no,plate_number,front_plate,left_plate,right_plate,back_plate,customer_card_id,customer_card_number,ticket_number,plate_country,plate_emirate,device_number,operator_id,operator_name,plate_prefix,key_card_id,valet_in_datetime,car_brand,car_color,car_model,key_card_number) VALUES('"+carpark_number+"','"+carpark_name+"','"+facility_number+"','"+facility_name+"','"+carpark_id+"','"+customer_name+"','"+mobile_no+"','"+plate_number+"','"+front_plate+"','"+left_plate+"','"+right_plate+"','"+back_plate+"','"+customer_card_id+"','"+customer_card_number+"','"+ticket_number+"','"+plate_country+"','"+plate_emirate+"','"+device_number+"','"+operator_id+"','"+operator_name+"','"+plate_prefix+"','"+key_card_id+"','"+valet_in_datetime+"','"+car_brand+"','"+car_color+"','"+car_model+"','"+key_card_number+"')"; 
+                        result = stmt->executeUpdate(sql);
+                        }
+                    sql="INSERT INTO valet_parking(carpark_number,carpark_name,facility_number,facility_name,carpark_id,customer_name,mobile_no,plate_number,front_plate,left_plate,right_plate,back_plate,customer_card_id,customer_card_number,ticket_number,plate_country,plate_emirate,device_number,operator_id,operator_name,plate_prefix,key_card_id,valet_in_datetime,car_brand,car_color,car_model,key_card_number) VALUES('"+carpark_number+"','"+carpark_name+"','"+facility_number+"','"+facility_name+"','"+carpark_id+"','"+customer_name+"','"+mobile_no+"','"+plate_number+"','"+front_plate+"','"+left_plate+"','"+right_plate+"','"+back_plate+"','"+customer_card_id+"','"+customer_card_number+"','"+ticket_number+"','"+plate_country+"','"+plate_emirate+"','"+device_number+"','"+operator_id+"','"+operator_name+"','"+plate_prefix+"','"+key_card_id+"','"+valet_in_datetime+"','"+car_brand+"','"+car_color+"','"+car_model+"','"+key_card_number+"')"; 
+                    result = stmt->executeUpdate(sql);                
+                    }
+
+                sql="";
+                if(stoi(parking_in)==1)                                                                   
+                    sql=sql+"key_position='"+key_position+"',parking_bay='"+parking_bay+"',parking_in=1,parking_in_datetime="+mysqldate(parking_in_datetime)+",pickup_driver_id='"+pickup_driver_id+"',pickup_driver_name='"+pickup_driver_name+"',duration_pickup_parking='"+duration_pickup_parking+"'";
+
+                if(stoi(paid_status)==1)
+                    {
+                    if(sql!="")
+                        sql=sql+",";                                       
+
+                    sql=sql+"paid_status=1,payment_date_time="+mysqldate(payment_date_time);                
+                    } 
+
+                if(stoi(parking_out)==1)
+                    {
+                    if(sql!="")
+                        sql=sql+",";                                        
+
+                    sql=sql+"parking_out=1,parking_out_datetime="+mysqldate(parking_out_datetime)+",delivery_driver_id='"+delivery_driver_id+"',delivery_driver_name='"+delivery_driver_name+"',duration_payment_parking='"+duration_payment_parking+"'";                
+                    }
+
+                if(stoi(ready_for_delivery)==1)
+                    {
+                    if(sql!="")
+                        sql=sql+",";                                        
+
+                    sql=sql+"ready_for_delivery=1,dropoff_datetime="+mysqldate(dropoff_datetime)+",duration_parking_dropoff='"+duration_parking_dropoff+"'";                
+                    } 
+
+                if(stoi(valet_out)==1)
+                    {
+                    if(sql!="")
+                        sql=sql+",";                                       
+
+                    sql=sql+"valet_out=1,duration_dropoff_delivery='"+duration_dropoff_delivery+"',valet_out_datetime="+mysqldate(valet_out_datetime);                    
+                    }
+
+                if(stoi(disable_flag)==1)
+                    {
+                    if(sql!="")
+                        sql=sql+",";                                       
+
+                    sql=sql+"disable_flag=1,disable_reason='"+disable_reason+"',disable_datetime="+mysqldate(disable_datetime);                    
+                    }
+
+                if(sql!="")
+                    {
+                    sql=sql+" where ticket_number='"+ticket_number+"' and carpark_id='"+carpark_id+"'" ;  
+                    result = stmt->executeUpdate("update valet_parking set plate_number='"+plate_number+"',plate_prefix='"+plate_prefix+"',front_plate='"+front_plate+"',left_plate='"+left_plate+"',right_plate='"+right_plate+"',back_plate='"+back_plate+"',plate_country='"+plate_country+"',plate_emirate='"+plate_emirate+"',"+sql);
+
+                    if (stoi(valet_out)==0) 
+                        result = stmt->executeUpdate("update live_valet_parking set "+sql);
+                    }
+
+                result=1;
+                if (result == 1) 
+                    {
+                    jsonresponseid[j] = id;
+                    j++;
+                    }
+                delete res;    
+            }
+        }
+        
+        
+        delete stmt;
+        delete con;        
+    } 
+    catch (const std::exception &e) 
+    {
+        WriteException("postValetParking", e.what());
+        WriteException("postValetParking", sql);
+        
+        jsonresponse["message"] = "failed";
+        jsonresponse["error"] = e.what();
+        jsonresponse["table"] = "valet_parking";        
+    }
+    jsonresponse["data"] = jsonresponseid;        
+    jsonresponse["table"] = "valet_parking";
+    return jsonresponse;
+    }
+
+Json::Value UpdateParkingValidation(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name) {
+    sql::Connection *con_write;
+    sql::Statement *stmt_write;
+    sql::Connection *con;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    Json::Value data, jsonresponseid, jsonresponse,table_rules;
+    string sql = "";    
+    int id, result = 0, j = 0, rowid = 0;
+    int validation_value,product_id,validator_id;
+    string date_time,carpark_number, plate_number, ticket_id, product_name, validator_name,validation_type;
+    try 
+        {
+        table_rules = GetTableRules("parking_validation");
+        con_write = general.DBConnectionWrite(DBServer);
+        stmt_write = con_write->createStatement();
+        con = general.DBConnectionWrite(DBServer);
+        stmt = con->createStatement();
+        data = json["data"];
+        for (int i = 0; i < (signed)data.size(); i++) 
+        {
+            data[i] = validation.checkSpecialCharacters(data[i],table_rules);
+           // WriteToLog("UpdateParkingReservation", fw.write(data[i]));
+            Json::Value validation_response = validation.checkValidation(data[i],table_rules);           
+            
+            //WriteToLog("UpdateParkingReservation", fw.write(validation_response));
+            if(validation_response["result"]=="failed")
+            {
+                WriteException("UpdateParkingValidation", fw.write(validation_response));
+                jsonresponse["validation"] = "failed";
+                jsonresponse["validation_details"] = validation_response["validation_details"];
+            }
+            else
+            {
+                id = data[i]["id"].asInt();
+                date_time = data[i]["date_time"].asString();
+                plate_number = data[i]["plate_number"].asString();
+                ticket_id = data[i]["ticket_id"].asString();
+                validator_id = data[i]["validator_id"].asInt();
+                validator_name = data[i]["validator_name"].asString();
+                product_id = data[i]["product_id"].asInt();
+                product_name = data[i]["product_name"].asString();
+                validation_type = data[i]["validation_type"].asString();
+                validation_value = data[i]["validation_value"].asInt();
+                carpark_number = data[i]["carpark_number"].asString();
+                string carpark_name =cloud_carpark_name[stoi(carpark_number)];           
+                string carpark_id = cloud_carpark_id[stoi(carpark_number)];   
+                
+                res = stmt->executeQuery("Select id from parking_validation where ticket_id = '" + ticket_id+"' and carpark_id = "+carpark_id);
+                if (res->next()) 
+                {
+                    rowid = res->getInt("id");
+                    sql = "Update parking_validation set download_flag=1,plate_number = '" + plate_number + "',ticket_id = '" + ticket_id + "',validator_id = "+to_string(validator_id)+",validator_name = '"+validator_name+"',product_id="+to_string(product_id)+",product_name = '"+product_name+"',validation_type='"+validation_type+"',validation_value="+to_string(validation_value)+" where id = " + to_string(rowid);
+                    result = stmt_write->executeUpdate(sql);
+                    if (result == 1) 
+                    {
+                        jsonresponseid[j] = id;
+                        j++;
+                    }
+                } 
+                else 
+                {
+                    sql = "Insert into parking_validation (ticket_id,date_time,plate_number,validator_id,validator_name,product_id,product_name,validation_type,validation_value,carpark_id,carpark_number,carpark_name,facility_number,facility_name,download_flag) values('" + ticket_id + "','" +date_time+ "','"+plate_number+"'," + to_string(validator_id) + ",'" + validator_name + "'," + to_string(product_id) + ",'" + product_name + "','" + validation_type + "'," + to_string(validation_value) + "," +carpark_id + ","+carpark_number+",'" + carpark_name + "'," +facility_number + ",'" + facility_name + "',1)";
+                    result = stmt_write->executeUpdate(sql);
+                    if (result == 1) 
+                    {
+                        jsonresponseid[j] = id;
+                        j++;
+                    }
+                }
+                delete res;
+            }
+        }
+        jsonresponse["message"] = "success";                
+        delete stmt_write;
+        delete con_write;
+        delete stmt;
+        delete con;
+
+        } 
+    catch (const std::exception &e) 
+        {
+        WriteException("UpdateParkingValidation", e.what());
+        jsonresponse["message"] = "failed";
+        jsonresponse["error"] = e.what();    
+        }
+    jsonresponse["data"] = jsonresponseid;
+    jsonresponse["table"] = "parking_validation";
+    return jsonresponse;
+    }
+
 void UpdateFacilityDateTime(string facility_number, int type) {
     sql::Connection *conn;
     sql::Statement *stmt;
@@ -1973,6 +2420,18 @@ Php::Value PostDataToServer(Php::Parameters &params)
                     break;
                 case 16:
                     response = UpdateParkingSubscription(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
+                    break;
+                case 17:
+                    response = UpdateParkingMovements(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
+                    break;
+                case 18:
+                    response = UpdateParkingMovementsReservation(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
+                    break;
+                case 19:
+                    response = UpdateValetParking(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);              
+                    break;
+                case 20:
+                    response = UpdateParkingValidation(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);              
                     break;
                 }
             array.append(response);
@@ -2251,7 +2710,8 @@ string DownloadCloudData(Json::Value json,string facility_number,string cloud_op
                 {
                 conn = general.DBConnectionRead(DBServer);
                 stmt = conn->createStatement();
-                res = stmt->executeQuery("Select * from application_users  where parent_user_id = " + cloud_operator_id + " and download_flag=0 limit " + to_string(rowlimit));
+                //res = stmt->executeQuery("Select * from application_users  where parent_user_id = " + cloud_operator_id + " and download_flag=0 limit " + to_string(rowlimit));
+                res = stmt->executeQuery("Select * from application_users  where parent_user_id = " + cloud_operator_id + "  and  !find_in_set("+facility_id+",download_flag) limit " + to_string(rowlimit));
                 if (res->rowsCount() > 0) 
                     {
                     while (res->next()) 

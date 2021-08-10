@@ -423,6 +423,8 @@ void DeleteOpenTransactions()
 			WriteToLog("DeleteOpenTransactions","No of records deleted:"+to_string(n));
 			cout << " No of records deleted:"+to_string(n)<<endl;		
 		}
+		delete stmt;
+		delete conn;
 	}
 	catch(std::exception &e)
 	{
@@ -482,7 +484,7 @@ void DeleteOldLogFile()
 		string actual_log_path = GetSettingsValue("actual_log_path")+"/Logs";
 		cout<<"Retention:"<<retention_time<<endl;
 		sprintf(file_delete_command,"sudo find %s -name '*.log' -mtime +%d -type f -exec rm {} \\;",actual_log_path.c_str(),retention_time-1);
-		WriteToLog("DeleteOldLogFile",file_delete_command);
+		//WriteToLog("DeleteOldLogFile",file_delete_command);
 		system(file_delete_command);
 		WriteToLog("DeleteOldLogFile","Log files older than "+to_string(retention_time)+ " days will be deleted");
 	}
@@ -592,7 +594,9 @@ void DeleteOldTransactions()
 			int n = stmt->executeUpdate("Delete from "+table+" where date(report_date) <(curdate() - interval "+retention_summary+" day)");
 			WriteToLog("DeleteOldTransactions:summary","No of rows deleted for "+table+" :"+to_string(n));
 			summary_tables.erase(0, pos + delimiter.length());	
-		}*/	
+		}*/
+		delete stmt;
+		delete conn;	
 	}
 	catch(std::exception &e)
 	{

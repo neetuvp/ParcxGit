@@ -43,18 +43,10 @@ string Validation::CurrentDateValidation()
     string datetime(buffer);
     return datetime;
 }
-/*void Validation::writelog(string data)
-{
-	ofstream f;
-    f.open("Logs/ReservationLogcpp"+CurrentDateValidation()+".log",fstream::app);
-    f << CurrentDateTimeValidation()<<":";
-    f << data<< endl;
-	
-}*/
+
 void Validation::writelog(string function, string txt) {    
     string path = "Services/ExceptionLogs/PX_DaemonService_Validation_" + gen.currentDateTime("%Y-%m-%d");
     gen.writeLog(path, function, txt);
-    //WriteToLog("****Validation:"+function+"*****",txt);
 }
 
 Json::Value Validation::DataValidation(string data,int len,int datatype,int mandatoryflag) //Datatype: 1 - Integer, 2 - Alphabets, 3 - AlphaNumeric, 4 - SpecialCharacter
@@ -64,13 +56,13 @@ Json::Value Validation::DataValidation(string data,int len,int datatype,int mand
     response["data"] = data;
     if(mandatoryflag==1 && data=="")  //Check if data is null
     {
-	writelog("DataValidation","Missing Mandatory field");
+	writelog("DataValidation","Missing Mandatory field:"+data);
         response["result"]=false;
         response["reason"] = "Missing Mandatory field";
     }
     if(datatype==3 && data.length()>(unsigned)len)  //Check if length of the data is within the assigned limit
     {
-	writelog("DataValidation","Data length exceeds allowed limit");
+	writelog("DataValidation","Data length exceeds allowed limit:"+data);
         response["result"]=false;
         response["reason"] = "Data length exceeded";
     }
@@ -165,7 +157,7 @@ bool Validation::checkAlpha(string data)
 
 bool Validation::checkAlphaNumeric(string data)
 {
-    writelog("checkAlphaNumeric", data);   
+    //writelog("checkAlphaNumeric", data);   
     //std::replace_if(data.begin(), data.end(), ::ispunct, '');
     size_t found = data.find("'");
     if (found != string::npos){
@@ -181,15 +173,6 @@ bool Validation::checkAlphaNumeric(string data)
 bool Validation::checkDate(string data)
 {
     struct tm tm;
-    
-    /*if(!strptime(data.c_str(),"%Y-%m-%dT%H:%M:%S+%H:%M",&tm) && !strptime(data.c_str(),"%Y-%m-%dT%H:%M:%S-%H:%M",&tm) && !strptime(data.c_str(),"%Y-%m-%dT%H:%M:%SZ",&tm) && data!="")
-    {
-        return false;   //||strptime(data.c_str(),"%FT%TZ",&tm)
-    }
-    else
-    {
-        return true;;
-    }*/
     if(!strptime(data.c_str(),"%Y-%m-%d %H:%M:%S",&tm) && data!="")
     {
         return false;   //||strptime(data.c_str(),"%FT%TZ",&tm)
@@ -202,12 +185,6 @@ bool Validation::checkDate(string data)
 
 bool Validation::checkEmail(string data)
 {
-    /*const regex pattern("(\\w+)(\\.|_)?(\\w*)@(\\w+)(\\.(\\w+))+");
-    if(!regex_match(data,pattern) && data!="")
-    {
-        return false;
-    }
-    return true;*/
 	if(data != "")
 	{
 		auto b=data.begin(), e=data.end();
@@ -256,15 +233,16 @@ try{
         response["field"]=field;
         if(response["result"]==false)
         {
-            flag = 1;
+           flag = 1;
            validation["result"] = "failed";
            row.append(response);
         }
         
     }
     if(flag==1)
-    {
+    {      
         validation["validation_details"] = row;
+        writelog("Validation", "Validation Error:"+fw.write(validation));    
     }
     else
     {
@@ -321,7 +299,7 @@ Json::Value Validation::checkSpecialCharacters(Json::Value data,Json::Value rule
     string field,fieldvalue,type,new_string;
     string float_replace = "@~`!@#$%^&*()_=+\\\\';:\"\\/?><,-‘";
     string date_replace = "@~`!@#$%^&*()_=+\\\\';\"\\/?><,‘";
-
+    string varchar_replace = "@~`!@#$%^&*()_=+\\\\';:\"\\/?><.-‘";
     try{
         for (auto const& member : data.getMemberNames()) {
             field = string(member);
@@ -342,8 +320,10 @@ Json::Value Validation::checkSpecialCharacters(Json::Value data,Json::Value rule
             }
             else if(type=="varchar"||type=="text" || type=="tinytext")
             {
-                fieldvalue = removePunct(fieldvalue);
-                data[field] = fieldvalue;
+                //fieldvalue = removePunct(fieldvalue);
+                //data[field] = fieldvalue;
+                new_string = removeCharsFromString(fieldvalue, const_cast<char*>(varchar_replace.c_str()));
+                data[field] = new_string;
             }   
             else if(type=="datetime"||type=="date" ||type=="timestamp")
             {
