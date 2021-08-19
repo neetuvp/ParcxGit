@@ -99,6 +99,33 @@ int GetNextDashboardCount(int carpark_number, int facility_number)
     return order;
     }
 
+int GetCarparkFromDevice(int device_number,string facility_number)
+{
+    sql::Connection *conn=NULL;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    int carpark_number= 0;
+    try 
+    {
+        conn = general.DBConnectionWrite(DBServer);
+        stmt = conn->createStatement();  
+        res = stmt->executeQuery("SELECT b.carpark_number FROM system_devices as a inner join system_carparks as b on a.carpark_id = b.carpark_id where facility_number = '"+facility_number+"' and device_number = "+to_string(device_number));
+        while(res->next())
+        {
+            carpark_number = res->getInt("carpark_number");
+        }
+        delete res;
+        delete stmt;
+        delete conn;
+    }
+    catch (const std::exception &e) 
+    {
+        WriteException("GetCarparkFromDevice", e.what());             
+        delete conn;        
+    }
+    return carpark_number;
+}
+
 Json::Value GetTableRules(string table)
 {
     sql::Connection *conn=NULL;
@@ -2256,6 +2283,82 @@ Json::Value UpdateParkingValidation(Json::Value json,string facility_number,stri
     return jsonresponse;
     }
 
+Json::Value UpdatePlatesCaptured(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name) {
+    sql::Connection *con_write;
+    sql::Statement *stmt_write;
+    Json::Value data, jsonresponseid, jsonresponse,table_rules;
+    string sql = "";    
+    int id, result = 0, j = 0;
+    int camera_device_number,confidence_rate,user_id,carpark_number ;
+    string capture_date_time,initial_plate_number, plate_number,plate_type,plate_image_name, camera_name,plate_area,plate_country,plate_corrected_date_time,user_name;
+    try 
+        {
+        table_rules = GetTableRules("plates_captured");
+        con_write = general.DBConnectionWrite(DBServer);
+        stmt_write = con_write->createStatement();
+        
+        data = json["data"];
+        for (int i = 0; i < (signed)data.size(); i++) 
+        {
+            data[i] = validation.checkSpecialCharacters(data[i],table_rules);
+           // WriteToLog("UpdateParkingReservation", fw.write(data[i]));
+            Json::Value validation_response = validation.checkValidation(data[i],table_rules);           
+            
+            //WriteToLog("UpdateParkingReservation", fw.write(validation_response));
+            if(validation_response["result"]=="failed")
+            {
+                WriteException("UpdatePlatesCaptured", fw.write(validation_response));
+                jsonresponse["validation"] = "failed";
+                jsonresponse["validation_details"] = validation_response["validation_details"];
+            }
+            else
+            {
+                id = data[i]["id"].asInt();
+                capture_date_time = data[i]["capture_date_time"].asString();
+                plate_number = data[i]["plate_number"].asString();
+                plate_type = data[i]["plate_type"].asString();
+                plate_image_name = data[i]["plate_image_name"].asString();
+                camera_device_number = data[i]["camera_device_number"].asInt();
+                camera_name = data[i]["camera_name"].asString();
+                plate_area = data[i]["plate_area"].asString();
+                plate_country = data[i]["plate_country"].asString();
+                initial_plate_number = data[i]["initial_plate_number"].asString();
+                confidence_rate = data[i]["confidence_rate"].asInt();
+                plate_corrected_date_time = data[i]["plate_corrected_date_time"].asString();
+                user_id = data[i]["user_id"].asInt();
+                user_name = data[i]["user_name"].asString();
+                carpark_number = GetCarparkFromDevice(camera_device_number,facility_number);
+                WriteToLog("UpdateParkingReservation", "Carpark :"+to_string(carpark_number));
+                string carpark_name =cloud_carpark_name[carpark_number];           
+                string carpark_id = cloud_carpark_id[carpark_number];   
+                
+                
+                sql = "INSERT INTO plates_captured (camera_device_number, camera_name, plate_number, plate_type, plate_image_name, capture_date_time, plate_area, plate_country, initial_plate_number, confidence_rate, plate_corrected_date_time, user_id, user_name, carpark_number, facility_number, carpark_id) VALUES("+to_string(camera_device_number)+",'"+camera_name+"', '"+plate_number+"', '"+plate_type+"', '"+plate_image_name+"', '"+capture_date_time+"', '"+plate_area+"', '"+plate_country+"', '"+initial_plate_number+"',"+to_string(confidence_rate)+","+mysqldate(plate_corrected_date_time)+","+to_string(user_id)+",'"+user_name+"',"+to_string(carpark_number)+",'"+facility_number+"',"+carpark_id+")";
+                result = stmt_write->executeUpdate(sql);
+                if (result == 1) 
+                {
+                    jsonresponseid[j] = id;
+                    j++;
+                }
+
+            }
+        }
+        jsonresponse["message"] = "success";                
+        delete stmt_write;
+        delete con_write;
+
+        } 
+    catch (const std::exception &e) 
+        {
+        WriteException("UpdatePlatesCaptured", e.what());
+        jsonresponse["message"] = "failed";
+        jsonresponse["error"] = e.what();    
+        }
+    jsonresponse["data"] = jsonresponseid;
+    jsonresponse["table"] = "plates_captured";
+    return jsonresponse;
+    }
+
 void UpdateFacilityDateTime(string facility_number, int type) {
     sql::Connection *conn;
     sql::Statement *stmt;
@@ -2432,6 +2535,9 @@ Php::Value PostDataToServer(Php::Parameters &params)
                     break;
                 case 20:
                     response = UpdateParkingValidation(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);              
+                    break;
+                case 21:
+                    response = UpdatePlatesCaptured(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
                     break;
                 }
             array.append(response);
