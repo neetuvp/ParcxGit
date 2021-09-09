@@ -11,6 +11,18 @@ Updated downloaddata based on pxcloud_download_settings in local server
 Added Validation features 
 Added parking_movements,parking_movements_reservation for IOT
 Added valet_parking posting
+
+
+Added plates_captured - Updated staging but not production
+Added carpark_id insert/update in parking_revenue - Updated staging but not updated on production 
+
+Change parking_movements to parking_movements_iot on staging
+Added ipaddress in the php page for parking_movements_iot on staging
+Added posting for watchdog_device_alarms_iot on staging
+Added posting for access_request_iot on staging
+
+On production DB:
+-Add plate_captured,watchdog_device_alarms_iot,access_request_iot,change parking_movements to parking_movements_iot and add the extra columns
  */
 
 #include <phpcpp.h>
@@ -1238,7 +1250,7 @@ Json::Value UpdateParkingRevenue(Json::Value json,string facility_number,string 
     int device_type, device_number, product_sale_count, creditcard_payment_count, sms_payment_count, network_status, discount_count, lost_ticket_count, payable_entries_count;
     string last_transaction, last_updated_date_time, device_name;
     
-    int id, result, k = 0, parking_id;
+    int id, result, k = 0, parking_id,carpark_id;
 
     string sql = "";
     try 
@@ -1269,7 +1281,7 @@ Json::Value UpdateParkingRevenue(Json::Value json,string facility_number,string 
 
 
                 string carpark_name =cloud_carpark_name[carpark_number];                                   
-
+                carpark_id = cloud_carpark_id[carpark_number];
                 device_type = data[i]["device_type"].asInt();
                 device_number = data[i]["device_number"].asInt();
                 device_name = data[i]["device_name"].asString();
@@ -1300,11 +1312,11 @@ Json::Value UpdateParkingRevenue(Json::Value json,string facility_number,string 
                 if (res->next()) 
                     {
                     id = res->getInt("id");
-                    sql = "Update parking_revenue set network_status=" + to_string(network_status) + ",gross_amount=" + to_string(gross_amount) + ",parking_fee = " + to_string(parking_fee) + ",vat_amount=" + to_string(vat_amount) + ",lost_ticket_fee=" + to_string(lost_ticket_fee) + ",admin_fixed_charges=" + to_string(admin_fixed_charges) + ",ticket_replacement_fee=" + to_string(ticket_replacement_fee) + ",discount_amount=" + to_string(discount_amount) + ",product_sale_amount=" + to_string(product_sale_amount) + ",sms_payment_amount=" + to_string(sms_payment_amount) + ",creditcard_payment_amount=" + to_string(creditcard_payment_amount) + ",payable_entries_count=" + to_string(payable_entries_count) + ",lost_ticket_count=" + to_string(lost_ticket_count) + ",discount_count=" + to_string(discount_count) + ",sms_payment_count=" + to_string(sms_payment_count) + ",creditcard_payment_count=" + to_string(creditcard_payment_count) + ",product_sale_count=" + to_string(product_sale_count) + ",last_transaction=" + last_transaction + ",last_updated_date_time=" + last_updated_date_time + " where id=" + to_string(id);                                
+                    sql = "Update parking_revenue set network_status=" + to_string(network_status) + ",gross_amount=" + to_string(gross_amount) + ",parking_fee = " + to_string(parking_fee) + ",vat_amount=" + to_string(vat_amount) + ",lost_ticket_fee=" + to_string(lost_ticket_fee) + ",admin_fixed_charges=" + to_string(admin_fixed_charges) + ",ticket_replacement_fee=" + to_string(ticket_replacement_fee) + ",discount_amount=" + to_string(discount_amount) + ",product_sale_amount=" + to_string(product_sale_amount) + ",sms_payment_amount=" + to_string(sms_payment_amount) + ",creditcard_payment_amount=" + to_string(creditcard_payment_amount) + ",payable_entries_count=" + to_string(payable_entries_count) + ",lost_ticket_count=" + to_string(lost_ticket_count) + ",discount_count=" + to_string(discount_count) + ",sms_payment_count=" + to_string(sms_payment_count) + ",creditcard_payment_count=" + to_string(creditcard_payment_count) + ",product_sale_count=" + to_string(product_sale_count) + ",last_transaction=" + last_transaction + ",last_updated_date_time=" + last_updated_date_time + ",carpark_id="+to_string(carpark_id)+" where id=" + to_string(id);                                
                     } 
                 else 
                     {
-                    sql = "INSERT INTO parking_revenue(carpark_number,carpark_name,facility_number,device_type,device_number,device_name,network_status,gross_amount,parking_fee,vat_amount,lost_ticket_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,product_sale_amount,sms_payment_amount,creditcard_payment_amount,payable_entries_count,lost_ticket_count,discount_count,sms_payment_count,creditcard_payment_count,product_sale_count,last_transaction,last_updated_date_time)values(" + to_string(carpark_number) + ",'" + carpark_name + "'," + facility_number + "," + to_string(device_type) + "," + to_string(device_number) + ",'" + device_name + "'," + to_string(network_status) + "," + to_string(gross_amount) + "," + to_string(parking_fee) + "," + to_string(vat_amount) + "," + to_string(lost_ticket_fee) + "," + to_string(admin_fixed_charges) + "," + to_string(ticket_replacement_fee) + "," + to_string(discount_amount) + "," + to_string(product_sale_amount) + "," + to_string(sms_payment_amount) + "," + to_string(creditcard_payment_amount) + "," + to_string(payable_entries_count) + "," + to_string(lost_ticket_count) + "," + to_string(discount_count) + "," + to_string(sms_payment_count) + "," + to_string(creditcard_payment_count) + "," + to_string(product_sale_count) + "," + last_transaction + "," + last_updated_date_time + ")";                                
+                    sql = "INSERT INTO parking_revenue(carpark_number,carpark_name,facility_number,device_type,device_number,device_name,network_status,gross_amount,parking_fee,vat_amount,lost_ticket_fee,admin_fixed_charges,ticket_replacement_fee,discount_amount,product_sale_amount,sms_payment_amount,creditcard_payment_amount,payable_entries_count,lost_ticket_count,discount_count,sms_payment_count,creditcard_payment_count,product_sale_count,last_transaction,last_updated_date_time,carpark_id)values(" + to_string(carpark_number) + ",'" + carpark_name + "'," + facility_number + "," + to_string(device_type) + "," + to_string(device_number) + ",'" + device_name + "'," + to_string(network_status) + "," + to_string(gross_amount) + "," + to_string(parking_fee) + "," + to_string(vat_amount) + "," + to_string(lost_ticket_fee) + "," + to_string(admin_fixed_charges) + "," + to_string(ticket_replacement_fee) + "," + to_string(discount_amount) + "," + to_string(product_sale_amount) + "," + to_string(sms_payment_amount) + "," + to_string(creditcard_payment_amount) + "," + to_string(payable_entries_count) + "," + to_string(lost_ticket_count) + "," + to_string(discount_count) + "," + to_string(sms_payment_count) + "," + to_string(creditcard_payment_count) + "," + to_string(product_sale_count) + "," + last_transaction + "," + last_updated_date_time + ","+to_string(carpark_id)+")";                                
                     }
                 result = stmt_write->executeUpdate(sql);
                 if (result == 1) 
@@ -1842,7 +1854,7 @@ Json::Value UpdateParkingSubscription(Json::Value json,string facility_number,st
     return jsonresponse;
     }
 
-Json::Value UpdateParkingMovements(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name) {
+Json::Value UpdateParkingMovementsIOT(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name,string ipaddress) {
     sql::Connection *con_write;
     sql::Statement *stmt_write;
     
@@ -1850,11 +1862,11 @@ Json::Value UpdateParkingMovements(Json::Value json,string facility_number,strin
     Json::Value data, jsonresponseid, jsonresponse,table_rules;
     string sql = "";
     int id, result = 0, j = 0;    
-    int device_number,movement_type,plate_capture_id,carpark_number;
-    string date_time, device_name, plate_number,ticket_id,chip_utid;
+    int device_number,movement_type,plate_capture_id,carpark_number,parking_id,status_code,iot_mode;
+    string date_time, device_name, plate_number,ticket_id,utc_date_time,user_id,iot_mode_name,secure_key,decoded_ticket_id;
     try 
         {
-        table_rules = GetTableRules("parking_movements");
+        table_rules = GetTableRules("parking_movements_iot");
         con_write = general.DBConnectionWrite(DBServer);
         stmt_write = con_write->createStatement();
         data = json["data"];
@@ -1879,16 +1891,23 @@ Json::Value UpdateParkingMovements(Json::Value json,string facility_number,strin
                 device_number = data[i]["device_number"].asInt();
                 device_name = data[i]["device_name"].asString();
                 movement_type = data[i]["movement_type"].asInt();
-                chip_utid = data[i]["chip_utid"].asString();
                 plate_number = data[i]["plate_number"].asString();                  
                 plate_capture_id = data[i]["plate_capture_id"].asInt();
+                utc_date_time =data[i]["utc_date_time"].asString();
+                parking_id =data[i]["parking_id"].asInt();
+                user_id =data[i]["user_id"].asString();
+                status_code =data[i]["status_code"].asInt();
+                iot_mode =data[i]["iot_mode"].asInt();
+                iot_mode_name=data[i]["iot_mode_name"].asString();
+                secure_key=data[i]["secure_key"].asString();
+                decoded_ticket_id = data[i]["decoded_ticket_id"].asString();
                 carpark_number = data[i]["carpark_number"].asInt();
                 int carpark_id = cloud_carpark_id[carpark_number];                         
                 string carpark_name =cloud_carpark_name[carpark_number];
+                
 
 
-
-                sql = "Insert into parking_movements(date_time,ticket_id,device_number,device_name,movement_type,carpark_number,facility_number,chip_utid,plate_number,create_date_time,plate_captured_id,carpark_name,carpark_id) Values ('"+date_time+"','"+ticket_id+"',"+to_string(device_number)+",'"+device_name+"',"+to_string(movement_type)+","+to_string(carpark_number)+","+facility_number+",'"+chip_utid+"','"+plate_number+"','"+date_time+"',"+to_string(plate_capture_id)+",'"+carpark_name+"',"+to_string(carpark_id)+")";
+                sql = "Insert into parking_movements_iot(date_time,ticket_id,device_number,device_name,movement_type,carpark_number,facility_number,plate_number,create_date_time,plate_captured_id,carpark_name,carpark_id,utc_date_time,parking_id,user_id,status_code,iot_mode,iot_mode_name,secure_key,decoded_ticket_id,ip_address) Values ('"+date_time+"','"+ticket_id+"',"+to_string(device_number)+",'"+device_name+"',"+to_string(movement_type)+","+to_string(carpark_number)+","+facility_number+",'"+plate_number+"','"+date_time+"',"+to_string(plate_capture_id)+",'"+carpark_name+"',"+to_string(carpark_id)+",'"+utc_date_time+"',"+to_string(parking_id)+",'"+user_id+"',"+to_string(status_code)+","+to_string(iot_mode)+",'"+iot_mode_name+"','"+secure_key+"','"+decoded_ticket_id+"','"+ipaddress+"')";
                 result = stmt_write->executeUpdate(sql);
                 if (result == 1) 
                 {
@@ -1905,7 +1924,7 @@ Json::Value UpdateParkingMovements(Json::Value json,string facility_number,strin
         } 
     catch (const std::exception &e) 
         {
-        WriteException("UpdateParkingMovements", e.what());
+        WriteException("UpdateParkingMovementsIOT", e.what());
         jsonresponse["message"] = "failed";
         jsonresponse["error"] = e.what();    
         }
@@ -2359,6 +2378,161 @@ Json::Value UpdatePlatesCaptured(Json::Value json,string facility_number,string 
     return jsonresponse;
     }
 
+Json::Value UpdateWatchdogAlarmsIOT(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name,string ipaddress) {   
+    sql::Connection *con_write;
+    con_write=NULL;
+    sql::Statement *stmt_write;
+    Json::Value data;
+    string sql = "";
+    int id;
+    string description, datetime, device_name, code,validation_response,iot_mode_name,alarm;
+    int  severity, carpark_number,device_number,iot_mode;
+    
+    Json::Value jsonresponse, jsonresponseid,table_rules;
+    int result = 0;
+    int j = 0;    
+    try 
+        {
+        table_rules = GetTableRules("watchdog_device_alarms_iot");
+        
+        con_write = general.DBConnectionWrite(DBReporting);
+        stmt_write = con_write->createStatement();                
+        data = json["data"];
+        
+        for (int i = 0; i < (signed)data.size(); i++) 
+        {
+            data[i] = validation.checkSpecialCharacters(data[i],table_rules);
+            //WriteToLog("UpdateWatchdogAlarms", fw.write(data[i]));
+            Json::Value validation_response = validation.checkValidation(data[i],table_rules);           
+            
+            //WriteToLog("UpdateWatchdogAlarms", fw.write(validation_response));
+            if(validation_response["result"]=="failed")
+            {
+                WriteException("UpdateWatchdogAlarmsIOT", fw.write(validation_response));
+                jsonresponse["validation"] = "failed";
+                jsonresponse["validation_details"] = validation_response["validation_details"];
+            }
+            else
+            {
+                id = data[i]["id"].asInt();
+                device_number = data[i]["device_number"].asInt();
+                device_name = data[i]["device_name"].asString();
+                carpark_number = data[i]["carpark_number"].asInt();           
+                string carpark_name =cloud_carpark_name[carpark_number];           
+                int carpark_id = cloud_carpark_id[carpark_number];                                                                     
+                severity = data[i]["alarm_severity"].asInt();
+                code = data[i]["alarm_code"].asString();
+                description = data[i]["alarm_description"].asString();
+                datetime = data[i]["alarm_date_time"].asString();
+                alarm = data[i]["alarm"].asString();
+                //create_datetime = data[i]["create_date_time"].asString();
+                //dismiss = data[i]["dismiss"].asInt();
+                iot_mode =data[i]["iot_mode"].asInt();
+                iot_mode_name=data[i]["iot_mode_name"].asString();
+        
+                sql = "INSERT into watchdog_device_alarms_iot(carpark_name,carpark_number,carpark_id,facility_name,facility_number,device_name,device_number,alarm_severity,alarm_code,alarm_description,alarm,alarm_date_time,iot_mode,iot_mode_name,ip_address) VALUES('" + carpark_name + "'," + to_string(carpark_number) + "," + to_string(carpark_id) + ",'" + facility_name + "'," + facility_number + ",'" + device_name + "'," + to_string(device_number) + "," + to_string(severity) + ",'" + code + "','" + description + "','"+alarm+"'," + mysqldate(datetime) + ","+to_string(iot_mode)+",'"+iot_mode_name+"','"+ipaddress+"')";
+                result = stmt_write->executeUpdate(sql);
+                if (result == 1) 
+                {
+                    jsonresponseid[j] = id;
+                    j++;
+                }   
+            }
+        }                
+        delete stmt_write;
+        delete con_write;
+        } 
+    catch (const std::exception &e) 
+        {
+        WriteException("UpdateWatchdogAlarmsIOT", e.what());
+        jsonresponse["message"] = "failed";
+        jsonresponse["error"] = e.what();        
+        delete con_write;        
+        }
+    jsonresponse["data"] = jsonresponseid;
+    jsonresponse["table"] = "watchdog_device_alarms";
+    return jsonresponse;
+    }
+
+
+Json::Value UpdateAccessRequestIOT(Json::Value json,string facility_number,string facility_name,Php::Value cloud_carpark_id,Php::Value cloud_carpark_name,string ipaddress) {   
+    sql::Connection *con_write;
+    con_write=NULL;
+    sql::Statement *stmt_write;
+    Json::Value data;
+    string sql = "";
+    int id;
+    string token_request_date_time,token_response_date_time,token_response,api_request_date_time,api_response_date_time,api_request,api_response,response_status,ticket_id,plate_number,iot_mode_name;
+    int plate_captured_id,iot_mode;
+    
+    Json::Value jsonresponse, jsonresponseid,table_rules;
+    int result = 0;
+    int j = 0;    
+    try 
+        {
+        table_rules = GetTableRules("access_request_iot");
+        
+        con_write = general.DBConnectionWrite(DBReporting);
+        stmt_write = con_write->createStatement();                
+        data = json["data"];
+        
+        for (int i = 0; i < (signed)data.size(); i++) 
+        {
+            data[i] = validation.checkSpecialCharacters(data[i],table_rules);
+            //WriteToLog("UpdateAccessRequestIOT", fw.write(data[i]));
+            Json::Value validation_response = validation.checkValidation(data[i],table_rules);           
+            
+            //WriteToLog("UpdateAccessRequestIOT", fw.write(validation_response));
+            if(validation_response["result"]=="failed")
+            {
+                WriteException("UpdateAccessRequestIOT", fw.write(validation_response));
+                jsonresponse["validation"] = "failed";
+                jsonresponse["validation_details"] = validation_response["validation_details"];
+            }
+            else
+            {
+                id = data[i]["id"].asInt();
+                token_request_date_time = data[i]["token_request_date_time"].asString();
+                token_response_date_time = data[i]["token_response_date_time"].asString();
+                token_response = data[i]["token_response"].asString(); 
+                api_request_date_time = data[i]["api_request_date_time"].asString(); 
+                api_response_date_time = data[i]["api_response_date_time"].asString(); 
+                api_request =data[i]["api_request"].asString();     
+                api_response =data[i]["api_response"].asString();
+                response_status =data[i]["response_status"].asString();
+                ticket_id =data[i]["ticket_id"].asString();
+                plate_number =data[i]["plate_number"].asString();
+                plate_captured_id = data[i]["plate_captured_id"].asInt();
+                iot_mode =data[i]["iot_mode"].asInt();
+                iot_mode_name=data[i]["iot_mode_name"].asString();
+        
+                sql = "INSERT into access_request_iot(token_request_date_time,token_response_date_time,token_response,api_request_date_time,api_response_date_time,api_request,api_response,response_status,ticket_id,plate_number,plate_captured_id,iot_mode,iot_mode_name,ip_address) VALUES(" +  mysqldate(token_request_date_time) + "," +  mysqldate(token_response_date_time) + ",'" + token_response + "'," +  mysqldate(api_request_date_time) + "," + mysqldate(api_response_date_time) + ",'" + api_request + "','" +api_response + "','" +response_status + "','" + ticket_id + "','" + plate_number + "',"+to_string(plate_captured_id)+","+to_string(iot_mode)+",'"+iot_mode_name+"','"+ipaddress+"')";
+                result = stmt_write->executeUpdate(sql);
+                if (result == 1) 
+                {
+                    jsonresponseid[j] = id;
+                    j++;
+                }   
+            }
+        }                
+        delete stmt_write;
+        delete con_write;
+        } 
+    catch (const std::exception &e) 
+        {
+        WriteException("UpdateAccessRequestIOT", e.what());
+        jsonresponse["message"] = "failed";
+        jsonresponse["error"] = e.what();        
+        delete con_write;        
+        }
+    jsonresponse["data"] = jsonresponseid;
+    jsonresponse["table"] = "access_request";
+    return jsonresponse;
+    }
+
+
+
+
 void UpdateFacilityDateTime(string facility_number, int type) {
     sql::Connection *conn;
     sql::Statement *stmt;
@@ -2394,7 +2568,9 @@ Php::Value PostDataToServer(Php::Parameters &params)
     WriteToLog("PostDataToServer", "Json:" + jsondata);
     reader.parse(jsondata, json, true);
     
-    string facility_number = json["facility_number"].asString();              
+    string facility_number = json["facility_number"].asString();      
+    string ipaddress =  json["ipaddress"].asString();
+    
     operator_id=json["operator_id"].asString();        
     if(facility_number=="")
         {
@@ -2525,7 +2701,7 @@ Php::Value PostDataToServer(Php::Parameters &params)
                     response = UpdateParkingSubscription(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
                     break;
                 case 17:
-                    response = UpdateParkingMovements(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
+                    response = UpdateParkingMovementsIOT(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name,ipaddress);
                     break;
                 case 18:
                     response = UpdateParkingMovementsReservation(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
@@ -2539,6 +2715,11 @@ Php::Value PostDataToServer(Php::Parameters &params)
                 case 21:
                     response = UpdatePlatesCaptured(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name);
                     break;
+                case 22:
+                    response = UpdateWatchdogAlarmsIOT(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name,ipaddress);
+                    break;
+                case 23:
+                    response = UpdateAccessRequestIOT(json["table"][i],facility_number,facility_name,cloud_carpark_id,cloud_carpark_name,ipaddress);
                 }
             array.append(response);
             }
