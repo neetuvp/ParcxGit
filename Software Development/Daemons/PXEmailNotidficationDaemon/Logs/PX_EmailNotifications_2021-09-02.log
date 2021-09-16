@@ -1,0 +1,24 @@
+15:34:51   ******************************************Log******************************************
+15:34:51   Email Notification Request:{"email_attachment_included":"0","email_body_html":"Cloud Upload Stopped.Immediate Action required</br>Cloud Download Stopped.Immediate Action required</br>The current occupancy has reached the maximum threshold","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210902153346558386"}
+
+15:34:51   Ids:692
+15:34:52   Push Notification Curl Successful
+15:34:52   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210902153346558386"}
+15:49:55   ******************************************Log******************************************
+15:49:55   Email Notification Request:{"email_attachment_included":"0","email_body_html":"200006:Cloud Upload Stopped.Immediate Action required</br>200006:Cloud Download Stopped.Immediate Action required</br>Souq Al Mutahida:The current occupancy has reached the maximum threshold","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210902154938153117"}
+
+15:49:55   Ids:694
+15:49:56   Push Notification Curl Successful
+15:49:56   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210902154938153117"}
+15:53:40   ******************************************Log******************************************
+15:53:40   Email Notification Request:{"email_attachment_included":"0","email_body_html":"200006:Cloud Upload Daemon Stopped.Immediate Action required</br>200006:Cloud Download DaemonStopped.Immediate Action required</br>Souq Al Mutahida:The current occupancy has reached the maximum threshold</br>200006:Cloud Upload Daemon Stopped.Immediate Action required</br>200006:Cloud Download DaemonStopped.Immediate Action required</br>Souq Al Mutahida:The current occupancy has reached the maximum threshold","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210902155238267855"}
+
+15:53:40   Ids:695
+15:53:40   Push Notification Curl Successful
+15:53:40   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210902155238267855"}
+15:55:02   ******************************************Log******************************************
+15:55:02   Email Notification Request:{"email_attachment_included":"0","email_body_html":"200006:Cloud Upload Daemon Stopped.Immediate Action required</br>200006:Cloud Download DaemonStopped.Immediate Action required</br>Souq Al Mutahida:The current occupancy has reached the maximum threshold","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210902155440071497"}
+
+15:55:02   Ids:696
+15:55:02   Push Notification Curl Successful
+15:55:02   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210902155440071497"}

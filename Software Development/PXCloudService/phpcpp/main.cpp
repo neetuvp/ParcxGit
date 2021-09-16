@@ -2463,7 +2463,7 @@ Json::Value UpdateAccessRequestIOT(Json::Value json,string facility_number,strin
     string sql = "";
     int id;
     string token_request_date_time,token_response_date_time,token_response,api_request_date_time,api_response_date_time,api_request,api_response,response_status,ticket_id,plate_number,iot_mode_name;
-    int plate_captured_id,iot_mode;
+    int plate_captured_id,iot_mode,api_response_delay;
     
     Json::Value jsonresponse, jsonresponseid,table_rules;
     int result = 0;
@@ -2492,11 +2492,9 @@ Json::Value UpdateAccessRequestIOT(Json::Value json,string facility_number,strin
             else
             {
                 id = data[i]["id"].asInt();
-                token_request_date_time = data[i]["token_request_date_time"].asString();
-                token_response_date_time = data[i]["token_response_date_time"].asString();
-                token_response = data[i]["token_response"].asString(); 
                 api_request_date_time = data[i]["api_request_date_time"].asString(); 
                 api_response_date_time = data[i]["api_response_date_time"].asString(); 
+                api_response_delay =data[i]["api_response_delay"].asInt();
                 api_request =data[i]["api_request"].asString();     
                 api_response =data[i]["api_response"].asString();
                 response_status =data[i]["response_status"].asString();
@@ -2506,7 +2504,7 @@ Json::Value UpdateAccessRequestIOT(Json::Value json,string facility_number,strin
                 iot_mode =data[i]["iot_mode"].asInt();
                 iot_mode_name=data[i]["iot_mode_name"].asString();
         
-                sql = "INSERT into access_request_iot(token_request_date_time,token_response_date_time,token_response,api_request_date_time,api_response_date_time,api_request,api_response,response_status,ticket_id,plate_number,plate_captured_id,iot_mode,iot_mode_name,ip_address) VALUES(" +  mysqldate(token_request_date_time) + "," +  mysqldate(token_response_date_time) + ",'" + token_response + "'," +  mysqldate(api_request_date_time) + "," + mysqldate(api_response_date_time) + ",'" + api_request + "','" +api_response + "','" +response_status + "','" + ticket_id + "','" + plate_number + "',"+to_string(plate_captured_id)+","+to_string(iot_mode)+",'"+iot_mode_name+"','"+ipaddress+"')";
+                sql = "INSERT into access_request_iot(api_request_date_time,api_response_date_time,api_response_delay,api_request,api_response,response_status,ticket_id,plate_number,plate_captured_id,iot_mode,iot_mode_name,ip_address) VALUES(" +  mysqldate(api_request_date_time) + "," + mysqldate(api_response_date_time) + ","+to_string(api_response_delay)+",'" + api_request + "','" +api_response + "','" +response_status + "','" + ticket_id + "','" + plate_number + "',"+to_string(plate_captured_id)+","+to_string(iot_mode)+",'"+iot_mode_name+"','"+ipaddress+"')";
                 result = stmt_write->executeUpdate(sql);
                 if (result == 1) 
                 {

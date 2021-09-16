@@ -1,0 +1,50 @@
+10:07:19   ******************************************Log******************************************
+10:07:19   Email Notification Request:{"email_attachment_included":"0","email_body_html":"Dear Neetu,</br><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 10:04:10</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906100410466965"}
+
+10:07:19   Ids:709
+10:07:20   Push Notification Curl Successful
+10:07:20   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906100410466965"}
+10:55:46   ******************************************Log******************************************
+10:55:46   Email Notification Request:{"email_attachment_included":"0","email_body_html":"Dear Neetu,</br></br><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 10:49:11</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></br>Parcx<img src = 'parcx.png'>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906104911533985"}
+
+10:55:46   Ids:710
+10:55:46   Push Notification Curl Successful
+10:55:46   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906104911533985"}
+11:26:45   ******************************************Log******************************************
+11:26:45   Email Notification Request:{"email_attachment_included":"0","email_body_html":"<table border=0><td>Dear Neetu,</td><td><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 11:22:12</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></td><td>Parcx</td><td><img src = 'parcx.png'></td>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906112212382013"}
+
+11:26:45   Ids:711
+11:26:45   Push Notification Curl Successful
+11:26:45   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906112212382013"}
+11:36:13   ******************************************Log******************************************
+11:36:13   Email Notification Request:{"email_attachment_included":"0","email_body_html":"<table border=0><tr><td>Dear Neetu,</td></tr><tr><td><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 11:31:12</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></td></tr><tr><td>Parcx</td></tr><tr><td><img src = 'parcx.png'></td></tr>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906113112647590"}
+
+11:36:13   Ids:712
+11:36:14   Push Notification Curl Successful
+11:36:14   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906113112647590"}
+11:43:45   ******************************************Log******************************************
+11:43:45   Email Notification Request:{"email_attachment_included":"0","email_body_html":"<table border=0><tr><td>Dear Neetu,</td></tr><tr><td><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 11:43:13</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></td></tr><tr><td>Parcx</td></tr><tr><td><img src = 'parcx.png'></td></tr>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906114313008007"}
+
+11:43:45   Ids:713
+11:43:45   Push Notification Curl Successful
+11:43:45   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906114313008007"}
+11:46:32   ******************************************Log******************************************
+11:46:32   Email Notification Request:{"email_attachment_included":"0","email_body_html":"<p>Dear Neetu,</p><p><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 11:46:13</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></p><p>Parcx</p><p><img src = 'parcx.png'></p>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906114613112262"}
+
+11:46:32   Ids:714
+11:46:33   Push Notification Curl Successful
+11:46:33   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906114613112262"}
+11:54:32   ******************************************Log******************************************
+11:54:32   <p>Dear Neetu,</p><p><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 11:52:13</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></p><p>Parcx</p><p><img src = 'parcx.png'></p>
+11:54:32   Email Notification Request:{"email_attachment_included":"0","email_body_html":"<p>Dear Neetu,</p><p><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 11:52:13</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></p><p>Parcx</p><p><img src = 'parcx.png'></p>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906115213321702"}
+
+11:54:32   Ids:715
+11:54:33   Push Notification Curl Successful
+11:54:33   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906115213321702"}
+13:16:25   ******************************************Log******************************************
+13:16:25   <p>Dear Neetu,</p><p><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 13:10:18</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr><tr><td>06-09-2021 13:15:19</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></table></p><p>Parcx</p><p><img src = 'parcx.png'></p>
+13:16:25   Email Notification Request:{"email_attachment_included":"0","email_body_html":"<p>Dear Neetu,</p><p><table border=1><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr><tr><td>06-09-2021 13:10:18</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr><tr><td>06-09-2021 13:15:19</td><td>Souq Al Mutahida</td><td>Entry</td><td>Server Offline.Immediate Action required</td></tr></table></p><p>Parcx</p><p><img src = 'parcx.png'></p>","email_body_plain_text":"","email_from_address":"parcx@alfalakme.com","email_from_name":"Parcx","email_subject":"Important Notice","email_to_address":"npillai@alfalakme.com","email_to_name":"Neetu","transaction_id":"20210906131018538335"}
+
+13:16:25   Ids:720
+13:16:26   Push Notification Curl Successful
+13:16:26   Response:{"status_code":200,"status_message":"OK","transaction_id":"20210906131018538335"}

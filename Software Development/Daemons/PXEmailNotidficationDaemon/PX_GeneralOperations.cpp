@@ -10,7 +10,6 @@
 #define Password "1fromParcx!19514"
 #define dateTimeFormat "%Y-%m-%d %H:%M:%S"
 
-
 using namespace std;
 
 string logpath="/opt/parcx/Logs/";

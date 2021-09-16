@@ -6,6 +6,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $json = file_get_contents("php://input"); 
     //$json = str_replace("'","",$json);
     $json_request = json_decode($json, true);
+    
+    //Add request ip address for posting parking_movements_iot
+    $json_request["ipaddress"] = $_SERVER['REMOTE_ADDR'];
+    $json = json_encode($json_request);
+    
     $data = json_decode(PostDataToServer($json), true);
     $response = $data;
     $response['status_code'] = 200;

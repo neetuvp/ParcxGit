@@ -8,7 +8,7 @@
 #define Server "DBServer"
 #define Username "parcxservice"
 #define Password "1fromParcx!19514"
-#define dateTimeFormat "%Y-%m-%d %H:%M:%S"
+#define dateTimeFormat "%H:%M:%S"
 
 using namespace std;
 
