@@ -8,9 +8,6 @@ Notes:
 5.Add notification_sent field in watchdog_device_alarms
 6.Add notification_sent field in watchdog_device_alarms_iot
 7.Added multiple email feature(in the column
-
-8.Added header with the email body - updated in production
-9.Updated Handhake function to update the network_status in system_devices_iot - updated on staging,not updates on production 07-10-2021
 */
 
 #include <curl/curl.h>
@@ -157,7 +154,6 @@ int PushNotification(string transaction_id,string email_to_address,string email_
     sql::Statement *stmt;
     sql::ResultSet *res;
     string sql1="",sql2="";
-    string email_header="";
     int result = 0;
     try {
         
@@ -175,9 +171,7 @@ int PushNotification(string transaction_id,string email_to_address,string email_
         }
         else
         {        
-            email_header = "<b>Hi "+email_to_name+",</b><br>";
-            
-            email_html_body = email_header + "<table border=1 style=\\'border-collapse:collapse\\'><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr>" + email_html_body;
+            email_html_body = "<table border=1 style=\\'border-collapse:collapse\\'><tr><th>Date</th><th>Facility/Carpark</th><th>Device</th><th>Alarm</th></tr>" + email_html_body;
             sql1 = "Insert into push_notifications(transaction_id,application_user_id,date_time,notification_type,email_to_address,email_from_address,email_from_name,email_to_name,email_html_body,email_subject,email_attachment_name) values ('"+transaction_id+"',0,CURRENT_TIMESTAMP(),2,'"+email_to_address+"','"+email_from_address+"','"+email_from_name+"','"+email_to_name+"','"+email_html_body+"</table>','"+cloud_monitor_email_subject+"','')";
 
             sql2 = "Insert into push_notifications_report(transaction_id,application_user_id,date_time,notification_type,email_to_address,email_from_address,email_from_name,email_to_name,email_html_body,email_subject,email_attachment_name) values ('"+transaction_id+"',0,CURRENT_TIMESTAMP(),2,'"+email_to_address+"','"+email_from_address+"','"+email_from_name+"','"+email_to_name+"','"+email_html_body+"</table>','"+cloud_monitor_email_subject+"','')";
@@ -538,23 +532,32 @@ void MonitorHandshake()
         conn = general.mysqlConnect(DATABASE);
         stmt = conn->createStatement();        
         
-        res = stmt->executeQuery("Select id,network_status,device_number,facility_number,server_handshake_interval from system_devices_iot where device_enabled = 1");
+        res = stmt->executeQuery("Select distinct(a.device_number),a.facility_number from handshake_iot as a join system_devices_iot as b on a.device_number = b.device_number and a.facility_number = b.facility_number where b.device_enabled = 1");
         if(res->rowsCount()>0)
         {
             while(res->next())
             {
-                monitor_interval = res->getInt("server_handshake_interval");//in minutes
                 res1 = stmt->executeQuery("SELECT * FROM handshake_iot where device_number = "+res->getString("device_number")+" and facility_number="+res->getString("facility_number")+" order by date_time desc limit 1");
                 if(res1->next())
                 {
                     if(res1->getInt("notification_sent")==0)
                     {
-                        int *diff = general.differenceDateTime(general.currentDateTime("%Y-%m-%d %H:%M:%S"),res1->getString("date_time"),"%Y-%m-%d %H:%M:%S");                      
+                        int *diff = general.differenceDateTime(general.currentDateTime("%Y-%m-%d %H:%M:%S"),res1->getString("date_time"),"%Y-%m-%d %H:%M:%S");
+                        res2 = stmt->executeQuery("Select server_handshake_interval from system_devices_iot where device_number = "+res->getString("device_number")+" and facility_number="+res->getString("facility_number"));
+                        if(res2->next())
+                        {
+                            monitor_interval = res2->getInt("server_handshake_interval");//in minutes
+                        }
+                        else
+                        {
+                            monitor_interval = 30;
+                        }
+                        delete res2;
+                        
+
                         monitor_interval = monitor_interval+2; //Add 2 min delay to send handshake notification
                         if(diff[0]>monitor_interval * 60)
                         {
-
-			    stmt->executeUpdate("Update system_devices_iot set network_status = 0 where id = "+res->getString("id"));
 
                             res2 = stmt->executeQuery("Select * from alarm_notifications where alarm_code ='103'");
                             if(res2->next())
@@ -593,11 +596,6 @@ void MonitorHandshake()
                             }          
                             delete res2;
                         }
-			else
-			{
-				if(res->getInt("network_status")==0)
-					stmt->executeUpdate("Update system_devices_iot set network_status = 1 where id = "+res->getString("id"));
-			}
 
                     }
                     delete res1;

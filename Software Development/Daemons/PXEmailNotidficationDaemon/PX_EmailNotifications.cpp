@@ -1,5 +1,9 @@
 //  sudo g++ -Wall  -std=c++11 -fpic -o PX_EmailNotifications_V01_01_20210826  PX_EmailNotifications.cpp PX_GeneralOperations.cpp -lcurl -lmysqlcppconn -ljsoncpp -I/opt/lampp/include/ -L/opt/parcx/lib/
 
+
+//1.Removed header tag- not updated in production
+//2.When from_address is empty,take it from the settings table  - not updated in production
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<iostream>
@@ -26,6 +30,8 @@
 #define DATABASE "pxcloud_server"
 //#define LOGO_URL "http://65.1.116.38/parcx.png"
 string logo_url="http://65.1.116.38/parcx.png";
+string email_from_address,email_from_name,aws_path;
+int email_notification_interval=60;
 using namespace std;
 char buf[80];
 GeneralOperations general;
@@ -69,8 +75,8 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 
 void EmailNotifications()
 {
-    string url = "http://localhost//aws_email/php_mail.php";
-    //string url = "http://localhost/aws_email/php_mail.php";
+    //string url = "http://localhost//aws_email/php_mail.php";
+    string url = aws_path;
     Json::Value json;
     Json::Value request;
     Json::Value jsonid;
@@ -93,7 +99,7 @@ void EmailNotifications()
         string email_header="",email_footer="",email_content;
         con = general.mysqlConnect(DATABASE);
         stmt = con->createStatement();
-        string sql = "select * from push_notifications where notification_type = 2 and email_to_address>'' and email_from_address>'' limit 15";
+        string sql = "select * from push_notifications where notification_type = 2 and email_to_address>'' limit 15";
         //WriteToLog(sql);
         rs = stmt->executeQuery(sql);
         if(rs->rowsCount()>0)
@@ -101,105 +107,121 @@ void EmailNotifications()
             //string encoded_image =  base64encode("parcx.png");
             while(rs->next())
             {
-                email_footer = "";
-                json["email_from_address"]=rs->getString("email_from_address").asStdString();
-                json["email_from_name"]=rs->getString("email_from_name").asStdString();
-                json["email_to_address"]=rs->getString("email_to_address").asStdString();					
-                json["email_to_name"]=rs->getString("email_to_name").asStdString();		
-                json["email_subject"]=rs->getString("email_subject").asStdString();
-                email_header = "<p>Dear "+rs->getString("email_to_name").asStdString()+",</p>";
-                email_content ="<p>"+rs->getString("email_html_body").asStdString()+"</p>";
-               // email_footer = "<p>"+rs->getString("email_from_name").asStdString()+"</p>";
-                
-                email_footer = email_footer +"<p><img src = '"+logo_url+"' width='80' height='40'></p>";
-                WriteToLog("EmailNotifications",email_header + email_content + email_footer);
-                json["email_body_html"]=email_header + email_content + email_footer;					
-                json["email_body_plain_text"]="";
-                if(rs->getString("email_html_body")!="")
-                {
-                    json["email_attachment_included"]="0";					
-                }
-                else
-                {
-                    json["email_attachment_included"]="1";	
-                    json["email_attachment_path"]="";
-                    json["email_attachment_filename"]=rs->getString("email_attachment_name").asStdString();
-                }
-
-                json["transaction_id"] = rs->getString("transaction_id").asStdString();
-                id = rs->getInt("notification_id");
-
-                string jsonstring = fw.write(json);
-                WriteToLog("EmailNotifications","Email Notification Request:"+jsonstring);
-                WriteToLog("EmailNotifications","Ids:"+to_string(id));
-                if(!jsonstring.empty())
-                {
-                    string readBuffer="";
-                    CURL *curl;
-                    CURLcode res;
-                    struct curl_slist *headers=NULL;
-                    headers = curl_slist_append(headers, "Accept-encoding:gzip,deflate");
-                    headers = curl_slist_append(headers, "Accept:application/json");
-                    headers = curl_slist_append(headers, "Content-Type:application/json");
-               // headers = curl_slist_append(headers, "Username:external");
-
-                    curl = curl_easy_init();
-                    if(curl) 
+                try{
+                    email_footer = "";
+                    if(rs->getString("email_from_address")!="")
                     {
-                        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-                        //curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
-                        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST"); 
-                        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonstring.c_str());
-                        curl_easy_setopt(curl, CURLOPT_ENCODING ,"");
-                        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 20L);            
-                        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);            
-                        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-                        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
-                        res = curl_easy_perform(curl);
-                        if(res==CURLE_OK)
+                        json["email_from_address"]=rs->getString("email_from_address").asStdString();
+                        json["email_from_name"]=rs->getString("email_from_name").asStdString();
+                    }
+                    else
+                    {
+                        json["email_from_address"]=email_from_address;
+                        json["email_from_name"]=email_from_name;
+                    }
+
+                    json["email_to_address"]=rs->getString("email_to_address").asStdString();					
+                    json["email_to_name"]=rs->getString("email_to_name").asStdString();		
+                    json["email_subject"]=rs->getString("email_subject").asStdString();
+                    //email_header = "<p>Dear "+rs->getString("email_to_name").asStdString()+",</p>";
+                    email_content ="<p>"+rs->getString("email_html_body").asStdString()+"</p>";
+                   // email_footer = "<p>"+rs->getString("email_from_name").asStdString()+"</p>";
+
+                    email_footer = email_footer +"<p><img src = '"+logo_url+"' width='80' height='40'></p>";
+                    WriteToLog("EmailNotifications",email_header + email_content + email_footer);
+                    json["email_body_html"]=email_header + email_content + email_footer;					
+                    json["email_body_plain_text"]="";
+                    if(rs->getString("email_html_body")!="")
+                    {
+                        json["email_attachment_included"]="0";					
+                    }
+                    else
+                    {
+                        json["email_attachment_included"]="1";	
+                        json["email_attachment_path"]="";
+                        json["email_attachment_filename"]=rs->getString("email_attachment_name").asStdString();
+                    }
+
+                    json["transaction_id"] = rs->getString("transaction_id").asStdString();
+                    id = rs->getInt("notification_id");
+
+                    string jsonstring = fw.write(json);
+                    WriteToLog("EmailNotifications","Email Notification Request:"+jsonstring);
+                    WriteToLog("EmailNotifications","Ids:"+to_string(id));
+                    if(!jsonstring.empty())
+                    {
+                        string readBuffer="";
+                        CURL *curl;
+                        CURLcode res;
+                        struct curl_slist *headers=NULL;
+                        headers = curl_slist_append(headers, "Accept-encoding:gzip,deflate");
+                        headers = curl_slist_append(headers, "Accept:application/json");
+                        headers = curl_slist_append(headers, "Content-Type:application/json");
+                   // headers = curl_slist_append(headers, "Username:external");
+
+                        curl = curl_easy_init();
+                        if(curl) 
                         {
-                           WriteToLog("EmailNotifications","Push Notification Curl Successful");
-                           WriteToLog("EmailNotifications","Response:"+readBuffer);
-                           parse = reader.parse(readBuffer,json,true);
-                           if(parse)
-                           {
-                                if(json["status_code"]==200)
-                                {
-                                    transaction_id = json["transaction_id"].asString();
-                                    con_write = general.mysqlConnect(DATABASE);
-                                    stmt_write = con_write->createStatement();
-
-                                    n = stmt_write->executeUpdate("Update push_notifications_report set notification_sent_datetime = CURRENT_TIMESTAMP() where transaction_id ='"+transaction_id+"' and notification_type=2");
-                                    delete stmt_write;
-                                    delete con_write;
-
-                                    if(n>0)
+                            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+                            //curl_easy_setopt(curl, CURLOPT_HTTPHEADER,headers);
+                            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST"); 
+                            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonstring.c_str());
+                            curl_easy_setopt(curl, CURLOPT_ENCODING ,"");
+                            curl_easy_setopt(curl, CURLOPT_TIMEOUT, 20L);            
+                            curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);            
+                            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+                            curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+                            res = curl_easy_perform(curl);
+                            if(res==CURLE_OK)
+                            {
+                               WriteToLog("EmailNotifications","Push Notification Curl Successful");
+                               WriteToLog("EmailNotifications","Response:"+readBuffer);
+                               parse = reader.parse(readBuffer,json,true);
+                               if(parse)
+                               {
+                                    if(json["status_code"]==200)
                                     {
-                                            con_write = general.mysqlConnect(DATABASE);
-                                            stmt_write = con_write->createStatement();
-                                            stmt_write->executeUpdate("Delete from push_notifications where notification_id ="+to_string(id));
-                                            delete stmt_write;
-                                            delete con_write;
+                                        transaction_id = json["transaction_id"].asString();
+                                        con_write = general.mysqlConnect(DATABASE);
+                                        stmt_write = con_write->createStatement();
+
+                                        n = stmt_write->executeUpdate("Update push_notifications_report set notification_sent_datetime = CURRENT_TIMESTAMP() where transaction_id ='"+transaction_id+"' and notification_type=2");
+                                        delete stmt_write;
+                                        delete con_write;
+
+                                        if(n>0)
+                                        {
+                                                con_write = general.mysqlConnect(DATABASE);
+                                                stmt_write = con_write->createStatement();
+                                                stmt_write->executeUpdate("Delete from push_notifications where notification_id ="+to_string(id));
+                                                delete stmt_write;
+                                                delete con_write;
+                                        }
+
                                     }
 
-                                }
 
-
-                           }
-                           else{
-                                WriteToLog("EmailNotifications","Email Notification Parse Error");
-                                WriteException("EmailNotifications","Email Notification Parse Error");
-                                WriteException("EmailNotifications","Response:"+readBuffer);
-                           }
+                               }
+                               else{
+                                    WriteToLog("EmailNotifications","Email Notification Parse Error");
+                                    WriteException("EmailNotifications","Email Notification Parse Error");
+                                    WriteException("EmailNotifications","Response:"+readBuffer);
+                               }
+                            }
+                            else{
+                                cout<<"Curl failed:"<<res<<endl;
+                                WriteToLog("EmailNotifications","Email Notification Curl Failed");
+                                WriteException("EmailNotifications","Email Notification Curl Failed");
+                            }
+                            curl_easy_cleanup(curl);
                         }
-                        else{
-                            cout<<"Curl failed:"<<res<<endl;
-                            WriteToLog("EmailNotifications","Email Notification Curl Failed");
-                            WriteException("EmailNotifications","Email Notification Curl Failed");
-                        }
-                        curl_easy_cleanup(curl);
-                    }
-                }					
+                    }	
+                }
+                catch(const std::exception& e)
+                {
+                        WriteToLog("EmailNotifications",e.what());
+                        WriteException("EmailNotifications", e.what());
+                }
 
             }
 
@@ -229,13 +251,30 @@ void GetSettings()
         conn = general.mysqlConnect(DATABASE);
         stmt = conn->createStatement();
 	//	WriteToLog("Query","Select setting_name,setting_value from cloud_settings where status = 1 and setting_name = 'email_logo_url'");
-        res  = stmt->executeQuery("Select setting_name,setting_value from cloud_settings where status = 1 and setting_name = 'email_logo_url'");
+        res  = stmt->executeQuery("Select setting_name,setting_value from cloud_settings where status = 1 and setting_name in ('email_logo_url','email_from_address','email_from_name','email_notification_interval','aws_path')");
         while(res->next())
         {
             if(res->getString("setting_name")=="email_logo_url"){
                 logo_url = res->getString("setting_value");      
                 	//WriteToLog("logo",logo_url);
                 }
+            if(res->getString("setting_name")=="email_from_address"){
+                email_from_address = res->getString("setting_value");      
+                	//WriteToLog("logo",logo_url);
+                }
+            if(res->getString("setting_name")=="email_from_name"){
+                email_from_name = res->getString("setting_value");      
+                	//WriteToLog("logo",logo_url);
+                }
+            if(res->getString("setting_name")=="email_notification_interval"){
+                email_notification_interval = res->getInt("setting_value");      
+                	//WriteToLog("logo",logo_url);
+                }
+            if(res->getString("setting_name")=="aws_path"){
+                aws_path = res->getString("setting_value");      
+                	//WriteToLog("logo",logo_url);
+                }
+                
         }
 
         
@@ -310,7 +349,7 @@ int main(void)
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
 
-        const int SLEEP_INTERVAL = 60;
+        const int SLEEP_INTERVAL = email_notification_interval;
         WriteToLog("","******************************************Log******************************************"); 
         GetSettings();
         while(1)

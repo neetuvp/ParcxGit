@@ -231,6 +231,7 @@ try{
             datatype=4;
         response = DataValidation(data[field].asString(),length,datatype,rules[field+"_mandatory"].asInt());
         response["field"]=field;
+        response["id"]=data["id"];
         if(response["result"]==false)
         {
            flag = 1;
@@ -277,69 +278,6 @@ string SetDoublePrecision(double amt,int precision)
 	return amt_string;
 	
 }
-string removeSpecialCharactersfromText(string str)
-{
-    for(int i=0;i<(signed)str.length();i++)
-    {
-       // cout<<i<<":"<<str[i]<<endl;
-       //Allowed chars - Uppercase and Lowercase alphabets,numbers,curly brackets,space,comma,dot
-      if ((str[i]>=48 && str[i]<=57)||
-          (str[i]>=65 && str[i]<=90)||
-          (str[i]>=97 && str[i]<=122)||
-          str[i]==32||str[i]==44||str[i]==46 || str[i]==123 || str[i]==125)
-          {
-             // cout<<"cont."<<str[i]<<endl;
-            continue;
-          }
-      else
-      {
-        //cout<<"String contains special character.\n";
-        //flag=1;
-        char c = str[i];
-        //str.erase(std::find(str.begin(), str.end(), c));
-        //i=i-1;
-        std::replace(str.begin(), str.end(), c, ' ');
-      }
-    }
-    return str;
-}
-
-string removeSpecialCharactersfromDecimal(string str)
-{
-    //Allowed chars - numbers,dot
-    for(int i=0;i<(signed)str.length();i++)
-    {
-      if ((str[i]>=48 && str[i]<=57)||str[i]==46)
-          {
-            continue;
-          }
-      else
-      {
-        char c = str[i];
-        std::replace(str.begin(), str.end(), c, '\0'); 
-      }
-    }
-    return str;
-}
-
-
-string removeSpecialCharactersfromDateTime(string str)
-{
-    //Allowed chars - Numbers,colon,space,comma,dot,hyphen
-    for(int i=0;i<(signed)str.length();i++)
-    {
-      if ((str[i]>=48 && str[i]<=57)||str[i]==46||str[i]==58||str[i]==32||str[i]==45)
-      {
-        continue;
-      }
-      else
-      {
-        char c = str[i];
-        std::replace(str.begin(), str.end(), c, '\0'); 
-      }
-    }
-    return str;
-}
 
 string removeCharsFromString( string &str, char* charsToRemove ) {
    for ( unsigned int i = 0; i < strlen(charsToRemove); ++i ) {
@@ -360,9 +298,9 @@ string removePunct(string &str)
 Json::Value Validation::checkSpecialCharacters(Json::Value data,Json::Value rules)
 {
     string field,fieldvalue,type,new_string;
-   // string float_replace = "@~`!@#$%^&*()_=+\\\\';:\"\\/?><,-‘–";
-   // string date_replace = "@~`!@#$%^&*()_=+\\\\';\"\\/?><,‘–";
-   // string varchar_replace = "@~`!@#$%^&*()_=+\\\\';:\"\\/?><.-–‘";
+    string float_replace   = "@~`!@#$%^&*()_=+\\\\';:\"\\/?><,-—‘–";
+    string date_replace    = "@~`!@#$%^&*()_=+\\\\';\"\\/?><,—‘–";
+    string varchar_replace = "@~`!@#$%^&*()_=+\\\\';:\"\\/?><—.-–‘™";
     try{
         for (auto const& member : data.getMemberNames()) {
             field = string(member);
@@ -378,21 +316,20 @@ Json::Value Validation::checkSpecialCharacters(Json::Value data,Json::Value rule
             else if(type=="double"||type=="float"||type=="decimal")
             {
                 fieldvalue = removeAlpha(fieldvalue);
-               // new_string = removeCharsFromString(fieldvalue, const_cast<char*>(float_replace.c_str()));
-                new_string = removeSpecialCharactersfromDecimal(fieldvalue);
+                new_string = removeCharsFromString(fieldvalue, const_cast<char*>(float_replace.c_str()));
                 data[field] = new_string;
             }
             else if(type=="varchar"||type=="text" || type=="tinytext")
             {
-                //new_string = removeCharsFromString(fieldvalue, const_cast<char*>(varchar_replace.c_str()));
-                new_string = removeSpecialCharactersfromText(fieldvalue);
+                //fieldvalue = removePunct(fieldvalue);
+                //data[field] = fieldvalue;
+                new_string = removeCharsFromString(fieldvalue, const_cast<char*>(varchar_replace.c_str()));
                 data[field] = new_string;
             }   
             else if(type=="datetime"||type=="date" ||type=="timestamp")
             {
                 new_string = removeAlpha(fieldvalue);
-                //new_string = removeCharsFromString(new_string, const_cast<char*>(date_replace.c_str()));
-                new_string = removeSpecialCharactersfromDateTime(fieldvalue);
+                new_string = removeCharsFromString(new_string, const_cast<char*>(date_replace.c_str()));
                 data[field] = new_string;
             }    
         }
@@ -404,52 +341,3 @@ Json::Value Validation::checkSpecialCharacters(Json::Value data,Json::Value rule
     return data;
 
 }
-
-/*
-#include <iostream>
-#include <string>
-#include <algorithm>
-using namespace std; 
-int main()
-{
-  // Input a string 
-  string str;
-  cout<<"Enter a string: ";
-  getline(cin,str);
-  int flag=0;
-  //char c;
-  // Checking if string contains special character
-  for(int i=0;i<str.length();i++)
-  {
-      cout<<i<<":"<<str[i]<<endl;
-    if ((str[i]>=48 && str[i]<=57)||
-        (str[i]>=65 && str[i]<=90)||
-        (str[i]>=97 && str[i]<=122)||
-        str[i]==32)
-        {
-           // cout<<"cont."<<str[i]<<endl;
-          continue;
-        }
-    else
-    {
-        
-      cout<<"String contains special character.\n";
-      flag=1;
-      
-      char c = str[i];
-      
-      
-      str.erase(std::find(str.begin(), str.end(), c));
-      i=i-1;
-    }
-  }
-  if(flag==0)
-  {
-    cout<<"There is no special character in the string.\n";
-  }
-  else
-  {
-      cout<<str<<endl;
-  }
-  return 0;
-}*/

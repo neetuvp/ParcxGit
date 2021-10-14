@@ -5,7 +5,7 @@ header("Content-Type: application/json; charset=UTF-8");
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $json = file_get_contents("php://input");
     $json_request = json_decode($json, true);
-    $data = json_decode(DownloadDataFromServer($json), true);
+    $data = json_decode(str_replace("'","",DownloadDataFromServer($json)), true);
     $response = $data;
     $response['status_code'] = 200;
     $response['status_message'] = "OK";
