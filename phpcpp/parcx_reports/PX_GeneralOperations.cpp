@@ -151,32 +151,32 @@ Php::Value GeneralOperations::getLabels(string lang,string label)
 
 
 Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
-    {
+{
     string lang=data["language"];  
     int page=data["page"];                
     string label=data["label"];    
     if(page>0)
-        {
+    {
         string reportlabels="choose_datetime_range,view_report,export,export_to_excel,export_to_pdf,logout,search,entries_label,info_label,previous,next,";
         switch(page)
-            {
+        {
             case 1://"watchdog_device_alarms"
                     label=reportlabels+"watchdog_device_alarms,select_severity,low,high,medium,all_devices,select_devices";
                     break;
             case 2 ://payment_transactions
-                label=reportlabels+"payment_transactions,detailed_payment,receipt_details,close,print,tax_invoice,cash,credit_card,parking_fee,lost_ticket,discount,grace_period,product_sales,all_devices,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
+                label=reportlabels+"all_validation,select_validation,payment_transactions,detailed_payment,receipt_details,close,print,tax_invoice,cash,credit_card,parking_fee,lost_ticket,discount,grace_period,product_sales,all_devices,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
                     break;
             case 3 ://revenue_summary
-                label = reportlabels+"earnings,sunday,monday,tuesday,wednesday,thursday,friday,saturday,total_revenue,revenue_report,all_carparks,select_carparks,select_days,all_days,product_sales,lost_fee,parking_fee";
+                label = reportlabels+"earnings_by_device,vat_amount,reservation_amount,earnings,total_revenue,parking_fee,discount_amount,product_sale_amount,lost_fee,sunday,monday,tuesday,wednesday,thursday,friday,saturday,revenue_report,all_carparks,select_carparks,select_days,all_days";
                     break;
             case 4://shift_report
-                label = reportlabels + "shift_report,all_carparks,select_carparks,all_devices,select_devices,all_operators,select_operators";
+                label = reportlabels + "detailed_shift,shift_report,all_carparks,select_carparks,all_devices,select_devices,all_operators,select_operators";
                     break;
             case 5://vat_report
                 label = reportlabels + "vat_report,cash,credit_card,detailed_payment,receipt_details,close,print,tax_invoice,all_devices,parking_fee,lost_ticket,discount,grace_period,product_sales,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
                     break;
             case 6://creditcard_payment_transactions
-                label = reportlabels + "creditcard_transactions,all_carparks,select_carparks,all_devices,select_devices";
+                label = reportlabels + "creditcard_transactions,all_carparks,select_carparks,all_devices,select_devices,";
                     break;
             case 7://payment_transaction_exceptions
                 label = reportlabels + "payment_transaction_exception,all_carparks,select_carparks,all_devices,select_devices,select_exception,blacklisted,already_paid_chipcoin,invalid_carpark,invalid_chipcoin,cancelled_transaction";
@@ -194,10 +194,10 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "parking_movement,plate_ticket,all_carparks,select_carparks,all_devices,select_devices";
                     break;
             case 12://blacklist_report
-                label = reportlabels + "blacklist_report,all_carparks,select_carparks";
+                label = reportlabels + "blacklist_report,all_carparks,select_carparks,all_devices,select_devices";
                     break;
             case 13://traffic_report
-                label = reportlabels + "traffic_report,all_carparks,select_carparks,all_days,select_days,sunday,monday,tuesday,wednesday,thursday,friday,saturday,entries,exits";
+                label = reportlabels + "traffic_report,entries,exits,all_carparks,select_carparks,all_days,select_days,sunday,monday,tuesday,wednesday,thursday,friday,saturday";
                     break;
             case 14://ticket_details
                 label = reportlabels + "ticket_details,ticket_id,view_details,plate_number";
@@ -212,22 +212,22 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "select_status,access_movements,plate_ticket,all_carparks,select_carparks,all_devices,select_devices,access_allowed,access_denied,tag_unknown,plate_ticket_tag,add_to_whitelist,customer_name,country,select_country,emirate,uae,bahrain,kuwait,oman,qatar,saudi,abudhabi,dubai,ajman,sharjah,rasalkhaimah,fujairah,ummalquwwain,qrcode,activation_date,expiry_date,facility_name,personal_message_1,personal_message_2,anti_passback,submit,tag,prefix,carpark";
                     break;
             case 18://manual_movements
-                label = reportlabels + "manual_movement,all_operation_methods,manual_open_from_cashier,remote_pushbutton_open,all_carparks,select_carparks,all_devices,select_devices,access_allowed,access_denied,tag_unknown,plate_ticket_tag,add_to_whitelist,customer_name,country,select_country";
+                label = reportlabels + "manual_movement,barrier_open_from_server,barrier_close,free_passage_mode,lane_closed_mode,standard_operation_mode,all_operation_methods,manual_open_from_cashier,remote_pushbutton_open,all_carparks,select_carparks,all_devices,select_devices,access_allowed,access_denied,tag_unknown,plate_ticket_tag,add_to_whitelist,customer_name,country,select_country";
                     break;
             case 19://open_transactions
                 label = reportlabels + "open_transactions,anpr_image,sel_duration,less_1_day,greater_1_day,greater_2_day,greater_3_day,greater_4_day,greater_5_day,greater_6_day,greater_7_day,plate_ticket,all_operation_methods,manual_open_from_cashier,remote_pushbutton_open,all_carparks,select_carparks,all_devices,select_devices";
                     break;
             case 20://plates_captured
-                label = reportlabels + "plates_captured,plate_number,plate_area,plate_type,plate_type,police,transport,commercial,private,learning,cddiplomat,ccdiplomat,protocol,government,export,taxi,testing,transfer,truck,bus,publictransport,privatetransport,all_carparks,select_carparks,all_devices,select_devices,uae,bahrain,kuwait,oman,qatar,saudi,select_country";
+                label = reportlabels + "confidence_rate,plates_captured,plate_number,plate_area,plate_type,plate_type,police,transport,commercial,private,learning,cddiplomat,ccdiplomat,protocol,government,export,taxi,testing,transfer,truck,bus,publictransport,privatetransport,all_carparks,select_carparks,all_devices,select_devices,uae,bahrain,kuwait,oman,qatar,saudi,select_country";
                     break;
             case 21://validation_report
                 label = reportlabels + "validation_report,all_carparks,select_carparks,all_devices,select_devices,select_validator,all_validators,select_product,all_products,plate_ticket";
                     break;
             case 22://parking_duration
-                label = reportlabels + "parking_duration,all_devices,select_devices,all_carparks,all_days,select_days,select_carparks,sunday,monday,tuesday,wednesday,thursday,friday,saturday,shortterm_parkers,contract_parkers";
+                label = reportlabels + "parking_duration,shortterm_parkers,contract_parkers,all_devices,select_devices,all_carparks,all_days,select_days,select_carparks,sunday,monday,tuesday,wednesday,thursday,friday,saturday";
                     break;
             case 23://watchdog_network_logs
-                label = reportlabels + "watchdog_network_logs";
+                label = reportlabels + "watchdog_network_logs,all_carparks,select_carparks,all_devices,select_devices";
                     break;
             
             case 24://anpr_entry_plate_correction
@@ -237,10 +237,15 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
                 label = reportlabels + "live_parking";
                     break;
             case 26://manual_operations page
-                label=reportlabels+"device_name,device_ip,manual_operation,reason,ok,cancel,standard_operation_mode_from_server,enter_valid_reason";
+                label=reportlabels+"device_name,device_ip,manual_operation,reason,ok,cancel,standard_operation_mode_from_server,enter_valid_reason,latest_manual_operations";
                     break;
-
-}
+            case 27 ://discount summary
+                label=reportlabels+"discount_summary,all_devices,select_devices,all_carparks,select_carparks,all_discount,select_discount";
+                    break;
+            case 28 ://user activity
+                label=reportlabels+"user_activity,all_operators,select_operators";
+                    break;
         }
-    return  getLabels(lang,label);
     }
+    return  getLabels(lang,label);
+}

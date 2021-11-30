@@ -500,6 +500,7 @@ function loadReportLabels()
         $("#export_excel_report").html(json.export_to_excel);           
         $("#export_pdf_report").html(json.export_to_pdf); 
         $("#logout").html(json.logout);
+        $("#last_update").html(json.last_updated+ ": " + datetime);
 
 	pieChart.data.labels[0]=json.parking_fee;
     	pieChart.data.labels[1]=json.lost_fee;
