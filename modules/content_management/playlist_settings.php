@@ -15,8 +15,8 @@ include('../../includes/header.php');
 <div class="header text-dark" id="pdf-report-header">Playlist Settings</div>
 <div class="row hidden-sm-down">
     <div class="col tab-header d-flex justify-content-center">
-        <div class="tab-link active" data-target="overview">Overview</div>
-        <div class="tab-link" data-target="form">Add Playlist</div>
+        <div class="tab-link active" data-target="overview" id="overview-tab">Overview</div>
+        <div class="tab-link" data-target="form" id="form-tab">Add Playlist</div>
     </div>
 </div>
 
@@ -24,7 +24,7 @@ include('../../includes/header.php');
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
-<style>
+<!--<style>
 * {
   box-sizing: border-box;
 }
@@ -76,9 +76,9 @@ body {
   clear: both;
 }
 
-</style>
-<!-- Modal  -->
-<div class="modal fade text-dark" id="view_playlist_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</style>-->
+<!--View Playlist Modal  -->
+<div class="modal fade text-dark" id="view_playlist_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none; z-index:1055">
     <div class="modal-dialog" role="document" id="edit-content">
         <div class="modal-content">
             <div class="modal-header">
@@ -90,89 +90,98 @@ body {
                 
             </div>
 
-            <div class="modal-body pt-4 pl-4 pr-4 pb-4">
+            <div class="modal-body pt-4 pl-4 pr-4 pb-4 view-playlist-body">
             </div>
         </div>
     </div>
 </div>
 <!-- end / Modal -->
 
-<div class="content-wrapper">
-    <section class="content">
-        <div class="container-wide">        
-            <!-- add/update carpark form --> 
-            <form name="form1" class="block-data card card-body col-md-10" data-status="form" style="display:none;" id="form">                
-                <div class="alert alert-light mb-2" role="alert" id="messagebox">
-                                    
-                </div>
-                <div class="row">                    
-                    <div class="col form-group">
-                        <label for="">Playlist Name</label>
-                        <input type="text" class="form-control" id="playlist_name" required name="playlist_name">
-                    </div>
-                    <div class="col form-group">
+<!--Add Playlist Modal  -->
+<!-- Modal -->
+<div class="modal fade" id="add-edit-playlist-modal"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add/Edit Playlist</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close-playlist-modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-2" id="playlist-modal-body">  
+                <form name="form1" class="block-data card card-body" data-status="form"  id="form">                
+                    <!--<div class="alert alert-light mb-2" role="alert" id="messagebox">
+                    </div>-->
+                    <div class="row">                    
+                        <div class="col form-group">
+                            <label for="">Playlist Name</label>
+                            <input type="text" class="form-control" id="playlist_name" required name="playlist_name">
+                        </div>
                         
-                    </div>
-                </div> 
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="">Description</label>
-                        <input type="text" class="form-control" id="description"  name="description">
-                    </div> 
-                    <div class="col form-group">
+                    
+                        <div class="col form-group">
+                            <label for="">Description</label>
+                            <input type="text" class="form-control" id="description"  name="description">
+                        </div> 
                         
-                    </div>
-                </div>  
-                <div id="customer-div" class="row card card-body">
-                 
-                    <div class="row  mb-3">
-                        <div class="col h5">
-                            <label for="">Drag the videos in sequence to create the playlist</label>
+                    </div>  
+                    <div id="customer-div" class="row card card-body">
+
+                        <div class="row  mb-3">
+                            <div class="col h5">
+                                <label for="">Drag the videos in sequence to create the playlist</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row  mb-1">
-                        <div class="col"><h4>VIDEO LIBRARY</h4></div>
-                        <div class="col p-2"></h4></div>
-                        <div class="col"><h4>PLAYLIST</h4></div>
-                    </div>
-                    <div class="row">
-                        <div class="col form-group form-control scroll-smooth" id="left" ondrop="drop(event)" ondragover="allowDrop(event)">
-                            <?php
-                                $data["task"] = 4;
-                                parcxContentManagement($data);
-                            ?> 
+                        <div class="row  mb-1">
+                            <div class="col"><h4>VIDEO LIBRARY</h4></div>
+                            <div class="col p-2"></h4></div>
+                            <div class="col"><h4>PLAYLIST</h4></div>
                         </div>
-                        <div class="p-2" >
+                        <div class="row">
+                            <div class="col form-group form-control scroll-smooth" id="left" ondrop="drop(event)" ondragover="allowDrop(event)">
+                                <?php
+                                    $data["task"] = 4;
+                                    parcxContentManagement($data);
+                                ?> 
+                            </div>
+                            <div class="p-2" >
 
-                        </div>
+                            </div>
 
-                        <div class="col form-group form-control scroll-smooth" id="right" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            <div class="col form-group form-control scroll-smooth" id="right" ondrop="drop(event)" ondragover="allowDrop(event)">
 
-                        </div>                    
-                    </div>   
-                </div>
-               
-                <input type="submit" class="signUp btn btn-block btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
-           
-            </form>
+                            </div>                    
+                        </div>   
+                    </div>
 
-            <!-- playlist table -->         
-            <div class="block-data col-md-10" data-status="overview">
-                <div class="card" >               
-                    <div class="card-body" id="div-RecordsTable">     
-                        <table id="RecordsTable" class="table  table-bordered"> 
-                            <?php
-                            $data["task"] = 1;
-                            $data["edit"] = 1;
-                            $data["delete"]=1;
-                            parcxContentManagement($data);
-                            ?> 
-                        </table>
-                    </div>                                                  
-                </div>             
-            </div>             
+                    <input type="submit" class="signUp btn btn-block btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
 
+                </form>             
+            </div>
         </div>
+    </div>
+</div>
+<!-- / end modal -->
+
+
+<div class="content-wrapper container-wide">
+    <section class="content">
+        <!-- playlist table -->         
+        <div class="block-data col-md-10" data-status="overview">
+            <div class="card" >               
+                <div class="card-body" id="div-RecordsTable">     
+                    <table id="RecordsTable" class="table  table-bordered"> 
+                        <?php
+                        $data["task"] = 1;
+                        $data["edit"] = 1;
+                        $data["delete"]=1;
+                        parcxContentManagement($data);
+                        ?> 
+                    </table>
+                </div>                                                  
+            </div>             
+        </div>             
     </section>
 </div>
 
@@ -185,24 +194,7 @@ body {
     var user_name;
     var page = 0;
     table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
-    $(".pw-view-btn button").on('click', function (event)
-    {
-        event.preventDefault();
-        var currentElement = $(this).parents(".pw-view-btn");
-        var id = $("#" + currentElement.attr('id'))
-        var inputElement = id.find('input');
-        var inputIcon = id.find('i');
-
-        if (inputElement.attr("type") == "text") {
-            inputElement.attr('type', 'password');
-            inputIcon.addClass("fa-eye-slash");
-            inputIcon.removeClass("fa-eye");
-        } else if (inputElement.attr("type") == "password") {
-            inputElement.attr('type', 'text');
-            inputIcon.removeClass("fa-eye-slash");
-            inputIcon.addClass("fa-eye");
-        }
-    });
+    
 
 
     $(document).ready(function ()
@@ -215,7 +207,7 @@ body {
             var $target = $(this).data('target');
             if ($target == "form")
             {
-                //alert("here");
+                $("#add-edit-playlist-modal").modal('show');
                 $("#left").html("");
                 $("#right").html("");
                 $("form[name=form1]").trigger('reset');
@@ -262,6 +254,13 @@ body {
             submitHandler: function ()
             {
                 var data = {};
+                if ($("#add-edit-button").val() == "Submit")
+                {
+                    data["id"] = "";
+                } else
+                {
+                    data["id"] = id;
+                }
                 var div_id="";
                 data["playlist_name"] = $("#playlist_name").val();
                 data["description"] = $("#description").val();
@@ -276,9 +275,9 @@ body {
                 data["video_list"] = video_list;
                 data["task"] = "5";
                 var jsondata = JSON.stringify(data);
-                console.log(jsondata);
+                //console.log(jsondata);
                 $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-                    console.log(result);
+                    //console.log(result);
                     if (result === "Successfull")
                         location.reload();
                     else
@@ -308,7 +307,6 @@ body {
 
     /* === enable disable product === */
     var status;
-    var id;
     $(document).on("click", ".playlist-enable-disable-btn", function ()
     {
         id = $(this).parent('td').parent('tr').data('id');
@@ -341,11 +339,12 @@ body {
         var data = {};
         data["id"] = id;
         data["task"] = "3";
+        data["type"] = 1;
         var jsondata = JSON.stringify(data);
-        //console.log(jsondata);
+        console.log(jsondata);
         $.post("../../modules/ajax/cms.php", jsondata, function (result) {
             $("#view_playlist_modal").modal('show');
-            $(".modal-body").html(result);
+            $(".view-playlist-body").html(result);
             
         });
 
@@ -355,7 +354,7 @@ body {
     {
         var path = $(this).attr("data-path");
         $("#view_playlist_modal").modal('show');
-        $(".modal-body").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='video/mp4'></video>");
+        $(".view-playlist-body").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='video/mp4'></video>");
 
     });
     
@@ -402,24 +401,46 @@ body {
         ev.preventDefault();
     }
     
-    $(".user-edit").click(function (event) {        
-        var id = $(this).attr('id');
-        var $target = "form";
-        $('.block-data').css('display', 'none');
-        $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
-        $('.tab-link').removeClass('active');
-        $(this).addClass('active');
-        
-        /*var data = {};
+    $(".playlist-edit").click(function (event) {        
+        id = $(this).parent('td').parent('tr').data('id');
+        var data = {};
         data["id"] = id;
-        data["task"] = "3";
+        data["task"] = "12";
         var jsondata = JSON.stringify(data);
-        //console.log(jsondata);
+        console.log(jsondata);
         $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-            $("#view_playlist_modal").modal('show');
-            $(".modal-body").html(result);
+            console.log(result);
+            var json = JSON.parse(result);
+            $("#add-edit-playlist-modal").modal('show');
+            $("#playlist_name").val(json.playlist_name);
+            $("#description").val(json.playlist_description);
+            $("#add-edit-button").val("Edit");
+        });
+        
+        data = {};
+        data["task"] = "4";
+        data["playlist_id"]=id;
+        jsondata = JSON.stringify(data);
+        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
+            $("#left").html(result)
             
-        });*/
+            data = {};
+            data["task"] = "3";
+            data["id"]=id;
+            data["type"] = 0; 
+            jsondata = JSON.stringify(data);
+            console.log(jsondata);
+            $.post("../../modules/ajax/cms.php", jsondata, function (result1) {
+                console.log(result1);
+                $("#right").html(result1)
+            });
+        });
+        
+        
+        
+    });
+    $("#close-playlist-modal").click(function (event) {   
+        location.reload();
     });
     
     /*$(document).on("click", "#add-edit-button", function ()

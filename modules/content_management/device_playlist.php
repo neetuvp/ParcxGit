@@ -49,11 +49,20 @@ include('../../includes/sidebar.php');
 <div class="content-wrapper">
     <section class="content">
         
-        <div class="container-wide" >
-            <div class="row" id="screen-list-block" >
-                
-            </div>                        
-        </div>
+        <div class="block-data col-md-10" data-status="overview">
+            <div class="card" >               
+                <div class="card-body" id="div-RecordsTable">     
+                    <table id="RecordsTable" class="table  table-bordered"> 
+                        <?php
+                        $data["task"] = 6;
+                        $data["edit"] = 1;
+                        $data["delete"]=1;
+                        parcxContentManagement($data);
+                        ?> 
+                    </table>
+                </div>                                                  
+            </div>             
+        </div> 
     
     </section>
 </div>
@@ -72,20 +81,21 @@ include('../../includes/sidebar.php');
     
     
     //Load data
-function loadPage()
-    {
-        var data={};
-        data["task"]=1;
-        var jsondata = JSON.stringify(data);           
-           $.post("../../modules/ajax/playlist.php",jsondata,function(data){                       
-                    $("#screen-list-block").html(data);                    
-           })
-           .fail(function(jqxhr,status,error){
-               alert("Error: "+error);
-
-           }); 
-    }
-    loadPage(); 
+function loadTable()
+{
+    var data = {};
+    data["task"] = "6";
+    data["edit"] =1;
+    data["delete"]=1;
+    var jsondata = JSON.stringify(data);
+    $.post("../../modules/ajax/cms.php", jsondata, function (result) {
+        $("#div-RecordsTable").html("<table id='RecordsTable' class='table  table-bordered'>" + result + "</table>");
+        table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
+        table.page(page).draw(false);
+    });
+}
+    
+    
     $(document).ready(function ()
     {
         //$("#form-edit-user").validate();
@@ -171,48 +181,6 @@ function loadPage()
 
 
 
-
-
-    function loadTable()
-    {
-        var data = {};
-        data["task"] = "1";
-        var jsondata = JSON.stringify(data);
-        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-            $("#div-RecordsTable").html("<table id='RecordsTable' class='table  table-bordered'>" + result + "</table>");
-            table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
-            table.page(page).draw(false);
-        });
-    }
-    
-   
-
-
-    /* === enable disable product === */
-    var status;
-    var id;
-    $(document).on("click", ".playlist-enable-disable-btn", function ()
-    {
-        id = $(this).parent('td').parent('tr').data('id');
-        user_name = $(this).parent('td').siblings(":eq( 0 )").text();
-        var status_text = $(this).attr("data-text");
-        if (status_text == "Disable")
-            status = 0;
-        else
-            status = 1;
-
-        var data = {};
-        data["id"] = id;
-        data["status"] = status;
-        data["task"] = "2";
-        var jsondata = JSON.stringify(data);
-        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-            if (result === "Successfull")
-                loadTable();
-            else
-                alert(result);
-        });
-    });
 
     
     $(document).on("click", ".manage-playlist-button", function ()
