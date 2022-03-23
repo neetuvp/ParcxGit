@@ -66,9 +66,7 @@ include('../../includes/sidebar.php');
     
     </section>
 </div>
-<!-- password strength -->
-<script src="../../plugins/password-strength/password.js"></script>
-<script src="../../dist/js/password.js"></script>
+
 
 <?php include('../../includes/footer.php'); ?>
 <script>
@@ -188,10 +186,12 @@ function loadTable()
         var id = $(this).attr("data-id");
         var data = {};
         data["device_id"] = id;
-        data["task"] = "2";
+        data["task"] = "7";
+        //data["task"] = "2";
         var jsondata = JSON.stringify(data);
         //console.log(jsondata);
-        $.post("../../modules/ajax/playlist.php", jsondata, function (result) {
+        //$.post("../../modules/ajax/playlist.php", jsondata, function (result) {
+        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
             $("#view_playlist_modal").modal('show');
             $(".modal-body").html(result);
             $(".pl-options").hide();

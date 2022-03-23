@@ -733,7 +733,12 @@ Php::Value getDetailsbyId(string table, string id, Php::Value data) {
 
 void manageScreenPlaylist(Php::Value data)
 {
+    sql::Connection *con;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
     string html_data="";
+    string device_number = data["device_id"];
+    string id;
     html_data +="<div id='playlist-div' class='row card card-body'>";
                  
     html_data +="<div class='row  mb-3'><div class='col h5'>";
@@ -746,7 +751,35 @@ void manageScreenPlaylist(Php::Value data)
     html_data +="</div>";
     html_data +="<div class='row'>";
     html_data +="<div class='col form-group form-control scroll-smooth' id='left' ondrop='drop(event)' ondragover='allowDrop(event)'>";
-    html_data +="<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id='v1' data-playlist='1' draggable='true' ondragstart='drag(event)'>";
+    try {
+        
+        con = General.mysqlConnect(ServerDB);
+        prep_stmt = con->prepareStatement("select * from playlist_settings");
+        res = prep_stmt->executeQuery();
+        while(res->next())
+        {
+            id = res->getString("id");
+            html_data +="<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id='v"+id+"' data-playlist='"+id+"' draggable='true' ondragstart='drag(event)'>";
+            html_data +="<div class='row'>";
+            html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></span><label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
+        html_data +="</div>";
+            html_data +="<div class='row center'>";
+            html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Time'></p><p><span class='float-left'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p></fieldset>";
+            html_data +="</div>";
+            html_data +="<details class='small'>";
+            html_data +="<summary class='playlist-details-div' data-id='"+id+"'>View List</summary>";
+            html_data +="<div id ='playlist-details-"+id+"' class='playlist-details d-inline'></div>";
+            html_data +="</details>";
+            html_data +="</div>";
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    } catch (const std::exception& e) {
+        writeException("manageScreenPlaylist", e.what());
+    }
+
+    /*html_data +="<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id='v1' data-playlist='1' draggable='true' ondragstart='drag(event)'>";
     html_data +="<div class='row'>";
     html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-1'><input type='checkbox' class = 'playlist-checkbox' id = 'c1' data-id='1' value='p1'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-1'><button class='btn btn-danger btn-sm del-playlist' value='delete1' data-id='1'><i class='fas fa-minus'></i></button></span><label id = 'l1'>Playlist 1</label></fieldset>";
 html_data +="</div>";
@@ -771,15 +804,15 @@ html_data +="</div>";
     html_data +="<div id ='playlist-details-2' class='playlist-details d-inline'></div>";
     html_data +="</details>";
     html_data +="</div>";
-    html_data +="</div>";
+    html_data +="</div>";*/
 
-    html_data +="<div class='p-2'>";
+    html_data +="</div><div class='p-2'>";
     html_data +="</div>";
 
     html_data +="<div class='col form-group form-control scroll-smooth' id='right' ondrop='drop(event)' ondragover='allowDrop(event)'>";
     html_data +="</div>";                   
     html_data +="</div>"; 
-    html_data +="<input type='submit' class='signUp btn btn-block btn-info mt-2 btn-lg' value='Save' id='save-screen-playlist' data-screen='20'>";
+    html_data +="<input type='submit' class='signUp btn btn-block btn-info mt-2 btn-lg' value='Save' id='save-screen-playlist' data-screen='"+device_number+"'>";
     html_data +="</div>";
     Php::out<<html_data<<endl;
 
