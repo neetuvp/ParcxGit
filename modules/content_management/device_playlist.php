@@ -184,8 +184,10 @@ function loadTable()
     $(document).on("click", ".manage-playlist-button", function ()
     {
         var id = $(this).attr("data-id");
+        var name = $(this).attr("data-name");
         var data = {};
         data["device_id"] = id;
+        data["device_name"]=name;
         data["task"] = "7";
         //data["task"] = "2";
         var jsondata = JSON.stringify(data);
@@ -295,8 +297,17 @@ function loadTable()
         e.preventDefault();
         
         $('#playlist-modal-body').find("#right-v"+id).remove();
+        
+        if($("#v"+id).length==0)    
+        {
+           $('#playlist-modal-body').find("#left").append("<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' data-playlist="+id+" id='v"+id+"'>"+$('#right-v'+id).html()+"</div>");
+           $('#playlist-modal-body').find("#right-v"+id).addClass("hidden");
+        }
+        else
+        {
+            $('#playlist-modal-body').find("#v"+id).removeClass("hidden");//;.remove();
+        }
         $('#playlist-modal-body').find("#pl-options-"+id).removeClass("hidden");
-        $('#playlist-modal-body').find("#v"+id).removeClass("hidden");//;.remove();
         //$('#playlist-modal-body').find("#c"+id).removeClass("hidden");//.remove();
         $('#playlist-modal-body').find("#span-cbox-"+id).removeClass("hidden");
         $('#playlist-modal-body').find("#span-del-"+id).addClass("hidden");
@@ -344,7 +355,14 @@ function loadTable()
             daterange_playlist = $('#playlist-modal-body').find('#date-p'+id).val();
             from_date = daterange_playlist.substring(0, 19);
             to_date = daterange_playlist.substring(22, 41);
-            
+            if(from_date=="")
+            {
+                from_date="00:00:00";
+            }
+            if(to_date=="")
+            {
+                to_date="00:00:00";
+            }
             playlist.push({
                 id: id, 
                 repeat:repeat_playlist,
@@ -355,12 +373,12 @@ function loadTable()
          });
         var data = {};
         data["device_id"] = screen_id;
-        data["task"] = "3";
+        data["task"] = "8";
         data["playlists"]=playlist;
         var jsondata = JSON.stringify(data);
         console.log(jsondata);
-        $.post("../../modules/ajax/playlist.php", jsondata, function (result) {
-             //location.reload();
+        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
+             location.reload();
             
         });
     });

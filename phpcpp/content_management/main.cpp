@@ -284,9 +284,32 @@ void getVideoslibrary(Php::Value data)
         sql::Connection *con;
         sql::PreparedStatement *prep_stmt;            
         sql::ResultSet *res;
-        
+        string id = data["playlist_id"];
+        string query="";
         con= General.mysqlConnect(ServerDB); 
-        prep_stmt=con->prepareStatement("Select * from media_library where media_status=1");
+        if(id!="")
+        {
+            string ids="";
+            prep_stmt=con->prepareStatement("Select playlist_videos from playlist_settings where id=?");
+            prep_stmt->setInt(1,stoi(id));
+            res=prep_stmt->executeQuery();
+            if(res->next())
+            {
+                ids = res->getString("playlist_videos");
+            }
+            if(ids=="")
+            {
+                prep_stmt=con->prepareStatement("Select * from media_library where media_status=1");
+            }
+            else
+            {
+                prep_stmt=con->prepareStatement("Select * from media_library where media_status=1 and id not in ("+ids+")");
+            }
+            
+        }
+        else{
+            prep_stmt=con->prepareStatement("Select * from media_library where media_status=1");
+        }
         res=prep_stmt->executeQuery();
         if(res->rowsCount()>0)
         {
@@ -396,7 +419,7 @@ void screenList(Php::Value data)
         con= General.mysqlConnect(ServerDB); 
         stmt=con->createStatement();
         res=stmt->executeQuery("select * from system_devices where device_category=12 and device_enabled=1");
-        
+        //Php::out<<"select * from system_devices where device_category=12 and device_enabled=1"<<endl;
         if(res->rowsCount()>0)
             {
             //Php::out<<"<table class='table table-blue'>"<<endl;
@@ -414,31 +437,23 @@ void screenList(Php::Value data)
             Php::out << "</thead>" << std::endl;		
             }
         while(res->next())
-            {
+        {
             Php::out<<"<tr data-id='"<<res->getString("device_number")<<"'>"<<endl; 
             Php::out<<"<td><video width='150' controls='controls' preload='metadata'><source src='/parcx/Media/Videos/Video1.mp4#t=0.5' type='video/mp4'></video></td>"<<endl;
             Php::out<<"<td>"+res->getString("device_number")+"</td>"<<endl;
             Php::out<<"<td>"+res->getString("device_name")+"</td>"<<endl;    
             Php::out<<"<td>"+res->getString("device_ip")+"</td>"<<endl;    
             Php::out << "<td>"<< std::endl;
-            Php::out << "<button class='btn btn-info manage-playlist-button' data-id='20'>Manage Playlist</button>"<< std::endl;  
-            //if(edit_access==1 ||delete_access==1){
-               
-               // if(delete_access==1)
-               // {
-                    if(res->getInt("playlist_status")==1)
-                        Php::out << "<button type='button' class='btn btn-danger playlist-enable-disable-btn' title='Disable' data-text='Disable'><i class='fas fa-stop-circle'></i></button>"<< std::endl;
-                    else
-                        Php::out << "<button type='button' class='btn btn-success playlist-enable-disable-btn' title='Enable' data-text='Enable'><i class='fas fa-play-circle'></i></button>"<< std::endl;
-                //}
-                ////if(edit_access==1)
-                {
-                    Php::out << "<button type='button' class='btn btn-info playlist-edit' title='Edit'><i class='fas fa-edit'></i></button>"<< std::endl;            
-                //}  
-            }
+            Php::out << "<button class='btn btn-info manage-playlist-button' data-id='"+res->getString("device_number")+"' data-name='"+res->getString("device_name")+"'>Manage Playlist</button>"<< std::endl;  
+            /*if(res->getInt("playlist_status")==1)
+                Php::out << "<button type='button' class='btn btn-danger playlist-enable-disable-btn' title='Disable' data-text='Disable'><i class='fas fa-stop-circle'></i></button>"<< std::endl;
+            else
+                Php::out << "<button type='button' class='btn btn-success playlist-enable-disable-btn' title='Enable' data-text='Enable'><i class='fas fa-play-circle'></i></button>"<< std::endl;*/
+            
+            
             Php::out << "</td>"<< std::endl;
             Php::out<<"</tr>"<<endl;	
-            }
+        }
         //Php::out<<html_data<<endl;
         delete res;    
         delete stmt;
@@ -450,87 +465,45 @@ void screenList(Php::Value data)
     } 
 }
 
-void showdevicePlayList(Php::Value data)
+void insertScreenPlayList(Php::Value data)
     {
     try
         {
-        Php::Value role;
+        string query_string="";
         sql::Connection *con;
-        sql::Statement *stmt;            
-        sql::ResultSet *res;
-        int device_number = 0;
-        string checked = "";
-
+        sql::PreparedStatement *prep_stmt=NULL;            
+        int device_id = data["device_id"];
+        Php::Value playlists = data["playlists"];
+        //Php::out<<playlists.size()<<endl;
+        int i=0;
         con= General.mysqlConnect(ServerDB); 
-        stmt=con->createStatement();
-        res=stmt->executeQuery("select device_number from system_devices where device_category=12 limit 1");
-        if(res->next())
+        for(int j=0;j<playlists.size();j++)
         {
-           device_number = res->getInt("device_number");
-        }
-        res=stmt->executeQuery("select a.*,b.playlist_name from device_playlist a join playlist_settings b on a.playlist_id = b.id  where device_number = "+to_string(device_number));
-        if(res->rowsCount()>0)
-        {
-            //Php::out<<"<table class='table table-blue'>"<<endl;
-            Php::out << "<thead class='thead-light'>" << std::endl;
-            Php::out<<"<tr>"<<endl;
-            Php::out<<"<th>Playlist</th>"<<endl;
-            Php::out<<"<th>Start Date</th>"<<endl;        
-            Php::out<<"<th>End Date</th>"<<endl;        
-            Php::out<<"<th>Repeat Playlist</th>"<<endl; 		           
-            //Php::out<<"<th></th>"<<endl;
-            Php::out<<"</tr>"<<endl;	
-            Php::out << "</thead>" << std::endl;	
-            while(res->next())
+            if(i==0)
             {
-                Php::out<<"<tr data-id='"<<res->getString("id")<<"'>"<<endl;                       
-                Php::out<<"<td>"+res->getString("playlist_name")<<endl;
-                Php::out<<"<details class='small'>"<<endl;
-                Php::out<<"<summary class='playlist-details-div' data-id='"+res->getString("playlist_id")+"'>View Details</summary>"<<endl;
-                Php::out<<"<div id ='playlist-details-"+res->getString("playlist_id")+"' class='playlist-details d-inline'>"<<endl;
-                Php::out<<"</div>"<<endl;
-                Php::out<<"</details>"<<endl;
-                Php::out<<"</td>"<<endl;
-                Php::out<<"<td>"+res->getString("start_date_time")+"</td>"<<endl;   
-                Php::out<<"<td>"+res->getString("end_date_time")+"</td>"<<endl; 
-                if(res->getInt("repeat_videos")==1)
-                {
-                    checked="checked";
-                }
-                else
-                {
-                    checked="";
-                }
-                Php::out<<"<td><input type='checkbox' id='repeat"+res->getString("id")+"' "+checked+" disabled></td>"<<endl; 
-                /*Php::out << "<td>"<< std::endl;
-                //Php::out << "<button type='button' class='btn btn-info playlist-view' title='View Playlist' data-text='View Playlist' data-playlist="+res->getString("playlist_id")+"><i class='fas fa-eye'></i></button>"<< std::endl;  
-                
-                if(res->getInt("status")==1)
-                    Php::out << "<button type='button' class='btn btn-danger playlist-enable-disable-btn' title='Disable' data-text='Disable'><i class='fas fa-stop-circle'></i></button>"<< std::endl;
-                else
-                    Php::out << "<button type='button' class='btn btn-success playlist-enable-disable-btn' title='Enable' data-text='Enable'><i class='fas fa-play-circle'></i></button>"<< std::endl;
-                    
-                    
-                        //Php::out << "<button type='button' class='btn btn-info user-edit' title='Edit'><i class='fas fa-edit'></i></button>"<< std::endl;            
-                    
-                //}
-                Php::out << "</td>"<< std::endl;*/
-                Php::out<<"</tr>"<<endl;	
+                prep_stmt = con->prepareStatement("Delete from device_playlist where device_number = ?");
+                prep_stmt->setInt(1,device_id);
+                prep_stmt->executeUpdate();
             }
+            i++;
+            
+            query_string = "Insert into device_playlist(device_number,playlist_id,playlist_name,start_date_time,end_date_time,repeat_videos) values (?,?,?,?,?,?)";
+            prep_stmt = con->prepareStatement(query_string);
+            prep_stmt->setInt(1,device_id);
+            prep_stmt->setInt(2,playlists[j]["id"]);
+            prep_stmt->setString(3,toString(playlists[j]["name"]));
+            prep_stmt->setString(4,toString(playlists[j]["start"]));
+            prep_stmt->setString(5,toString(playlists[j]["end"]));
+            prep_stmt->setInt(6,playlists[j]["repeat"]);
+            prep_stmt->executeUpdate();
         }
-        else
-        {
-            Php::out<<"No Playlists found for this Screen"<<endl;
-        }
-        
-        //Php::out<<"</table>"<<endl;	
-        delete res;    
-        delete stmt;
+    
+        delete prep_stmt;
         delete con;  
         }
     catch(const std::exception& e)
         {
-        writeException("showdevicePlayList",e.what());
+        writeException("insertScreenPlayList",e.what());
         }
     
     }
@@ -555,7 +528,7 @@ Php::Value uploadMedia(Php::Value data)
     else
     {
         string extension = filename.substr(filename.find_last_of(".") + 1);
-        if(extension == "mp4" || extension == "avi" || extension == "MP4" || extension == "AVI" || extension == "jpeg" || extension == "png" || extension == "jpg" || extension == "gif")  {
+        if(extension == "mp4" || extension == "avi" || extension == "MP4" || extension == "AVI" || extension == "webm" || extension == "WEBM" || extension == "jpeg" || extension == "png" || extension == "jpg" || extension == "gif" || extension == "ogg" || extension == "OGG")  {
             if(error>0)
             {
                 result ="File Upload Error:"+to_string(error) ;
@@ -644,7 +617,28 @@ void showMediaLibraryList(Php::Value data)
             }
             else if (res->getString("media_type").find("video") != std::string::npos) 
             {
-                Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                if(res->getString("media_type")=="video/mp4")
+                {
+                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                }
+                else if(res->getString("media_type")=="video/webm")
+                {
+                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/webm'></video></td>"<<endl;
+                }
+                else if(res->getString("media_type")=="video/ogg")
+                {
+                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/ogg'></video></td>"<<endl;
+                }
+                else if(res->getString("media_type")=="video/x-msvideo")
+                {
+                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/avi'></video></td>"<<endl;
+                   // Php::out<<"<td><object data='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'> <param name='src' value='"+string(MediaPath)+"/"+res->getString("media_name")+"' /> <embed type='video/x-ms-wm' src='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'></embed> </object></td>"<<endl;
+                }
+                
+            }
+            else if (res->getString("media_type").find("audio") != std::string::npos) 
+            {
+                Php::out<<"<td><audio style='width: 100px;' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='audio/ogg'></audio></td>"<<endl;
             }
             else
             {
@@ -731,18 +725,65 @@ Php::Value getDetailsbyId(string table, string id, Php::Value data) {
     return response;
 }
 
+string getScreenPlaylist(int device_number)
+{
+    sql::Connection *con;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    string id,html_data="";
+    try {
+        
+        con = General.mysqlConnect(ServerDB);
+        prep_stmt = con->prepareStatement("select * from device_playlist where device_number ="+to_string(device_number));
+        res = prep_stmt->executeQuery();
+        while(res->next())
+        {
+            id = res->getString("playlist_id");
+            html_data+="<div class='nodrop btn btn-block btn-info btn-lg bg-gray playlist-right' id='right-v"+id+"' data-playlist='"+id+"' draggable='true' ondragstart='drag(event)'>";
+            html_data+="<div class='row'>";
+            html_data+="<fieldset>";
+            html_data+="<span class='float-left mr-3 hidden' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span>";
+            html_data+="<span class='float-left mr-3' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></span>";
+            html_data+="<label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label>";
+            html_data+="</fieldset>";
+            html_data+="</div>";
+            html_data+="<div class='row center'>";
+            html_data+="<fieldset class='pl-options mt-2 hidden' id='pl-options-"+id+"'>";
+            html_data+="<p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Time'></p>";
+            html_data+="<p><span class='float-left'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label>";
+            html_data+="</span></p></br>";
+            html_data+="<p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p>";
+            html_data+="</fieldset>";
+            html_data+="</div>";
+            html_data+="<details class='small'>";
+            html_data+="<summary class='playlist-details-div' data-id='"+id+"'>View List</summary>";
+            html_data+="<div id ='playlist-details-"+id+"' class='playlist-details d-inline'>";
+            html_data+="</div>";
+            html_data+="</details>";
+            html_data+="</div>";
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    } catch (const std::exception& e) {
+        writeException("getScreenPlaylist", e.what());
+    }
+    return html_data;
+}
+
 void manageScreenPlaylist(Php::Value data)
 {
     sql::Connection *con;
     sql::PreparedStatement *prep_stmt;
     sql::ResultSet *res;
     string html_data="";
-    string device_number = data["device_id"];
-    string id;
+    int device_number = data["device_id"];
+    string device_name = data["device_name"];
+    string id,playlist_excluded="";
     html_data +="<div id='playlist-div' class='row card card-body'>";
                  
     html_data +="<div class='row  mb-3'><div class='col h5'>";
-    html_data +="<label for=''>Drag the videos in sequence to create the playlist</label>";
+    html_data +="<label for=''>Select Playlist for "+device_name+"</label>";
     html_data +="</div></div>";
     html_data +="<div class='row  mb-1'>";
     html_data +="<div class='col'><h4>PLAYLIST LIBRARY</h4></div>";
@@ -754,7 +795,23 @@ void manageScreenPlaylist(Php::Value data)
     try {
         
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("select * from playlist_settings");
+        prep_stmt = con->prepareStatement("Select GROUP_CONCAT(playlist_id) as playlist_id from device_playlist where device_number=?");
+        prep_stmt->setInt(1,device_number);
+        res = prep_stmt->executeQuery();
+        if(res->next())
+        {
+            playlist_excluded = res->getString("playlist_id");
+        }
+        delete res;
+        if(playlist_excluded=="")
+        {
+            prep_stmt = con->prepareStatement("select * from playlist_settings where playlist_status=1");
+        }
+        else
+        {
+            prep_stmt = con->prepareStatement("select * from playlist_settings where id not in ("+playlist_excluded+") and playlist_status=1");
+        }
+        
         res = prep_stmt->executeQuery();
         while(res->next())
         {
@@ -779,40 +836,14 @@ void manageScreenPlaylist(Php::Value data)
         writeException("manageScreenPlaylist", e.what());
     }
 
-    /*html_data +="<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id='v1' data-playlist='1' draggable='true' ondragstart='drag(event)'>";
-    html_data +="<div class='row'>";
-    html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-1'><input type='checkbox' class = 'playlist-checkbox' id = 'c1' data-id='1' value='p1'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-1'><button class='btn btn-danger btn-sm del-playlist' value='delete1' data-id='1'><i class='fas fa-minus'></i></button></span><label id = 'l1'>Playlist 1</label></fieldset>";
-html_data +="</div>";
-    html_data +="<div class='row center'>";
-    html_data +="<fieldset class='pl-options mt-2' id='pl-options-1'><p><input type='text' id='date-p1' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Time'></p><p><span class='float-left'><input type='checkbox' id='repeat-p1'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add1' data-id='1'><i class='fas fa-plus'></i></button></span></p></fieldset>";
-    html_data +="</div>";
-    html_data +="<details class='small'>";
-    html_data +="<summary class='playlist-details-div' data-id='1'>View List</summary>";
-    html_data +="<div id ='playlist-details-1' class='playlist-details d-inline'></div>";
-    html_data +="</details>";
-    html_data +="</div>";
-
-    html_data +="<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id='v2' data-playlist='2' draggable='true' ondragstart='drag(event)'>";
-    html_data +="<div class='row'>";
-    html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-2'><input type='checkbox' class = 'playlist-checkbox' id = 'c2' data-id='2' value='p2'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-2'><button class='btn btn-danger btn-sm del-playlist' value='delete2' data-id='2'><i class='fas fa-minus'></i></button></span><label id = 'l2'>Playlist 2</label></fieldset>";
-    html_data +="</div>";
-    html_data +="<div class='row center'>";
-    html_data +="<fieldset class='pl-options mt-2' id='pl-options-2'><p><input type='text' id='date-p2' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Time'></p><p><span class='float-left'><input type='checkbox' id='repeat-p2'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add2' data-id='2'><i class='fas fa-plus'></i></button></span></p></fieldset>";
-    html_data +="</div>";
-    html_data +="<details class='small'>";
-    html_data +="<summary class='playlist-details-div' data-id='2'>View List</summary>";
-    html_data +="<div id ='playlist-details-2' class='playlist-details d-inline'></div>";
-    html_data +="</details>";
-    html_data +="</div>";
-    html_data +="</div>";*/
-
     html_data +="</div><div class='p-2'>";
     html_data +="</div>";
 
     html_data +="<div class='col form-group form-control scroll-smooth' id='right' ondrop='drop(event)' ondragover='allowDrop(event)'>";
+    html_data +=getScreenPlaylist(device_number);
     html_data +="</div>";                   
     html_data +="</div>"; 
-    html_data +="<input type='submit' class='signUp btn btn-block btn-info mt-2 btn-lg' value='Save' id='save-screen-playlist' data-screen='"+device_number+"'>";
+    html_data +="<input type='submit' class='signUp btn btn-block btn-info mt-2 btn-lg' value='Save' id='save-screen-playlist' data-screen='"+to_string(device_number)+"'>";
     html_data +="</div>";
     Php::out<<html_data<<endl;
 
@@ -837,10 +868,10 @@ Php::Value parcxContentManagement(Php::Parameters &params) {
             break;
         case 7:manageScreenPlaylist(data);
             break;
-        case 8:showdevicePlayList(data);
+        case 8:insertScreenPlayList(data);
             break;
         case 9:response = uploadMedia(data);
-            writeLog("Main",toString(response));
+            //writeLog("Main",toString(response));
             break;
         case 10:showMediaLibraryList(data);
             break;

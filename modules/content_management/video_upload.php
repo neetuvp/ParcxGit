@@ -37,7 +37,7 @@ include('../../includes/sidebar.php');
                     <div class="row">
                         <div class="card-body col form-group">
                             <label for="">Upload File</label>
-                            <input type="file" name="file" id="file" accept ="image/png, image/gif, image/jpeg,video/mp4,video/avi" required=""/> 
+                            <input type="file" name="file" id="file" required=""/> <!--accept ="image/png, image/gif, image/jpeg,video/mp4,video/avi"-->
                         </div>
                     </div>                         
                     <input class="btn btn-block btn-info mt-2 btn-lg" onclick="upload_3()" type="submit" name="submit" value="Submit" />                
@@ -83,7 +83,8 @@ include('../../includes/sidebar.php');
 
         <div class="block-data col-md-12" data-status="overview">
                 <div class="card" >               
-                    <div class="card-body" id="div-RecordsTable">     
+                    <div class="card-body" id="div-RecordsTable">
+                        
                         <table id="RecordsTable" class="table  table-bordered"> 
                             <?php
                             $data["task"] = 10;
@@ -120,7 +121,7 @@ function setFileInfo() {
     {
         var file_name = file_data.name;
         var extension = file_name.split('.').pop();
-        if(extension=="mp4"||extension=="avi" || extension=="MP4"||extension=="AVI" )
+        if(extension=="mp4"||extension=="avi" || extension=="MP4"||extension=="AVI" ||extension=="webm"||extension=="WEBM" )
         files = this.files;
         //myVideos=files;
         var video = document.createElement('video');
@@ -253,9 +254,18 @@ $(document).on("click", ".play-video", function ()
         var path = $(this).attr("data-path");
         var type = $(this).attr("data-type");
         $("#view_video_modal").modal('show');
-        if(type.includes("video"))
+        if(type.includes("video") || type.includes("audio"))
         {
-            $(".modal-body-view-video").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='video/mp4'></video>");
+            if(type=="video/x-msvideo")
+            {
+                $(".modal-body-view-video").html("<object data="+path+"> <param name='src' value="+path+" /> <embed type='video/x-ms-wm' src="+path+"></embed> </object>");
+                $("#view_video_modal").modal('hide');
+            }
+            else
+            {
+                $(".modal-body-view-video").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='"+type+"'></video>");
+                
+            }
         }
         else 
         {

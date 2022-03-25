@@ -401,7 +401,7 @@ body {
         ev.preventDefault();
     }
     
-    $(".playlist-edit").click(function (event) {        
+    $(document).on("click", ".playlist-edit", function (){          
         id = $(this).parent('td').parent('tr').data('id');
         var data = {};
         data["id"] = id;
