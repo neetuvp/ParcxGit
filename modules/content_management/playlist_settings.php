@@ -2,9 +2,10 @@
 $page_title = "Playlist";
 
 include('../../includes/header.php');
+
 //$access = checkPageAccess("playlist");
 ?>
-
+<script src="<?=URL?>plugins/jQueryUI/jquery-ui.js"></script>
 <div class="navbar-has-tablink">
 
     <?php
@@ -24,6 +25,7 @@ include('../../includes/header.php');
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
+
 <!--<style>
 * {
   box-sizing: border-box;
@@ -78,7 +80,7 @@ body {
 
 </style>-->
 <!--View Playlist Modal  -->
-<div class="modal fade text-dark" id="view_playlist_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none; z-index:1055">
+<div class="modal fade text-dark" id="view_playlist_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none; z-index:2000">
     <div class="modal-dialog" role="document" id="edit-content">
         <div class="modal-content">
             <div class="modal-header">
@@ -99,9 +101,9 @@ body {
 
 <!--Add Playlist Modal  -->
 <!-- Modal -->
-<div class="modal fade" id="add-edit-playlist-modal"  tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+<div class="modal fade" id="add-edit-playlist-modal"  tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="z-index: 1999;">
+    <div class="modal-dialog modal-xl" style="width:1000px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Add/Edit Playlist</h5>
@@ -126,7 +128,7 @@ body {
                         </div> 
                         
                     </div>  
-                    <div id="customer-div" class="row card card-body">
+                    <div id="customer-div" class="row card">
 
                         <div class="row  mb-3">
                             <div class="col h5">
@@ -138,18 +140,15 @@ body {
                             <div class="col p-2"></h4></div>
                             <div class="col"><h4>PLAYLIST</h4></div>
                         </div>
-                        <div class="row">
-                            <div class="col form-group form-control scroll-smooth" id="left" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="row dragdrop ">
+                            <div class="col connectedSortable overflow-hidden" id="left">
                                 <?php
                                     $data["task"] = 4;
                                     parcxContentManagement($data);
                                 ?> 
                             </div>
-                            <div class="p-2" >
-
-                            </div>
-
-                            <div class="col form-group form-control scroll-smooth" id="right" ondrop="drop(event)" ondragover="allowDrop(event)">
+                            
+                            <div class="col connectedSortable overflow-hidden" id="right">
 
                             </div>                    
                         </div>   
@@ -267,7 +266,7 @@ body {
                 var video_list="";
                 $('#right > div').map(function() {
                     div_id = this.id;
-                    div_id = div_id.substring(1)
+                    div_id = div_id.substring(1);
                     video_list = video_list+div_id+",";
                 });
                 var l = video_list.length;
@@ -275,7 +274,7 @@ body {
                 data["video_list"] = video_list;
                 data["task"] = "5";
                 var jsondata = JSON.stringify(data);
-                //console.log(jsondata);
+                console.log(jsondata);
                 $.post("../../modules/ajax/cms.php", jsondata, function (result) {
                     //console.log(result);
                     if (result === "Successfull")
@@ -285,6 +284,29 @@ body {
                 });
             }
         });
+        
+         /*$( "#right" ).sortable({
+            revert: true
+          });
+          
+          
+          
+          
+          $( "#play-video" ).draggable({
+            connectToSortable: "#right",
+            helper: "clone",
+            revert: "invalid"
+          });*/
+        
+        $( "#left, #right" ).sortable({
+            //items: ".play-video",
+            //revert: true,
+            helper: 'clone',
+            appendTo: 'body',
+            zIndex: 10000,
+            cursor: "move",
+            connectWith: ".connectedSortable"
+          }).disableSelection();
      });
 
 
@@ -374,13 +396,13 @@ body {
         }
     }
     
-    function drag(ev) {
+    /*function drag(ev) {
         //console.log(ev.target.id);
         ev.dataTransfer.setData("div", ev.target.id);
     }
     
     function drop(ev) {
-        var _target = $("#" + ev.target.id);
+        /*var _target = $("#" + ev.target.id);
         if ($(_target).hasClass("nodrop")) {
             ev.preventDefault();
             var src = document.getElementById(ev.dataTransfer.getData("div"));
@@ -389,17 +411,18 @@ body {
 
             ev.currentTarget.replaceChild(src, tgt);
             srcParent.appendChild(tgt);
-        } else {
-            ev.preventDefault();
+        } else {*/
+          /*  ev.preventDefault();
             var data = ev.dataTransfer.getData("div");
-            ev.target.appendChild(document.getElementById(data));
-        }
+            ev.target.appendChild(document.getElementById(data));*/
+        //}
         
-    }
+    //}
 
-    function allowDrop(ev) {
+   /* function allowDrop(ev) {
         ev.preventDefault();
     }
+    */
     
     $(document).on("click", ".playlist-edit", function (){          
         id = $(this).parent('td').parent('tr').data('id');

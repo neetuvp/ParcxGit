@@ -15,7 +15,7 @@
 #define MANDATORY "Mandatory"
 #define MAXLENGTH "Maximum Length Exceeded"
 #define CONSTRAINT "Invalid Character"
-#define MediaPath "/parcx/Media/Videos"
+#define MediaPath "/parcx/Media/cms"
 using namespace std;
 GeneralOperations General;
 Validation validation;
@@ -119,9 +119,9 @@ void showPlayListSettings(Php::Value data)
 
         con= General.mysqlConnect(ServerDB); 
         stmt=con->createStatement();
-        res=stmt->executeQuery("select * from playlist_settings");
+        res=stmt->executeQuery("select * from playlist_settings order by playlist_status desc");
         if(res->rowsCount()>0)
-            {
+        {
             //Php::out<<"<table class='table table-blue'>"<<endl;
             Php::out << "<thead class='thead-light'>" << std::endl;
             Php::out<<"<tr>"<<endl;
@@ -133,9 +133,9 @@ void showPlayListSettings(Php::Value data)
            
             Php::out<<"</tr>"<<endl;	
             Php::out << "</thead>" << std::endl;		
-            }
+        }
         while(res->next())
-            {
+        {
             Php::out<<"<tr data-id='"<<res->getString("id")<<"'>"<<endl;                       
             Php::out<<"<td>"+res->getString("playlist_name")+"</td>"<<endl;
             Php::out<<"<td>"+res->getString("playlist_description")+"</td>"<<endl;            
@@ -157,7 +157,7 @@ void showPlayListSettings(Php::Value data)
             }
             Php::out << "</td>"<< std::endl;
             Php::out<<"</tr>"<<endl;	
-            }
+        }
         //Php::out<<"</table>"<<endl;	
         delete res;    
         delete stmt;
@@ -209,52 +209,83 @@ void getPlaylistVideos(Php::Value data)
         int id = data["id"];
         int type = data["type"]; //type =1 for view else edit
         int i=0;
+        string width = "100";
         con= General.mysqlConnect(ServerDB); 
-        prep_stmt=con->prepareStatement("SELECT *, (SELECT GROUP_CONCAT(media_label) FROM media_library WHERE FIND_IN_SET(id, playlist_videos)) AS media_label,(SELECT GROUP_CONCAT(media_name) FROM media_library WHERE FIND_IN_SET(id, playlist_videos)) AS media_name FROM playlist_settings where id=?");
+        //prep_stmt=con->prepareStatement("SELECT *, (SELECT GROUP_CONCAT(media_label) FROM media_library WHERE FIND_IN_SET(id, playlist_videos)) AS media_label,(SELECT GROUP_CONCAT(media_name) FROM media_library WHERE FIND_IN_SET(id, playlist_videos)) AS media_name FROM playlist_settings where id=?");
+        prep_stmt=con->prepareStatement("SELECT playlist_videos FROM playlist_settings where id=?");
         prep_stmt->setInt(1,id);
         res=prep_stmt->executeQuery();
         
         if(res->next())
         {
-           // Php::out<<"<table width='100%' class='jspdf-table'><tbody class='table-view'>"<<endl;
-         
-            vector<string>video_array = split_videolist(res->getString("media_label"),','); //video labels
-            vector<string>video_name = split_videolist(res->getString("media_name"),','); //video name
-            if(type==1) //for view
-            {
-                if(res->getString("playlist_videos")=="")
+            string ids="";   
+            ids = res->getString("playlist_videos");
+           // vector<string>video_array = split_videolist(res->getString("media_label"),','); //video labels
+           // vector<string>video_name = split_videolist(res->getString("media_name"),','); //video name
+           
+           
+            
+                if(ids=="")
                 {
                     Php::out<<"<div class='row'><div class='col'>Playlist is empty</div></div>"<<endl;
                 }
                 else
                 {
-                    while(i<(signed)video_array.size())
+                    prep_stmt = con->prepareStatement("SELECT * from media_library where id in("+ids+") ORDER BY FIND_IN_SET(id, '"+ids+"')");
+                    res=prep_stmt->executeQuery();
+                    while(res->next())
                     {
-                        Php::out<<"<div class='btn btn-block btn-lg bg-gray'>"<<endl;
-                        //Php::out<<video_array[i]<<endl;
+                        if(type==1) //for view
+                        {
+                            Php::out<<"<div class='btn btn-block btn-lg bg-gray'>"<<endl;
+                            width="150";
+                            //Php::out<<video_array[i]<<endl;    
+                        }
+                        else//for edit view
+                        {
+                            Php::out<<"<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id = v"+res->getString("id")+" data-path='"+string(MediaPath)+"/"+res->getString("media_name")+"'>"<<endl;
+                            width="100";
+                        }
+
                         Php::out<<"<div class='d-flex justify-content-between'>";
-                        Php::out<<"<div><video width='150' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+video_name[i]+"#t=0.5' type='video/mp4'></video></div>"<<endl;
-                        Php::out<<"<div>"<<video_array[i]<<"</div>"<<endl;
+                        //Php::out<<"<div><video width='150' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='"+res->getString("media_type")+"'></video></div>"<<endl;
+                        if (res->getString("media_type").find("image") != std::string::npos) {
+                            Php::out<<"<img src='"+string(MediaPath)+"/"+res->getString("media_name")+"'  style='width:"+width+"px'>"<<endl;
+                        }
+                        else if (res->getString("media_type").find("video") != std::string::npos) 
+                        {
+                            if(res->getString("media_type")=="video/mp4")
+                            {
+                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video>"<<endl;
+                            }
+                            else if(res->getString("media_type")=="video/webm")
+                            {
+                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/webm'></video>"<<endl;
+                            }
+                            else if(res->getString("media_type")=="video/ogg")
+                            {
+                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/ogg'></video>"<<endl;
+                            }
+                            else if(res->getString("media_type")=="video/x-msvideo")
+                            {
+                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/avi'></video>"<<endl;
+                               // Php::out<<"<td><object data='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'> <param name='src' value='"+string(MediaPath)+"/"+res->getString("media_name")+"' /> <embed type='video/x-ms-wm' src='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'></embed> </object></td>"<<endl;
+                            }
+
+                        }
+                        else if (res->getString("media_type").find("audio") != std::string::npos) 
+                        {
+                            Php::out<<"<audio style='width: "+width+"px;' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='audio/ogg'></audio>"<<endl;
+                        }
+                        Php::out<<"<div>"<<res->getString("media_label")<<"</div>"<<endl;
                         Php::out<<"</div></div>"<<endl;
                         i++;
 
                     }
                 }
                 
-            }
-            else //for edit
-            {
-                vector<string>video_id = split_videolist(res->getString("playlist_videos"),','); //video ids
-                while(i<(signed)video_array.size())
-                {
-                    Php::out<<"<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id = v"+video_id[i]+" draggable='true' ondragstart='drag(event)' data-path='"+string(MediaPath)+"/"+video_name[i]+"'>"<<endl;
-                    Php::out<<"<div class='d-flex justify-content-between'>";
-                    Php::out<<"<div><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+video_name[i]+"#t=0.5' type='video/mp4'></video></div>"<<endl;
-                    Php::out<<"<div style='word-break: break-all;'>"<<video_array[i]<<"</div>"<<endl;    
-                    Php::out<<"</div></div>"<<endl;
-                    i++;
-                }
-            }
+            
+            
             
         }
         else
@@ -317,9 +348,38 @@ void getVideoslibrary(Php::Value data)
             
             while(res->next())
             {
-                Php::out<<"<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id = v"+res->getString("id")+" draggable='true' ondragstart='drag(event)' data-path='"+string(MediaPath)+"/"+res->getString("media_name")+"'>"<<endl;
+                Php::out<<"<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id = v"+res->getString("id")+" data-path='"+string(MediaPath)+"/"+res->getString("media_name")+"'>"<<endl;
                 Php::out<<"<div class='d-flex justify-content-between'>";
-                Php::out<<"<div><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video></div>"<<endl;
+                //Php::out<<"<div><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video></div>"<<endl;
+                if (res->getString("media_type").find("image") != std::string::npos) {
+                    Php::out<<"<img src='"+string(MediaPath)+"/"+res->getString("media_name")+"'  style='width:100px'>"<<endl;
+                }
+                else if (res->getString("media_type").find("video") != std::string::npos) 
+                {
+                    if(res->getString("media_type")=="video/mp4")
+                    {
+                        Php::out<<"<video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video>"<<endl;
+                    }
+                    else if(res->getString("media_type")=="video/webm")
+                    {
+                        Php::out<<"<video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/webm'></video>"<<endl;
+                    }
+                    else if(res->getString("media_type")=="video/ogg")
+                    {
+                        Php::out<<"<video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/ogg'></video>"<<endl;
+                    }
+                    else if(res->getString("media_type")=="video/x-msvideo")
+                    {
+                        Php::out<<"<video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/avi'></video>"<<endl;
+                       // Php::out<<"<td><object data='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'> <param name='src' value='"+string(MediaPath)+"/"+res->getString("media_name")+"' /> <embed type='video/x-ms-wm' src='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'></embed> </object></td>"<<endl;
+                    }
+
+                }
+                else if (res->getString("media_type").find("audio") != std::string::npos) 
+                {
+                    Php::out<<"<audio style='width: 100px;' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='audio/ogg'></audio>"<<endl;
+                }
+                
                 Php::out<<"<div style='word-break: break-all;'>"<<res->getString("media_label")<<"</div>"<<endl;    
                 Php::out<<"</div></div>"<<endl;
                 	
@@ -439,7 +499,7 @@ void screenList(Php::Value data)
         while(res->next())
         {
             Php::out<<"<tr data-id='"<<res->getString("device_number")<<"'>"<<endl; 
-            Php::out<<"<td><video width='150' controls='controls' preload='metadata'><source src='/parcx/Media/Videos/Video1.mp4#t=0.5' type='video/mp4'></video></td>"<<endl;
+            Php::out<<"<td><video width='150' controls='controls' preload='metadata'><source src='/parcx/Media/cms/Video1.mp4#t=0.5' type='video/mp4'></video></td>"<<endl;
             Php::out<<"<td>"+res->getString("device_number")+"</td>"<<endl;
             Php::out<<"<td>"+res->getString("device_name")+"</td>"<<endl;    
             Php::out<<"<td>"+res->getString("device_ip")+"</td>"<<endl;    
@@ -471,30 +531,47 @@ void insertScreenPlayList(Php::Value data)
         {
         string query_string="";
         sql::Connection *con;
-        sql::PreparedStatement *prep_stmt=NULL;            
+        sql::PreparedStatement *prep_stmt=NULL;    
+        sql::ResultSet *res;
         int device_id = data["device_id"];
         Php::Value playlists = data["playlists"];
         //Php::out<<playlists.size()<<endl;
-        int i=0;
+
         con= General.mysqlConnect(ServerDB); 
+        
+        prep_stmt = con->prepareStatement("Update device_playlist set status = 0 where device_number = ?");
+        prep_stmt->setInt(1,device_id);
+        prep_stmt->executeUpdate();
+        delete prep_stmt;
         for(int j=0;j<playlists.size();j++)
         {
-            if(i==0)
-            {
-                prep_stmt = con->prepareStatement("Delete from device_playlist where device_number = ?");
-                prep_stmt->setInt(1,device_id);
-                prep_stmt->executeUpdate();
-            }
-            i++;
-            
-            query_string = "Insert into device_playlist(device_number,playlist_id,playlist_name,start_date_time,end_date_time,repeat_videos) values (?,?,?,?,?,?)";
-            prep_stmt = con->prepareStatement(query_string);
+            //writeException("insertScreenPlayList","here");
+            prep_stmt = con->prepareStatement("Select playlist_id from device_playlist where device_number = ? and playlist_id = ?");
             prep_stmt->setInt(1,device_id);
             prep_stmt->setInt(2,playlists[j]["id"]);
-            prep_stmt->setString(3,toString(playlists[j]["name"]));
-            prep_stmt->setString(4,toString(playlists[j]["start"]));
-            prep_stmt->setString(5,toString(playlists[j]["end"]));
+            res = prep_stmt->executeQuery();
+            if(res->next())
+            {
+                //writeException("insertScreenPlayList","update");
+                query_string = "Update device_playlist set playlist_name=?,start_date=?,end_date=?,start_time=?,end_time=?,repeat_videos=?,last_updated_date_time=NOW(),status=1 where playlist_id=? and device_number=?";
+            }
+            else
+            {
+                //writeException("insertScreenPlayList","insert");
+                query_string = "Insert into device_playlist(playlist_name,start_date,end_date,start_time=?,end_time=?,repeat_videos,playlist_id,device_number) values (?,?,?,?,?,?)";
+                
+            }
+            
+            prep_stmt = con->prepareStatement(query_string);
+            prep_stmt->setString(1,toString(playlists[j]["name"]));
+            prep_stmt->setString(2,toString(playlists[j]["start_date"]));
+            prep_stmt->setString(3,toString(playlists[j]["end_date"]));
+            prep_stmt->setString(4,toString(playlists[j]["start_time"]));
+            prep_stmt->setString(5,toString(playlists[j]["end_time"]));
             prep_stmt->setInt(6,playlists[j]["repeat"]);
+            prep_stmt->setInt(7,playlists[j]["id"]);
+            prep_stmt->setInt(8,device_id);
+            
             prep_stmt->executeUpdate();
         }
     
@@ -512,7 +589,7 @@ Php::Value uploadMedia(Php::Value data)
 {
     string filename = toString(data["name"]);
     string from = toString(data["from"]);
-    string dest = "../../Media/Videos/"+filename;
+    string dest = "../../Media/cms/"+filename;
     double size = data["size"];
     int error = data["error"];
     string type = toString(data["type"]);
@@ -587,7 +664,7 @@ void showMediaLibraryList(Php::Value data)
 
         con= General.mysqlConnect(ServerDB); 
         stmt=con->createStatement();
-        res=stmt->executeQuery("select * from media_library order by id desc");
+        res=stmt->executeQuery("select * from media_library order by media_status desc");
         if(res->rowsCount()>0)
         {
             //Php::out<<"<table class='table table-blue'>"<<endl;
@@ -730,27 +807,32 @@ string getScreenPlaylist(int device_number)
     sql::Connection *con;
     sql::PreparedStatement *prep_stmt;
     sql::ResultSet *res;
-    string id,html_data="";
+    string id,html_data="",checked="";
     try {
         
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("select * from device_playlist where device_number ="+to_string(device_number));
+        prep_stmt = con->prepareStatement("select * from device_playlist where status = 1 and device_number ="+to_string(device_number)+" order by start_date");
         res = prep_stmt->executeQuery();
         while(res->next())
         {
             id = res->getString("playlist_id");
-            html_data+="<div class='nodrop btn btn-block btn-info btn-lg bg-gray playlist-right' id='right-v"+id+"' data-playlist='"+id+"' draggable='true' ondragstart='drag(event)'>";
+            html_data+="<div class='btn btn-block btn-info btn-lg bg-gray playlist-right' id='v"+id+"' data-playlist='"+id+"' >";
             html_data+="<div class='row'>";
             html_data+="<fieldset>";
             html_data+="<span class='float-left mr-3 hidden' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span>";
-            html_data+="<span class='float-left mr-3' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></span>";
+            html_data+="<span class='float-left mr-3' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></span>";
             html_data+="<label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label>";
             html_data+="</fieldset>";
             html_data+="</div>";
             html_data+="<div class='row center'>";
             html_data+="<fieldset class='pl-options mt-2 hidden' id='pl-options-"+id+"'>";
-            html_data+="<p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Time'></p>";
-            html_data+="<p><span class='float-left'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label>";
+            html_data+="<p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range' value = '"+res->getString("start_date")+" - "+res->getString("end_date")+"'></p>";
+            html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time'  value='"+res->getString("start_time")+"'><input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value='"+res->getString("end_time")+"'></div>";
+            if(res->getInt("repeat_videos")==1)
+                checked = "checked";
+            else
+                checked = "";
+            html_data+="<p><span class='float-left'><input type='checkbox' id='repeat-p"+id+"' "+checked+"><label for=''>Repeat</label>";
             html_data+="</span></p></br>";
             html_data+="<p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p>";
             html_data+="</fieldset>";
@@ -795,7 +877,7 @@ void manageScreenPlaylist(Php::Value data)
     try {
         
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("Select GROUP_CONCAT(playlist_id) as playlist_id from device_playlist where device_number=?");
+        prep_stmt = con->prepareStatement("Select GROUP_CONCAT(playlist_id) as playlist_id from device_playlist where device_number=? and status=1");
         prep_stmt->setInt(1,device_number);
         res = prep_stmt->executeQuery();
         if(res->next())
@@ -816,12 +898,15 @@ void manageScreenPlaylist(Php::Value data)
         while(res->next())
         {
             id = res->getString("id");
-            html_data +="<div class='nodrop btn btn-block btn-info btn-lg bg-gray play-video' id='v"+id+"' data-playlist='"+id+"' draggable='true' ondragstart='drag(event)'>";
+            html_data +="<div class='btn btn-block btn-info btn-lg bg-gray' id='v"+id+"' data-playlist='"+id+"'>";
             html_data +="<div class='row'>";
-            html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></span><label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
-        html_data +="</div>";
+            html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></button><button class='btn btn-info btn-sm edit-playlist ' id='edit"+id+"' data-id='"+id+"'><i class='fas fa-edit'></i></button></span><label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
+            html_data +="</div>";
             html_data +="<div class='row center'>";
-            html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Time'></p><p><span class='float-left'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p></fieldset>";
+            html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range'></p>";
+            html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time' value='' data-id="+id+"><input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value=''  data-id="+id+"></div>";
+            //html_data+="<input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time' value = '"+res->getString("start_time")+"'> <input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value = '"+res->getString("end_time")+"'>";
+            html_data+="<p><span class='float-left mt-1'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p></fieldset>";
             html_data +="</div>";
             html_data +="<details class='small'>";
             html_data +="<summary class='playlist-details-div' data-id='"+id+"'>View List</summary>";
