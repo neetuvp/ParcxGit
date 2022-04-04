@@ -1,0 +1,125 @@
+
+Date :2022-04-03 13:30:07 {"from":"\/opt\/lampp\/temp\/php6ZaKG9","name":"Video11.mp4","size":6726554,"type":"video\/mp4","error":0,"duration":"00:00:14","task":9}
+Date :2022-04-03 13:30:07 Success
+Date :2022-04-03 13:30:07 {"status":200,"message":"Success"}
+Date :2022-04-03 15:13:38 here2
+Date :2022-04-03 15:13:38 
+Date :2022-04-03 15:13:38 {"status":400,"message":null}
+Date :2022-04-03 15:16:39 here2
+Date :2022-04-03 15:16:39 
+Date :2022-04-03 15:16:39 {"status":400,"message":null}
+Date :2022-04-03 15:36:59 Failed
+Date :2022-04-03 15:36:59 {"status":400,"message":"Failed"}
+Date :2022-04-03 15:39:23 Failed
+Date :2022-04-03 15:39:23 {"status":400,"message":"Failed"}
+Date :2022-04-03 15:48:19 here3
+Date :2022-04-03 15:48:19 
+Date :2022-04-03 15:48:19 {"status":400,"message":null}
+Date :2022-04-03 15:49:00 here3
+Date :2022-04-03 15:49:00 
+Date :2022-04-03 15:49:00 {"status":400,"message":null}
+Date :2022-04-03 15:50:31 here3
+Date :2022-04-03 15:50:31 
+Date :2022-04-03 15:50:31 {"status":400,"message":null}
+Date :2022-04-03 16:05:42 here3
+Date :2022-04-03 16:05:42 
+Date :2022-04-03 16:05:42 {"status":400,"message":null}
+Date :2022-04-03 16:22:51 here3
+Date :2022-04-03 16:22:51 null
+Date :2022-04-03 16:23:36 here3
+Date :2022-04-03 16:23:36 null
+Date :2022-04-03 16:30:40 here3
+Date :2022-04-03 16:30:40 {"stage_id":"1","task":3}
+Date :2022-04-03 16:30:40 null
+Date :2022-04-03 16:34:09 here3
+Date :2022-04-03 16:34:09 {"stage_id":"1","task":3}
+Date :2022-04-03 16:34:09 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M1","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 15:20:30"}
+Date :2022-04-03 16:40:43 here3
+Date :2022-04-03 16:40:43 {"stage_id":"1","task":3}
+Date :2022-04-03 16:40:43 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M1","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 15:20:30"}
+Date :2022-04-03 16:42:32 here3
+Date :2022-04-03 16:42:32 {"stage_id":"1","task":3}
+Date :2022-04-03 16:42:32 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M1","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 15:20:30"}
+Date :2022-04-03 16:48:39 here3
+Date :2022-04-03 16:48:39 {"stage_id":"1","task":3}
+Date :2022-04-03 16:48:39 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M1","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 15:20:30"}
+Date :2022-04-03 16:49:32 here3
+Date :2022-04-03 16:49:32 {"stage_id":"1","task":3}
+Date :2022-04-03 16:49:32 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M1","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 15:20:30"}
+Date :2022-04-03 16:50:22 here3
+Date :2022-04-03 16:50:22 {"stage_id":"1","task":3}
+Date :2022-04-03 16:50:22 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M1","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 15:20:30"}
+Date :2022-04-03 16:50:41 here2
+Date :2022-04-03 16:50:41 null
+Date :2022-04-03 16:50:45 here3
+Date :2022-04-03 16:50:45 {"stage_id":"1","task":3}
+Date :2022-04-03 16:50:45 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 16:51:11 {"from":null,"name":null,"size":null,"type":"","error":null,"task":1}
+Date :2022-04-03 16:51:11 "Invalid Extension"
+Date :2022-04-03 16:51:15 here3
+Date :2022-04-03 16:51:15 {"stage_id":"1","task":3}
+Date :2022-04-03 16:51:15 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 16:53:35 here3
+Date :2022-04-03 16:53:35 {"stage_id":"1","task":3}
+Date :2022-04-03 16:53:35 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 16:54:26 {"from":"","name":"DashboardFlickering.mp4","size":0,"type":"","error":3,"task":1}
+Date :2022-04-03 16:54:26 "File Upload Error:3"
+Date :2022-04-03 16:54:30 here3
+Date :2022-04-03 16:54:30 {"stage_id":"1","task":3}
+Date :2022-04-03 16:54:30 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 17:00:41 here3
+Date :2022-04-03 17:00:41 {"stage_id":"1","task":3}
+Date :2022-04-03 17:00:41 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 17:01:08 {"from":"","name":"SampleVideo_1280x720_1mb.mp4","size":0,"type":"","error":3,"task":1}
+Date :2022-04-03 17:01:08 "File Upload Error:3"
+Date :2022-04-03 17:06:51 here3
+Date :2022-04-03 17:06:51 {"stage_id":"1","task":3}
+Date :2022-04-03 17:06:51 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 17:07:53 here3
+Date :2022-04-03 17:07:53 {"stage_id":"1","task":3}
+Date :2022-04-03 17:07:53 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 17:26:32 here3
+Date :2022-04-03 17:26:32 {"stage_id":"1","task":3}
+Date :2022-04-03 17:26:32 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 17:29:13 here3
+Date :2022-04-03 17:29:13 {"stage_id":"2","task":3}
+Date :2022-04-03 17:29:13 null
+Date :2022-04-03 17:29:23 here3
+Date :2022-04-03 17:29:23 {"stage_id":"3","task":3}
+Date :2022-04-03 17:29:23 null
+Date :2022-04-03 17:33:04 here3
+Date :2022-04-03 17:33:04 {"stage_id":"1","task":3}
+Date :2022-04-03 17:33:04 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 17:33:34 here3
+Date :2022-04-03 17:33:34 {"stage_id":"1","task":3}
+Date :2022-04-03 17:33:34 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 18:13:21 here3
+Date :2022-04-03 18:13:21 {"stage_id":"1","task":3}
+Date :2022-04-03 18:13:22 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 22:57:01 here3
+Date :2022-04-03 22:57:01 {"stage_id":"1","task":3}
+Date :2022-04-03 22:57:01 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 23:37:14 here3
+Date :2022-04-03 23:37:14 {"stage_id":"1","task":3}
+Date :2022-04-03 23:37:14 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 23:38:10 "Failed"
+Date :2022-04-03 23:40:40 here3
+Date :2022-04-03 23:40:40 {"stage_id":"1","task":3}
+Date :2022-04-03 23:40:40 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 23:41:16 {"from":null,"name":null,"size":null,"type":"","error":null,"task":1}
+Date :2022-04-03 23:41:16 "Invalid Extension"
+Date :2022-04-03 23:43:28 here3
+Date :2022-04-03 23:43:28 {"stage_id":"1","task":3}
+Date :2022-04-03 23:43:28 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 23:43:47 {"from":"\/opt\/lampp\/temp\/phpPg6uQi","name":"SampleVideo_1280x720_1mb.mp4","size":1055736,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-03 23:43:47 "Success"
+Date :2022-04-03 23:48:01 here3
+Date :2022-04-03 23:48:01 {"stage_id":"1","task":3}
+Date :2022-04-03 23:48:01 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 23:48:46 {"from":"","name":"DashboardFlickering.mp4","size":0,"type":"","error":3,"task":1}
+Date :2022-04-03 23:48:46 "File Upload Error:3"
+Date :2022-04-03 23:51:41 here3
+Date :2022-04-03 23:51:41 {"stage_id":"1","task":3}
+Date :2022-04-03 23:51:41 {"id":"1","stage_id":"1","bg_video_file":"","message_line1":"M11","message_line2":"M2","message_line3":"M3","description":"Description","animation_type":"","animation_file":"","last_updated_date_time":"2022-04-03 16:50:41"}
+Date :2022-04-03 23:52:02 {"from":"\/opt\/lampp\/temp\/phprmxKbY","name":"SampleVideo_1280x720_1mb.mp4","size":1055736,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-03 23:52:02 "Success"

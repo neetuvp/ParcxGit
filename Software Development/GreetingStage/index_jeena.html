@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>PARCX ADNOC - Test Greeting Screen </title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="css/styles.css" rel="stylesheet" />
+        <script src="js/jquery-3.5.0.js"></script>
+        <!-- <script src="https://cdnjs.com/libraries/lottie-web" type="text/javascript"></script> -->
+        <script src="js/lottie-player.js"></script>
+        <!-- <script src="PortCommunication/server.js"></script> -->
+
+    </head>
+    <body>
+        
+        <!-- The video -->
+        <div class="row" id="myVideo">
+        <video autoplay loop muted id="myVideo"> <source src="assets/pump-demo.mp4" type="video/mp4"> </video>
+        </div>
+        
+        <!-- Navigation-->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-bottom">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="#!">Simulator HTML</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarResponsive">
+                    <ul class="navbar-nav ml-auto">
+                        <li id="Default" class="nav-item active"><a class="nav-link" href="#!">Default</a></li>
+                         <li  id="VehicleArrives" class="nav-item"><a class="nav-link" href="#!">Vehicle Arrives</a></li>
+                        <li id="Fueling" class="nav-item"><a class="nav-link" href="#!" >Pump Active</a></li>
+                        <li id="Advertising" class="nav-item"><a class="nav-link" href="#!">Advertising</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#!">LottieTest</a></li>
+                 
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page Content-->
+        <section>
+              
+                <div class="row gx-4 gx-lg-5 MessageArea">                                      
+                    <div class="ContentArea">                        
+                        <div class="row">                               
+                            <div class="TextContent display-1"> 
+                                <div class="icon"><img src="assets/location.png" height="84" width="64" alt="location icon"/></div> 
+                               TEST STATION (110)
+                            </div>                                                   
+                        </div> <!-- Row -->                           
+                        <div class="row">
+                            <div class="row"><div id="PumpName">PUMP 1 </div> </div>
+                        </div> <!--- Row-->                                              
+                    </div>
+                    <div class="row ClimateArea display-2">
+                        10:10 AM Wednesday , Feb 23 | :;
+                    </div>
+                  
+                </div>
+          
+         
+            <div class="LottieFileTest">
+                <div style="width:1067px;height:600px" class="lottie" data-animation-path="assets/plane.json" data-anim-loop="true" data-name="ninja"></div>
+                
+            </div>
+          
+            
+        </section>
+        <!-- Bootstrap core JS-->
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+        
+        <script type="text/javascript">
+
+        var stage_data;        
+    
+    $(document).ready(function(){ 
+        
+        getDetails();
+
+        function getDetails()
+            {
+            $.get("ajax/getCmsContent.php", function (result)
+                {               
+                stage_data=JSON.parse(result);               
+                });
+            }
+        
+        
+    $("#Fueling").click(function() {
+        var title = $('.title').html();
+        var desc = $('.description').html();
+        $('.ContentArea').hide();            
+        if(stage_data["stage_3"]["image_type"]=="lottie")
+            $('.ContentArea').html('<lottie-player autoplay="true" loop="" src="assets/'+stage_data["stage_3"]["image"]+'" id="jsk74" speed="1" class="lottieanimation" style="width: 100%; height: 150px; overflow: hidden; margin: auto; cursor: pointer; background: rgba(0, 0, 0, 0) none repeat scroll 0% 0%;" background="transparent"></lottie-player>');
+        else
+            $('.ContentArea').html('<img src="assets/'+stage_data["stage_3"]["image"]+'">');
+        $( '.ContentArea' ).fadeIn( 3000 );
+       
+    });
+    
+      $("#VehicleArrives").click(function() {
+        var title = $('.title').html();
+        var desc = $('.description').html();
+        $('#myVideo').html('<video autoplay muted id="myVideo"> <source src="assets/'+stage_data["stage_2"]["video"]+'" type="video/mp4"> </video>');        
+        $('.MessageArea').hide();
+        var message='<div class="ContentArea"><div class="row">';
+        message+='<div class="TextContent display-1 LargeText">'+stage_data["stage_2"]["message_1"]+'</div>';
+        $('.MessageArea').html(message);        
+        $('.MessageArea' ).fadeIn( 2000 );       
+        $("#myVideo video")[0].load();
+        $("#myVideo video")[0].play();
+    });
+        
+        
+        //Default Standby screen 
+       $("#Default").click(function() {     
+       
+       // hide the message
+       $( ".MessageArea" ).fadeOut( 500 );
+        
+        //hide the video
+        setTimeout(function(){
+         $( "#myVideo" ).fadeOut( 500 );
+         },1000);
+         
+          setTimeout(function(){
+        
+        $('#myVideo').html('<video autoplay loop muted id="myVideo"> <source src="assets/'+stage_data["stage_1"]["video"]+'" type="video/mp4"> </video>');
+          $("#myVideo video")[0].load();        
+         },1500);
+         
+        
+        //change to default video
+        setTimeout(function(){        
+          $("#myVideo video")[0].play();
+          $('#myVideo' ).fadeIn( 500 );    
+           
+         },2000);
+        
+        
+        //show default timeout message        
+        setTimeout(function(){     
+                 
+        var message='<div class="ContentArea"><div class="row">';
+        message+='<div id="TextTitle" class="TextContent display-1"> <div class="icon">';           
+        message+='<img src="assets/location.png" height="84" width="64" alt="location icon"/></div>'+stage_data["stage_1"]["message_1"]+'</div>       </div>';
+        message+='<div class="row"><div id="PumpName">'+stage_data["stage_1"]["message_2"]+'</div> </div>';                          
+        message+='<div class="row ClimateArea display-2" id="ClimateInfo">'+stage_data["stage_1"]["message_3"]+'</div>';   
+        $('.MessageArea').html(message);
+        $('#TextTitle').hide();
+        $('#PumpName').hide(); 
+        $('#ClimateInfo').hide();
+        $('.MessageArea' ).fadeIn( 500 );              
+        },3000);   
+        
+        
+         setTimeout(function(){
+        $('.TextContent' ).fadeIn( 500 );
+      
+         },4000);
+        
+         setTimeout(function(){       
+        $('#PumpName' ).fadeIn( 500 );
+         },4500);
+        
+         setTimeout(function(){       
+        $('#ClimateInfo' ).fadeIn( 500 );
+         },5000);
+         
+         });
+    
+    
+    //Show the advertising 
+    $("#Advertising").click(function() {
+     
+      // hide the message
+       $( ".MessageArea" ).fadeOut( 1000 );
+        
+        //hide the video
+        setTimeout(function(){
+        $('.MessageArea').hide();  
+        $('.MessageArea').html('');  
+         $( "#myVideo" ).fadeOut( 1000 );
+         },2000);
+        
+        //change to default video
+        setTimeout(function(){
+          $('#myVideo').html('<video autoplay loop muted id="myVideo"> <source src="assets/'+stage_data["stage_4"]["video"]+'" type="video/mp4"> </video>');
+          $("#myVideo video")[0].load();
+          $("#myVideo video")[0].play();
+           $('#myVideo' ).fadeIn( 500 );       
+         },3000);
+     
+
+    }); // End advertising
+          
+    
+    
+});
+    
+    </script>
+        
+        
+    </body>
+</html>
+
+    

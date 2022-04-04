@@ -558,7 +558,7 @@ void insertScreenPlayList(Php::Value data)
             else
             {
                 //writeException("insertScreenPlayList","insert");
-                query_string = "Insert into device_playlist(playlist_name,start_date,end_date,start_time=?,end_time=?,repeat_videos,playlist_id,device_number) values (?,?,?,?,?,?)";
+                query_string = "Insert into device_playlist(playlist_name,start_date,end_date,start_time,end_time,repeat_videos,playlist_id,device_number) values (?,?,?,?,?,?,?,?)";
                 
             }
             
@@ -900,7 +900,7 @@ void manageScreenPlaylist(Php::Value data)
             id = res->getString("id");
             html_data +="<div class='btn btn-block btn-info btn-lg bg-gray' id='v"+id+"' data-playlist='"+id+"'>";
             html_data +="<div class='row'>";
-            html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></button><button class='btn btn-info btn-sm edit-playlist ' id='edit"+id+"' data-id='"+id+"'><i class='fas fa-edit'></i></button></span><label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
+            html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></button></span><label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
             html_data +="</div>";
             html_data +="<div class='row center'>";
             html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range'></p>";
