@@ -60,7 +60,7 @@ int* GeneralOperations::differenceDateTime(string date1,string date2,string form
 {    
 	static int arr[5];
 	int n,totalseconds;  
-    int day=0,hour=0,minutes=0,seconds=0;  
+        int day=0,hour=0,minutes=0,seconds=0;  
 	struct tm tm;
 	strptime(date1.c_str(),format.c_str(),&tm);
 	time_t t1 =mktime(&tm);
@@ -68,10 +68,10 @@ int* GeneralOperations::differenceDateTime(string date1,string date2,string form
 	time_t t2 =mktime(&tm);
 	n =difftime(t1,t2);
     totalseconds = n;   
-    if(n>0)    
+    if(difftime(t1,t2)>0)    
         {
-        day = n / (24 * 3600); 
-        n = n % (24 * 3600); 	
+        day = difftime(t1,t2) / (24 * 3600);         
+        n=difftime(t1,t2)-(day*24*3600);
         hour = n / 3600; 
         n %= 3600; 	
         minutes = n / 60 ; 
@@ -111,7 +111,7 @@ Php::Value GeneralOperations::getLabels(string lang,string label)
         sql::ResultSet *res; 
         GeneralOperations g;
         con = g.mysqlConnect(ServerDB);
-	stmt = con->createStatement();
+	    stmt = con->createStatement();
         
         res=stmt->executeQuery(query);
         
@@ -151,20 +151,20 @@ Php::Value GeneralOperations::getLabels(string lang,string label)
 
 
 Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
-{
+    {
     string lang=data["language"];  
     int page=data["page"];                
     string label=data["label"];    
     if(page>0)
-    {
+        {
         string reportlabels="choose_datetime_range,view_report,export,export_to_excel,export_to_pdf,logout,search,entries_label,info_label,previous,next,";
         switch(page)
-        {
+            {
             case 1://"watchdog_device_alarms"
                     label=reportlabels+"watchdog_device_alarms,select_severity,low,high,medium,all_devices,select_devices";
                     break;
             case 2 ://payment_transactions
-                label=reportlabels+"all_validation,select_validation,payment_transactions,detailed_payment,receipt_details,close,print,tax_invoice,cash,credit_card,parking_fee,lost_ticket,discount,grace_period,product_sales,all_devices,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount";
+                label=reportlabels+"all_validation,select_validation,payment_transactions,detailed_payment,receipt_details,close,print,tax_invoice,cash,credit_card,parking_fee,lost_ticket,discount,grace_period,product_sales,all_devices,select_devices,all_carparks,select_carparks,all_category,select_category,all_payment,select_payment,all_discount,select_discount,duplicate";
                     break;
             case 3 ://revenue_summary
                 label = reportlabels+"earnings_by_device,vat_amount,reservation_amount,earnings,total_revenue,parking_fee,discount_amount,product_sale_amount,lost_fee,sunday,monday,tuesday,wednesday,thursday,friday,saturday,revenue_report,all_carparks,select_carparks,select_days,all_days";
@@ -245,7 +245,8 @@ Php::Value GeneralOperations::getApplicationLabels(Php::Value data)
             case 28 ://user activity
                 label=reportlabels+"user_activity,all_operators,select_operators";
                     break;
-        }
-    }
-    return  getLabels(lang,label);
+
 }
+        }
+    return  getLabels(lang,label);
+    }

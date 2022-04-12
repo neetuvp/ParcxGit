@@ -1,0 +1,289 @@
+
+Date :2022-04-05 18:09:33 In Get Details
+Date :2022-04-05 18:09:33 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:09:33 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:09:33 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71342615_Video2 (1).mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 17:23:35"}
+Date :2022-04-05 18:09:53 In Upload File
+Date :2022-04-05 18:09:53 {"from":"\/opt\/lampp\/temp\/php1BJaVH","name":"Video11.mp4","size":6726554,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-05 18:09:53 {"status":200,"message":"Success","file_name":"71345393_Video11.mp4"}
+Date :2022-04-05 18:09:53 In Update Details
+Date :2022-04-05 18:09:53 Request:{"stage_id":"1","schedule":1,"title":"Stage 1-Morning","description":"Description","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","timeout":"0","bg_file":"71345393_Video11.mp4","animation_file":"71342615_9744-sample-animation.json","animation_type":"application/json","task":2}
+Date :2022-04-05 18:09:53 "Success"
+Date :2022-04-05 18:09:59 In Get Details
+Date :2022-04-05 18:09:59 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:09:59 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:09:59 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:10:06 In Get Details
+Date :2022-04-05 18:10:06 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:10:06 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:10:06 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:12:42 In Get Details
+Date :2022-04-05 18:12:42 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:12:42 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:12:42 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:13:51 In Get Details
+Date :2022-04-05 18:13:51 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:13:51 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:13:51 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:40:54 In Get Details
+Date :2022-04-05 18:40:54 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:40:54 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:40:54 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:41:02 In Get Details
+Date :2022-04-05 18:41:02 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:41:02 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:41:02 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:41:07 In Get Details
+Date :2022-04-05 18:41:07 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:41:07 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:41:07 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:42:52 In Get Details
+Date :2022-04-05 18:42:52 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:42:52 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:42:52 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 18:43:36 In Get Details
+Date :2022-04-05 18:43:36 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:43:36 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 18:43:36 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:23:22 In Get Details
+Date :2022-04-05 19:23:22 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:23:22 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:23:22 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:23:32 In Get Details
+Date :2022-04-05 19:23:32 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:23:32 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:23:32 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:24:45 In Get Details
+Date :2022-04-05 19:24:45 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:24:45 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:24:45 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:32:23 In Get Details
+Date :2022-04-05 19:32:23 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:32:23 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:32:23 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:35:04 In Get Details
+Date :2022-04-05 19:35:04 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:35:04 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:35:04 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:36:22 In Get Details
+Date :2022-04-05 19:36:22 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:36:22 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:36:22 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:38:19 In Get Details
+Date :2022-04-05 19:38:19 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:38:19 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:38:19 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:49:55 In Get Details
+Date :2022-04-05 19:49:55 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:49:55 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:49:55 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:51:08 In Get Details
+Date :2022-04-05 19:51:08 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:51:08 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:51:09 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:52:35 In Get Details
+Date :2022-04-05 19:52:35 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:52:35 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:52:35 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:55:22 In Get Details
+Date :2022-04-05 19:55:22 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:55:22 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:55:22 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 19:56:11 In Get Details
+Date :2022-04-05 19:56:11 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:56:11 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 19:56:11 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 20:00:34 In Get Details
+Date :2022-04-05 20:00:34 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:00:34 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:00:34 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71342615_9744-sample-animation.json","timeout_period":"0","last_updated_date_time":"2022-04-05 18:09:53"}
+Date :2022-04-05 20:01:02 In Upload File
+Date :2022-04-05 20:01:02 {"from":"\/opt\/lampp\/temp\/phpnpNuuH","name":"6035-technology-application.json","size":147454,"type":"application\/json","error":0,"task":1}
+Date :2022-04-05 20:01:02 {"status":200,"message":"Success","file_name":"71352062_6035-technology-application.json"}
+Date :2022-04-05 20:01:02 In Update Details
+Date :2022-04-05 20:01:02 Request:{"stage_id":"1","schedule":1,"title":"Stage 1-Morning","description":"Description","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","timeout":"0","bg_file":"71345393_Video11.mp4","animation_file":"71352062_6035-technology-application.json","animation_type":"application/json","task":2}
+Date :2022-04-05 20:01:02 "Success"
+Date :2022-04-05 20:01:04 In Get Details
+Date :2022-04-05 20:01:04 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:01:04 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:01:04 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71345393_Video11.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71352062_6035-technology-application.json","timeout_period":"0","last_updated_date_time":"2022-04-05 20:01:02"}
+Date :2022-04-05 20:01:27 In Upload File
+Date :2022-04-05 20:01:27 {"from":"\/opt\/lampp\/temp\/phpcPO2Le","name":"pump-demo.mp4","size":9721620,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-05 20:01:28 {"status":200,"message":"Success","file_name":"71352087_pump-demo.mp4"}
+Date :2022-04-05 20:01:28 In Update Details
+Date :2022-04-05 20:01:28 Request:{"stage_id":"1","schedule":1,"title":"Stage 1-Morning","description":"Description","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","timeout":"0","bg_file":"71352087_pump-demo.mp4","animation_file":"71352062_6035-technology-application.json","animation_type":"application/json","task":2}
+Date :2022-04-05 20:01:28 "Success"
+Date :2022-04-05 20:01:30 In Get Details
+Date :2022-04-05 20:01:30 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:01:30 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:01:30 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71352087_pump-demo.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71352062_6035-technology-application.json","timeout_period":"0","last_updated_date_time":"2022-04-05 20:01:28"}
+Date :2022-04-05 20:01:37 In Get Details
+Date :2022-04-05 20:01:37 Request:{"stage_id":"1","schedule":"2","task":3}
+Date :2022-04-05 20:01:37 {"stage_id":"1","schedule":"2","task":3}
+Date :2022-04-05 20:01:37 {"id":"4","title":"Stage 1-Afternoon","stage_id":"1","schedule":"2","bg_video_file":"71328971_Video2 (1).mp4","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 13:36:11"}
+Date :2022-04-05 20:02:18 In Upload File
+Date :2022-04-05 20:02:18 {"from":"\/opt\/lampp\/temp\/phpSRBcln","name":"100724-loading-chemistry.json","size":13829,"type":"application\/json","error":0,"task":1}
+Date :2022-04-05 20:02:18 In Upload File
+Date :2022-04-05 20:02:18 {"from":"\/opt\/lampp\/temp\/phpxgoQkn","name":"Video2.mp4","size":1055736,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-05 20:02:18 {"status":200,"message":"Success","file_name":"71352138_100724-loading-chemistry.json"}
+Date :2022-04-05 20:02:18 In Update Details
+Date :2022-04-05 20:02:18 Request:{"stage_id":"1","schedule":"2","title":"Stage 1-Afternoon","description":"Description","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71328971_Video2 (1).mp4","animation_file":"71352138_100724-loading-chemistry.json","animation_type":"application/json","task":2}
+Date :2022-04-05 20:02:18 "Success"
+Date :2022-04-05 20:02:18 {"status":200,"message":"Success","file_name":"71352138_Video2.mp4"}
+Date :2022-04-05 20:02:18 In Update Details
+Date :2022-04-05 20:02:18 Request:{"stage_id":"1","schedule":"2","title":"Stage 1-Afternoon","description":"Description","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71352138_Video2.mp4","animation_file":"71352138_100724-loading-chemistry.json","animation_type":"application/json","task":2}
+Date :2022-04-05 20:02:18 "Success"
+Date :2022-04-05 20:02:21 In Get Details
+Date :2022-04-05 20:02:21 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:02:21 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:02:21 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71352087_pump-demo.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71352062_6035-technology-application.json","timeout_period":"0","last_updated_date_time":"2022-04-05 20:01:28"}
+Date :2022-04-05 20:02:23 In Get Details
+Date :2022-04-05 20:02:23 Request:{"stage_id":"1","schedule":"2","task":3}
+Date :2022-04-05 20:02:23 {"stage_id":"1","schedule":"2","task":3}
+Date :2022-04-05 20:02:23 {"id":"4","title":"Stage 1-Afternoon","stage_id":"1","schedule":"2","bg_video_file":"71352138_Video2.mp4","message_line1":"","message_line2":"","message_line3":"","description":"Description","animation_type":"application\/json","animation_file":"71352138_100724-loading-chemistry.json","timeout_period":"0","last_updated_date_time":"2022-04-05 20:02:18"}
+Date :2022-04-05 20:02:31 In Get Details
+Date :2022-04-05 20:02:31 Request:{"stage_id":"1","schedule":"3","task":3}
+Date :2022-04-05 20:02:31 {"stage_id":"1","schedule":"3","task":3}
+Date :2022-04-05 20:02:31 {"id":"5","title":"Stage 1-Evening","stage_id":"1","schedule":"3","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 12:28:41"}
+Date :2022-04-05 20:02:37 In Get Details
+Date :2022-04-05 20:02:37 Request:{"stage_id":"2","schedule":"3","task":3}
+Date :2022-04-05 20:02:37 {"stage_id":"2","schedule":"3","task":3}
+Date :2022-04-05 20:02:37 {"id":"8","title":"Stage 2-Evening","stage_id":"2","schedule":"3","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 12:28:41"}
+Date :2022-04-05 20:03:40 In Upload File
+Date :2022-04-05 20:03:40 {"from":"\/opt\/lampp\/temp\/phpOgMnf1","name":"Pivot.gif","size":520743,"type":"image\/gif","error":0,"task":1}
+Date :2022-04-05 20:03:40 In Upload File
+Date :2022-04-05 20:03:40 {"from":"\/opt\/lampp\/temp\/phpkTJv0r","name":"file_example_MP4_480_1_5MG.mp4","size":1570024,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-05 20:03:40 {"status":200,"message":"Success","file_name":"71352220_Pivot.gif"}
+Date :2022-04-05 20:03:40 In Update Details
+Date :2022-04-05 20:03:40 Request:{"stage_id":"2","schedule":"3","title":"Stage 2-Evening","description":"Description","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"","animation_file":"71352220_Pivot.gif","animation_type":"image/gif","task":2}
+Date :2022-04-05 20:03:40 "Success"
+Date :2022-04-05 20:03:40 {"status":200,"message":"Success","file_name":"71352220_file_example_MP4_480_1_5MG.mp4"}
+Date :2022-04-05 20:03:46 In Get Details
+Date :2022-04-05 20:03:46 Request:{"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:03:46 {"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:03:46 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-04 13:47:14"}
+Date :2022-04-05 20:13:59 In Get Details
+Date :2022-04-05 20:13:59 Request:{"stage_id":"3","schedule":1,"task":3}
+Date :2022-04-05 20:13:59 {"stage_id":"3","schedule":1,"task":3}
+Date :2022-04-05 20:13:59 {"id":"3","title":"Stage 3-Morning","stage_id":"3","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 08:34:16"}
+Date :2022-04-05 20:14:37 In Upload File
+Date :2022-04-05 20:14:37 {"from":"\/opt\/lampp\/temp\/phpYPIFaJ","name":"Pivot.gif","size":520743,"type":"image\/gif","error":0,"task":1}
+Date :2022-04-05 20:14:38 In Upload File
+Date :2022-04-05 20:14:38 {"from":"\/opt\/lampp\/temp\/phpwys2GW","name":"file_example_MP4_480_1_5MG.mp4","size":1570024,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-05 20:14:38 {"status":200,"message":"Success","file_name":"71352877_Pivot.gif"}
+Date :2022-04-05 20:14:38 In Update Details
+Date :2022-04-05 20:14:38 Request:{"stage_id":"3","schedule":1,"title":"Stage 3-Morning","description":"","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"","animation_file":"71352877_Pivot.gif","animation_type":"image/gif","task":2}
+Date :2022-04-05 20:14:38 "Success"
+Date :2022-04-05 20:14:38 {"status":200,"message":"Success","file_name":"71352878_file_example_MP4_480_1_5MG.mp4"}
+Date :2022-04-05 20:14:38 In Update Details
+Date :2022-04-05 20:14:38 Request:{"stage_id":"3","schedule":1,"title":"Stage 3-Morning","description":"","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71352878_file_example_MP4_480_1_5MG.mp4","animation_file":"71352877_Pivot.gif","animation_type":"image/gif","task":2}
+Date :2022-04-05 20:14:38 "Success"
+Date :2022-04-05 20:14:41 In Get Details
+Date :2022-04-05 20:14:41 Request:{"stage_id":"3","schedule":1,"task":3}
+Date :2022-04-05 20:14:41 {"stage_id":"3","schedule":1,"task":3}
+Date :2022-04-05 20:14:41 {"id":"3","title":"Stage 3-Morning","stage_id":"3","schedule":"1","bg_video_file":"71352878_file_example_MP4_480_1_5MG.mp4","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"image\/gif","animation_file":"71352877_Pivot.gif","timeout_period":"0","last_updated_date_time":"2022-04-05 20:14:38"}
+Date :2022-04-05 20:14:51 In Get Details
+Date :2022-04-05 20:14:51 Request:{"stage_id":"3","schedule":"3","task":3}
+Date :2022-04-05 20:14:51 {"stage_id":"3","schedule":"3","task":3}
+Date :2022-04-05 20:14:51 {"id":"11","title":"Stage 3-Evening","stage_id":"3","schedule":"3","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 12:28:41"}
+Date :2022-04-05 20:20:08 In Get Details
+Date :2022-04-05 20:20:08 Request:{"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:20:08 {"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:20:08 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-04 13:47:14"}
+Date :2022-04-05 20:20:09 In Get Details
+Date :2022-04-05 20:20:09 Request:{"stage_id":"2","schedule":"4","task":3}
+Date :2022-04-05 20:20:09 {"stage_id":"2","schedule":"4","task":3}
+Date :2022-04-05 20:20:09 {"id":"9","title":"Stage 2-Night","stage_id":"2","schedule":"4","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 12:28:41"}
+Date :2022-04-05 20:20:57 In Upload File
+Date :2022-04-05 20:20:57 {"from":"\/opt\/lampp\/temp\/phpm5zZKa","name":"Pivot.gif","size":520743,"type":"image\/gif","error":0,"task":1}
+Date :2022-04-05 20:20:57 {"status":200,"message":"Success","file_name":"71353257_Pivot.gif"}
+Date :2022-04-05 20:20:57 In Update Details
+Date :2022-04-05 20:20:57 Request:{"stage_id":"2","schedule":"4","title":"Stage 2-Night","description":"Description","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"","animation_file":"71353257_Pivot.gif","animation_type":"image/gif","task":2}
+Date :2022-04-05 20:20:57 "Success"
+Date :2022-04-05 20:20:57 In Upload File
+Date :2022-04-05 20:20:57 {"from":"","name":"pump-demo.mp4","size":0,"type":"","error":3,"task":1}
+Date :2022-04-05 20:20:57 {"status":400,"message":"File Upload Error:3"}
+Date :2022-04-05 20:21:00 In Get Details
+Date :2022-04-05 20:21:00 Request:{"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:21:00 {"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:21:00 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-04 13:47:14"}
+Date :2022-04-05 20:21:02 In Get Details
+Date :2022-04-05 20:21:02 Request:{"stage_id":"2","schedule":"4","task":3}
+Date :2022-04-05 20:21:02 {"stage_id":"2","schedule":"4","task":3}
+Date :2022-04-05 20:21:02 {"id":"9","title":"Stage 2-Night","stage_id":"2","schedule":"4","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"Description","animation_type":"image\/gif","animation_file":"71353257_Pivot.gif","timeout_period":"0","last_updated_date_time":"2022-04-05 20:20:57"}
+Date :2022-04-05 20:21:58 In Get Details
+Date :2022-04-05 20:21:58 Request:{"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:21:58 {"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:21:58 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-04 13:47:14"}
+Date :2022-04-05 20:22:00 In Get Details
+Date :2022-04-05 20:22:00 Request:{"stage_id":"2","schedule":"3","task":3}
+Date :2022-04-05 20:22:00 {"stage_id":"2","schedule":"3","task":3}
+Date :2022-04-05 20:22:00 {"id":"8","title":"Stage 2-Evening","stage_id":"2","schedule":"3","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"Description","animation_type":"image\/gif","animation_file":"71352220_Pivot.gif","timeout_period":"0","last_updated_date_time":"2022-04-05 20:03:40"}
+Date :2022-04-05 20:22:40 In Upload File
+Date :2022-04-05 20:22:40 {"from":"\/opt\/lampp\/temp\/phpgdAbS2","name":"pump-demo.mp4","size":9721620,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-05 20:22:40 {"status":200,"message":"Success","file_name":"71353360_pump-demo.mp4"}
+Date :2022-04-05 20:22:40 In Update Details
+Date :2022-04-05 20:22:40 Request:{"stage_id":"2","schedule":"3","title":"Stage 2-Evening","description":"Description","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71353360_pump-demo.mp4","animation_file":"71352220_Pivot.gif","animation_type":"image/gif","task":2}
+Date :2022-04-05 20:22:40 "Success"
+Date :2022-04-05 20:22:40 In Upload File
+Date :2022-04-05 20:22:40 {"from":"\/opt\/lampp\/temp\/phpVkdZFK","name":"test.gif","size":510619,"type":"image\/gif","error":0,"task":1}
+Date :2022-04-05 20:22:40 {"status":200,"message":"Success","file_name":"71353360_test.gif"}
+Date :2022-04-05 20:22:40 In Update Details
+Date :2022-04-05 20:22:40 Request:{"stage_id":"2","schedule":"3","title":"Stage 2-Evening","description":"Description","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71353360_pump-demo.mp4","animation_file":"71353360_test.gif","animation_type":"image/gif","task":2}
+Date :2022-04-05 20:22:40 "Success"
+Date :2022-04-05 20:22:45 In Get Details
+Date :2022-04-05 20:22:45 Request:{"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:22:45 {"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:22:45 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-04 13:47:14"}
+Date :2022-04-05 20:22:47 In Get Details
+Date :2022-04-05 20:22:47 Request:{"stage_id":"2","schedule":"3","task":3}
+Date :2022-04-05 20:22:47 {"stage_id":"2","schedule":"3","task":3}
+Date :2022-04-05 20:22:47 {"id":"8","title":"Stage 2-Evening","stage_id":"2","schedule":"3","bg_video_file":"71353360_pump-demo.mp4","message_line1":"","message_line2":"","message_line3":"","description":"Description","animation_type":"image\/gif","animation_file":"71353360_test.gif","timeout_period":"0","last_updated_date_time":"2022-04-05 20:22:40"}
+Date :2022-04-05 20:39:45 In Get Details
+Date :2022-04-05 20:39:45 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:39:45 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-05 20:39:45 {"id":"1","title":"Stage 1-Morning","stage_id":"1","schedule":"1","bg_video_file":"71352087_pump-demo.mp4","message_line1":"Message Line 1","message_line2":"Message Line 2","message_line3":"Message Line 3","description":"Description","animation_type":"application\/json","animation_file":"71352062_6035-technology-application.json","timeout_period":"0","last_updated_date_time":"2022-04-05 20:01:28"}
+Date :2022-04-05 20:39:59 In Get Details
+Date :2022-04-05 20:39:59 Request:{"stage_id":"1","schedule":"2","task":3}
+Date :2022-04-05 20:39:59 {"stage_id":"1","schedule":"2","task":3}
+Date :2022-04-05 20:39:59 {"id":"4","title":"Stage 1-Afternoon","stage_id":"1","schedule":"2","bg_video_file":"71352138_Video2.mp4","message_line1":"","message_line2":"","message_line3":"","description":"Description","animation_type":"application\/json","animation_file":"71352138_100724-loading-chemistry.json","timeout_period":"0","last_updated_date_time":"2022-04-05 20:02:18"}
+Date :2022-04-05 20:40:04 In Get Details
+Date :2022-04-05 20:40:04 Request:{"stage_id":"1","schedule":"3","task":3}
+Date :2022-04-05 20:40:04 {"stage_id":"1","schedule":"3","task":3}
+Date :2022-04-05 20:40:04 {"id":"5","title":"Stage 1-Evening","stage_id":"1","schedule":"3","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 12:28:41"}
+Date :2022-04-05 20:40:10 In Get Details
+Date :2022-04-05 20:40:10 Request:{"stage_id":"1","schedule":"4","task":3}
+Date :2022-04-05 20:40:10 {"stage_id":"1","schedule":"4","task":3}
+Date :2022-04-05 20:40:10 {"id":"6","title":"Stage 1-Night","stage_id":"1","schedule":"4","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 12:28:41"}
+Date :2022-04-05 20:40:27 In Get Details
+Date :2022-04-05 20:40:27 Request:{"stage_id":"2","schedule":"4","task":3}
+Date :2022-04-05 20:40:27 {"stage_id":"2","schedule":"4","task":3}
+Date :2022-04-05 20:40:27 {"id":"9","title":"Stage 2-Night","stage_id":"2","schedule":"4","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"Description","animation_type":"image\/gif","animation_file":"71353257_Pivot.gif","timeout_period":"0","last_updated_date_time":"2022-04-05 20:20:57"}
+Date :2022-04-05 20:40:32 In Get Details
+Date :2022-04-05 20:40:32 Request:{"stage_id":"2","schedule":"1","task":3}
+Date :2022-04-05 20:40:32 {"stage_id":"2","schedule":"1","task":3}
+Date :2022-04-05 20:40:32 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-04 13:47:14"}
+Date :2022-04-05 20:42:21 In Get Details
+Date :2022-04-05 20:42:21 Request:{"stage_id":"2","schedule":"2","task":3}
+Date :2022-04-05 20:42:21 {"stage_id":"2","schedule":"2","task":3}
+Date :2022-04-05 20:42:21 {"id":"7","title":"Stage 2-Afternoon","stage_id":"2","schedule":"2","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-05 12:28:41"}
+Date :2022-04-05 20:42:23 In Get Details
+Date :2022-04-05 20:42:23 Request:{"stage_id":"2","schedule":"1","task":3}
+Date :2022-04-05 20:42:23 {"stage_id":"2","schedule":"1","task":3}
+Date :2022-04-05 20:42:23 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"","animation_file":"","timeout_period":"0","last_updated_date_time":"2022-04-04 13:47:14"}
+Date :2022-04-05 20:44:13 In Upload File
+Date :2022-04-05 20:44:13 {"from":"\/opt\/lampp\/temp\/phpht1zGh","name":"Video34.mp4","size":75563547,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-05 20:44:14 {"status":200,"message":"Success","file_name":"71354653_Video34.mp4"}
+Date :2022-04-05 20:44:14 In Update Details
+Date :2022-04-05 20:44:14 Request:{"stage_id":"2","schedule":"1","title":"Stage 2-Morning","description":"","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71354653_Video34.mp4","animation_file":"","animation_type":"","task":2}
+Date :2022-04-05 20:44:14 In Upload File
+Date :2022-04-05 20:44:14 {"from":"\/opt\/lampp\/temp\/phpR9qCVE","name":"test.json","size":13829,"type":"application\/json","error":0,"task":1}
+Date :2022-04-05 20:44:14 "Success"
+Date :2022-04-05 20:44:14 {"status":200,"message":"Success","file_name":"71354654_test.json"}
+Date :2022-04-05 20:44:14 In Update Details
+Date :2022-04-05 20:44:14 Request:{"stage_id":"2","schedule":"1","title":"Stage 2-Morning","description":"","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71354653_Video34.mp4","animation_file":"71354654_test.json","animation_type":"application/json","task":2}
+Date :2022-04-05 20:44:14 "Success"
+Date :2022-04-05 20:44:18 In Get Details
+Date :2022-04-05 20:44:18 Request:{"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:44:18 {"stage_id":"2","schedule":1,"task":3}
+Date :2022-04-05 20:44:18 {"id":"2","title":"Stage 2-Morning","stage_id":"2","schedule":"1","bg_video_file":"71354653_Video34.mp4","message_line1":"","message_line2":"","message_line3":"","description":"","animation_type":"application\/json","animation_file":"71354654_test.json","timeout_period":"0","last_updated_date_time":"2022-04-05 20:44:14"}

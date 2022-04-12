@@ -112,7 +112,7 @@ body {
                 </button>
             </div>
             <div class="modal-body p-2" id="playlist-modal-body">  
-                <form name="form1" class="block-data card card-body" data-status="form"  id="form">                
+                <form name="form1" class="block-data " data-status="form"  id="form">                
                     <!--<div class="alert alert-light mb-2" role="alert" id="messagebox">
                     </div>-->
                     <div class="row">                    
@@ -128,7 +128,7 @@ body {
                         </div> 
                         
                     </div>  
-                    <div id="customer-div" class="row card">
+                    <div id="playlist-div" class="row card card-body">
 
                         <div class="row  mb-3">
                             <div class="col h5">
@@ -162,6 +162,22 @@ body {
     </div>
 </div>
 <!-- / end modal -->
+<!-- Info modal -->
+<div class="modal fade" id="info-modal" tabindex="-1" role="dialog" aria-labelledby="edit-preview" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Info</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pt-4 pl-4 pr-4 pb-4 h5" id='info-message'> 
+           </div>
+        </div>
+    </div>
+</div>
+<!-- Info modal -->
 
 
 <div class="content-wrapper container-wide">
@@ -252,6 +268,7 @@ body {
             
             submitHandler: function ()
             {
+                event.preventDefault();
                 var data = {};
                 if ($("#add-edit-button").val() == "Submit")
                 {
@@ -277,8 +294,12 @@ body {
                 console.log(jsondata);
                 $.post("../../modules/ajax/cms.php", jsondata, function (result) {
                     //console.log(result);
-                    if (result === "Successfull")
-                        location.reload();
+                    if (result === "Successfull"){
+                        //location.reload();
+                        $("#add-edit-playlist-modal").modal('hide');
+                        $("#info-message").html("<i class='fas fa-check'></i>Update Successful");
+                        $("#info-modal").modal('show');
+                    }
                     else
                         alert(result);
                 });
@@ -309,7 +330,10 @@ body {
           }).disableSelection();
      });
 
-
+$('#info-modal').on('hidden.bs.modal', function () {
+    location.reload();
+   })
+   
     function loadTable()
     {
         var data = {};
@@ -396,33 +420,7 @@ body {
         }
     }
     
-    /*function drag(ev) {
-        //console.log(ev.target.id);
-        ev.dataTransfer.setData("div", ev.target.id);
-    }
     
-    function drop(ev) {
-        /*var _target = $("#" + ev.target.id);
-        if ($(_target).hasClass("nodrop")) {
-            ev.preventDefault();
-            var src = document.getElementById(ev.dataTransfer.getData("div"));
-            var srcParent = src.parentNode;
-            var tgt = ev.currentTarget.firstElementChild;
-
-            ev.currentTarget.replaceChild(src, tgt);
-            srcParent.appendChild(tgt);
-        } else {*/
-          /*  ev.preventDefault();
-            var data = ev.dataTransfer.getData("div");
-            ev.target.appendChild(document.getElementById(data));*/
-        //}
-        
-    //}
-
-   /* function allowDrop(ev) {
-        ev.preventDefault();
-    }
-    */
     
     $(document).on("click", ".playlist-edit", function (){          
         id = $(this).parent('td').parent('tr').data('id');
@@ -466,78 +464,6 @@ body {
         location.reload();
     });
     
-    /*$(document).on("click", "#add-edit-button", function ()
-    {
-        var data = {};
-        var div_id="";
-        data["playlist_name"] = $("#playlist_name").val();
-        data["description"] = $("#description").val();
-        var video_list="";
-        $('#right > div').map(function() {
-            div_id = this.id;
-            div_id = div_id.substring(1)
-            video_list = video_list+div_id+",";
-        });
-        var l = video_list.length;
-        video_list = video_list.substring(0,l-1);
-        data["video_list"] = video_list;
-        data["task"] = "5";
-        var jsondata = JSON.stringify(data);
-        console.log(jsondata);
-        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-            console.log(result);
-            if (result === "Successfull")
-                loadTable();
-            else
-                alert(result);
-        });
-         
-    });*/
-    /*$(document).on("click", "#user-edit-save", function ()
-    {
-        var data = {};
-
-        
-        data["id"] = id;
-        data["activity_message"] = "Edit user " + $("#user_name_edit").val();
-        
-
-        if ($("#automatic_password").prop('checked') == true) {
-            data["generate_pwd"] = 1;
-        } else
-            data["generate_pwd"] = 0;
-
-        if ($("#reset_password").prop('checked') == true) {
-            data["reset_pwd"] = 1;
-        } else
-            data["reset_pwd"] = 0;
-
-        data["full_name"] = $("#full_name_edit").val();
-        data["user_name"] = $("#user_name_edit").val();
-        data["email"] = $("#email_edit").val();
-        data["password"] = $("#password_edit").val();
-        data["company_name"] = $("#company_name_edit").val();
-        data["phone"] = $("#phone_edit").val();
-        data["start_date"] = $("#start_date_edit").val();
-        data["expiry_date"] = $("#expiry_date_edit").val();
-        data["user_role"] = $("#user_role_edit").val();
-        data["language"] = $("#user_language_edit").val();
-        data["task"] = "7";
-
-        var jsondata = JSON.stringify(data);
-        jsondata = jsondata.replace("'", "\\\\\'");
-        console.log(jsondata);
-        $.post("../../modules/ajax/users.php", jsondata, function (result) {
-            console.log(result);
-            if (result == "Successfull")
-                location.reload();
-            else if (result.includes("auto"))
-            {
-                alertMessage(result);
-                location.reload();
-            } else
-                alertMessage(result);
-        });
-    });*/
+    
 
 </script>

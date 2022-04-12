@@ -3,10 +3,13 @@
 #include <cppconn/statement.h>
 #include <phpcpp.h>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <cppconn/prepared_statement.h>
 #include "validation.h"
 #include<vector>
+#include <string>
+#include <sys/stat.h>
 #define ServerDB "parcx_server"
 #define ReportingDB "parcx_reporting"
 #define DashboardDB "parcx_dashboard"
@@ -16,6 +19,8 @@
 #define MAXLENGTH "Maximum Length Exceeded"
 #define CONSTRAINT "Invalid Character"
 #define MediaPath "/parcx/Media/cms"
+#define AbsMediaPath "/opt/lampp/htdocs/parcx/Media/cms"
+#define ThumbnailPath "../../Media/cms/thumbnail"
 using namespace std;
 GeneralOperations General;
 Validation validation;
@@ -186,7 +191,14 @@ Php::Value enabledisablePlaylist(Php::Value json) {
         if(n>0)
         {
             msg = "Successfull";
+            query = "update device_playlist set status=? where playlist_id=?";
+            prep_stmt = con->prepareStatement(query);
+            prep_stmt->setInt(1,status);
+            prep_stmt->setInt(2,id);
+            prep_stmt->executeUpdate();
         }
+
+        
         
         delete prep_stmt;
         delete con;
@@ -428,7 +440,7 @@ Php::Value savePlaylist(Php::Value data)
         prep_stmt->setString(3,video_list);
             
         int n=prep_stmt->executeUpdate();
-        if(n>0)
+        if(n>=0)
         {
             msg = "Successfull";
         }
@@ -439,6 +451,7 @@ Php::Value savePlaylist(Php::Value data)
     catch(const std::exception& e)
     {
         writeException("savePlaylist",e.what());
+        msg = "Failed";
     }
     return msg;
 }
@@ -585,70 +598,115 @@ void insertScreenPlayList(Php::Value data)
     
     }
 
+string removeSpecialCharactersfromText(string str)
+{
+    for(int i=0;i<(signed)str.length();i++)
+    {
+       // cout<<i<<":"<<str[i]<<endl;
+       //Allowed chars - Uppercase and Lowercase alphabets,numbers,curly brackets,space,comma,dot
+      //if ((str[i]>=48 && str[i]<=57)||(str[i]>=65 && str[i]<=90)||(str[i]>=97 && str[i]<=122)||str[i]==46)
+        if (!(str[i]==32))
+          {
+             // cout<<"cont."<<str[i]<<endl;
+            continue;
+          }
+      else
+      {
+        //cout<<"String contains special character.\n";
+        //flag=1;
+        char c = str[i];
+        //str.erase(std::find(str.begin(), str.end(), c));
+        //i=i-1;
+        std::replace(str.begin(), str.end(), c, '_');
+      }
+    }
+    return str;
+}
+
 Php::Value uploadMedia(Php::Value data)
 {
     string filename = toString(data["name"]);
+    string filename_new = removeSpecialCharactersfromText(filename);
     string from = toString(data["from"]);
-    string dest = "../../Media/cms/"+filename;
+    //string dest = "../../Media/cms/"+filename_new;
+    string dest = string(AbsMediaPath)+"/"+filename_new;
     double size = data["size"];
     int error = data["error"];
     string type = toString(data["type"]);
     string duration = data["duration"];
     string result = "";
+    writeLog("uploadMedia","filename:"+filename_new);
     writeLog("uploadMedia","size:"+to_string(size/ (1024 * 1024))+" MB");
     writeLog("uploadMedia","duration:"+duration);
     writeLog("uploadMedia","type:"+string(type));
-    if(size > 200 * 1024 * 1024)
-    {
-        result ="File size is >200 MB" ;
-    }
-    else
-    {
-        string extension = filename.substr(filename.find_last_of(".") + 1);
-        if(extension == "mp4" || extension == "avi" || extension == "MP4" || extension == "AVI" || extension == "webm" || extension == "WEBM" || extension == "jpeg" || extension == "png" || extension == "jpg" || extension == "gif" || extension == "ogg" || extension == "OGG")  {
-            if(error>0)
-            {
-                result ="File Upload Error:"+to_string(error) ;
-            }
-            else
-            {
-                system(("sudo cp -p "+from+" "+dest).c_str());
-                system(("sudo chmod 777 "+dest).c_str());
-                result ="Success" ;
-                writeLog("uploadMedia",result);
-                sql::Connection *con;
-                sql::Statement *stmt;            
-                try
-                { 
-                    con= General.mysqlConnect(ServerDB); 
-                    stmt=con->createStatement();
-                    int n = stmt->executeUpdate("Insert into media_library(media_name,media_label,media_type,media_duration,media_size) values ('"+filename+"','"+filename+"','"+type+"','"+duration+"',"+to_string(size/(1024*1024))+")");
-                 
-                    delete stmt;
-                    delete con;
-                    if(n>0)
+    try{
+        if(size > 200 * 1024 * 1024)
+        {
+            result ="File size is >200 MB" ;
+        }
+        else
+        {
+            string extension = filename.substr(filename.find_last_of(".") + 1);
+            if(extension == "mp4" || extension == "avi" || extension == "MP4" || extension == "AVI" || extension == "webm" || extension == "WEBM" || extension == "jpeg" || extension == "png" || extension == "jpg" || extension == "gif" || extension == "ogg" || extension == "OGG" ||extension == "bmp" || extension == "BMP")  {
+                if(error>0)
+                {
+                    result ="File Upload Error:"+to_string(error) ;
+                }
+                else
+                {
+                    int n = system(("sudo cp -p "+from+" "+dest).c_str());
+                    writeLog("uploadMedia","Upload result"+to_string(n));
+                    if(n==0)
                     {
-                        result = "Success";
+                        system(("sudo chmod 777 "+dest).c_str());
+                        result ="Success" ;
+
+                        writeLog("uploadMedia",result);
+                        sql::Connection *con;
+                        sql::Statement *stmt;            
+                        try
+                        { 
+                            con= General.mysqlConnect(ServerDB); 
+                            stmt=con->createStatement();
+                            n = stmt->executeUpdate("Insert into media_library(media_name,media_label,media_type,media_duration,media_size) values ('"+filename_new+"','"+filename+"','"+type+"','"+duration+"',"+to_string(size/(1024*1024))+")");
+
+                            delete stmt;
+                            delete con;
+                            if(n>0)
+                            {
+                                result = "Success";
+                            }
+                            else
+                            {
+                                result = "Failed to create a record";
+                            }
+                        }
+                    catch(const std::exception& e)
+                        {
+                            result ="DB Error: Failed" ;
+                            writeException("uploadMedia",e.what());
+                        }
                     }
                     else
                     {
-                        result = "Failed to create a record";
+                        result ="Upload Failed" ;
+                        writeException("uploadMedia","Failed to Upload");
                     }
                 }
-            catch(const std::exception& e)
-                {
-                    result ="DB Error: Failed" ;
-                    writeException("uploadMedia",e.what());
-                }
+            } 
+            else 
+            {
+                //writeLog("uploadMedia","Invalid Extension");
+                result ="Invalid Extension" ;
             }
-        } 
-        else 
-        {
-            //writeLog("uploadMedia","Invalid Extension");
-            result ="Invalid Extension" ;
         }
+        writeLog("uploadMedia",result);
     }
-    writeLog("uploadMedia",result);
+    catch(const std::exception& e)
+    {
+        result ="Upload Failed" ;
+        writeException("uploadMedia",e.what());
+    }
     return result;
     
 }
@@ -661,7 +719,7 @@ void showMediaLibraryList(Php::Value data)
         sql::Connection *con;
         sql::Statement *stmt;            
         sql::ResultSet *res;
-
+        string video_type;
         con= General.mysqlConnect(ServerDB); 
         stmt=con->createStatement();
         res=stmt->executeQuery("select * from media_library order by media_status desc");
@@ -696,21 +754,28 @@ void showMediaLibraryList(Php::Value data)
             {
                 if(res->getString("media_type")=="video/mp4")
                 {
-                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                    video_type = "video/mp4";
+                    
+                    //Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
                 }
                 else if(res->getString("media_type")=="video/webm")
                 {
-                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/webm'></video></td>"<<endl;
+                    video_type = "video/webm";
+                    
                 }
                 else if(res->getString("media_type")=="video/ogg")
                 {
-                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/ogg'></video></td>"<<endl;
+                    video_type = "video/ogg";
+                    
                 }
                 else if(res->getString("media_type")=="video/x-msvideo")
                 {
-                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/avi'></video></td>"<<endl;
+                    video_type = "video/avi";
+                   
                    // Php::out<<"<td><object data='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'> <param name='src' value='"+string(MediaPath)+"/"+res->getString("media_name")+"' /> <embed type='video/x-ms-wm' src='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'></embed> </object></td>"<<endl;
                 }
+                Php::out<<"<td><img src='"+string(ThumbnailPath)+"/"+res->getString("media_name")+".png'  style='width:100px' class = 'play-video' data-path='"+string(MediaPath)+"/"+res->getString("media_name")+"' data-type='"+res->getString("media_type")+"'></td>"<<endl;
+                //Php::out<<"<td><video width='100' controls='controls' preload='none' poster='"+string(ThumbnailPath)+"/"+res->getString("media_name")+".png'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"' type='"+video_type+"'></video></td>"<<endl;
                 
             }
             else if (res->getString("media_type").find("audio") != std::string::npos) 
@@ -934,6 +999,86 @@ void manageScreenPlaylist(Php::Value data)
 
 }
 
+const std::string b64decode(const void* data, const size_t &len)
+{
+   // static const char* B64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    static const int B64index[256] =
+    {
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  62, 63, 62, 62, 63,
+        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 0,  0,  0,  0,  0,  0,
+        0,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14,
+        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 0,  0,  0,  0,  63,
+        0,  26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
+    };
+    if (len == 0) return "";
+
+    unsigned char *p = (unsigned char*) data;
+    size_t j = 0,
+        pad1 = len % 4 || p[len - 1] == '=',
+        pad2 = pad1 && (len % 4 > 2 || p[len - 2] != '=');
+    const size_t last = (len - pad1) / 4 << 2;
+    std::string result(last / 4 * 3 + pad1 + pad2, '\0');
+    unsigned char *str = (unsigned char*) &result[0];
+
+    for (size_t i = 0; i < last; i += 4)
+    {
+        int n = B64index[p[i]] << 18 | B64index[p[i + 1]] << 12 | B64index[p[i + 2]] << 6 | B64index[p[i + 3]];
+        str[j++] = n >> 16;
+        str[j++] = n >> 8 & 0xFF;
+        str[j++] = n & 0xFF;
+    }
+    if (pad1)
+    {
+        int n = B64index[p[last]] << 18 | B64index[p[last + 1]] << 12;
+        str[j++] = n >> 16;
+        if (pad2)
+        {
+            n |= B64index[p[last + 2]] << 6;
+            str[j++] = n >> 8 & 0xFF;
+        }
+    }
+    return result;
+}
+
+
+Php::Value uploadThumbnail(Php::Value data)
+{
+    string result="";
+    string filename = toString(data["name"]);
+    string filename_new = removeSpecialCharactersfromText(filename);
+    string filedata = toString(data["filedata"]);
+    filedata = b64decode(filedata.c_str(),filedata.size());
+    //writeLog("uploadThumbnail","b64decode : "+filedata);
+
+    if (mkdir(string(ThumbnailPath).c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
+    {
+        if( errno == EEXIST ) {
+           
+        } else {
+           writeException("uploadThumbnail", "Error creating Thumbnail directory");
+        }
+    }
+
+
+    fstream file;
+    file.open(string(ThumbnailPath)+"/"+filename_new,ios::out);
+    if (!file) {
+        writeException("uploadThumbnail", "Thumbnail file not created");
+        result = "Failed";
+    }
+    else {
+        file << filedata;
+        file.close();
+        result = "Success";
+        writeLog("uploadThumbnail","Thumbnail created successfully");
+    }
+    return result;
+}
+
 Php::Value parcxContentManagement(Php::Parameters &params) {
     Php::Value data = params[0];
     int task = data["task"];
@@ -963,6 +1108,8 @@ Php::Value parcxContentManagement(Php::Parameters &params) {
         case 11:response=enabledisableVideo(data);
             break;
         case 12:response = getDetailsbyId("playlist_settings", "id", data);
+            break;
+        case 13:response = uploadThumbnail(data);
             break;
     }
     return response;

@@ -23,8 +23,6 @@ include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
 
-
-</style>
 <!-- Modal  -->
 <!-- Modal -->
 <div class="modal fade" id="view_playlist_modal"  role="dialog" aria-labelledby="exampleModalLabel"
@@ -427,6 +425,7 @@ function loadTable()
             }
         }).on('show.daterangepicker', function(ev, picker) {
             picker.container.find(".calendar-date").hide();
+            picker.container.find('.hourselect').val("5");
         }).on('showCalendar.daterangepicker', function(ev, picker){
            picker.container.find('.calendar-date').remove();
         }).on('apply.daterangepicker', function (e, picker) {
@@ -457,6 +456,10 @@ function loadTable()
             var ampm = picker.container.find('.ampmselect').val();
             const timeformat = moment(hh+":"+mm+" "+ampm, ["h:mm A"]).format("HH:mm");
             $('#end-time'+id).val(timeformat+":00");
+	    if(mm!="0")
+	    {
+		$('#end-time'+id).val(timeformat+":59");
+            }
         });
         
         $("#pl-options-"+id).removeClass("hidden");

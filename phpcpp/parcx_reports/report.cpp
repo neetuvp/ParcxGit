@@ -47,8 +47,7 @@ Php::Value parcxReport(Php::Parameters &params)
                 break;
         case 8:rObj.paymentTransactions(data);
                 break;
-        case 9:pObj.ticketDetails(data);
-                break;
+        
         case 10:pObj.blacklistReport(data);
 		break;
         case 11:pObj.manualmovementReport(data);
@@ -95,9 +94,9 @@ Php::Value parcxReport(Php::Parameters &params)
                         break;
         case 31:pObj.liveParking(data);
                 break;
-	case 32:pObj.getPlatesfromTicket(data);
-		break;
-        case 33:pObj.reprocessDayClosureReport(data);
+        case 32:pObj.getPlatesfromTicket(data);
+                break;
+        case 33:pObj.userActivity(data);
                 break;
 	}
 	return response;

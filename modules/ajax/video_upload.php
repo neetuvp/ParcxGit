@@ -1,32 +1,62 @@
 <?php
-if($_FILES["file"]["name"]!='')
-{
-    $data=array();
-    $data["from"]=$_FILES["file"]["tmp_name"];
-    $data["name"]=$_FILES["file"]["name"];
-    $data["size"]=$_FILES["file"]["size"];
-    $data["type"]=$_FILES["file"]["type"];
-    $data["error"]=$_FILES["file"]["error"];
-    $data["duration"]= $_GET["duration"];
-    $data["task"]=9;
-    
-    WriteLog(json_encode($data));
-    
-    $response=parcxContentManagement($data);
-    if($response=="Success")
-    {
-        $json_response["status"]=200;
-        $json_response["message"]=$response;
-    }
-    else
-    {
-        $json_response["status"]=400;
-        $json_response["message"]=$response;
-    }
-    echo json_encode($json_response);
-    WriteLog($response);
-    WriteLog(json_encode($json_response));
+$task = $_GET["task"];
+switch ($task) {
+    case 1:
+        if($_FILES["file"]["name"]!='')
+        {
+            $data=array();
+            $data["from"]=$_FILES["file"]["tmp_name"];
+            $data["name"]=$_FILES["file"]["name"];
+            $data["size"]=$_FILES["file"]["size"];
+            $data["type"]=$_FILES["file"]["type"];
+            $data["error"]=$_FILES["file"]["error"];
+            $data["duration"]= $_GET["duration"];
+            $data["task"]=9;
+
+            WriteLog(json_encode($data));
+
+            $response=parcxContentManagement($data);
+            if($response=="Success")
+            {
+                $json_response["status"]=200;
+                $json_response["message"]=$response;
+            }
+            else
+            {
+                $json_response["status"]=400;
+                $json_response["message"]=$response;
+            }
+            echo json_encode($json_response);
+            WriteLog($response);
+            WriteLog(json_encode($json_response));
+        }
+        break;
+    case 2:
+         if( $_POST["data"] ){
+             if (!preg_match('/data:([^;]*);base64,(.*)/', $_POST['data'], $matches)) {
+                die("error");
+            }
+            
+            $file_data = $matches[2];
+            $file_data = str_replace(' ','+',$file_data);
+            
+            $data=array();
+            $data["filedata"]=$file_data;
+            $data["name"]=$_POST["filename"].".png";
+            $data["task"]=13;
+
+            WriteLog(json_encode($data));
+
+            $response=parcxContentManagement($data);
+             
+         }
+        
+        break;
+
+    default:
+        break;
 }
+
     
     
 function WriteLog($data)

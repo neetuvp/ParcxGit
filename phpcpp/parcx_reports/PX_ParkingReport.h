@@ -12,8 +12,7 @@ class ParkingReport
     void accessReport(Php::Value json);  
     void trackTicket(Php::Value json);   
     void visitorFrequencyReport(Php::Value json);
-    void visitorFrequencyRealTimeReport(Php::Value json); 
-    void ticketDetails(Php::Value json);   
+    void visitorFrequencyRealTimeReport(Php::Value json);     
     void blacklistReport(Php::Value json);
     void manualmovementReport(Php::Value json);   
     void platescapturedReport(Php::Value json);      
@@ -25,7 +24,7 @@ class ParkingReport
     void parkingDuration(Php::Value json);
     void liveParking(Php::Value json);
     void getPlatesfromTicket(Php::Value json);
-    void reprocessDayClosureReport(Php::Value json);
+    void userActivity(Php::Value json);
     };
 
 #endif    

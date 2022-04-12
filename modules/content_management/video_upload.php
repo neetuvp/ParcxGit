@@ -68,11 +68,32 @@ include('../../includes/sidebar.php');
             <div class="modal-body pt-4 pl-4 pr-4 pb-4 modal-body-view-video">    
                 
             </div>
+            
+            <div class="modal-footer">
+                
+            </div>
 
         </div>
     </div>
 </div>
 <!-- end / Modal -->
+
+<!-- Info modal -->
+<div class="modal fade" id="info-modal" tabindex="-1" role="dialog" aria-labelledby="edit-preview" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Info</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pt-4 pl-4 pr-4 pb-4 h5" id='info-message'> 
+           </div>
+        </div>
+    </div>
+</div>
+<!-- Info modal -->
 
 
 <div class="content-wrapper container-wide">
@@ -85,7 +106,7 @@ include('../../includes/sidebar.php');
                 <div class="card" >               
                     <div class="card-body" id="div-RecordsTable">
                         
-                        <table id="RecordsTable" class="table  table-bordered"> 
+                        <table id="RecordsTable" class="table  table-bordered" > 
                             <?php
                             $data["task"] = 10;
                             $data["edit"] = 1;
@@ -110,11 +131,12 @@ include('../../includes/sidebar.php');
 
     var files;
     var duration=0;
+    var isVideo = false;
     window.URL = window.URL || window.webkitURL;
     document.getElementById('file').onchange = setFileInfo;
 table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
 function setFileInfo() {
-    
+    isVideo = false;
     var file_data = $("#file").prop("files")[0];
 
     if (typeof file_data !== "undefined")
@@ -122,20 +144,21 @@ function setFileInfo() {
         var file_name = file_data.name;
         var extension = file_name.split('.').pop();
         if(extension=="mp4"||extension=="avi" || extension=="MP4"||extension=="AVI" ||extension=="webm"||extension=="WEBM" )
-        files = this.files;
-        //myVideos=files;
-        var video = document.createElement('video');
-        video.preload = 'metadata';
+        {
+            isVideo = true;
+            files = this.files;
+            var video = document.createElement('video');
+            video.preload = 'metadata';
 
-        video.onloadedmetadata = function() {
-          window.URL.revokeObjectURL(video.src);
-          duration = format_duration(video.duration);
-          files.duration = duration;  
-          //updateInfos();
-          //alert(duration);
+            video.onloadedmetadata = function() {
+              window.URL.revokeObjectURL(video.src);
+              duration = format_duration(video.duration);
+              files.duration = duration;  
+              //alert(duration);
+            }
+
+            video.src = URL.createObjectURL(files[0]);
         }
-
-        video.src = URL.createObjectURL(files[0]);
     }
 }
 
@@ -183,6 +206,95 @@ $(document).on("click", ".upload-media-btn", function ()
 function makeProgress(i){      
             $(".progress-bar").css("width", i + "%").text(i + "%");
     }
+function getthumbnail(seekTo,filename) {
+    console.log("getting video cover for file: ", file);
+    return new Promise((resolve, reject) => {
+        // load the file to a video player
+        const videoPlayer = document.createElement('video');
+        videoPlayer.setAttribute('src', URL.createObjectURL($('input[name="file"]').get(0).files[0]));
+        videoPlayer.load();
+        var filename_src = videoPlayer.src;
+        console.log(filename_src);
+        videoPlayer.addEventListener('error', (ex) => {
+            reject("error when loading video file", ex);
+        });
+        // load metadata of the video to get video duration and dimensions
+        videoPlayer.addEventListener('loadedmetadata', () => {
+            // seek to user defined timestamp (in seconds) if possible
+            if (videoPlayer.duration < seekTo) {
+                reject("video is too short.");
+                return;
+            }
+            // delay seeking or else 'seeked' event won't fire on Safari
+            setTimeout(() => {
+              videoPlayer.currentTime = seekTo;
+            }, 200);
+            // extract video thumbnail once seeking is complete
+            videoPlayer.addEventListener('seeked', () => {
+                console.log('video is now paused at %ss.', seekTo);
+                // define a canvas to have the same dimension as the video
+                const canvas = document.createElement("canvas");
+                canvas.width = 360;//videoPlayer.videoWidth;
+                canvas.height =240;// videoPlayer.videoHeight;
+                // draw the video frame to canvas
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
+                // return the canvas image as a blob
+                var data = canvas.toDataURL("image/png");
+    
+                //send to php script
+                var xmlhttp = new XMLHttpRequest;
+
+                xmlhttp.onreadystatechange = function(){
+                    if (xmlhttp.readyState==4 && xmlhttp.status==200){
+                        console.log('saved');
+                    }
+                }
+                console.log("in getTHumb3");
+                console.log('saving');
+                xmlhttp.open("POST", "../../modules/ajax/video_upload.php?task=2", true);
+                xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+                xmlhttp.send('name='+encodeURIComponent(filename_src)+'&data='+data+'&filename='+filename);
+                console.log('name='+encodeURIComponent(filename_src)+'&data='+data);
+            });
+        });
+    });
+}
+/*function getThumb(){
+    console.log("in getTHumb");
+    var video = document.createElement("video");
+    
+    var fileURL = URL.createObjectURL($('input[name="file"]').get(0).files[0]);
+    video.src = fileURL;
+    var filename = video.src;
+    console.log(filename);
+    var w = video.videoWidth;//video.videoWidth * scaleFactor;
+    var h = video.videoHeight;//video.videoHeight * scaleFactor;
+    var canvas = document.createElement('canvas');
+    console.log("in getTHumb1");
+    canvas.width = 360;
+    canvas.height = 240;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    console.log("in getTHumb2");
+    //document.body.appendChild(canvas);
+    var data = canvas.toDataURL("image/png");
+    
+    //send to php script
+    var xmlhttp = new XMLHttpRequest;
+    
+    xmlhttp.onreadystatechange = function(){
+        if (xmlhttp.readyState==4 && xmlhttp.status==200){
+            console.log('saved');
+        }
+    }
+    console.log("in getTHumb3");
+    console.log('saving');
+    xmlhttp.open("POST", "http://localhost/parcx/modules/ajax/video_upload.php?task=2", true);
+    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    xmlhttp.send('name='+encodeURIComponent(filename)+'&data='+data);
+    console.log('name='+encodeURIComponent(filename)+'&data='+data);
+}*/
 
 function upload_3()
 {
@@ -193,6 +305,8 @@ function upload_3()
         var file_data = $('input[name="file"]').get(0).files[0];
         var formData = new FormData();
         formData.append('file', file_data);
+        if(isVideo)
+            getthumbnail(0.0,file_data.name);
         //formData.append('name', file_data.name);
         //alert("../../modules/ajax/video_upload.php?duration="+duration);
         $.ajax({
@@ -208,9 +322,10 @@ function upload_3()
                 }, false);
                 return xhr;
               },
-            url: "../../modules/ajax/video_upload.php?duration="+duration,
+            url: "../../modules/ajax/video_upload.php?duration="+duration+"&task=1",
             method: 'POST',
             data: formData,
+            async:false,
             contentType: false,
             processData: false,
             beforeSend: function(){
@@ -219,9 +334,13 @@ function upload_3()
             success: function (response) {
                 try{
                     var json = JSON.parse(response);
-                    if (json.status == 200) {
+                    if (json.status === 200) {
                         //alert("Upload Successful");
-                        location.reload();
+                        //location.reload();
+                        $("#upload_media_modal").modal('hide');
+                        $("#info-message").html("<i class='fas fa-check'></i>Update Successful");
+                        $("#info-modal").modal('show');
+
                     } else
                     {
                         $(".progress-bar").css("width", "0%").text("0%");
@@ -233,7 +352,7 @@ function upload_3()
                 }
                 catch (e) {
                     $(".progress-bar").css("width", "0%").text("0%");
-                    //alert("Upload Failed:"+response);
+                    console.log("here");
                     $("#error-upload").show();
                     $("#error-upload").html(response);
                 }
@@ -249,6 +368,10 @@ function upload_3()
     
 }
 
+$('#info-modal').on('hidden.bs.modal', function () {
+    location.reload();
+   })
+   
 $(document).on("click", ".play-video", function ()
     {
         var path = $(this).attr("data-path");

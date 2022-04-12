@@ -1,0 +1,13 @@
+
+Date :2022-04-07 08:38:37 In Get Details
+Date :2022-04-07 08:38:37 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-07 08:38:37 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-07 08:38:37 {"id":"1","title":"Standyby","stage_id":"1","schedule":"1","bg_video_file":"71416064_Video2.mp4","message_line1":"Al Saadiyaat(116)","message_line2":"PUMP 1 ","message_line3":"Message Line 3","description":"Description","animation_type":"image\/gif","animation_file":"71416614_Pivot.gif","timeout_period":"0","last_updated_date_time":"2022-04-06 13:56:55"}
+Date :2022-04-07 09:32:26 In Get Details
+Date :2022-04-07 09:32:26 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-07 09:32:26 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-07 09:32:26 {"id":"1","title":"Standyby","stage_id":"1","schedule":"1","bg_video_file":"71416064_Video2.mp4","message_line1":"Al Saadiyaat(116)","message_line2":"PUMP 1 ","message_line3":"Message Line 3","description":"Description","animation_type":"image\/gif","animation_file":"71416614_Pivot.gif","timeout_period":"0","last_updated_date_time":"2022-04-06 13:56:55"}
+Date :2022-04-07 09:34:15 In Get Details
+Date :2022-04-07 09:34:15 Request:{"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-07 09:34:15 {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-07 09:34:15 {"id":"1","title":"Standyby","stage_id":"1","schedule":"1","bg_video_file":"71416064_Video2.mp4","message_line1":"Al Saadiyaat(116)","message_line2":"PUMP 1 ","message_line3":"Message Line 3","description":"Description","animation_type":"image\/gif","animation_file":"71416614_Pivot.gif","timeout_period":"0","last_updated_date_time":"2022-04-06 13:56:55"}

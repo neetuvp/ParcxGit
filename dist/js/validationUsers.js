@@ -177,10 +177,10 @@ $("#addValidatorButton").click(function(){
     
 //Function Cancel Button
 
-$(".btn.btn-default").click(function(event){
+/*$(".btn.btn-default").click(function(event){
     event.preventDefault();
     location.reload(true);
-    });//end of $("btnCancel"),click()
+    });//end of $("btnCancel"),click()*/
 
 
 function getInputUserData()
