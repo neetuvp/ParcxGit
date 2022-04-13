@@ -1,8 +1,14 @@
 <?php
+//Add in footer:  plugins/timepicker/jquery.timepicker.min.js"></script>
+//plugins/timepicker/jquery.timepicker.min.css" />
 $page_title = "Playlist";
 
 include('../../includes/header.php');
+
 ?>
+
+
+
 <div class="navbar-has-tablink">
 
     <?php
@@ -44,10 +50,10 @@ include('../../includes/sidebar.php');
 </div>
 <!-- / end modal -->
 
-<div class="content-wrapper">
+<div class="content-wrapper container-wide">
     <section class="content">
         
-        <div class="block-data col-md-10" data-status="overview">
+        <div class="block-data col-md-12" data-status="overview">
             <div class="card" >               
                 <div class="card-body" id="div-RecordsTable">     
                     <table id="RecordsTable" class="table  table-bordered"> 
@@ -67,14 +73,15 @@ include('../../includes/sidebar.php');
 
 
 <?php include('../../includes/footer.php'); ?>
+
 <script>
     var status;
     var id;
     var table;
     var user_name;
     var page = 0;
+    var edit=false;
     table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
-    
     
     //Load data
 function loadTable()
@@ -94,6 +101,7 @@ function loadTable()
     //2022-03-01 23:00:00 - 2022-03-28 23:59:59
     $(document).ready(function ()
     {
+
         //$("#form-edit-user").validate();
         
         //table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
@@ -268,31 +276,14 @@ function loadTable()
             return false;
         });
         
-        /*$(function() {
-   $('.schedulestarttime').daterangepicker({
-            timePicker : true,
-            timePicker24Hour : true,
-            timePickerIncrement : 1,
-            timePickerSeconds : false,
-            locale : {
-                format : 'HH:mm:ss'
-            }
-        }).on('show.daterangepicker', function(ev, picker) {
-            picker.container.find(".calendar-table").hide();
-        }).on('show.daterangepicker', function(ev, picker) {
-            picker.container.find(".calendar-date").hide();
-        }).on('showCalendar.daterangepicker', function(ev, picker){
-           picker.container.find('.calendar-date').remove();
-       }).on('show.daterangepicker', function(ev, picker){
-           picker.container.find('.daterangepicker_start_input').remove();
-       }).on('show.daterangepicker', function(ev, picker){
-           picker.container.find('.daterangepicker_end_input').remove();
-       }).on('apply.daterangepicker', function (e, picker) {
-            var starttime = picker.startDate.format('HH:mm:ss')+" - "+picker.endDate.format('HH:mm:ss');
-            $('.schedulestarttime').val(starttime);
+        
+        $('.timepicker').timepicker({
+            scrollDefault: '00:00',
+            timeFormat: 'H:i',
+            step: 15,
         });
-})*/
-        $('.schedulestarttime').daterangepicker({
+        
+        /*$('.schedulestarttime').daterangepicker({
             timePicker : true,
             singleDatePicker:true,
             timePicker24Hour : true,
@@ -336,7 +327,7 @@ function loadTable()
         }).end().on('keypress paste', function (e) {
             e.preventDefault();
             return false;
-        });
+        });*/
         
         
         
@@ -346,6 +337,7 @@ function loadTable()
     
     $(document).on("click", ".playlist-checkbox", function ()
     {
+        edit=false;
         var id = $(this).attr("data-id");
         //alert(id)
         if($(this).is(":checked")) {
@@ -361,7 +353,7 @@ function loadTable()
                 
     });
     
-    $(document).on("click", ".edit-playlist", function ()
+   /* $(document).on("click", ".edit-playlist", function ()
     {
         var id = $(this).attr("data-id");
         //alert(id)
@@ -377,23 +369,29 @@ function loadTable()
         //}
                 
     });
- 
- 
-    
-    $(document).on("click", ".add-playlist", function (e)
+ */
+    function addeditplaylist(id,e)
     {
-        var id = $(this).attr("data-id");
         e.preventDefault();
         $("#pl-options-"+id).addClass("hidden");
         //$("#v"+id).addClass("hidden");//;.remove();
         $("#span-cbox-"+id).addClass("hidden");
         $("#span-del-"+id).removeClass("hidden");
+        $("#span-edit-"+id).removeClass("hidden");
         //$("#right").append("<div class='btn btn-block btn-info btn-lg bg-gray playlist-right' data-playlist="+id+" id='right-v"+id+"'>"+$('#v'+id).html()+"</div>");
-        var element = $('#v'+id).clone();
-        element.addClass("playlist-right")
-        $("#v"+id).remove();
-        $("#right").append(element);
-       
+        if(edit==false){
+            var element = $('#v'+id).clone();
+            element.addClass("playlist-right")
+            $("#v"+id).remove();
+            $("#right").append(element);
+        }
+        edit=false;
+    }
+    
+    $(document).on("click", ".add-playlist", function (e)
+    {
+        var id = $(this).attr("data-id");
+        addeditplaylist(id,e);
     });
     
    
@@ -413,7 +411,20 @@ function loadTable()
             format: 'YYYY-MM-DD'
         });
         
-        $("#v"+id).find('.schedulestarttime').daterangepicker({
+        $("#v"+id).find('.schedulestarttime').timepicker({
+            //scrollDefault: '00:00',
+            timeFormat: 'H:i',
+            step: 15,
+            
+        });
+        
+        $("#v"+id).find('.scheduleendtime').timepicker({
+            //scrollDefault: '00:00',
+            timeFormat: 'H:i',
+            step: 15,
+            
+        });
+        /*$("#v"+id).find('.schedulestarttime').daterangepicker({
             timePicker : true,
             singleDatePicker:true,
             timePicker24Hour : true,
@@ -460,12 +471,13 @@ function loadTable()
 	    {
 		$('#end-time'+id).val(timeformat+":59");
             }
-        });
+        });*/
         
         $("#pl-options-"+id).removeClass("hidden");
         //$('#playlist-modal-body').find("#c"+id).removeClass("hidden");//.remove();
         $("#span-cbox-"+id).removeClass("hidden");
         $("#span-del-"+id).addClass("hidden");
+        $("#span-edit-"+id).addClass("hidden");
         $("#c"+id).prop('checked', false); // Unchecks it
         $("#pl-options-"+id).hide();
     });
@@ -550,6 +562,22 @@ function loadTable()
              location.reload();
             
         });
+    });
+    
+    $(document).on("click", ".edit-playlist", function (e)
+    {
+        var id =$(this).attr("data-id");
+        if(edit==true)
+        {
+            addeditplaylist(id,e);
+        }
+        else
+        {
+            edit=true;
+            $("#pl-options-"+id).show();
+            $("#pl-options-"+id).removeClass("hidden");
+        }
+        
     });
     
   /*  $("#view_playlist_modal" ).scroll(function() {

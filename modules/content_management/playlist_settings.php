@@ -128,7 +128,7 @@ body {
                         </div> 
                         
                     </div>  
-                    <div id="playlist-div" class="row card card-body">
+                    <div id="playlist-div" class="block-data p-3">
 
                         <div class="row  mb-3">
                             <div class="col h5">
@@ -236,7 +236,7 @@ body {
                 });
                 $("#add-edit-button").val("Submit");
             }
-            $('.block-data').css('display', 'none');
+            //$('.block-data').css('display', 'none');
             $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
             $('.tab-link').removeClass('active');
             $(this).addClass('active');
@@ -331,6 +331,10 @@ body {
      });
 
 $('#info-modal').on('hidden.bs.modal', function () {
+    location.reload();
+   })
+   
+$('#add-edit-playlist-modal').on('hidden.bs.modal', function () {
     location.reload();
    })
    

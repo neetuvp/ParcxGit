@@ -40,12 +40,12 @@ string toString(Php::Value param) {
     return value;
 }
 
-std::vector<std::string> split_videolist(const std::string& s, char delimiter) {
-    std::vector<std::string> splits;
+std::vector<int> split_videolist(const std::string& s, char delimiter) {
+    std::vector<int> splits;
     std::string split;
     std::istringstream ss(s);
     while (std::getline(ss, split, delimiter)) {
-        splits.push_back(split);
+        splits.push_back(stoi(split));
     }
     return splits;
 }
@@ -814,13 +814,46 @@ void showMediaLibraryList(Php::Value data)
     
     }
 
-Php::Value enabledisableVideo(Php::Value json) {
+void removeMediafromPlaylist(int media_id,int playlist_id,string playlist_videos)
+{
+    sql::Connection *con;
+    sql::PreparedStatement *prep_stmt; 
+    string playlist_updated="";
+    try {
+        vector<int>video_array = split_videolist(playlist_videos,','); //video labels
+        for(int id:video_array) 
+        {
+            if(id==media_id)
+                continue;
+            else
+            {
+                playlist_updated = playlist_updated+to_string(id)+",";
+            }
+        }
+        if (!playlist_updated.empty()) {
+            playlist_updated.pop_back();
+        }
+
+        con = General.mysqlConnect(ServerDB);
+        string query = "update playlist_settings set playlist_videos=? where id=?";
+        prep_stmt = con->prepareStatement(query);
+        prep_stmt->setString(1,playlist_updated);
+        prep_stmt->setInt(2,playlist_id);
+        prep_stmt->executeUpdate();
+    }    
+    catch (const std::exception& e) {
+        writeException("removeMediafromPlaylist", e.what());
+    }
+}
+
+Php::Value enabledisableMedia(Php::Value json) {
     string msg = "Failed";
     try {
         int status = json["status"];
         int id = json["id"];
         sql::Connection *con;
-        sql::PreparedStatement *prep_stmt;                    
+        sql::PreparedStatement *prep_stmt; 
+        sql::ResultSet *res;
         con = General.mysqlConnect(ServerDB);
         string query = "update media_library set media_status=? where id=?";
         prep_stmt = con->prepareStatement(query);
@@ -830,13 +863,22 @@ Php::Value enabledisableVideo(Php::Value json) {
         if(n>0)
         {
             msg = "Successfull";
+            query = "SELECT * FROM playlist_settings where FIND_IN_SET(?, playlist_videos)";
+            prep_stmt = con->prepareStatement(query);
+            prep_stmt->setInt(1,id);
+            res = prep_stmt->executeQuery();
+            while(res->next())
+            {
+                removeMediafromPlaylist(id,res->getInt("id"),res->getString("playlist_videos"));
+            }
+            delete res;
         }
         
         delete prep_stmt;
         delete con;
     
     }    catch (const std::exception& e) {
-        writeException("enabledisableVideo", e.what());
+        writeException("enabledisableMedia", e.what());
     }
     
     return msg;
@@ -885,14 +927,15 @@ string getScreenPlaylist(int device_number)
             html_data+="<div class='row'>";
             html_data+="<fieldset>";
             html_data+="<span class='float-left mr-3 hidden' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span>";
-            html_data+="<span class='float-left mr-3' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></span>";
+            html_data+="<span class='float-left mr-1' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></span>";
+            html_data+="<span class='float-left mr-3' id='span-edit-"+id+"'><button class='btn btn-info btn-sm edit-playlist mr-1' value='edit"+id+"' data-id='"+id+"'><i class='fas fa-edit'></i></button></span>";
             html_data+="<label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label>";
             html_data+="</fieldset>";
             html_data+="</div>";
             html_data+="<div class='row center'>";
             html_data+="<fieldset class='pl-options mt-2 hidden' id='pl-options-"+id+"'>";
             html_data+="<p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range' value = '"+res->getString("start_date")+" - "+res->getString("end_date")+"'></p>";
-            html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time'  value='"+res->getString("start_time")+"'><input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value='"+res->getString("end_time")+"'></div>";
+            html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime timepicker' autocomplete='off' placeholder='Choose Start Time'  value='"+res->getString("start_time")+"'><input type='text' id='end-time"+id+"' class='form-control scheduleendtime timepicker' autocomplete='off' placeholder='Choose End Time' value='"+res->getString("end_time")+"'></div>";
             if(res->getInt("repeat_videos")==1)
                 checked = "checked";
             else
@@ -965,11 +1008,13 @@ void manageScreenPlaylist(Php::Value data)
             id = res->getString("id");
             html_data +="<div class='btn btn-block btn-info btn-lg bg-gray' id='v"+id+"' data-playlist='"+id+"'>";
             html_data +="<div class='row'>";
-            html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span><span class='float-left mr-3 hidden' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></button></span><label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
+            html_data +="<fieldset><span class='float-left mr-3' id='span-cbox-"+id+"'><input type='checkbox' class = 'playlist-checkbox' id = 'c"+id+"' data-id='"+id+"' value='p"+id+"'></checkbox></span><span class='float-left mr-1 hidden' id='span-del-"+id+"'><button class='btn btn-danger btn-sm del-playlist mr-1' value='delete"+id+"' data-id='"+id+"'><i class='fas fa-minus'></i></button></button></span>";
+            html_data += "<span class='float-left mr-3 hidden' id='span-edit-"+id+"'><button class='btn btn-info btn-sm edit-playlist mr-1' data-id='"+id+"'><i class='fas fa-edit'></i></button></button></span>";
+            html_data += "<label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
             html_data +="</div>";
             html_data +="<div class='row center'>";
             html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range'></p>";
-            html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time' value='' data-id="+id+"><input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value=''  data-id="+id+"></div>";
+            html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime timepicker' autocomplete='off' placeholder='Choose Start Time' value='' data-id="+id+"><input type='text' id='end-time"+id+"' class='form-control scheduleendtime timepicker' autocomplete='off' placeholder='Choose End Time' value=''  data-id="+id+"></div>";
             //html_data+="<input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time' value = '"+res->getString("start_time")+"'> <input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value = '"+res->getString("end_time")+"'>";
             html_data+="<p><span class='float-left mt-1'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p></fieldset>";
             html_data +="</div>";
@@ -1105,7 +1150,7 @@ Php::Value parcxContentManagement(Php::Parameters &params) {
             break;
         case 10:showMediaLibraryList(data);
             break;
-        case 11:response=enabledisableVideo(data);
+        case 11:response=enabledisableMedia(data);
             break;
         case 12:response = getDetailsbyId("playlist_settings", "id", data);
             break;

@@ -68,10 +68,7 @@ include('../../includes/sidebar.php');
             <div class="modal-body pt-4 pl-4 pr-4 pb-4 modal-body-view-video">    
                 
             </div>
-            
-            <div class="modal-footer">
-                
-            </div>
+          
 
         </div>
     </div>
@@ -90,6 +87,10 @@ include('../../includes/sidebar.php');
             </div>
             <div class="modal-body pt-4 pl-4 pr-4 pb-4 h5" id='info-message'> 
            </div>
+            <div class="modal-footer hidden" id="info-footer">
+                <button type="button" class="btn btn-default" id="modal-btn-yes">Yes</button>
+                <button type="button" class="btn btn-primary" id="modal-btn-no">No</button>
+            </div>
         </div>
     </div>
 </div>
@@ -340,6 +341,7 @@ function upload_3()
                         $("#upload_media_modal").modal('hide');
                         $("#info-message").html("<i class='fas fa-check'></i>Update Successful");
                         $("#info-modal").modal('show');
+                        $("#info-footer").addClass("hidden");
 
                     } else
                     {
@@ -397,16 +399,26 @@ $(document).on("click", ".play-video", function ()
 
     });
     
-$(document).on("click", ".video-enable-disable-btn", function ()
-{
-    id = $(this).parent('td').parent('tr').data('id');
-    user_name = $(this).parent('td').siblings(":eq( 0 )").text();
-    var status_text = $(this).attr("data-text");
-    if (status_text == "Disable")
-        status = 0;
-    else
-        status = 1;
+   
+    var modalConfirm = function(callback){
+        $("#info-message").html("This action will remove the current media from playlists.Do you wish to continue?");
+        $("#info-modal").modal('show');
+        $("#info-footer").removeClass("hidden");
+        
+        $("#modal-btn-yes").on("click", function(){
+          callback(true);
+          $("#info-modal").modal('hide');
+        });
 
+        $("#modal-btn-no").on("click", function(){
+          callback(false);
+          $("#info-modal").modal('hide');
+        });
+    };
+    
+    
+function enabledisable(id,status)
+{
     var data = {};
     data["id"] = id;
     data["status"] = status;
@@ -418,6 +430,32 @@ $(document).on("click", ".video-enable-disable-btn", function ()
         else
             alert(result);
     });
+}
+
+$(document).on("click", ".video-enable-disable-btn", function (e)
+{
+    id = $(this).parent('td').parent('tr').data('id');
+    var status_text = $(this).attr("data-text");
+    if (status_text == "Disable")
+    {
+        status = 0;
+        modalConfirm(function(confirm){
+            if(confirm){
+               enabledisable(id,status);
+            }
+            else{
+                
+            }
+        });
+        
+    }
+    else
+    {
+        status = 1;
+        enabledisable(id,status);
+    }
+
+    
 });
 
 

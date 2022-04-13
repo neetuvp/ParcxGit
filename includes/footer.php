@@ -122,6 +122,10 @@ function update_session()
 <script src="<?=URL?>plugins/jquery/moment.min.js"></script>
 <script src="<?=URL?>plugins/daterangepicker/daterangepicker.js"></script>
 
+
+<!-- timepicker -->
+<script src="<?=URL?>plugins/timepicker/jquery.timepicker.min.js"></script>
+<link rel="stylesheet" href="<?=URL?>plugins/timepicker/jquery.timepicker.min.css" />
 <!-- theme scripts -->
 <script src="<?=URL?>dist/js/parcx.js"></script>
 
