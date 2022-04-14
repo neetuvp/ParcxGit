@@ -183,7 +183,7 @@ body {
 <div class="content-wrapper container-wide">
     <section class="content">
         <!-- playlist table -->         
-        <div class="block-data col-md-10" data-status="overview">
+        <div class="block-data col-md-12" data-status="overview">
             <div class="card" >               
                 <div class="card-body" id="div-RecordsTable">     
                     <table id="RecordsTable" class="table  table-bordered"> 

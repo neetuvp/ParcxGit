@@ -7,6 +7,8 @@
 #include <cppconn/prepared_statement.h>
 #include "validation.h"
 #include<vector>
+#include <algorithm>
+#include <string>
 #define ServerDB "parcx_server"
 #define ReportingDB "parcx_reporting"
 #define DashboardDB "parcx_dashboard"
@@ -16,6 +18,7 @@
 #define MAXLENGTH "Maximum Length Exceeded"
 #define CONSTRAINT "Invalid Character"
 #define MediaPath "/opt/lampp/htdocs/parcx/modules/greeting/Media"
+#define DisplayMediaPath "/parcx/modules/greeting/Media"
 using namespace std;
 GeneralOperations General;
 Validation validation;
@@ -35,7 +38,7 @@ string toString(Php::Value param) {
     return value;
 }
 
-std::vector<std::string> split_videolist(const std::string& s, char delimiter) {
+std::vector<std::string> splitstring(const std::string& s, char delimiter) {
     std::vector<std::string> splits;
     std::string split;
     std::istringstream ss(s);
@@ -108,7 +111,8 @@ Php::Value uploadMedia(Php::Value data)
     else
     {
         string extension = filename.substr(filename.find_last_of(".") + 1);
-        if(extension == "mp4" ||  extension == "gif" || extension == "lottie" || extension == "json")  {
+        
+        if(extension == "mp4" ||  extension == "MP4" ||  extension == "gif" ||  extension == "GIF" || extension == "lottie" || extension == "json" ||  extension == "JSON")  {
             if(error>0)
             {
                 result ="File Upload Error:"+to_string(error) ;
@@ -144,28 +148,38 @@ Php::Value uploadMedia(Php::Value data)
 Php::Value updateStage(Php::Value data)
 {
     string result = "Failed";
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt=NULL;    
     try
         {
-        string query_string="";
-        sql::Connection *con;
-        sql::PreparedStatement *prep_stmt=NULL;    
-        
+        string query_string="";     
         con= General.mysqlConnect(ServerDB); 
-        query_string = "Update greeting_screen set message_line1=?,message_line2=?,message_line3=?,description=?,bg_video_file=?,animation_file=?,title=?,animation_type=?,timeout_period=?, last_updated_date_time=NOW() where stage_id=? and schedule=?";
-            
+        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_video_file=?,animation_file=?,title=?,animation_type=?,timeout_period=?, last_updated_date_time=NOW() where stage_id=? and schedule=?";          
             
         prep_stmt = con->prepareStatement(query_string);
         prep_stmt->setString(1,toString(data["message_line1"]));
-        prep_stmt->setString(2,toString(data["message_line2"]));
-        prep_stmt->setString(3,toString(data["message_line3"]));
-        prep_stmt->setString(4,toString(data["description"]));
-        prep_stmt->setString(5,toString(data["bg_file"]));
-        prep_stmt->setString(6,toString(data["animation_file"]));
-        prep_stmt->setString(7,toString(data["title"]));
-        prep_stmt->setString(8,toString(data["animation_type"]));
-        prep_stmt->setInt(9,data["timeout"]);
-        prep_stmt->setString(10,toString(data["stage_id"]));
-        prep_stmt->setInt(11,data["schedule"]);
+        prep_stmt->setString(2,toString(data["m1_font_family"]));
+        prep_stmt->setInt(3,data["m1_font_size"]);
+        prep_stmt->setString(4,toString(data["m1_font_color"]));
+
+        prep_stmt->setString(5,toString(data["message_line2"]));
+        prep_stmt->setString(6,toString(data["m2_font_family"]));
+        prep_stmt->setInt(7,data["m2_font_size"]);
+        prep_stmt->setString(8,toString(data["m2_font_color"]));
+
+        prep_stmt->setString(9,toString(data["message_line3"]));
+        prep_stmt->setString(10,toString(data["m3_font_family"]));
+        prep_stmt->setInt(11,data["m3_font_size"]);
+        prep_stmt->setString(12,toString(data["m3_font_color"]));
+
+        prep_stmt->setString(13,toString(data["description"]));
+        prep_stmt->setString(14,toString(data["bg_file"]));
+        prep_stmt->setString(15,toString(data["animation_file"]));
+        prep_stmt->setString(16,toString(data["title"]));
+        prep_stmt->setString(17,toString(data["animation_type"]));
+        prep_stmt->setInt(18,data["timeout"]);
+        prep_stmt->setString(19,toString(data["stage_id"]));
+        prep_stmt->setInt(20,data["schedule"]);
         
 
         prep_stmt->executeUpdate();
@@ -175,21 +189,22 @@ Php::Value updateStage(Php::Value data)
         delete con;  
         }
     catch(const std::exception& e)
-        {
+    {
         writeException("updateStage",e.what());
-        }
+        delete con;
+        result = "Failed";
+    }
         return result;
     
 }
 
 Php::Value getStageDetails(Php::Value data) {
     Php::Value response;
-    try {
-        sql::Connection *con;
-        sql::PreparedStatement *prep_stmt;
-        sql::ResultSet *res;
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    try {      
         con = General.mysqlConnect(ServerDB);
-        
         prep_stmt = con->prepareStatement("select * from greeting_screen where stage_id =? and schedule=?");
         prep_stmt->setString(1, toString(data["stage_id"]));
         prep_stmt->setString(2, toString(data["schedule"]));
@@ -205,55 +220,250 @@ Php::Value getStageDetails(Php::Value data) {
         delete con;
     } catch (const std::exception& e) {
         writeException("getStageDetails", e.what());
+        delete con;
     }
     return response;
 }
 
-/*Php::Value getAllStages(Php::Value data) {
-    Php::Value response;
-    Php::Value data;
+void showAdvertisementVideos(Php::Value data) {
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
     try {
-        sql::Connection *con;
-        sql::PreparedStatement *prep_stmt;
-        sql::ResultSet *res;
-        sql::ResultSetMetaData *res_meta;
         con = General.mysqlConnect(ServerDB);
-        int j=0;
-        int columns,i;
-        prep_stmt = con->prepareStatement("SELECT stage_id,title,description FROM `greeting_screen` where schedule = 1 group by stage_id");
-        res = prep_stmt->executeQuery();
-        while (res->next()) {
-            res_meta = res -> getMetaData();
-            columns = res_meta -> getColumnCount();
-            for (i = 1; i <= columns; i++)
-                data[res_meta -> getColumnLabel(i)] = string(res->getString(i));
-            response[j] = data;
-        }
+        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement_video where schedule=? order by id desc");
+        prep_stmt->setString(1, toString(data["schedule"]));
+        res = prep_stmt->executeQuery();        
+       
+            Php::out<<"<table  class='table  table-bordered ' id='table_videos'>"<<std::endl;
+            
+            Php::out << "<thead class='thead-light'>" << std::endl;
+            Php::out << "<tr>" << endl;
+            Php::out << "<th>Media</th>" << endl;
+            Php::out << "<th>Start Date</th>" << endl;
+            Php::out << "<th>Expiry Date</th>" << endl;
+            Php::out << "<th></th>"<< endl;
+            Php::out << "<th><button type='button' class='btn btn-info advt-video-add-btn' title='Add Video'><i class='fas fa-plus'></i></button></th>" << endl;            
+            Php::out << "</tr>" << endl;
+            Php::out << "</thead>" << std::endl;
+            
+            while (res->next()) {
+                Php::out << "<tr data-id='" << res->getString("id") << "'>" << endl;
+                Php::out << "<td>" + res->getString("video_file") + "</td>" << endl;
+                Php::out << "<td>" + res->getString("start_date") + "</td>" << endl;
+                Php::out << "<td>" + res->getString("expiry_date") + "</td>" << endl;
+                Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                Php::out << "<td>" << std::endl;
+                if (res->getInt("status") == 1)
+                    Php::out << "<button type='button' class='btn btn-danger ad-video-enable-disable-btn' data-text='Disable' title='Disable'><i class='fas fa-stop-circle'></i></button>" << std::endl;
+                else
+                    Php::out << "<button type='button' class='btn btn-success ad-video-enable-disable-btn' data-text='Enable' title='Enable'><i class='fas fa-play-circle'></i></button>" << std::endl;            
+
+                Php::out << "<button type='button' class='btn btn-info ad-video-edit' title='Edit' data-text='Edit'><i class='fas fa-edit'></i></button>" << std::endl;
+                Php::out << "</td>" << std::endl;
+                Php::out << "</tr>" << endl;
+                }
+          Php::out<<"</table>"<<std::endl;   
+        
+        
+               
         delete res;
         delete prep_stmt;
         delete con;
     } catch (const std::exception& e) {
-        writeException("getStageDetails", e.what());
+        writeException("showAdvertisementVideos", e.what());
+        delete con;
     }
-    return response;
-}*/
+
+}
+
+Php::Value enabledisableAdVideo(Php::Value json) {
+    string msg = "Failed";
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;   
+    try {
+        int status = json["status"];
+        int id = json["id"];                 
+        con = General.mysqlConnect(ServerDB);
+        string query = "update greeting_screen_advertisement_video set status=? where id=?";
+        prep_stmt = con->prepareStatement(query);
+        prep_stmt->setInt(1,status);
+        prep_stmt->setInt(2,id);
+        int n = prep_stmt->executeUpdate();
+        if(n>0)
+        {
+            msg = "Successfull";
+        }
+        
+        delete prep_stmt;
+        delete con;
+    
+    }    catch (const std::exception& e) {
+        writeException("enabledisableAdVideo", e.what());
+        delete con;
+    }
+    
+    return msg;
+}
+
+
+Php::Value insertUpdateAdVideo(Php::Value data)
+{
+    string result = "Failed";
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt=NULL;    
+    try
+        {
+        string id=data["id"];
+        string query_string="";
+        
+        
+        con= General.mysqlConnect(ServerDB); 
+        if(id=="")
+            {
+            query_string = "insert into greeting_screen_advertisement_video(start_date,expiry_date,schedule,video_file,status)values(?,?,?,?,1)";           
+            prep_stmt = con->prepareStatement(query_string);      
+            prep_stmt->setInt(3,data["schedule"]);
+            prep_stmt->setString(4,toString(data["file_name"]));
+            }
+        else
+            {
+            query_string = "Update greeting_screen_advertisement_video set start_date=?,expiry_date=? where id=?";            
+            prep_stmt = con->prepareStatement(query_string);      
+            prep_stmt->setString(3,id);
+            }
+                                           
+        prep_stmt->setString(1,toString(data["start_date"]));
+        prep_stmt->setString(2,toString(data["expiry_date"]));
+                
+        prep_stmt->executeUpdate();
+        result = "Success";
+    
+        delete prep_stmt;
+        delete con;  
+        }
+    catch(const std::exception& e)
+    {
+        writeException("insertUpdateAdVideo",e.what());
+        delete con;
+    }
+        return result;
+    
+}
+
+void getfontfamilyDropdown()
+{
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    try 
+    {
+        con = General.mysqlConnect(ServerDB);
+        string query = "select font_family from greeting_font_styles";
+        prep_stmt = con->prepareStatement(query);
+        res = prep_stmt->executeQuery();
+        if(res->next())
+        {
+            vector<string>font_array = splitstring(res->getString("font_family"),','); //video labels
+            for(string font:font_array) 
+            {
+                Php::out << "<option value='"<<font<<"'>"<<font<<"</option>" << std::endl; 
+            }
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    
+    }    
+    catch (const std::exception& e) {
+        writeException("getfontfamilyDropdown", e.what());
+        delete con;
+    }
+}
+
+void getfontsizeDropdown()
+{
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    try 
+    {
+        con = General.mysqlConnect(ServerDB);
+        string query = "select font_size from greeting_font_styles";
+        prep_stmt = con->prepareStatement(query);
+        res = prep_stmt->executeQuery();
+        if(res->next())
+        {
+            vector<string>font_array = splitstring(res->getString("font_size"),','); //video labels
+            for(string font:font_array) 
+            {
+                Php::out << "<option value="<<font<<">"<<font<<"</option>" << std::endl; 
+            }
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    
+    }    
+    catch (const std::exception& e) {
+        writeException("getfontsizeDropdown", e.what());
+        delete con;
+    }
+}
+
+void getfontcolorDropdown()
+{
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    try 
+    {
+        con = General.mysqlConnect(ServerDB);
+        string query = "select font_color from greeting_font_styles";
+        prep_stmt = con->prepareStatement(query);
+        res = prep_stmt->executeQuery();
+        if(res->next())
+        {
+            vector<string>font_array = splitstring(res->getString("font_color"),','); //video labels
+            for(string font:font_array) 
+            {
+                Php::out << "<option value="<<font<<">"<<font<<"</option>" << std::endl; 
+            }
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    
+    }    
+    catch (const std::exception& e) {
+        writeException("getfontcolorDropdown", e.what());
+        delete con;
+    }
+}
 
 Php::Value parcxGreetingScreen(Php::Parameters &params) {
     Php::Value data = params[0];
     int task = data["task"];
     Php::Value response;
     switch (task) {
-        case 1:response = uploadMedia(data);
-            //writeLog("Main",toString(response));
+        case 1:response = uploadMedia(data);           
             break;
         case 2:response = updateStage(data);
             break;
         case 3:response = getStageDetails(data);
             break;
-        //case 4:response = getAllStages(data);
-         //   break;
-        
-        
+        case 4:showAdvertisementVideos(data);
+            break;
+        case 5:response=enabledisableAdVideo(data);
+            break;
+        case 6:response=insertUpdateAdVideo(data);
+            break;
+        case 7:getfontfamilyDropdown();
+            break;
+        case 8:getfontsizeDropdown();
+            break;
+        case 9:getfontcolorDropdown();
+            break;
     }
     return response;
 }
