@@ -1,0 +1,4 @@
+1.AVI Plugin
+2.Enabling a video should reflect in playlist
+3.Adding the same playlist multiple times to the same screen
+4.Device Playlist - The timepicker does not show when a playlist is added and trying to edit in the right div

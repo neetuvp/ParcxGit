@@ -2,9 +2,10 @@
 $page_title = "Playlist";
 
 include('../../includes/header.php');
+
 //$access = checkPageAccess("playlist");
 ?>
-
+<script src="<?=URL?>plugins/jQueryUI/jquery-ui.js"></script>
 <div class="navbar-has-tablink">
 
     <?php
@@ -15,8 +16,8 @@ include('../../includes/header.php');
 <div class="header text-dark" id="pdf-report-header">Playlist Settings</div>
 <div class="row hidden-sm-down">
     <div class="col tab-header d-flex justify-content-center">
-        <div class="tab-link active" data-target="overview">Overview</div>
-        <div class="tab-link" data-target="form">Add Playlist</div>
+        <div class="tab-link active" data-target="overview" id="overview-tab">Overview</div>
+        <div class="tab-link" data-target="form" id="form-tab">Add Playlist</div>
     </div>
 </div>
 
@@ -24,7 +25,8 @@ include('../../includes/header.php');
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
 ?>
-<style>
+
+<!--<style>
 * {
   box-sizing: border-box;
 }
@@ -76,9 +78,9 @@ body {
   clear: both;
 }
 
-</style>
-<!-- Modal  -->
-<div class="modal fade text-dark" id="view_playlist_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+</style>-->
+<!--View Playlist Modal  -->
+<div class="modal fade text-dark" id="view_playlist_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none; z-index:2000">
     <div class="modal-dialog" role="document" id="edit-content">
         <div class="modal-content">
             <div class="modal-header">
@@ -90,102 +92,114 @@ body {
                 
             </div>
 
-            <div class="modal-body pt-4 pl-4 pr-4 pb-4">
-                
-                
-                          
+            <div class="modal-body pt-4 pl-4 pr-4 pb-4 view-playlist-body">
             </div>
-            
-            
-            <!--<div class="modal-footer">
-                <button type='button' class='btn btn-info' name='update_payment_btn' id='update_payment_btn' value='Update'>Update</button>  
-            </div>-->
         </div>
     </div>
 </div>
 <!-- end / Modal -->
 
-<div class="content-wrapper">
-    <section class="content">
-        <div class="container-wide">        
-            <!-- add/update carpark form --> 
-            <form name="form1" class="block-data card card-body col-md-10" data-status="form" style="display:none;" id="form">                
-                <div class="alert alert-light mb-2" role="alert" id="messagebox">
-                                    
-                </div>
-                <div class="row">                    
-                    <div class="col form-group">
-                        <label for="">Playlist Name</label>
-                        <input type="text" class="form-control" id="playlist_name" required name="playlist_name">
-                    </div>
-                    <div class="col form-group">
+<!--Add Playlist Modal  -->
+<!-- Modal -->
+<div class="modal fade" id="add-edit-playlist-modal"  tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="z-index: 1999;">
+    <div class="modal-dialog modal-xl" style="width:1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add/Edit Playlist</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="close-playlist-modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-2" id="playlist-modal-body">  
+                <form name="form1" class="block-data " data-status="form"  id="form">                
+                    <!--<div class="alert alert-light mb-2" role="alert" id="messagebox">
+                    </div>-->
+                    <div class="row">                    
+                        <div class="col form-group">
+                            <label for="">Playlist Name</label>
+                            <input type="text" class="form-control" id="playlist_name" required name="playlist_name">
+                        </div>
                         
-                    </div>
-                </div> 
-                <div class="row">
-                    <div class="col form-group">
-                        <label for="">Description</label>
-                        <input type="text" class="form-control" id="description"  name="description">
-                    </div> 
-                    <div class="col form-group">
+                    
+                        <div class="col form-group">
+                            <label for="">Description</label>
+                            <input type="text" class="form-control" id="description"  name="description">
+                        </div> 
                         
-                    </div>
-                </div>  
-                <div id="customer-div" class="row card card-body">
-                 
-                    <div class="row  mb-3">
-                        <div class="col h5">
-                            <label for="">Drag the videos in sequence to create the playlist</label>
+                    </div>  
+                    <div id="playlist-div" class="block-data p-3">
+
+                        <div class="row  mb-3">
+                            <div class="col h5">
+                                <label for="">Drag the videos in sequence to create the playlist</label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row  mb-1">
-                        <div class="col"><h4>VIDEO LIBRARY</h4></div>
-                        <div class="col p-2"></h4></div>
-                        <div class="col"><h4>PLAYLIST</h4></div>
-                    </div>
-                    <div class="row">
-                        <div class="col form-group form-control scroll-smooth" id="left" ondrop="drop(event)" ondragover="allowDrop(event)">
-                            <?php
-                                $data["task"] = 4;
-                                parcxContentManagement($data);
-                            ?> 
+                        <div class="row  mb-1">
+                            <div class="col"><h4>VIDEO LIBRARY</h4></div>
+                            <div class="col p-2"></h4></div>
+                            <div class="col"><h4>PLAYLIST</h4></div>
                         </div>
-                        <div class="p-2" >
+                        <div class="row dragdrop ">
+                            <div class="col connectedSortable overflow-hidden" id="left">
+                                <?php
+                                    $data["task"] = 4;
+                                    parcxContentManagement($data);
+                                ?> 
+                            </div>
+                            
+                            <div class="col connectedSortable overflow-hidden" id="right">
 
-                        </div>
+                            </div>                    
+                        </div>   
+                    </div>
 
-                        <div class="col form-group form-control scroll-smooth" id="right" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <input type="submit" class="signUp btn btn-block btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
 
-                        </div>                    
-                    </div>   
-                </div>
-               
-                <input type="submit" class="signUp btn btn-block btn-info mt-2 btn-lg" value="Submit" id="add-edit-button">
-           
-            </form>
-
-            <!-- playlist table -->         
-            <div class="block-data col-md-10" data-status="overview">
-                <div class="card" >               
-                    <div class="card-body" id="div-RecordsTable">     
-                        <table id="RecordsTable" class="table  table-bordered"> 
-                            <?php
-                            $data["task"] = 1;
-                            $data["edit"] = 1;
-                            $data["delete"]=1;
-                            parcxContentManagement($data);
-                            ?> 
-                        </table>
-                    </div>                                                  
-                </div>             
-            </div>             
-
+                </form>             
+            </div>
         </div>
+    </div>
+</div>
+<!-- / end modal -->
+<!-- Info modal -->
+<div class="modal fade" id="info-modal" tabindex="-1" role="dialog" aria-labelledby="edit-preview" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Info</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body pt-4 pl-4 pr-4 pb-4 h5" id='info-message'> 
+           </div>
+        </div>
+    </div>
+</div>
+<!-- Info modal -->
+
+
+<div class="content-wrapper container-wide">
+    <section class="content">
+        <!-- playlist table -->         
+        <div class="block-data col-md-12" data-status="overview">
+            <div class="card" >               
+                <div class="card-body" id="div-RecordsTable">     
+                    <table id="RecordsTable" class="table  table-bordered"> 
+                        <?php
+                        $data["task"] = 1;
+                        $data["edit"] = 1;
+                        $data["delete"]=1;
+                        parcxContentManagement($data);
+                        ?> 
+                    </table>
+                </div>                                                  
+            </div>             
+        </div>             
     </section>
 </div>
-<!-- password strength -->
-<script src="../../plugins/password-strength/password.js"></script>
-<script src="../../dist/js/password.js"></script>
+
 
 <?php include('../../includes/footer.php'); ?>
 <script>
@@ -195,24 +209,7 @@ body {
     var user_name;
     var page = 0;
     table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
-    $(".pw-view-btn button").on('click', function (event)
-    {
-        event.preventDefault();
-        var currentElement = $(this).parents(".pw-view-btn");
-        var id = $("#" + currentElement.attr('id'))
-        var inputElement = id.find('input');
-        var inputIcon = id.find('i');
-
-        if (inputElement.attr("type") == "text") {
-            inputElement.attr('type', 'password');
-            inputIcon.addClass("fa-eye-slash");
-            inputIcon.removeClass("fa-eye");
-        } else if (inputElement.attr("type") == "password") {
-            inputElement.attr('type', 'text');
-            inputIcon.removeClass("fa-eye-slash");
-            inputIcon.addClass("fa-eye");
-        }
-    });
+    
 
 
     $(document).ready(function ()
@@ -225,7 +222,7 @@ body {
             var $target = $(this).data('target');
             if ($target == "form")
             {
-                //alert("here");
+                $("#add-edit-playlist-modal").modal('show');
                 $("#left").html("");
                 $("#right").html("");
                 $("form[name=form1]").trigger('reset');
@@ -239,7 +236,7 @@ body {
                 });
                 $("#add-edit-button").val("Submit");
             }
-            $('.block-data').css('display', 'none');
+            //$('.block-data').css('display', 'none');
             $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
             $('.tab-link').removeClass('active');
             $(this).addClass('active');
@@ -271,14 +268,22 @@ body {
             
             submitHandler: function ()
             {
+                event.preventDefault();
                 var data = {};
+                if ($("#add-edit-button").val() == "Submit")
+                {
+                    data["id"] = "";
+                } else
+                {
+                    data["id"] = id;
+                }
                 var div_id="";
                 data["playlist_name"] = $("#playlist_name").val();
                 data["description"] = $("#description").val();
                 var video_list="";
                 $('#right > div').map(function() {
                     div_id = this.id;
-                    div_id = div_id.substring(1)
+                    div_id = div_id.substring(1);
                     video_list = video_list+div_id+",";
                 });
                 var l = video_list.length;
@@ -288,17 +293,51 @@ body {
                 var jsondata = JSON.stringify(data);
                 console.log(jsondata);
                 $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-                    console.log(result);
-                    if (result === "Successfull")
-                        location.reload();
+                    //console.log(result);
+                    if (result === "Successfull"){
+                        //location.reload();
+                        $("#add-edit-playlist-modal").modal('hide');
+                        $("#info-message").html("<i class='fas fa-check'></i>Update Successful");
+                        $("#info-modal").modal('show');
+                    }
                     else
                         alert(result);
                 });
             }
         });
+        
+         /*$( "#right" ).sortable({
+            revert: true
+          });
+          
+          
+          
+          
+          $( "#play-video" ).draggable({
+            connectToSortable: "#right",
+            helper: "clone",
+            revert: "invalid"
+          });*/
+        
+        $( "#left, #right" ).sortable({
+            //items: ".play-video",
+            //revert: true,
+            helper: 'clone',
+            appendTo: 'body',
+            zIndex: 10000,
+            cursor: "move",
+            connectWith: ".connectedSortable"
+          }).disableSelection();
      });
 
-
+$('#info-modal').on('hidden.bs.modal', function () {
+    location.reload();
+   })
+   
+$('#add-edit-playlist-modal').on('hidden.bs.modal', function () {
+    location.reload();
+   })
+   
     function loadTable()
     {
         var data = {};
@@ -318,7 +357,6 @@ body {
 
     /* === enable disable product === */
     var status;
-    var id;
     $(document).on("click", ".playlist-enable-disable-btn", function ()
     {
         id = $(this).parent('td').parent('tr').data('id');
@@ -351,11 +389,12 @@ body {
         var data = {};
         data["id"] = id;
         data["task"] = "3";
+        data["type"] = 1;
         var jsondata = JSON.stringify(data);
-        //console.log(jsondata);
+        console.log(jsondata);
         $.post("../../modules/ajax/cms.php", jsondata, function (result) {
             $("#view_playlist_modal").modal('show');
-            $(".modal-body").html(result);
+            $(".view-playlist-body").html(result);
             
         });
 
@@ -365,7 +404,7 @@ body {
     {
         var path = $(this).attr("data-path");
         $("#view_playlist_modal").modal('show');
-        $(".modal-body").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='video/mp4'></video>");
+        $(".view-playlist-body").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='video/mp4'></video>");
 
     });
     
@@ -385,125 +424,50 @@ body {
         }
     }
     
-    function drag(ev) {
-        console.log(ev.target.id);
-        ev.dataTransfer.setData("div", ev.target.id);
-    }
     
-    function drop(ev) {
-        var _target = $("#" + ev.target.id);
-        if ($(_target).hasClass("nodrop")) {
-            ev.preventDefault();
-            var src = document.getElementById(ev.dataTransfer.getData("div"));
-            var srcParent = src.parentNode;
-            var tgt = ev.currentTarget.firstElementChild;
-
-            ev.currentTarget.replaceChild(src, tgt);
-            srcParent.appendChild(tgt);
-        } else {
-            ev.preventDefault();
-            var data = ev.dataTransfer.getData("div");
-            ev.target.appendChild(document.getElementById(data));
-        }
-        
-    }
-
-    function allowDrop(ev) {
-        ev.preventDefault();
-    }
     
-    $(".user-edit").click(function (event) {        
-        var id = $(this).attr('id');
-        var $target = "form";
-        $('.block-data').css('display', 'none');
-        $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
-        $('.tab-link').removeClass('active');
-        $(this).addClass('active');
-        
-        /*var data = {};
+    $(document).on("click", ".playlist-edit", function (){          
+        id = $(this).parent('td').parent('tr').data('id');
+        var data = {};
         data["id"] = id;
-        data["task"] = "3";
+        data["task"] = "12";
         var jsondata = JSON.stringify(data);
-        //console.log(jsondata);
+        console.log(jsondata);
         $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-            $("#view_playlist_modal").modal('show');
-            $(".modal-body").html(result);
+            console.log(result);
+            var json = JSON.parse(result);
+            $("#add-edit-playlist-modal").modal('show');
+            $("#playlist_name").val(json.playlist_name);
+            $("#description").val(json.playlist_description);
+            $("#add-edit-button").val("Edit");
+        });
+        
+        data = {};
+        data["task"] = "4";
+        data["playlist_id"]=id;
+        jsondata = JSON.stringify(data);
+        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
+            $("#left").html(result)
             
-        });*/
+            data = {};
+            data["task"] = "3";
+            data["id"]=id;
+            data["type"] = 0; 
+            jsondata = JSON.stringify(data);
+            console.log(jsondata);
+            $.post("../../modules/ajax/cms.php", jsondata, function (result1) {
+                console.log(result1);
+                $("#right").html(result1)
+            });
+        });
+        
+        
+        
+    });
+    $("#close-playlist-modal").click(function (event) {   
+        location.reload();
     });
     
-    /*$(document).on("click", "#add-edit-button", function ()
-    {
-        var data = {};
-        var div_id="";
-        data["playlist_name"] = $("#playlist_name").val();
-        data["description"] = $("#description").val();
-        var video_list="";
-        $('#right > div').map(function() {
-            div_id = this.id;
-            div_id = div_id.substring(1)
-            video_list = video_list+div_id+",";
-        });
-        var l = video_list.length;
-        video_list = video_list.substring(0,l-1);
-        data["video_list"] = video_list;
-        data["task"] = "5";
-        var jsondata = JSON.stringify(data);
-        console.log(jsondata);
-        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-            console.log(result);
-            if (result === "Successfull")
-                loadTable();
-            else
-                alert(result);
-        });
-         
-    });*/
-    /*$(document).on("click", "#user-edit-save", function ()
-    {
-        var data = {};
-
-        
-        data["id"] = id;
-        data["activity_message"] = "Edit user " + $("#user_name_edit").val();
-        
-
-        if ($("#automatic_password").prop('checked') == true) {
-            data["generate_pwd"] = 1;
-        } else
-            data["generate_pwd"] = 0;
-
-        if ($("#reset_password").prop('checked') == true) {
-            data["reset_pwd"] = 1;
-        } else
-            data["reset_pwd"] = 0;
-
-        data["full_name"] = $("#full_name_edit").val();
-        data["user_name"] = $("#user_name_edit").val();
-        data["email"] = $("#email_edit").val();
-        data["password"] = $("#password_edit").val();
-        data["company_name"] = $("#company_name_edit").val();
-        data["phone"] = $("#phone_edit").val();
-        data["start_date"] = $("#start_date_edit").val();
-        data["expiry_date"] = $("#expiry_date_edit").val();
-        data["user_role"] = $("#user_role_edit").val();
-        data["language"] = $("#user_language_edit").val();
-        data["task"] = "7";
-
-        var jsondata = JSON.stringify(data);
-        jsondata = jsondata.replace("'", "\\\\\'");
-        console.log(jsondata);
-        $.post("../../modules/ajax/users.php", jsondata, function (result) {
-            console.log(result);
-            if (result == "Successfull")
-                location.reload();
-            else if (result.includes("auto"))
-            {
-                alertMessage(result);
-                location.reload();
-            } else
-                alertMessage(result);
-        });
-    });*/
+    
 
 </script>

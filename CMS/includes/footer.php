@@ -1,0 +1,172 @@
+
+<script>
+var search_label="<?=$json["search"]?>";
+var entries_label = "<?=$json["entries_label"]?>";
+var info_label="<?=$json["info_label"]?>";
+previous_label = '<?=$json["previous"]?>';
+next_label = '<?=$json["next"]?>';
+
+//Neetu
+ $("#language").val("<?php echo isset($_SESSION["language"])?$_SESSION["language"]:"English"; ?>");
+
+$(document).ready(function () 
+{	         
+    // check date is selected
+    $(".applyBtn").click(function () 
+        {
+        $(this).data('clicked', true);
+        });
+
+    // view report button click
+    $('#view-report-button').click(function (event) 
+        {
+        if ($('.applyBtn').data('clicked')) 
+            {
+            // only display loader if button has been clicked
+            $("#loader").css("visibility", "visible");
+            }
+        });        
+    
+    if($("#report-content").find('#RecordsTable').length!=0) 
+       loadDataTable();    
+});
+             
+                              
+  // button ui changes on successful report load
+  function loadReport(data)
+      {
+      
+      $("#report-content").html(data);
+      $("#loader").css("visibility", "hidden");       
+      if($("#report-content").find('table').length!=0)
+          {
+          $("#action-buttons").css("visibility", "visible");  
+          loadDataTable() ;       
+          }
+      else 
+          { 
+          $("#action-buttons").css("visibility", "hidden");                
+          if($("#export-container").is(":visible")) 
+              $("#export-container").addClass("hidden");
+          }      
+      }
+
+  function reportSuccess() 
+    {     
+    $("#action-buttons").css("visibility", "visible");
+    $("#loader").css("visibility", "hidden");      
+    if($("#report-content").find('#RecordsTable').length!=0) 
+      loadDataTable();
+    }
+
+
+
+function loadDataTable()
+    {      
+    $('#RecordsTable').DataTable(
+        {
+        "paging": true,
+        "lengthChange":true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        "aaSorting": [],
+        "language": {search: search_label,},
+        "oLanguage": 
+                {
+                "sLengthMenu": entries_label,
+                "info":info_label,
+                "oPaginate": 
+                        {
+                        "sPrevious": previous_label,
+                        "sNext": next_label
+                        }
+                },					            
+        });   	  
+    }
+
+//Neetu	
+function update_session()
+{
+	var session_language = $("#language").val();
+	var req = {};
+	req["language"]=session_language;
+    	var json = JSON.stringify(req);
+    	$.post("/parcx/modules/ajax/sessionlanguage.php",json,function(data){ 
+		$("#language").val(session_language);
+	});
+	
+}
+
+
+</script>
+
+</div>
+
+<!------------------------>
+<!-- load plugins -------->
+<!------------------------>
+
+<!-- jQuery UI - for draggable divs -->
+<script src="<?=URL?>plugins/jquery/jquery-ui.min.js"></script>
+
+<!-- resolve conflict between jQuery UI tooltip with Bootstrap tooltip -->
+<script>$.widget.bridge('uibutton', $.ui.button)</script>
+
+<!-- bootstrap 4 -->
+<script src="<?=URL?>plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- daterangepicker -->
+<script src="<?=URL?>plugins/jquery/moment.min.js"></script>
+<script src="<?=URL?>plugins/daterangepicker/daterangepicker.js"></script>
+
+
+<!-- timepicker -->
+<script src="<?=URL?>plugins/timepicker/jquery.timepicker.min.js"></script>
+<link rel="stylesheet" href="<?=URL?>plugins/timepicker/jquery.timepicker.min.css" />
+<!-- theme scripts -->
+<script src="<?=URL?>dist/js/parcx.js"></script>
+
+<!-- PDF export -->
+<script src="<?=URL?>plugins/jspdf/canvas2image.js"></script>
+<script src="<?=URL?>plugins/jspdf/html2canvas.js"></script>
+<script src="<?=URL?>plugins/jspdf/jspdf.1.5.3.js"></script>
+<script src="<?=URL?>plugins/jspdf/jspdf.autotable.js"></script>
+
+ <!-- DataTables -->
+ <script src="<?=URL?>plugins/datatables/jquery.dataTables.js"></script>
+<script src="<?=URL?>plugins/datatables-bs4/js/dataTables.bootstrap4.js"></script>
+
+
+<!-- SlimScroll -->
+<script src="<?=URL?>plugins/slimScroll/jquery.slimscroll.min.js"></script>
+<!-- FastClick -->
+<script src="<?=URL?>plugins/fastclick/fastclick.js"></script>
+
+
+<!------------------------>
+<!-- load custom scripts-->
+<!------------------------>
+
+<!-- chart scripts and global vars -->
+<?php include('chart-custom.php'); ?>
+<!--validation-->
+<script src="<?=URL?>dist/js/jquery.validate.js"></script>
+
+<!-- init daterangepicker -->
+<script src="<?=URL?>dist/js/init-daterangepicker.js"></script>
+
+<!-- export scripts -->
+<script src="<?=URL?>dist/js/excel-export.js"></script>
+<script src="<?=URL?>dist/js/pdf-export.js"></script>
+
+<!-- application scripts --> 
+<!--<script src="<?=URL?>dist/js/alertModule.js"></script>-->
+<!--<script src="<?=URL?>dist/js/counter.js"></script>-->
+<script src="<?=URL?>dist/js/validationUsers.js"></script>
+<script src="<?=URL?>dist/js/configuration.js"></script>
+</body>
+
+</html>
