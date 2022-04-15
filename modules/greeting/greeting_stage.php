@@ -216,32 +216,39 @@ include('../../includes/sidebar.php');
                             </div> 
                         </div> 
                     </div>
-
-
-                    <div class="row">                         
-                        <div class="col form-group">
-                            <input type="checkbox" class="form-control" id="auto_stage_change">
-                            <label>Go to next stage automatically</label> 
-                        </div> 
-                    </div>
-                    
-                    <div id="auto_stage_option" hidden>
-                        <div class="row">                         
+                   
+                    <div id="auto_stage_option">
+                        <div class="row mt-2 mb-1">  
                             <div class="col form-group">
-                                <label for="">Timeout</label>
-                                <input type="number" class="form-control" id="timeout" required name="timeout">
-                            </div> 
+                                <input type="checkbox" class="form-control" id="auto_stage_change">
+                                <label>Go to next stage automatically</label> 
+                            </div>
                         </div>
                         <div class="row">                         
-                            <div class="col form-group">
+                             <div class="col-2 form-group">
+                                <label for="">Timeout</label>
+                                <input type="number" class="form-control" id="timeout" required name="timeout" min="0">
+                            </div>
+                            <div class="col-4 form-group">
                                 <label for="">Next Stage</label>
                                 <select id="next_stage">
-                                    <option hidden value="0">Select Stage</option>
-                                    <?php parcxGreetingScreen(array("task"=>"8","stage_id"=>stage_id)) ?>
+                                    <option value="0">--Select Stage--</option>
+                                    <?php parcxGreetingScreen(array("task"=>"10")) ?>
                                 </select>
                             </div> 
                         </div>
                     </div>
+                    
+                    <div class="row">                         
+                        <div class="col-2 form-group">
+                            <label for="">Background Opacity(%)</label>
+                           <input type="number" class="form-control" id="bg_opacity" required name="opacity" min="0" max="100">
+                       </div>
+                       <div class="col-4 form-group">
+                           <label for="">Background Color</label>
+                           <input type="text" class="form-control" id="bg_color" required name="bgcolor" placeholder = "rgba(255,255,255)">
+                       </div> 
+                   </div>
 
                     <div class="row" id="video-div"> 
                         <div class="col form-group">
@@ -492,6 +499,8 @@ include('../../includes/sidebar.php');
         document.querySelector("video").src = "";
         $("#bgvideo_preview").hide();
         $("#bgimage_preview").hide();
+        $("#next_stage option[value="+stage_id+"]").hide();
+        $('#auto_stage_change').prop('checked', false);
     }
 
     function showform()
@@ -525,22 +534,28 @@ include('../../includes/sidebar.php');
             $("#m3_font_color").val(json.m3_font_color);
             
             $("#timeout").val(json.timeout_period);
-            $("#bgfile_hidden").val(json.bg_video_file);
+            $("#bgfile_hidden").val(json.bg_file);
             $("#animationfile_hidden").val(json.animation_file);
             $("#animationtype_hidden").val(json.animation_type);
-            if(json.bg_video_file>"")
+            if (json.auto_stage_change == 1)
+                $('#auto_stage_change').prop('checked', true);
+            else
+                $('#auto_stage_change').prop('checked', false);
+            $("#next_stage").val(json.next_stage_id);
+            $("#bg_opacity").val(json.bg_opacity);
+            $("#bg_color").val(json.bg_color);
+            if(json.bg_file>"")
             {
-                
                 if(json.bg_type=="video/mp4")
                 {
-                    document.querySelector("video").src = "Media/" + json.bg_video_file + "#t=0.5";
+                    document.querySelector("video").src = "Media/" + json.bg_file + "#t=0.5";
                     $("#bgvideo_preview").show();
                     $("#file_video").prop("checked", true);
                     $("#file_image").prop("checked", false);
                 }
                 else if((json.bg_type).includes("image"))
                 {
-                    $("#bgimage_preview").attr("src", "Media/"+json.bg_video_file);
+                    $("#bgimage_preview").attr("src", "Media/"+json.bg_file);
                     $("#bgimage_preview").show();
                     $("#file_image").prop("checked", true);
                     $("#file_video").prop("checked", false);
@@ -630,8 +645,10 @@ include('../../includes/sidebar.php');
                         alert(result);
                     });
                 }
-            else
+            else{
                 loadAdVideos();
+                add_video=0;
+            }
                 
         });
         
@@ -868,7 +885,13 @@ include('../../includes/sidebar.php');
         data["bg_type"] = $("#bgtype_hidden").val();
         data["animation_file"] = $("#animationfile_hidden").val();
         data["animation_type"] = $("#animationtype_hidden").val();
-
+        if ($('#auto_stage_change').is(":checked"))
+            data["auto_stage_change"] = 1;
+        else
+            data["auto_stage_change"] = 0;
+        data["next_stage_id"] = $("#next_stage").val();
+        data["bg_color"] = $("#bg_color").val();
+        data["bg_opacity"] = $("#bg_opacity").val();
         data["task"] = 2;
         var jsondata = JSON.stringify(data);
         console.log(jsondata);

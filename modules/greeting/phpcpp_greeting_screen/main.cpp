@@ -154,7 +154,7 @@ Php::Value updateStage(Php::Value data)
         {
         string query_string="";     
         con= General.mysqlConnect(ServerDB); 
-        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_video_file=?,animation_file=?,title=?,animation_type=?,timeout_period=?,bg_type=?, last_updated_date_time=NOW() where stage_id=? and schedule=?";          
+        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_file=?,animation_file=?,title=?,animation_type=?,timeout_period=?,bg_type=?,bg_color=?,bg_opacity=?,auto_stage_change=?,next_stage_id=?,last_updated_date_time=NOW() where stage_id=? and schedule=?";          
             
         prep_stmt = con->prepareStatement(query_string);
         prep_stmt->setString(1,toString(data["message_line1"]));
@@ -179,8 +179,12 @@ Php::Value updateStage(Php::Value data)
         prep_stmt->setString(17,toString(data["animation_type"]));
         prep_stmt->setInt(18,data["timeout"]);
         prep_stmt->setString(19,toString(data["bg_type"]));
-        prep_stmt->setString(20,toString(data["stage_id"]));
-        prep_stmt->setInt(21,data["schedule"]);
+        prep_stmt->setString(20,toString(data["bg_color"]));
+        prep_stmt->setInt(21,data["bg_opacity"]);
+        prep_stmt->setInt(22,data["auto_stage_change"]);
+        prep_stmt->setInt(23,data["next_stage_id"]);
+        prep_stmt->setString(24,toString(data["stage_id"]));
+        prep_stmt->setInt(25,data["schedule"]);
         
 
         prep_stmt->executeUpdate();
