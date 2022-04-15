@@ -220,21 +220,52 @@ include('../../includes/sidebar.php');
 
                     <div class="row">                         
                         <div class="col form-group">
-                            <label for="">Timeout</label>
-                            <input type="number" class="form-control" id="timeout" required name="timeout">
+                            <input type="checkbox" class="form-control" id="auto_stage_change">
+                            <label>Go to next stage automatically</label> 
                         </div> 
                     </div>
-
+                    
+                    <div id="auto_stage_option" hidden>
+                        <div class="row">                         
+                            <div class="col form-group">
+                                <label for="">Timeout</label>
+                                <input type="number" class="form-control" id="timeout" required name="timeout">
+                            </div> 
+                        </div>
+                        <div class="row">                         
+                            <div class="col form-group">
+                                <label for="">Next Stage</label>
+                                <select id="next_stage">
+                                    <option hidden value="0">Select Stage</option>
+                                    <?php parcxGreetingScreen(array("task"=>"8","stage_id"=>stage_id)) ?>
+                                </select>
+                            </div> 
+                        </div>
+                    </div>
 
                     <div class="row" id="video-div"> 
                         <div class="col form-group">
-                            <label for="">Backgroud Video</label>
+                            <label for="">Backgroud Image/Video</label>
+                            <div class="form-check col-2">
+                                <input class="form-check-input radiobtn-bg" type="radio" name="bg-radio" data-name="video" id="file_video" value="video/mp4" checked>
+                                <label class="form-check-label" for="videoradio">
+                                    Video
+                                </label>
+                            </div>
+                            <div class="form-check col-2">
+                                <input class="form-check-input radiobtn-bg" type="radio" name="bg-radio" data-name="image" id="file_image" value="image/*" >
+                                <label class="form-check-label" for="imageradio">
+                                    Image
+                                </label>
+                            </div>
                             <input type="hidden" id="bgfile_hidden" value="">
+                            <input type="hidden" id="bgtype_hidden" value="">
                             <br>
-                            <input type='file'  id='bg_file' accept ="video/mp4"  />
-                            <video class="mt-3" width="25%" height="200" controls>
+                            <input type='file'  id='bg_file' accept ="video/mp4" class="mb-3"   />
+                            <video width="25%" height="200" controls id="bgvideo_preview">
                                 Your browser does not support the video tag.
                             </video>
+                            <img src ="" width='25%' height="200" id="bgimage_preview"/>
                         </div> 
                     </div>
                     
@@ -434,7 +465,7 @@ include('../../includes/sidebar.php');
 
 <script type="text/javascript">
     var stage_id;
-    var schedule = 1;
+    var schedule = '1';
     var id;
     var add_video=0;
     $(document).on("click", ".preview-btn", function ()
@@ -456,7 +487,11 @@ include('../../includes/sidebar.php');
         $("#image_preview").hide();
         $("#lottie_preview").html("");
         $("#lottie_preview").hide();
+        $('#animation_file').attr("accept", ".gif");
+        $('#bg_file').attr("accept", "video/mp4");
         document.querySelector("video").src = "";
+        $("#bgvideo_preview").hide();
+        $("#bgimage_preview").hide();
     }
 
     function showform()
@@ -493,8 +528,26 @@ include('../../includes/sidebar.php');
             $("#bgfile_hidden").val(json.bg_video_file);
             $("#animationfile_hidden").val(json.animation_file);
             $("#animationtype_hidden").val(json.animation_type);
-            document.querySelector("video").src = "Media/" + json.bg_video_file + "#t=0.5";
-
+            if(json.bg_video_file>"")
+            {
+                
+                if(json.bg_type=="video/mp4")
+                {
+                    document.querySelector("video").src = "Media/" + json.bg_video_file + "#t=0.5";
+                    $("#bgvideo_preview").show();
+                    $("#file_video").prop("checked", true);
+                    $("#file_image").prop("checked", false);
+                }
+                else if((json.bg_type).includes("image"))
+                {
+                    $("#bgimage_preview").attr("src", "Media/"+json.bg_video_file);
+                    $("#bgimage_preview").show();
+                    $("#file_image").prop("checked", true);
+                    $("#file_video").prop("checked", false);
+                }
+                
+            }
+            
             if (json.animation_type == "image/gif")
             {
                 $("#file_gif").prop("checked", true);
@@ -506,7 +559,7 @@ include('../../includes/sidebar.php');
             {
                 $("#file_lottie").prop("checked", true);
                 $("#file_gif").prop("checked", false);
-                $('#animation_file').attr("accept", ".json")
+                $('#animation_file').attr("accept", ".json");
                 $("#image_preview").hide();
                 $("#lottie_preview").show();
                 $("#lottie_preview").html("<lottie-player autoplay='true' loop='' src='Media/" + json.animation_file + "' speed='1'  width='200' height='150' background='transparent'></lottie-player>");
@@ -530,8 +583,10 @@ include('../../includes/sidebar.php');
 
     $(document).on("click", ".edit-btn", function ()
     {
-        stage_id = $(this).attr("data-id");        
-        showform(stage_id, 1);        
+        stage_id = $(this).attr("data-id");
+        schedule = '1';
+        showform();        
+        //showform(stage_id, 1);        
     });
     
     function loadAdVideos()
@@ -687,14 +742,20 @@ include('../../includes/sidebar.php');
         $('.btn-schedule').addClass('btn-info');
         $(this).removeClass('btn-info');
         $(this).addClass('btn-success');
-        showform(stage_id, schedule);
+        showform();
+        //showform(stage_id, schedule);
     });
 
 
     $('.radiobtn').change(function () {
         $('#animation_file').val(""); // before setting
         $('#animation_file').attr("accept", $(this).val())
-    })
+    });
+    
+    $('.radiobtn-bg').change(function () {
+        $('#bg_file').val(""); // before setting
+        $('#bg_file').attr("accept", $(this).val())
+    });
 
     function uploadfile(type)
     {
@@ -728,6 +789,7 @@ include('../../includes/sidebar.php');
                         if (type == 1)
                             {
                             $("#bgfile_hidden").val(new_filname);
+                            $("#bgtype_hidden").val(file_data.type);
                             UpdateStageDetails();
                             }
                         else if (type == 2) 
@@ -803,12 +865,13 @@ include('../../includes/sidebar.php');
         data["m3_font_color"] = $("#m3_font_color").val();
         data["timeout"] = $("#timeout").val();
         data["bg_file"] = $("#bgfile_hidden").val();
+        data["bg_type"] = $("#bgtype_hidden").val();
         data["animation_file"] = $("#animationfile_hidden").val();
         data["animation_type"] = $("#animationtype_hidden").val();
 
         data["task"] = 2;
         var jsondata = JSON.stringify(data);
-       // console.log(jsondata);
+        console.log(jsondata);
         $.post("ajax/greeting_screen.php", jsondata, function (result) {
            // console.log(result);
             if (result === "Success")
@@ -826,14 +889,28 @@ include('../../includes/sidebar.php');
         location.reload();
     })
     
+    $('#edit-modal').on('hidden.bs.modal', function () {
+        location.reload();
+    })
     
     
 
     document.getElementById("bg_file")
             .onchange = function (event) {
+                event.preventDefault();
                 let file = event.target.files[0];
                 let blobURL = URL.createObjectURL(file);
-                document.querySelector("video").src = blobURL;
+                if (file.type == "image/jpeg" || file.type == "image/png" || file.type == "image/gif")
+                {
+                    $("#bgimage_preview").attr("src", blobURL);
+                    $("#bgimage_preview").show();
+                    $("#bgvideo_preview").hide();
+                } else if (file.type == "video/mp4")
+                {
+                    document.querySelector("video").src = blobURL;
+                    $("#bgimage_preview").hide();
+                    $("#bgvideo_preview").show();
+                }
             }
 
     document.getElementById("animation_file")
