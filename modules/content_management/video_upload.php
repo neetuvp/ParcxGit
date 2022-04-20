@@ -251,51 +251,17 @@ function getthumbnail(seekTo,filename) {
                         console.log('saved');
                     }
                 }
-                console.log("in getTHumb3");
-                console.log('saving');
+                //console.log("in getTHumb3");
+                //console.log('saving');
                 xmlhttp.open("POST", "../../modules/ajax/video_upload.php?task=2", true);
                 xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
                 xmlhttp.send('name='+encodeURIComponent(filename_src)+'&data='+data+'&filename='+filename);
-                console.log('name='+encodeURIComponent(filename_src)+'&data='+data);
+                //console.log('name='+encodeURIComponent(filename_src)+'&data='+data);
             });
         });
     });
 }
-/*function getThumb(){
-    console.log("in getTHumb");
-    var video = document.createElement("video");
-    
-    var fileURL = URL.createObjectURL($('input[name="file"]').get(0).files[0]);
-    video.src = fileURL;
-    var filename = video.src;
-    console.log(filename);
-    var w = video.videoWidth;//video.videoWidth * scaleFactor;
-    var h = video.videoHeight;//video.videoHeight * scaleFactor;
-    var canvas = document.createElement('canvas');
-    console.log("in getTHumb1");
-    canvas.width = 360;
-    canvas.height = 240;
-    var ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    console.log("in getTHumb2");
-    //document.body.appendChild(canvas);
-    var data = canvas.toDataURL("image/png");
-    
-    //send to php script
-    var xmlhttp = new XMLHttpRequest;
-    
-    xmlhttp.onreadystatechange = function(){
-        if (xmlhttp.readyState==4 && xmlhttp.status==200){
-            console.log('saved');
-        }
-    }
-    console.log("in getTHumb3");
-    console.log('saving');
-    xmlhttp.open("POST", "http://localhost/parcx/modules/ajax/video_upload.php?task=2", true);
-    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-    xmlhttp.send('name='+encodeURIComponent(filename)+'&data='+data);
-    console.log('name='+encodeURIComponent(filename)+'&data='+data);
-}*/
+
 
 function upload_3()
 {
@@ -306,10 +272,8 @@ function upload_3()
         var file_data = $('input[name="file"]').get(0).files[0];
         var formData = new FormData();
         formData.append('file', file_data);
-        if(isVideo)
-            getthumbnail(0.0,file_data.name);
-        //formData.append('name', file_data.name);
-        //alert("../../modules/ajax/video_upload.php?duration="+duration);
+        
+        
         $.ajax({
             xhr: function() {
                 var xhr = new window.XMLHttpRequest();
@@ -317,7 +281,7 @@ function upload_3()
                   if (evt.lengthComputable) {
                     var percentComplete = evt.loaded / evt.total;
                     percentComplete = parseInt(percentComplete * 100);
-                    console.log(percentComplete);
+                    //console.log(percentComplete);
                     $(".progress-bar").css("width", percentComplete + "%").text(percentComplete + "%");
                   }
                 }, false);
@@ -326,7 +290,7 @@ function upload_3()
             url: "../../modules/ajax/video_upload.php?duration="+duration+"&task=1",
             method: 'POST',
             data: formData,
-            async:false,
+            //async:false,
             contentType: false,
             processData: false,
             beforeSend: function(){
@@ -338,6 +302,8 @@ function upload_3()
                     if (json.status === 200) {
                         //alert("Upload Successful");
                         //location.reload();
+                        if(isVideo)
+                            getthumbnail(0.0,file_data.name);
                         $("#upload_media_modal").modal('hide');
                         $("#info-message").html("<i class='fas fa-check'></i>Update Successful");
                         $("#info-modal").modal('show');
@@ -401,7 +367,7 @@ $(document).on("click", ".play-video", function ()
     
    
     var modalConfirm = function(callback){
-        $("#info-message").html("This action will remove the current media from playlists.Do you wish to continue?");
+        $("#info-message").html("This action will remove the current media from all the playlists.Do you wish to continue?");
         $("#info-modal").modal('show');
         $("#info-footer").removeClass("hidden");
         

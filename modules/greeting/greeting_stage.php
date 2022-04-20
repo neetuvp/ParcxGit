@@ -140,10 +140,11 @@ include('../../includes/sidebar.php');
                                     </select>
                                 </div>
                                 <div class="col-2 mt-2">
-                                    <select id="m1_font_size">
+                                    <input type="number" class="form-control" id="m1_font_size" required name="m1_font_size" min="0">
+                                    <!--<select id="m1_font_size">
                                         <option hidden value="0">Select font-size</option>
                                         <?php parcxGreetingScreen(array("task"=>"8")) ?>
-                                    </select>
+                                    </select-->
                                 </div>
                                 <div class="col-2 mt-2">
                                     <select id="m1_font_color">
@@ -171,10 +172,11 @@ include('../../includes/sidebar.php');
                                     </select>
                                 </div>
                                 <div class="col-2 mt-2">
-                                    <select id="m2_font_size">
+                                    <input type="number" class="form-control" id="m2_font_size" required name="m2_font_size" min="0">
+                                    <!--<select id="m2_font_size">
                                         <option hidden value="0">Select font-size</option>
                                         <?php parcxGreetingScreen(array("task"=>"8")) ?>
-                                    </select>
+                                    </select>-->
                                 </div>
                                 <div class="col-2 mt-2">
                                     <select id="m2_font_color">
@@ -202,10 +204,11 @@ include('../../includes/sidebar.php');
                                     </select>
                                 </div>
                                 <div class="col-2 mt-2">
-                                    <select id="m3_font_size">
+                                    <input type="number" class="form-control" id="m3_font_size" required name="m3_font_size" min="0">
+                                    <!--<select id="m3_font_size">
                                         <option hidden value="0">Select font-size</option>
                                         <?php parcxGreetingScreen(array("task"=>"8")) ?>
-                                    </select>
+                                    </select>-->
                                 </div>
                                 <div class="col-2 mt-2">
                                     <select id="m3_font_color">
@@ -246,7 +249,7 @@ include('../../includes/sidebar.php');
                        </div>
                        <div class="col-4 form-group">
                            <label for="">Background Color</label>
-                           <input type="text" class="form-control" id="bg_color" required name="bgcolor" placeholder = "rgba(255,255,255)">
+                           <input type="text" class="form-control" id="bg_color" required name="bgcolor" placeholder = "255,255,255">
                        </div> 
                    </div>
 
@@ -260,7 +263,7 @@ include('../../includes/sidebar.php');
                                 </label>
                             </div>
                             <div class="form-check col-2">
-                                <input class="form-check-input radiobtn-bg" type="radio" name="bg-radio" data-name="image" id="file_image" value="image/*" >
+                                <input class="form-check-input radiobtn-bg" type="radio" name="bg-radio" data-name="image" id="file_image" value="image/jpeg,image/gif,image/png" >
                                 <label class="form-check-label" for="imageradio">
                                     Image
                                 </label>
@@ -321,11 +324,12 @@ include('../../includes/sidebar.php');
             <div class="container bootstrap snippets bootdeys p-4">
                 <div class="col-md-12">
                     <div class="timeline-centered timeline-sm">
+                        <!-- Standby -->
                         <article class="timeline-entry">
                             <div class="timeline-entry-inner">
 
                                 <div class="dropdown">
-                                    <div class="timeline-icon bg-violet stage"><i class="fa fa-exclamation"></i>
+                                    <div class="timeline-icon"><i class="fa fa-exclamation"></i>
                                         <div class="dropdown-content">
                                             <div class="btn btn-block btn-default edit-btn" data-id="1">Edit</div>
                                             <div class="btn btn-block btn-default preview-btn" data-id="1">Preview</div>
@@ -336,6 +340,41 @@ include('../../includes/sidebar.php');
                                 </div>
                             </div>
                         </article>
+                        
+                        <!-- Welcome -->
+                        <article class="timeline-entry left-aligned">
+                            <div class="timeline-entry-inner">
+                                <div class="dropdown">
+                                    <div class="timeline-icon bg-blue stage"><i class="fa fa-hand-paper-o"></i>
+                                        <div class="dropdown-content">
+                                            <div class="btn btn-block btn-default edit-btn" data-id="10">Edit</div>
+                                            <div class="btn btn-block btn-default preview-btn" data-id="10">Preview</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-label bg-blue"><h4 class="timeline-title" id="title-10">Welcome</h4>
+                                </div>
+                            </div>
+                        </article>
+                        
+                        <!-- Standby -->
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
+
+                                <div class="dropdown">
+                                    <div class="timeline-icon bg-violet stage"><i class="fa fa-info"></i>
+                                        <div class="dropdown-content">
+                                            <div class="btn btn-block btn-default edit-btn" data-id="11">Edit</div>
+                                            <div class="btn btn-block btn-default preview-btn" data-id="11">Preview</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-label bg-violet"><h4 class="timeline-title" id="title-11">Pump Information</h4>
+                                </div>
+                            </div>
+                        </article>
+                        
+                        <!-- Vehicle Arrives -->
                         <article class="timeline-entry left-aligned">
                             <div class="timeline-entry-inner">
 
@@ -351,6 +390,8 @@ include('../../includes/sidebar.php');
                                 </div>
                             </div>
                         </article>
+                        
+                        <!-- App Promotion -->
                         <article class="timeline-entry">
                             <div class="timeline-entry-inner">
 
@@ -367,6 +408,8 @@ include('../../includes/sidebar.php');
                             </div>
 
                         </article>
+                        
+                        <!-- Fueling Started -->
                         <article class="timeline-entry left-aligned">
                             <div class="timeline-entry-inner">
 
@@ -382,6 +425,8 @@ include('../../includes/sidebar.php');
                                 </div>
                             </div>
                         </article>
+                        
+                        <!-- Advertising -->
                         <article class="timeline-entry">
                             <div class="timeline-entry-inner">
 
@@ -398,6 +443,8 @@ include('../../includes/sidebar.php');
                             </div>
 
                         </article>
+                        
+                        <!-- Fueling Completed -->
                         <article class="timeline-entry left-aligned">
                             <div class="timeline-entry-inner">
 
@@ -413,6 +460,9 @@ include('../../includes/sidebar.php');
                                     <p></p></div>
                             </div>
                         </article>
+                        
+                        
+                        <!-- Fueling AmountToPay -->
                         <article class="timeline-entry">
                             <div class="timeline-entry-inner">
 
@@ -429,6 +479,8 @@ include('../../includes/sidebar.php');
                             </div>
 
                         </article>
+                        
+                        <!-- Payment Collection -->
                         <article class="timeline-entry left-aligned">
                             <div class="timeline-entry-inner">
 
@@ -444,7 +496,43 @@ include('../../includes/sidebar.php');
                                 </div>
                             </div> 
                         </article>
+                        
+                        <!-- Rewards -->
+                        <article class="timeline-entry">
+                            <div class="timeline-entry-inner">
 
+                                <div class="dropdown">
+                                    <div class="timeline-icon bg-orange stage"><i class="fa fa-star"></i>
+                                        <div class="dropdown-content">
+                                            <div class="btn btn-block btn-default edit-btn" data-id="13">Edit</div>
+                                            <div class="btn btn-block btn-default preview-btn" data-id="13">Preview</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-label bg-orange"><h4 class="timeline-title" id="title-13">Rewards</h4>
+                                </div>
+                            </div> 
+                        </article>
+                        
+                        <!-- Advertising -->
+                        <article class="timeline-entry left-aligned">
+                            <div class="timeline-entry-inner">
+
+                                <div class="dropdown">
+                                    <div class="timeline-icon bg-pink stage"><i class="fa fa-paper-plane"></i>
+                                        <div class="dropdown-content">
+                                            <div class="btn btn-block btn-default edit-btn" data-id="12">Edit</div>
+                                            <div class="btn btn-block btn-default preview-btn" data-id="12">Preview</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-label bg-pink"><h4 class="timeline-title" id="title-12">Advertising</h4>
+                                </div>
+                            </div>
+
+                        </article>
+
+                        <!-- Thank You -->
                         <article class="timeline-entry">
                             <div class="timeline-entry-inner">
 
@@ -477,16 +565,15 @@ include('../../includes/sidebar.php');
     var add_video=0;
     $(document).on("click", ".preview-btn", function ()
     {
-        stage_id = $(this).attr("data-id");
+        stage_id = $(this).attr("data-id");        
         $("#preview-modal").modal("show");
         $(".thumbnail-container").css("height", 850)
-        $("#preview-webpage").attr("src","http://localhost/PGEGreeting/");
+        $("#preview-webpage").attr("src","http://<?=$_SERVER['SERVER_NAME']?>/PGEGreeting/?stage="+stage_id);        
     });
 
     function initialize()
     {
         $("#form").trigger("reset");
-        $("#edit-preview-modal").modal("hide");
         $("#edit-modal").modal("show");
         $("#error-upload").hide();
 
@@ -546,12 +633,13 @@ include('../../includes/sidebar.php');
             $("#bg_color").val(json.bg_color);
             if(json.bg_file>"")
             {
-                if(json.bg_type=="video/mp4")
+                if((json.bg_type).includes("video"))
                 {
                     document.querySelector("video").src = "Media/" + json.bg_file + "#t=0.5";
                     $("#bgvideo_preview").show();
                     $("#file_video").prop("checked", true);
                     $("#file_image").prop("checked", false);
+                    $('#bg_file').attr("accept", "video/mp4");
                 }
                 else if((json.bg_type).includes("image"))
                 {
@@ -559,6 +647,7 @@ include('../../includes/sidebar.php');
                     $("#bgimage_preview").show();
                     $("#file_image").prop("checked", true);
                     $("#file_video").prop("checked", false);
+                    $('#bg_file').attr("accept", "image/jpeg,image/gif,image/png");
                 }
                 
             }
@@ -582,7 +671,7 @@ include('../../includes/sidebar.php');
 
         });
         
-        if(stage_id==5)
+        if(stage_id==5 || stage_id==12)
             {
             $("#video-div").hide();
             $("#video-div-ad").show();
@@ -608,6 +697,7 @@ include('../../includes/sidebar.php');
         {
         var data = {};           
         data["schedule"] = schedule;
+        data["stage"] = stage_id;
         data["task"] = 4;
         var jsondata = JSON.stringify(data);       
         $.post("ajax/greeting_screen.php", jsondata, function (result) {       
@@ -639,8 +729,10 @@ include('../../includes/sidebar.php');
                 data["task"] = 5;
                 var jsondata = JSON.stringify(data);
                 $.post("ajax/greeting_screen.php", jsondata, function (result) {
-                    if (result === "Successfull")
+                    if (result === "Successfull"){
                         loadAdVideos();
+                        add_video=0;
+                    }
                     else
                         alert(result);
                     });
@@ -660,10 +752,13 @@ include('../../includes/sidebar.php');
             id="";    
             var newRow = $("<tr>");
             var cols = "";                                          
-            cols += '<td><input type="file"  id="advt_video_file" accept ="video/mp4"  /></td>';            
+            cols += '<td><input type="file"  id="advt_video_file" accept ="video/mp4,image/jpeg,image/gif,image/png"  /></td>';            
             cols += '<td><input type="date" id="start_date"></td>';            
             cols += '<td><input type="date" id="expiry_date"></td>';            
-            cols += '<td><video width="100" controls="controls" preload="metadata" id="advt_video"></video></td>';            
+            cols += '<td>';
+            cols += '<video width="100" controls="controls" preload="metadata" id="advt_video"></video>'; 
+            cols += '<img src="" width="100" id="advt_image">';
+            cols += '</td>'; 
             cols += '<td><button type="button" class="btn btn-danger ad-video-enable-disable-btn mr-1" data-text="Cancel" title="Cancel"><i class="fas fa-window-close"></i></button><button type="button" class="btn btn-success btn-add-advt-video" title="Save"><i class="fas fa-floppy-o"></i></button></td>';               
                 
             newRow.append(cols);
@@ -675,13 +770,35 @@ include('../../includes/sidebar.php');
             
         });
         
-    $(document).on("change", "#advt_video_file", function(evt) {           
-        var $source = $('#advt_video');
-        $source[0].src = URL.createObjectURL(this.files[0]);        
+    $(document).on("change", "#advt_video_file", function(evt) {  
+        if(this.files[0].type=="video/mp4")
+        {
+            $('#advt_video').show();
+            $('#advt_image').hide();
+            var $source = $('#advt_video');
+            $source[0].src = URL.createObjectURL(this.files[0]);     
+        }
+        else
+        {
+            let blobURL = URL.createObjectURL(this.files[0]);
+            $('#advt_video').hide();
+            $('#advt_image').show();
+            $("#advt_image").attr("src", blobURL);
+        }
+           
         });                        
     
     $(document).on("click", ".btn-add-advt-video", function (){                        
         if ($('#advt_video_file').val()) {
+            if($('#start_date').val()==""){
+                alert("Start Date is empty")
+                return;
+            }
+            if($('#expiry_date').val()==""){
+                alert("Expiry Date is empty")
+                return;
+            }
+            
             uploadfile(3);
         }                                    
     });
@@ -711,7 +828,7 @@ include('../../includes/sidebar.php');
             {            
             var data = {}; 
             data["id"]=id;
-                        
+            data["stage"]=stage_id;           
             data["start_date"]=$("#start_date"+id).val();
             data["expiry_date"]=$("#expiry_date"+id).val();
             data["task"] = 6;
@@ -721,7 +838,8 @@ include('../../includes/sidebar.php');
                 console.log(result);
                 if (result === "Success")
                     {
-                    loadAdVideos()
+                    loadAdVideos();
+                    add_video=0;
                     } 
                 else
                     alert(result);            
@@ -735,7 +853,9 @@ include('../../includes/sidebar.php');
         var data = {}; 
         data["id"]=id;
         data["schedule"] = schedule;
+        data["stage"]=stage_id; 
         data["file_name"] = $("#bgfile_hidden").val();
+        data["file_type"] = $("#bgtype_hidden").val();
         data["start_date"]=$("#start_date").val();
         data["expiry_date"]=$("#expiry_date").val();
         data["task"] = 6;
@@ -745,7 +865,8 @@ include('../../includes/sidebar.php');
             console.log(result);
             if (result === "Success")
                 {
-                loadAdVideos()
+                loadAdVideos();
+                add_video=0;
                 } 
             else
                 alert(result);
@@ -818,6 +939,7 @@ include('../../includes/sidebar.php');
                         else if(type==3)
                             {
                             $("#bgfile_hidden").val(new_filname); 
+                            $("#bgtype_hidden").val(file_data.type);
                             insertUpdateAdvtVideo();
                             }
                         result = "Success"

@@ -291,7 +291,7 @@ body {
                 data["video_list"] = video_list;
                 data["task"] = "5";
                 var jsondata = JSON.stringify(data);
-                console.log(jsondata);
+                //console.log(jsondata);
                 $.post("../../modules/ajax/cms.php", jsondata, function (result) {
                     //console.log(result);
                     if (result === "Successfull"){
@@ -391,7 +391,7 @@ $('#add-edit-playlist-modal').on('hidden.bs.modal', function () {
         data["task"] = "3";
         data["type"] = 1;
         var jsondata = JSON.stringify(data);
-        console.log(jsondata);
+        //console.log(jsondata);
         $.post("../../modules/ajax/cms.php", jsondata, function (result) {
             $("#view_playlist_modal").modal('show');
             $(".view-playlist-body").html(result);
@@ -402,9 +402,9 @@ $('#add-edit-playlist-modal').on('hidden.bs.modal', function () {
     
     $(document).on("click", ".play-video", function ()
     {
-        var path = $(this).attr("data-path");
+        /*var path = $(this).attr("data-path");
         $("#view_playlist_modal").modal('show');
-        $(".view-playlist-body").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='video/mp4'></video>");
+        $(".view-playlist-body").html("<video controls='controls'  preload='metadata' width='100%'><source src='"+path+"#t=0.5' type='video/mp4'></video>");*/
 
     });
     
@@ -432,9 +432,9 @@ $('#add-edit-playlist-modal').on('hidden.bs.modal', function () {
         data["id"] = id;
         data["task"] = "12";
         var jsondata = JSON.stringify(data);
-        console.log(jsondata);
+        //console.log(jsondata);
         $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-            console.log(result);
+            //console.log(result);
             var json = JSON.parse(result);
             $("#add-edit-playlist-modal").modal('show');
             $("#playlist_name").val(json.playlist_name);
@@ -454,9 +454,9 @@ $('#add-edit-playlist-modal').on('hidden.bs.modal', function () {
             data["id"]=id;
             data["type"] = 0; 
             jsondata = JSON.stringify(data);
-            console.log(jsondata);
+            //console.log(jsondata);
             $.post("../../modules/ajax/cms.php", jsondata, function (result1) {
-                console.log(result1);
+                //console.log(result1);
                 $("#right").html(result1)
             });
         });

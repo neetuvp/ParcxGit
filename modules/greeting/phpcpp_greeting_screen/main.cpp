@@ -89,10 +89,29 @@ string arrayToString(Php::Value json) {
 }
 
 
+string removeSpecialCharactersfromText(string str)
+{
+    for(int i=0;i<(signed)str.length();i++)
+    {
+         if (!(str[i]==32))
+          {
+            continue;
+          }
+      else
+      {
+        char c = str[i];
+        std::replace(str.begin(), str.end(), c, '_');
+      }
+    }
+    return str;
+}
+
+
 Php::Value uploadMedia(Php::Value data)
 {
     Php::Value response;
     string filename = toString(data["name"]);
+    filename = removeSpecialCharactersfromText(filename);
     filename = to_string(generateUniqueId())+"_"+filename;
     string from = toString(data["from"]);
     string dest = string(MediaPath)+"/"+filename;
@@ -236,8 +255,9 @@ void showAdvertisementVideos(Php::Value data) {
     sql::ResultSet *res;
     try {
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement_video where schedule=? order by id desc");
+        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement_video where schedule=? and stage_id=? order by id desc");
         prep_stmt->setString(1, toString(data["schedule"]));
+        prep_stmt->setString(2, toString(data["stage"]));
         res = prep_stmt->executeQuery();        
        
             Php::out<<"<table  class='table  table-bordered ' id='table_videos'>"<<std::endl;
@@ -257,7 +277,10 @@ void showAdvertisementVideos(Php::Value data) {
                 Php::out << "<td>" + res->getString("video_file") + "</td>" << endl;
                 Php::out << "<td>" + res->getString("start_date") + "</td>" << endl;
                 Php::out << "<td>" + res->getString("expiry_date") + "</td>" << endl;
-                Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                if(res->getString("file_type")=="video/mp4")
+                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                else
+                    Php::out<<"<td><img width='100' src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"'></td>"<<endl;
                 Php::out << "<td>" << std::endl;
                 if (res->getInt("status") == 1)
                     Php::out << "<button type='button' class='btn btn-danger ad-video-enable-disable-btn' data-text='Disable' title='Disable'><i class='fas fa-stop-circle'></i></button>" << std::endl;
@@ -326,10 +349,12 @@ Php::Value insertUpdateAdVideo(Php::Value data)
         con= General.mysqlConnect(ServerDB); 
         if(id=="")
             {
-            query_string = "insert into greeting_screen_advertisement_video(start_date,expiry_date,schedule,video_file,status)values(?,?,?,?,1)";           
+            query_string = "insert into greeting_screen_advertisement_video(start_date,expiry_date,schedule,video_file,stage_id,file_type,status)values(?,?,?,?,?,?,1)";           
             prep_stmt = con->prepareStatement(query_string);      
             prep_stmt->setInt(3,data["schedule"]);
             prep_stmt->setString(4,toString(data["file_name"]));
+            prep_stmt->setInt(5,data["stage"]);
+            prep_stmt->setString(6,toString(data["file_type"]));
             }
         else
             {

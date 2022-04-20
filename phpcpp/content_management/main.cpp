@@ -198,8 +198,6 @@ Php::Value enabledisablePlaylist(Php::Value json) {
             prep_stmt->executeUpdate();
         }
 
-        
-        
         delete prep_stmt;
         delete con;
     
@@ -488,7 +486,7 @@ void screenList(Php::Value data)
         //string html_data="";
         sql::Connection *con;
         sql::Statement *stmt;            
-        sql::ResultSet *res;
+        sql::ResultSet *res,*res1;
         con= General.mysqlConnect(ServerDB); 
         stmt=con->createStatement();
         res=stmt->executeQuery("select * from system_devices where device_category=12 and device_enabled=1");
@@ -512,7 +510,25 @@ void screenList(Php::Value data)
         while(res->next())
         {
             Php::out<<"<tr data-id='"<<res->getString("device_number")<<"'>"<<endl; 
-            Php::out<<"<td><video width='150' controls='controls' preload='metadata'><source src='/parcx/Media/cms/Video1.mp4#t=0.5' type='video/mp4'></video></td>"<<endl;
+            //Php::out<<"<td><video width='150' controls='controls' preload='metadata'><source src='/parcx/Media/cms/Video1.mp4#t=0.5' type='video/mp4'></video></td>"<<endl;
+           res1=stmt->executeQuery("SELECT *,lower(media_type) as type FROM "+string(ReportingDB)+".player_report where media_status='Playing' and device_number="+res->getString("device_number")+" order by play_datetime desc limit 1");
+            if(res1->next())
+            {
+                if(res1->getString("type")=="mp4" || res1->getString("type")=="avi" || res1->getString("type")=="webm" || res1->getString("type")=="ogg" )
+                {
+                    //Php::out<<"<td><video width='150' controls='controls' preload='metadata'><source src='/parcx/Media/cms/"+res1->getString("media_name")+"#t=0.5' type='video/"+res1->getString("type")+"'></video></td>"<<endl;
+                    Php::out<<"<td><img src = '/parcx/Media/cms/thumbnail/"+res1->getString("media_name")+".png' width='150'></td>"<<endl;
+                }
+                else
+                {
+                    Php::out<<"<td><img src = '/parcx/Media/cms/"+res1->getString("media_name")+"' width='150'></td>"<<endl;
+                }
+            }
+            else
+            {
+                Php::out<<"<td><video width='150' controls='controls' preload='metadata'><source src='/parcx/Media/cms/Video1.mp4#t=0.5' type='video/mp4'></video></td>"<<endl;
+            }
+            delete res1;
             Php::out<<"<td>"+res->getString("device_number")+"</td>"<<endl;
             Php::out<<"<td>"+res->getString("device_name")+"</td>"<<endl;    
             Php::out<<"<td>"+res->getString("device_ip")+"</td>"<<endl;    

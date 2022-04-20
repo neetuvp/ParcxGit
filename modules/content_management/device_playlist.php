@@ -567,6 +567,8 @@ function loadTable()
     $(document).on("click", ".edit-playlist", function (e)
     {
         var id =$(this).attr("data-id");
+	 $(".pl-options").hide();
+	edit=false;
         if(edit==true)
         {
             addeditplaylist(id,e);
