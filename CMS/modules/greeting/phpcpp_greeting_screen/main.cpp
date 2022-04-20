@@ -89,10 +89,29 @@ string arrayToString(Php::Value json) {
 }
 
 
+string removeSpecialCharactersfromText(string str)
+{
+    for(int i=0;i<(signed)str.length();i++)
+    {
+         if (!(str[i]==32))
+          {
+            continue;
+          }
+      else
+      {
+        char c = str[i];
+        std::replace(str.begin(), str.end(), c, '_');
+      }
+    }
+    return str;
+}
+
+
 Php::Value uploadMedia(Php::Value data)
 {
     Php::Value response;
     string filename = toString(data["name"]);
+    filename = removeSpecialCharactersfromText(filename);
     filename = to_string(generateUniqueId())+"_"+filename;
     string from = toString(data["from"]);
     string dest = string(MediaPath)+"/"+filename;
@@ -112,7 +131,7 @@ Php::Value uploadMedia(Php::Value data)
     {
         string extension = filename.substr(filename.find_last_of(".") + 1);
         
-        if(extension == "mp4" ||  extension == "MP4" ||  extension == "gif" ||  extension == "GIF" || extension == "lottie" || extension == "json" ||  extension == "JSON")  {
+        if(extension == "mp4" ||  extension == "MP4" ||  extension == "gif" ||  extension == "GIF" || extension == "png" ||  extension == "PNG" || extension == "jpg" ||  extension == "JPG" || extension == "jpeg" ||  extension == "JPEG" || extension == "lottie" || extension == "json" ||  extension == "JSON")  {
             if(error>0)
             {
                 result ="File Upload Error:"+to_string(error) ;
@@ -154,7 +173,7 @@ Php::Value updateStage(Php::Value data)
         {
         string query_string="";     
         con= General.mysqlConnect(ServerDB); 
-        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_video_file=?,animation_file=?,title=?,animation_type=?,timeout_period=?, last_updated_date_time=NOW() where stage_id=? and schedule=?";          
+        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_file=?,animation_file=?,title=?,animation_type=?,timeout_period=?,bg_type=?,bg_color=?,bg_opacity=?,auto_stage_change=?,next_stage_id=?,last_updated_date_time=NOW() where stage_id=? and schedule=?";          
             
         prep_stmt = con->prepareStatement(query_string);
         prep_stmt->setString(1,toString(data["message_line1"]));
@@ -178,8 +197,13 @@ Php::Value updateStage(Php::Value data)
         prep_stmt->setString(16,toString(data["title"]));
         prep_stmt->setString(17,toString(data["animation_type"]));
         prep_stmt->setInt(18,data["timeout"]);
-        prep_stmt->setString(19,toString(data["stage_id"]));
-        prep_stmt->setInt(20,data["schedule"]);
+        prep_stmt->setString(19,toString(data["bg_type"]));
+        prep_stmt->setString(20,toString(data["bg_color"]));
+        prep_stmt->setInt(21,data["bg_opacity"]);
+        prep_stmt->setInt(22,data["auto_stage_change"]);
+        prep_stmt->setInt(23,data["next_stage_id"]);
+        prep_stmt->setString(24,toString(data["stage_id"]));
+        prep_stmt->setInt(25,data["schedule"]);
         
 
         prep_stmt->executeUpdate();
@@ -231,8 +255,9 @@ void showAdvertisementVideos(Php::Value data) {
     sql::ResultSet *res;
     try {
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement_video where schedule=? order by id desc");
+        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement_video where schedule=? and stage_id=? order by id desc");
         prep_stmt->setString(1, toString(data["schedule"]));
+        prep_stmt->setString(2, toString(data["stage"]));
         res = prep_stmt->executeQuery();        
        
             Php::out<<"<table  class='table  table-bordered ' id='table_videos'>"<<std::endl;
@@ -252,7 +277,10 @@ void showAdvertisementVideos(Php::Value data) {
                 Php::out << "<td>" + res->getString("video_file") + "</td>" << endl;
                 Php::out << "<td>" + res->getString("start_date") + "</td>" << endl;
                 Php::out << "<td>" + res->getString("expiry_date") + "</td>" << endl;
-                Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                if(res->getString("file_type")=="video/mp4")
+                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                else
+                    Php::out<<"<td><img width='100' src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"'></td>"<<endl;
                 Php::out << "<td>" << std::endl;
                 if (res->getInt("status") == 1)
                     Php::out << "<button type='button' class='btn btn-danger ad-video-enable-disable-btn' data-text='Disable' title='Disable'><i class='fas fa-stop-circle'></i></button>" << std::endl;
@@ -321,10 +349,12 @@ Php::Value insertUpdateAdVideo(Php::Value data)
         con= General.mysqlConnect(ServerDB); 
         if(id=="")
             {
-            query_string = "insert into greeting_screen_advertisement_video(start_date,expiry_date,schedule,video_file,status)values(?,?,?,?,1)";           
+            query_string = "insert into greeting_screen_advertisement_video(start_date,expiry_date,schedule,video_file,stage_id,file_type,status)values(?,?,?,?,?,?,1)";           
             prep_stmt = con->prepareStatement(query_string);      
             prep_stmt->setInt(3,data["schedule"]);
             prep_stmt->setString(4,toString(data["file_name"]));
+            prep_stmt->setInt(5,data["stage"]);
+            prep_stmt->setString(6,toString(data["file_type"]));
             }
         else
             {
@@ -441,6 +471,32 @@ void getfontcolorDropdown()
     }
 }
 
+void getStagesDropdown()
+{
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    try 
+    {
+        con = General.mysqlConnect(ServerDB);
+        string query = "select distinct title,stage_id from greeting_screen";
+        prep_stmt = con->prepareStatement(query);
+        res = prep_stmt->executeQuery();
+        while(res->next())
+        {
+            Php::out << "<option value="<<res->getInt("stage_id")<<">"<<res->getString("title")<<"</option>" << std::endl; 
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    
+    }    
+    catch (const std::exception& e) {
+        writeException("getStagesDropdown", e.what());
+        delete con;
+    }
+}
+
 Php::Value parcxGreetingScreen(Php::Parameters &params) {
     Php::Value data = params[0];
     int task = data["task"];
@@ -463,6 +519,8 @@ Php::Value parcxGreetingScreen(Php::Parameters &params) {
         case 8:getfontsizeDropdown();
             break;
         case 9:getfontcolorDropdown();
+            break;
+        case 10:getStagesDropdown();
             break;
     }
     return response;
