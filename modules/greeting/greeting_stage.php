@@ -696,7 +696,7 @@ include('../../includes/sidebar.php');
     function loadAdVideos()
         {
         var data = {};           
-        data["schedule"] = schedule;
+        //data["schedule"] = schedule;
         data["stage"] = stage_id;
         data["task"] = 4;
         var jsondata = JSON.stringify(data);       
@@ -852,7 +852,7 @@ include('../../includes/sidebar.php');
         {
         var data = {}; 
         data["id"]=id;
-        data["schedule"] = schedule;
+        //data["schedule"] = schedule;
         data["stage"]=stage_id; 
         data["file_name"] = $("#bgfile_hidden").val();
         data["file_type"] = $("#bgtype_hidden").val();
@@ -1077,3 +1077,4 @@ include('../../includes/sidebar.php');
                 }
             }
 </script>
+

@@ -255,9 +255,8 @@ void showAdvertisementVideos(Php::Value data) {
     sql::ResultSet *res;
     try {
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement_video where schedule=? and stage_id=? order by id desc");
-        prep_stmt->setString(1, toString(data["schedule"]));
-        prep_stmt->setString(2, toString(data["stage"]));
+        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement where stage_id=? order by id desc");        
+        prep_stmt->setString(1, toString(data["stage"]));
         res = prep_stmt->executeQuery();        
        
             Php::out<<"<table  class='table  table-bordered ' id='table_videos'>"<<std::endl;
@@ -274,13 +273,13 @@ void showAdvertisementVideos(Php::Value data) {
             
             while (res->next()) {
                 Php::out << "<tr data-id='" << res->getString("id") << "'>" << endl;
-                Php::out << "<td>" + res->getString("video_file") + "</td>" << endl;
+                Php::out << "<td>" + res->getString("file_name") + "</td>" << endl;
                 Php::out << "<td>" + res->getString("start_date") + "</td>" << endl;
                 Php::out << "<td>" + res->getString("expiry_date") + "</td>" << endl;
                 if(res->getString("file_type")=="video/mp4")
-                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
+                    Php::out<<"<td><video width='100' controls='controls' preload='metadata'><source src='"+string(DisplayMediaPath)+"/"+res->getString("file_name")+"#t=0.5' type='video/mp4'></video></td>"<<endl;
                 else
-                    Php::out<<"<td><img width='100' src='"+string(DisplayMediaPath)+"/"+res->getString("video_file")+"'></td>"<<endl;
+                    Php::out<<"<td><img width='100' src='"+string(DisplayMediaPath)+"/"+res->getString("file_name")+"'></td>"<<endl;
                 Php::out << "<td>" << std::endl;
                 if (res->getInt("status") == 1)
                     Php::out << "<button type='button' class='btn btn-danger ad-video-enable-disable-btn' data-text='Disable' title='Disable'><i class='fas fa-stop-circle'></i></button>" << std::endl;
@@ -313,7 +312,7 @@ Php::Value enabledisableAdVideo(Php::Value json) {
         int status = json["status"];
         int id = json["id"];                 
         con = General.mysqlConnect(ServerDB);
-        string query = "update greeting_screen_advertisement_video set status=? where id=?";
+        string query = "update greeting_screen_advertisement set status=? where id=?";
         prep_stmt = con->prepareStatement(query);
         prep_stmt->setInt(1,status);
         prep_stmt->setInt(2,id);
@@ -349,16 +348,15 @@ Php::Value insertUpdateAdVideo(Php::Value data)
         con= General.mysqlConnect(ServerDB); 
         if(id=="")
             {
-            query_string = "insert into greeting_screen_advertisement_video(start_date,expiry_date,schedule,video_file,stage_id,file_type,status)values(?,?,?,?,?,?,1)";           
-            prep_stmt = con->prepareStatement(query_string);      
-            prep_stmt->setInt(3,data["schedule"]);
-            prep_stmt->setString(4,toString(data["file_name"]));
-            prep_stmt->setInt(5,data["stage"]);
-            prep_stmt->setString(6,toString(data["file_type"]));
+            query_string = "insert into greeting_screen_advertisement(start_date,expiry_date,file_name,stage_id,file_type,status)values(?,?,?,?,?,1)";           
+            prep_stmt = con->prepareStatement(query_string);                  
+            prep_stmt->setString(3,toString(data["file_name"]));
+            prep_stmt->setInt(4,data["stage"]);
+            prep_stmt->setString(5,toString(data["file_type"]));
             }
         else
             {
-            query_string = "Update greeting_screen_advertisement_video set start_date=?,expiry_date=? where id=?";            
+            query_string = "Update greeting_screen_advertisement set start_date=?,expiry_date=? where id=?";            
             prep_stmt = con->prepareStatement(query_string);      
             prep_stmt->setString(3,id);
             }
