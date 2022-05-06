@@ -8,12 +8,12 @@ include('../../includes/header.php');
 <link href="css/parcx.css" rel="stylesheet">
 <style>
     .thumbnail embed{
-        width: 1020px;
-        height: 1980px;                 
+        width: 1080px;
+        height: 1920px;
     }
 
     .thumbnail {
-        position: absolute; left: 5%; top: 2%;
+        position: absolute; left: 3%; top: 2%;
         -ms-zoom: 0.40;
         -moz-transform: scale(0.40);
         -moz-transform-origin: 0 0;
@@ -32,6 +32,12 @@ include('../../includes/header.php');
 
 </ul>
 <div class="header text-dark" id="pdf-report-header">Greeting Stages</div>
+<div class="row hidden-sm-down">
+    <div class="col tab-header d-flex justify-content-center">
+        <div class="tab-link active known-div" data-target="known">Known Customer</div>
+        <div class="tab-link unknown-div" data-target="un-known">Unknown Customer</div>                      
+    </div>
+</div>
 
 
 <?php
@@ -110,7 +116,7 @@ include('../../includes/sidebar.php');
                 </div>
                 <br>
                 <div class="alert-danger" id="error-upload" style="display:none;"></div>
-                <form name="form1" class="block-data p-3" data-status="form"  id="form">
+                <form name="form1" class=" p-3" data-status="form"  id="form">
                     <div class="row"> 
                         <div class="col form-group">
                             <label for="">Title</label>
@@ -321,233 +327,14 @@ include('../../includes/sidebar.php');
 <div class="content-wrapper">
     <section class="content">
         <div class="container-fluid">
-            <div class="container bootstrap snippets bootdeys p-4">
+            <div class="container bootstrap snippets bootdeys p-4" >
                 <div class="col-md-12">
-                    <div class="timeline-centered timeline-sm">
-                        <!-- Standby -->
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon"><i class="fa fa-exclamation"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="1">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="1">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label"><h4 class="timeline-title" id="title-1">Standby</h4>
-                                </div>
-                            </div>
-                        </article>
-                        
-                        <!-- Welcome -->
-                        <article class="timeline-entry left-aligned">
-                            <div class="timeline-entry-inner">
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-blue stage"><i class="fa fa-hand-paper-o"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="10">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="10">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-blue"><h4 class="timeline-title" id="title-10">Welcome</h4>
-                                </div>
-                            </div>
-                        </article>
-                        
-                        <!-- Standby -->
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-violet stage"><i class="fa fa-info"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="11">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="11">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-violet"><h4 class="timeline-title" id="title-11">Pump Information</h4>
-                                </div>
-                            </div>
-                        </article>
-                        
-                        <!-- Vehicle Arrives -->
-                        <article class="timeline-entry left-aligned">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-green stage"><i class="fa fa-car"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="2">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="2">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-green"><h4 class="timeline-title" id="title-2">Vehicle Arrives</h4>
-                                </div>
-                            </div>
-                        </article>
-                        
-                        <!-- App Promotion -->
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-orange stage"><i class="fa fa-paper-plane"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="3">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="3">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-orange"><h4 class="timeline-title" id="title-3">App Promotion</h4>
-                                </div>
-                            </div>
-
-                        </article>
-                        
-                        <!-- Fueling Started -->
-                        <article class="timeline-entry left-aligned">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-red stage"><i class="fa fa-arrow-up"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="4">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="4">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-red"><h4 class="timeline-title" id="title-4">Fueling Started</h4>
-                                </div>
-                            </div>
-                        </article>
-                        
-                        <!-- Advertising -->
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-pink stage"><i class="fa fa-paper-plane"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="5">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="5">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-pink"><h4 class="timeline-title" id="title-5">Advertising</h4>
-                                </div>
-                            </div>
-
-                        </article>
-                        
-                        <!-- Fueling Completed -->
-                        <article class="timeline-entry left-aligned">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-blue stage"><i class="fa fa-thumbs-up"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="6">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="6">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-blue"><h4 class="timeline-title" id="title-6">Fueling Completed</h4>
-                                    <p></p></div>
-                            </div>
-                        </article>
-                        
-                        
-                        <!-- Fueling AmountToPay -->
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-dark stage"><i class="fa fa-calculator"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="7">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="7">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-dark"><h4 class="timeline-title" id="title-7">Fueling AmountToPay</h4>
-                                </div>
-                            </div>
-
-                        </article>
-                        
-                        <!-- Payment Collection -->
-                        <article class="timeline-entry left-aligned">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-green stage"><i class="fa fa-money-bill"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="8">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="8">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-green"><h4 class="timeline-title" id="title-8">Payment Collection</h4>
-                                </div>
-                            </div> 
-                        </article>
-                        
-                        <!-- Rewards -->
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-orange stage"><i class="fa fa-star"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="13">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="13">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-orange"><h4 class="timeline-title" id="title-13">Rewards</h4>
-                                </div>
-                            </div> 
-                        </article>
-                        
-                        <!-- Advertising -->
-                        <article class="timeline-entry left-aligned">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-pink stage"><i class="fa fa-paper-plane"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="12">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="12">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-pink"><h4 class="timeline-title" id="title-12">Advertising</h4>
-                                </div>
-                            </div>
-
-                        </article>
-
-                        <!-- Thank You -->
-                        <article class="timeline-entry">
-                            <div class="timeline-entry-inner">
-
-                                <div class="dropdown">
-                                    <div class="timeline-icon bg-yellow stage"><i class="fa fa-circle"></i>
-                                        <div class="dropdown-content">
-                                            <div class="btn btn-block btn-default edit-btn" data-id="9">Edit</div>
-                                            <div class="btn btn-block btn-default preview-btn" data-id="9">Preview</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="timeline-label bg-yellow"><h4 class="timeline-title" id="title-9">Thank You</h4>
-                                </div>
-                            </div>                           
-                        </article>
+                    <div class=" block-data timeline-centered timeline-sm" data-status="known">  
+                        <?php parcxGreetingScreen(array("task"=>"11","type"=>1)) ?>
+                    </div>
+                    
+                    <div class=" block-data timeline-centered timeline-sm" data-status="un-known" style="display:none;">
+                        <?php parcxGreetingScreen(array("task"=>"11","type"=>2)) ?>         
                     </div>
                 </div>
             </div>
@@ -563,12 +350,27 @@ include('../../includes/sidebar.php');
     var schedule = '1';
     var id;
     var add_video=0;
+    var known_customer=1;
+    
+    $("* [data-target]").on('click', function ()
+    {
+        var $target = $(this).data('target');   
+        if($target=="known")
+            known_customer=1;
+        else
+            known_customer=0;
+        $('.block-data').css('display', 'none');
+        $('.block-data[data-status="' + $target + '"]').fadeIn('slow');
+        $('.tab-link').removeClass('active');
+        $(this).addClass('active');
+    });
+        
     $(document).on("click", ".preview-btn", function ()
     {
         stage_id = $(this).attr("data-id");        
         $("#preview-modal").modal("show");
         $(".thumbnail-container").css("height", 850)
-        $("#preview-webpage").attr("src","http://<?=$_SERVER['SERVER_NAME']?>/PGEGreeting/?stage="+stage_id);        
+        $("#preview-webpage").attr("src","http://<?=$_SERVER['SERVER_NAME']?>/PGEGreeting/?stage="+stage_id+"&known_customer="+known_customer);        
     });
 
     function initialize()
@@ -594,13 +396,14 @@ include('../../includes/sidebar.php');
     {
         initialize();
         var data = {};
-        data["stage_id"] = stage_id;//$("#stage-id").val();
+        data["stage_id"] = stage_id;
         data["schedule"] = schedule;
+        data["known_customer"] = known_customer;
         data["task"] = 3;
         var jsondata = JSON.stringify(data);
-        //console.log(jsondata);
-        $.post("ajax/greeting_screen.php", jsondata, function (result) {
-            console.log(result);
+console.log(jsondata);            
+        $.post("ajax/greeting_screen.php", jsondata, function (result) { 
+console.log(result);       
             var json = JSON.parse(result);
             $("#title").val(json.title);
             $("#description").val(json.description);
@@ -631,6 +434,7 @@ include('../../includes/sidebar.php');
             $("#next_stage").val(json.next_stage_id);
             $("#bg_opacity").val(json.bg_opacity);
             $("#bg_color").val(json.bg_color);
+            $("#bgtype_hidden").val(json.bg_type);
             if(json.bg_file>"")
             {
                 if((json.bg_type).includes("video"))
@@ -988,6 +792,7 @@ include('../../includes/sidebar.php');
         var data = {};
         data["stage_id"] = stage_id;
         data["schedule"] = schedule;
+        data["known_customer"] = known_customer;
         data["title"] = $("#title").val();
         data["description"] = $("#description").val();
         data["message_line1"] = $("#message_line1").val();
@@ -1076,5 +881,33 @@ include('../../includes/sidebar.php');
 
                 }
             }
+            
+  $(document).on("click", ".enable-disable-btn", function ()
+    {
+        var status_text= $(this).html();
+        var stage_id = $(this).attr("data-id");
+        if (status_text == "Disable")
+            status = 0;
+        else
+            status = 1;
+
+        var data = {};
+        data["stage_id"] = stage_id;
+        data["status"] = status;
+        data["task"] = "12";
+        data["customer_type"]=known_customer;
+        var jsondata = JSON.stringify(data);
+        console.log(jsondata);
+        $.post("ajax/greeting_screen.php", jsondata, function (result) {
+            if (result === "Successfull")
+            { 
+                $("#info-message").html("Update Successful");
+                $("#info-modal").modal('show');
+            }
+            else
+                alert(result);
+        });
+    });
+
 </script>
 

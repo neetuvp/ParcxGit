@@ -1,0 +1,23 @@
+
+Date :2022-04-11 08:38:55 Request: {"stage_id":"5","schedule":1,"task":3}
+Date :2022-04-11 08:38:55 Request: {"schedule":1,"task":4}
+Date :2022-04-11 08:38:55 Response: {"schedule":1,"task":4}
+Date :2022-04-11 08:38:55 Response: {"stage_id":"5","schedule":1,"task":3}
+Date :2022-04-11 08:39:09 Request: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-11 08:39:09 Request: {"schedule":"2","task":4}
+Date :2022-04-11 08:39:09 Response: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-11 08:39:09 Response: {"schedule":"2","task":4}
+Date :2022-04-11 08:39:30 Upload File Request: {"from":"\/opt\/lampp\/temp\/phpghaEfu","name":"Video2.mp4","size":16695067,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-11 08:39:30 Upload File Response: {"status":200,"message":"Success","file_name":"71829570_Video2.mp4"}
+Date :2022-04-11 08:39:30 Request: {"id":"","schedule":"2","file_name":"71829570_Video2.mp4","start_date":"2022-04-11","expiry_date":"2022-04-30","task":6}
+Date :2022-04-11 08:39:30 Response: {"id":"","schedule":"2","file_name":"71829570_Video2.mp4","start_date":"2022-04-11","expiry_date":"2022-04-30","task":6}
+Date :2022-04-11 08:39:30 Request: {"schedule":"2","task":4}
+Date :2022-04-11 08:39:30 Response: {"schedule":"2","task":4}
+Date :2022-04-11 08:39:41 Request: {"stage_id":"5","schedule":"2","title":"Advertising","description":"","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71829570_Video2.mp4","animation_file":"","animation_type":"","task":2}
+Date :2022-04-11 08:39:41 Response: {"stage_id":"5","schedule":"2","title":"Advertising","description":"","message_line1":"","message_line2":"","message_line3":"","timeout":"0","bg_file":"71829570_Video2.mp4","animation_file":"","animation_type":"","task":2}
+Date :2022-04-11 08:43:45 Request: {"stage_id":"3","schedule":1,"task":3}
+Date :2022-04-11 08:43:45 Response: {"stage_id":"3","schedule":1,"task":3}
+Date :2022-04-11 09:34:52 Request: {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-11 09:34:52 Response: {"stage_id":"1","schedule":1,"task":3}
+Date :2022-04-11 09:36:21 Request: {"stage_id":"8","schedule":1,"task":3}
+Date :2022-04-11 09:36:21 Response: {"stage_id":"8","schedule":1,"task":3}

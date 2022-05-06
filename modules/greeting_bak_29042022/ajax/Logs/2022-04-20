@@ -1,0 +1,89 @@
+
+Date :2022-04-20 09:32:54 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:32:54 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:34:11 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:34:11 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:36:36 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:36:36 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:38:14 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:38:14 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:38:21 Request: {"stage_id":"1","schedule":"1","title":"Standby","description":"Description's","message_line1":"Al Saadiyaat(116)'s","m1_font_family":"Calibri","m1_font_size":"18","m1_font_color":"silver","message_line2":"PUMP 1 's","m2_font_family":"Times New Roman","m2_font_size":"27","m2_font_color":"purple","message_line3":"Message Line 3's","m3_font_size":"11","m3_font_color":"blue","timeout":"7","bg_file":"72438841_pump.demo.mp4","bg_type":"","animation_file":"72096597_9744-sample-animation.json","animation_type":"application/json","auto_stage_change":1,"next_stage_id":"5","bg_color":"rgba(255,255,0)","bg_opacity":"50","task":2}
+Date :2022-04-20 09:38:21 Response: {"stage_id":"1","schedule":"1","title":"Standby","description":"Description's","message_line1":"Al Saadiyaat(116)'s","m1_font_family":"Calibri","m1_font_size":"18","m1_font_color":"silver","message_line2":"PUMP 1 's","m2_font_family":"Times New Roman","m2_font_size":"27","m2_font_color":"purple","message_line3":"Message Line 3's","m3_font_size":"11","m3_font_color":"blue","timeout":"7","bg_file":"72438841_pump.demo.mp4","bg_type":"","animation_file":"72096597_9744-sample-animation.json","animation_type":"application/json","auto_stage_change":1,"next_stage_id":"5","bg_color":"rgba(255,255,0)","bg_opacity":"50","task":2}
+Date :2022-04-20 09:38:24 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:38:24 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:39:06 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:39:06 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:39:16 Request: {"stage_id":"1","schedule":"1","title":"Standby","description":"Description's","message_line1":"Al Saadiyaat(116)'s","m1_font_family":"Calibri","m1_font_size":"18","m1_font_color":"silver","message_line2":"PUMP 1 's","m2_font_family":"Times New Roman","m2_font_size":"27","m2_font_color":"purple","message_line3":"Message Line 3's","m3_font_family":"Calibri","m3_font_size":"15","m3_font_color":"blue","timeout":"7","bg_file":"72438841_pump.demo.mp4","bg_type":"","animation_file":"72096597_9744-sample-animation.json","animation_type":"application/json","auto_stage_change":1,"next_stage_id":"5","bg_color":"rgba(255,255,0)","bg_opacity":"50","task":2}
+Date :2022-04-20 09:39:16 Response: {"stage_id":"1","schedule":"1","title":"Standby","description":"Description's","message_line1":"Al Saadiyaat(116)'s","m1_font_family":"Calibri","m1_font_size":"18","m1_font_color":"silver","message_line2":"PUMP 1 's","m2_font_family":"Times New Roman","m2_font_size":"27","m2_font_color":"purple","message_line3":"Message Line 3's","m3_font_family":"Calibri","m3_font_size":"15","m3_font_color":"blue","timeout":"7","bg_file":"72438841_pump.demo.mp4","bg_type":"","animation_file":"72096597_9744-sample-animation.json","animation_type":"application/json","auto_stage_change":1,"next_stage_id":"5","bg_color":"rgba(255,255,0)","bg_opacity":"50","task":2}
+Date :2022-04-20 09:39:18 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 09:39:18 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 10:22:01 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 10:22:01 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 10:22:33 Request: {"stage_id":"1","schedule":"1","title":"Standby","description":"Description's","message_line1":"Al Saadiyaat(116)'s","m1_font_family":"Calibri","m1_font_size":"18","m1_font_color":"silver","message_line2":"PUMP 1 's","m2_font_family":"Times New Roman","m2_font_size":"27","m2_font_color":"purple","message_line3":"Message Line 3's","m3_font_family":"Calibri","m3_font_size":"15","m3_font_color":"blue","timeout":"7","bg_file":"72438841_pump.demo.mp4","bg_type":"","animation_file":"72096597_9744-sample-animation.json","animation_type":"application/json","auto_stage_change":1,"next_stage_id":"5","bg_color":"255,255,0","bg_opacity":"50","task":2}
+Date :2022-04-20 10:22:33 Response: {"stage_id":"1","schedule":"1","title":"Standby","description":"Description's","message_line1":"Al Saadiyaat(116)'s","m1_font_family":"Calibri","m1_font_size":"18","m1_font_color":"silver","message_line2":"PUMP 1 's","m2_font_family":"Times New Roman","m2_font_size":"27","m2_font_color":"purple","message_line3":"Message Line 3's","m3_font_family":"Calibri","m3_font_size":"15","m3_font_color":"blue","timeout":"7","bg_file":"72438841_pump.demo.mp4","bg_type":"","animation_file":"72096597_9744-sample-animation.json","animation_type":"application/json","auto_stage_change":1,"next_stage_id":"5","bg_color":"255,255,0","bg_opacity":"50","task":2}
+Date :2022-04-20 10:22:36 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 10:22:36 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 10:23:50 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 10:23:50 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 10:23:54 Request: {"stage_id":"1","schedule":"4","task":3}
+Date :2022-04-20 10:23:54 Response: {"stage_id":"1","schedule":"4","task":3}
+Date :2022-04-20 14:00:34 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-20 14:00:34 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-20 14:00:34 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:00:34 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:00:47 Request: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:00:47 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:00:47 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:00:47 Response: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:00:48 Request: {"stage_id":"5","schedule":"3","task":3}
+Date :2022-04-20 14:00:48 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:00:48 Response: {"stage_id":"5","schedule":"3","task":3}
+Date :2022-04-20 14:00:48 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:00:48 Request: {"stage_id":"5","schedule":"4","task":3}
+Date :2022-04-20 14:00:48 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:00:48 Response: {"stage_id":"5","schedule":"4","task":3}
+Date :2022-04-20 14:00:48 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:00:52 Request: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:00:52 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:00:52 Response: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:00:52 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:00:53 Request: {"stage_id":"5","schedule":"3","task":3}
+Date :2022-04-20 14:00:53 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:00:53 Response: {"stage_id":"5","schedule":"3","task":3}
+Date :2022-04-20 14:00:53 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:00:53 Request: {"stage_id":"5","schedule":"4","task":3}
+Date :2022-04-20 14:00:53 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:00:53 Response: {"stage_id":"5","schedule":"4","task":3}
+Date :2022-04-20 14:00:53 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:01:01 Request: {"stage_id":"5","schedule":"3","task":3}
+
+Date :2022-04-20 14:01:01 Request: {"stage":"5","task":4}Date :2022-04-20 14:01:01 Response: {"stage_id":"5","schedule":"3","task":3}
+Date :2022-04-20 14:01:01 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:01:09 Request: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:01:09 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:01:09 Response: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:01:09 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:01:09 Request: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:01:09 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:01:09 Response: {"stage_id":"5","schedule":"2","task":3}
+Date :2022-04-20 14:01:09 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:01:23 Request: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 14:01:23 Response: {"stage_id":"1","schedule":"1","task":3}
+Date :2022-04-20 14:06:13 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-20 14:06:13 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:06:13 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:06:13 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-20 14:06:32 Upload File Request: {"from":"\/opt\/lampp\/temp\/phpvwxNgd","name":"Mascot-siblings-Rashid-and-Latifa-_17be327effd_large.jpg","size":107880,"type":"image\/jpeg","error":0,"task":1}
+Date :2022-04-20 14:06:32 Upload File Response: {"status":200,"message":"Success","file_name":"72626792_Mascot-siblings-Rashid-and-Latifa-_17be327effd_large.jpg"}
+Date :2022-04-20 14:06:32 Request: {"id":"","stage":"5","file_name":"72626792_Mascot-siblings-Rashid-and-Latifa-_17be327effd_large.jpg","file_type":"image/jpeg","start_date":"2022-04-01","expiry_date":"2022-04-30","task":6}
+Date :2022-04-20 14:06:32 Response: {"id":"","stage":"5","file_name":"72626792_Mascot-siblings-Rashid-and-Latifa-_17be327effd_large.jpg","file_type":"image/jpeg","start_date":"2022-04-01","expiry_date":"2022-04-30","task":6}
+Date :2022-04-20 14:06:32 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:06:32 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:06:38 Request: {"stage_id":"5","schedule":"3","task":3}
+Date :2022-04-20 14:06:38 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:06:38 Response: {"stage_id":"5","schedule":"3","task":3}
+Date :2022-04-20 14:06:38 Response: {"stage":"5","task":4}
+Date :2022-04-20 14:06:45 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-20 14:06:45 Request: {"stage":"5","task":4}
+Date :2022-04-20 14:06:45 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-20 14:06:45 Response: {"stage":"5","task":4}

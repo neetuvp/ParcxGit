@@ -1,0 +1,91 @@
+
+Date :2022-04-19 08:08:40 Request: {"stage_id":"11","schedule":"1","task":3}
+Date :2022-04-19 08:08:40 Response: {"stage_id":"11","schedule":"1","task":3}
+Date :2022-04-19 08:08:48 Request: {"stage_id":"12","schedule":"1","task":3}
+Date :2022-04-19 08:08:48 Request: {"schedule":"1","stage":"12","task":4}
+Date :2022-04-19 08:08:48 Response: {"stage_id":"12","schedule":"1","task":3}
+Date :2022-04-19 08:08:48 Response: {"schedule":"1","stage":"12","task":4}
+Date :2022-04-19 08:21:19 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:21:19 Request: {"schedule":"1","stage":"5","task":4}
+
+Date :2022-04-19 08:21:19 Response: {"stage_id":"5","schedule":"1","task":3}Date :2022-04-19 08:21:19 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:26:59 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:26:59 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:26:59 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:26:59 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:27:47 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:27:47 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:27:47 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:27:47 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:28:46 Upload File Request: {"from":"\/opt\/lampp\/temp\/phpUJURne","name":"pump.demo.mp4","size":9721620,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-19 08:28:46 Upload File Response: {"status":200,"message":"Success","file_name":"72520126_pump.demo.mp4"}
+Date :2022-04-19 08:28:46 Request: {"id":"","schedule":"1","stage":"5","file_name":"72520126_pump.demo.mp4","file_type":"video/mp4","start_date":"2022-04-01","expiry_date":"2022-04-30","task":6}
+Date :2022-04-19 08:28:46 Response: {"id":"","schedule":"1","stage":"5","file_name":"72520126_pump.demo.mp4","file_type":"video/mp4","start_date":"2022-04-01","expiry_date":"2022-04-30","task":6}
+Date :2022-04-19 08:28:46 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:28:46 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:29:04 Request: {"stage_id":"5","schedule":"1","title":"Advertising","description":"","message_line1":"","m1_font_family":"","m1_font_size":"0","m1_font_color":"","message_line2":"","m2_font_family":"","m2_font_size":"0","m2_font_color":"","message_line3":"","m3_font_family":"","m3_font_size":"0","m3_font_color":"","timeout":"0","bg_file":"72520126_pump.demo.mp4","bg_type":"video/mp4","animation_file":"","animation_type":"","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"","task":2}
+Date :2022-04-19 08:29:04 Response: {"stage_id":"5","schedule":"1","title":"Advertising","description":"","message_line1":"","m1_font_family":"","m1_font_size":"0","m1_font_color":"","message_line2":"","m2_font_family":"","m2_font_size":"0","m2_font_color":"","message_line3":"","m3_font_family":"","m3_font_size":"0","m3_font_color":"","timeout":"0","bg_file":"72520126_pump.demo.mp4","bg_type":"video/mp4","animation_file":"","animation_type":"","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"","task":2}
+Date :2022-04-19 08:29:06 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:29:06 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:29:06 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:29:06 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:29:36 Request: {"stage_id":"5","schedule":"1","title":"Advertising","description":"","message_line1":"","m1_font_family":"Times New Roman","m1_font_size":"11","m1_font_color":"white","message_line2":"","m2_font_family":"Calibri","m2_font_size":"26","m2_font_color":"navy","message_line3":"","m3_font_family":"Calibri","m3_font_size":"12","m3_font_color":"green","timeout":"0","bg_file":"72520126_pump.demo.mp4","bg_type":"","animation_file":"","animation_type":"","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"0","task":2}
+Date :2022-04-19 08:29:36 Response: {"stage_id":"5","schedule":"1","title":"Advertising","description":"","message_line1":"","m1_font_family":"Times New Roman","m1_font_size":"11","m1_font_color":"white","message_line2":"","m2_font_family":"Calibri","m2_font_size":"26","m2_font_color":"navy","message_line3":"","m3_font_family":"Calibri","m3_font_size":"12","m3_font_color":"green","timeout":"0","bg_file":"72520126_pump.demo.mp4","bg_type":"","animation_file":"","animation_type":"","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"0","task":2}
+Date :2022-04-19 08:29:38 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:29:38 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:29:38 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:29:38 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 08:39:16 Request: {"stage_id":"12","schedule":"1","task":3}
+Date :2022-04-19 08:39:16 Request: {"schedule":"1","stage":"12","task":4}
+Date :2022-04-19 08:39:16 Response: {"stage_id":"12","schedule":"1","task":3}
+Date :2022-04-19 08:39:16 Response: {"schedule":"1","stage":"12","task":4}
+Date :2022-04-19 08:39:21 Request: {"stage_id":"12","schedule":"4","task":3}
+Date :2022-04-19 08:39:21 Request: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:39:21 Response: {"stage_id":"12","schedule":"4","task":3}
+Date :2022-04-19 08:39:21 Response: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:39:46 Request: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:39:46 Response: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:39:51 Request: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:39:51 Response: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:40:25 Request: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:40:25 Response: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:40:38 Request: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:40:38 Response: {"schedule":"4","stage":"12","task":4}
+Date :2022-04-19 08:42:53 Upload File Request: {"from":"\/opt\/lampp\/temp\/phpLIkj4I","name":"adnoclogoicon.png","size":10117,"type":"image\/png","error":0,"task":1}
+Date :2022-04-19 08:42:54 Upload File Response: {"status":200,"message":"Success","file_name":"72520973_adnoclogoicon.png"}
+Date :2022-04-19 08:42:54 Request: {"id":"","schedule":"4","stage":"12","file_name":"72520973_adnoclogoicon.png","file_type":"image/png","start_date":"","expiry_date":"","task":6}
+Date :2022-04-19 08:42:54 Response: {"id":"","schedule":"4","stage":"12","file_name":"72520973_adnoclogoicon.png","file_type":"image/png","start_date":"","expiry_date":"","task":6}
+Date :2022-04-19 08:48:09 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 08:48:09 Request: {"schedule":"1","stage":"5","task":4}
+
+Date :2022-04-19 08:48:09 Date :2022-04-19 08:48:09 Response: {"stage_id":"5","schedule":"1","task":3}Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 09:00:27 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 09:00:27 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 09:00:27 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 09:00:27 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 09:00:54 Upload File Request: {"from":"\/opt\/lampp\/temp\/phpiaJL7R","name":"adnoclogoicon.png","size":10117,"type":"image\/png","error":0,"task":1}
+Date :2022-04-19 09:00:54 Upload File Response: {"status":200,"message":"Success","file_name":"72522054_adnoclogoicon.png"}
+Date :2022-04-19 09:00:54 Request: {"id":"","schedule":"1","stage":"5","file_name":"72522054_adnoclogoicon.png","file_type":"image/png","start_date":"2022-04-01","expiry_date":"","task":6}
+Date :2022-04-19 09:00:54 Response: {"id":"","schedule":"1","stage":"5","file_name":"72522054_adnoclogoicon.png","file_type":"image/png","start_date":"2022-04-01","expiry_date":"","task":6}
+Date :2022-04-19 09:01:22 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 09:01:22 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 09:01:22 Response: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 09:01:22 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 09:02:59 Request: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 09:02:59 Response: {"schedule":"1","stage":"5","task":4}
+Date :2022-04-19 09:50:51 Request: {"stage_id":"13","schedule":"1","task":3}
+Date :2022-04-19 09:50:51 Response: {"stage_id":"13","schedule":"1","task":3}
+Date :2022-04-19 09:51:10 Upload File Request: {"from":"\/opt\/lampp\/temp\/phpt8X5sR","name":"test video.mp4","size":1055736,"type":"video\/mp4","error":0,"task":1}
+Date :2022-04-19 09:51:10 Upload File Response: {"status":200,"message":"Success","file_name":"72525070_test_video.mp4"}
+Date :2022-04-19 09:51:10 Request: {"stage_id":"13","schedule":"1","title":"Rewards","description":"","message_line1":"","m1_font_family":"","m1_font_size":"0","m1_font_color":"","message_line2":"","m2_font_family":"","m2_font_size":"0","m2_font_color":"","message_line3":"","m3_font_family":"","m3_font_size":"0","m3_font_color":"","timeout":"0","bg_file":"72525070_test_video.mp4","bg_type":"video/mp4","animation_file":"","animation_type":"","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"","task":2}
+Date :2022-04-19 09:51:10 Upload File Request: {"from":"\/opt\/lampp\/temp\/phpNYIKkm","name":"angry.gif","size":197055,"type":"image\/gif","error":0,"task":1}
+Date :2022-04-19 09:51:10 Response: {"stage_id":"13","schedule":"1","title":"Rewards","description":"","message_line1":"","m1_font_family":"","m1_font_size":"0","m1_font_color":"","message_line2":"","m2_font_family":"","m2_font_size":"0","m2_font_color":"","message_line3":"","m3_font_family":"","m3_font_size":"0","m3_font_color":"","timeout":"0","bg_file":"72525070_test_video.mp4","bg_type":"video/mp4","animation_file":"","animation_type":"","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"","task":2}
+Date :2022-04-19 09:51:10 Upload File Response: {"status":200,"message":"Success","file_name":"72525070_angry.gif"}
+Date :2022-04-19 09:51:10 Request: {"stage_id":"13","schedule":"1","title":"Rewards","description":"","message_line1":"","m1_font_family":"","m1_font_size":"0","m1_font_color":"","message_line2":"","m2_font_family":"","m2_font_size":"0","m2_font_color":"","message_line3":"","m3_font_family":"","m3_font_size":"0","m3_font_color":"","timeout":"0","bg_file":"72525070_test_video.mp4","bg_type":"video/mp4","animation_file":"72525070_angry.gif","animation_type":"image/gif","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"","task":2}
+Date :2022-04-19 09:51:10 Response: {"stage_id":"13","schedule":"1","title":"Rewards","description":"","message_line1":"","m1_font_family":"","m1_font_size":"0","m1_font_color":"","message_line2":"","m2_font_family":"","m2_font_size":"0","m2_font_color":"","message_line3":"","m3_font_family":"","m3_font_size":"0","m3_font_color":"","timeout":"0","bg_file":"72525070_test_video.mp4","bg_type":"video/mp4","animation_file":"72525070_angry.gif","animation_type":"image/gif","auto_stage_change":0,"next_stage_id":"0","bg_color":"","bg_opacity":"","task":2}
+Date :2022-04-19 09:51:21 Request: {"stage_id":"13","schedule":"1","task":3}
+Date :2022-04-19 09:51:21 Response: {"stage_id":"13","schedule":"1","task":3}
+Date :2022-04-19 11:16:18 Request: {"stage_id":"5","schedule":"1","task":3}
+Date :2022-04-19 11:16:18 Request: {"schedule":"1","stage":"5","task":4}
+
+Date :2022-04-19 11:16:18 Date :2022-04-19 11:16:18 Response: {"schedule":"1","stage":"5","task":4}Response: {"stage_id":"5","schedule":"1","task":3}

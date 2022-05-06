@@ -5,3 +5,4 @@
 5.Device Settings need to have settings related to screen category
 6. Screen list should show preview of currently playing media/playlist
 7.Scheduling playlist should not coincide with other playlists' schedule
+8.Add Time delay required while uploading images in the media library

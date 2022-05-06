@@ -173,7 +173,7 @@ Php::Value updateStage(Php::Value data)
         {
         string query_string="";     
         con= General.mysqlConnect(ServerDB); 
-        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_file=?,animation_file=?,title=?,animation_type=?,timeout_period=?,bg_type=?,bg_color=?,bg_opacity=?,auto_stage_change=?,next_stage_id=?,last_updated_date_time=NOW() where stage_id=? and schedule=?";          
+        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_file=?,animation_file=?,stage_title=?,animation_type=?,bg_type=?,bg_color=?,bg_opacity=?,last_updated_date_time=NOW() where stage_id=? and schedule=? and known_customer=?";          
             
         prep_stmt = con->prepareStatement(query_string);
         prep_stmt->setString(1,toString(data["message_line1"]));
@@ -196,17 +196,28 @@ Php::Value updateStage(Php::Value data)
         prep_stmt->setString(15,toString(data["animation_file"]));
         prep_stmt->setString(16,toString(data["title"]));
         prep_stmt->setString(17,toString(data["animation_type"]));
-        prep_stmt->setInt(18,data["timeout"]);
-        prep_stmt->setString(19,toString(data["bg_type"]));
-        prep_stmt->setString(20,toString(data["bg_color"]));
-        prep_stmt->setInt(21,data["bg_opacity"]);
-        prep_stmt->setInt(22,data["auto_stage_change"]);
-        prep_stmt->setInt(23,data["next_stage_id"]);
-        prep_stmt->setString(24,toString(data["stage_id"]));
-        prep_stmt->setInt(25,data["schedule"]);
+       // prep_stmt->setInt(18,data["timeout"]);
+        prep_stmt->setString(18,toString(data["bg_type"]));
+        prep_stmt->setString(19,toString(data["bg_color"]));
+        prep_stmt->setInt(20,data["bg_opacity"]);
+       // prep_stmt->setInt(22,data["auto_stage_change"]);
+        //prep_stmt->setInt(23,data["next_stage_id"]);
+        prep_stmt->setString(21,toString(data["stage_id"]));
+        prep_stmt->setInt(22,data["schedule"]);
+        prep_stmt->setInt(23,data["known_customer"]);
         
 
         prep_stmt->executeUpdate();
+
+        query_string = "Update greeting_screen set auto_stage_change=?,next_stage_id=?,timeout_period=? where stage_id=? and known_customer=?";
+        prep_stmt = con->prepareStatement(query_string);
+        prep_stmt->setInt(1,data["auto_stage_change"]);
+        prep_stmt->setInt(2,data["next_stage_id"]);
+        prep_stmt->setInt(3,data["timeout"]);
+        prep_stmt->setString(4,toString(data["stage_id"]));
+        prep_stmt->setInt(5,data["known_customer"]);
+        prep_stmt->executeUpdate();
+
         result = "Success";
     
         delete prep_stmt;
@@ -229,9 +240,10 @@ Php::Value getStageDetails(Php::Value data) {
     sql::ResultSet *res;
     try {      
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("select * from greeting_screen where stage_id =? and schedule=?");
+        prep_stmt = con->prepareStatement("select a.*,b.title from greeting_screen as a join greeting_stages as b on a.stage_id = b.stage_id where a.stage_id =? and a.schedule=? and a.known_customer=?");
         prep_stmt->setString(1, toString(data["stage_id"]));
         prep_stmt->setString(2, toString(data["schedule"]));
+        prep_stmt->setInt(3, data["known_customer"]);
         res = prep_stmt->executeQuery();
         if (res->next()) {
             sql::ResultSetMetaData *res_meta = res -> getMetaData();
@@ -473,11 +485,11 @@ void getStagesDropdown()
 {
     sql::Connection *con=NULL;
     sql::PreparedStatement *prep_stmt;
-    sql::ResultSet *res;
+    sql::ResultSet *res;  
     try 
     {
         con = General.mysqlConnect(ServerDB);
-        string query = "select distinct title,stage_id from greeting_screen";
+        string query = "select distinct title,stage_id from greeting_stages";
         prep_stmt = con->prepareStatement(query);
         res = prep_stmt->executeQuery();
         while(res->next())
@@ -493,6 +505,117 @@ void getStagesDropdown()
         writeException("getStagesDropdown", e.what());
         delete con;
     }
+}
+
+void getStagesList(Php::Value data)
+{
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    bool left_aligned=false;
+    string left_class="";
+    int type=data["type"];
+    string status_column;
+    try 
+    {
+        con = General.mysqlConnect(ServerDB);
+        string query = "select * from greeting_stages";
+        if(type==1){
+           // query += " where known_customer_status > 0 and known_customer_order>0 order by known_customer_order";
+            query += " order by known_customer_order=0,known_customer_order";
+            status_column  = "known_customer_status";
+        }
+        else{
+            //query += " where unknown_customer_status > 0 and unknown_customer_order>0 order by unknown_customer_order";
+            query += " order by unknown_customer_order=0,unknown_customer_order";
+            status_column  = "unknown_customer_status";
+        }
+        prep_stmt = con->prepareStatement(query);
+        res = prep_stmt->executeQuery();
+        while(res->next())
+        {
+            if(left_aligned==true)
+            {
+                left_class="left-aligned";
+                left_aligned=false;
+            }
+            else
+            {
+                left_class="";
+                left_aligned=true;
+            }
+            Php::out<<"<article class='timeline-entry "+left_class+"'>"<<endl;
+            Php::out<<"<div class='timeline-entry-inner'>"<<endl;
+            Php::out<<"<div class='dropdown'>"<<endl;
+            if(res->getInt(status_column)==1)
+                Php::out<<"<div class='timeline-icon "+res->getString("bg_color")+" stage'><i class='"+res->getString("stage_icon")+"'></i>"<<endl;
+            else
+                Php::out<<"<div class='timeline-icon gray stage'><i class='"+res->getString("stage_icon")+"'></i>"<<endl;
+            Php::out<<"<div class='dropdown-content'>"<<endl;
+            Php::out<<"<div class='btn btn-block btn-default edit-btn' data-id='"+res->getString("stage_id")+"'>Edit</div>"<<endl;
+            Php::out<<"<div class='btn btn-block btn-default preview-btn' data-id='"+res->getString("stage_id")+"1'>Preview</div>"<<endl;
+            if(res->getInt(status_column)==1)
+                Php::out<<"<div class='btn btn-block btn-default enable-disable-btn' data-id='"+res->getString("stage_id")+"'>Disable</div>"<<endl;
+            else
+                Php::out<<"<div class='btn btn-block btn-default enable-disable-btn' data-id='"+res->getString("stage_id")+"'>Enable</div>"<<endl;
+            Php::out<<"</div>"<<endl;
+            Php::out<<"</div>"<<endl;
+            Php::out<<"</div>"<<endl;
+            if(res->getInt(status_column)==1)
+                Php::out<<"<div class='timeline-label "+res->getString("bg_color")+"'><h4 class='timeline-title' id='title-"+res->getString("stage_id")+"'>"+res->getString("title")+"</h4>"<<endl;
+            else
+                Php::out<<"<div class='timeline-label gray'><h4 class='timeline-title' id='title-"+res->getString("stage_id")+"'>"+res->getString("title")+"</h4>"<<endl;
+            Php::out<<"</div>"<<endl;
+            Php::out<<"</div>"<<endl;
+            Php::out<<"</article>"<<endl;
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    
+    }    
+    catch (const std::exception& e) {
+        writeException("getStagesList", e.what());
+        delete con;
+    }
+}
+
+Php::Value enabledisableStage(Php::Value json) {
+    string msg = "Failed";
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt; 
+    string query="";
+    try {
+        int status = json["status"];
+        int stage_id = json["stage_id"];    
+        int customer_type = json["customer_type"];    
+        con = General.mysqlConnect(ServerDB);
+        if(customer_type==0)
+        {
+            query = "update greeting_stages set unknown_customer_status=? where stage_id=?";
+        }
+        else
+        {
+            query = "update greeting_stages set known_customer_status=? where stage_id=?";
+        }
+        prep_stmt = con->prepareStatement(query);
+        prep_stmt->setInt(1,status);
+        prep_stmt->setInt(2,stage_id);
+        int n = prep_stmt->executeUpdate();
+        if(n>0)
+        {
+            msg = "Successfull";
+        }
+        
+        delete prep_stmt;
+        delete con;
+    
+    }    catch (const std::exception& e) {
+        writeException("enabledisableStage", e.what());
+        delete con;
+    }
+    
+    return msg;
 }
 
 Php::Value parcxGreetingScreen(Php::Parameters &params) {
@@ -519,6 +642,10 @@ Php::Value parcxGreetingScreen(Php::Parameters &params) {
         case 9:getfontcolorDropdown();
             break;
         case 10:getStagesDropdown();
+            break;
+        case 11:getStagesList(data);
+            break;
+        case 12:response=enabledisableStage(data);
             break;
     }
     return response;
