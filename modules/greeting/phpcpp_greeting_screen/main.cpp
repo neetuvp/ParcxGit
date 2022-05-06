@@ -32,6 +32,14 @@ void writeException(string function, string message) {
     writeLog(function, "Exception: " + message);
 }
 
+void writeLogService(string function, string message) {
+    General.writeLog("Services/ApplicationLogs/PX-GreetingScreen-" + General.currentDateTime(dateFormat), function, message);
+}
+
+void writeExceptionService(string function, string message) {
+    General.writeLog("Services/ExceptionLogs/PX-GreetingScreen-" + General.currentDateTime(dateFormat), function, message);
+    writeLogService(function, "Exception: " + message);
+}
 
 string toString(Php::Value param) {
     string value = param;
@@ -208,7 +216,7 @@ Php::Value updateStage(Php::Value data)
         
 
         prep_stmt->executeUpdate();
-
+        
         query_string = "Update greeting_screen set auto_stage_change=?,next_stage_id=?,timeout_period=? where stage_id=? and known_customer=?";
         prep_stmt = con->prepareStatement(query_string);
         prep_stmt->setInt(1,data["auto_stage_change"]);
@@ -618,6 +626,37 @@ Php::Value enabledisableStage(Php::Value json) {
     return msg;
 }
 
+Php::Value contentService()
+{
+    Php::Value response,row;
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;
+    try {      
+        con = General.mysqlConnect(ServerDB);
+        prep_stmt = con->prepareStatement("select * from greeting_screen");
+        
+        res = prep_stmt->executeQuery();
+        int i=0;
+        while (res->next()) {
+            sql::ResultSetMetaData *res_meta = res -> getMetaData();
+            int columns = res_meta -> getColumnCount();
+            for (int i = 1; i <= columns; i++)
+                row[res_meta -> getColumnLabel(i)] = string(res->getString(i));
+                response[i] = row;
+                i++;
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    } catch (const std::exception& e) {
+        writeExceptionService("contentService", e.what());
+        delete con;
+    }
+    return response;
+
+}
+
 Php::Value parcxGreetingScreen(Php::Parameters &params) {
     Php::Value data = params[0];
     int task = data["task"];
@@ -646,6 +685,8 @@ Php::Value parcxGreetingScreen(Php::Parameters &params) {
         case 11:getStagesList(data);
             break;
         case 12:response=enabledisableStage(data);
+            break;
+        case 13: response = contentService();
             break;
     }
     return response;

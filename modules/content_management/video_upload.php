@@ -37,7 +37,11 @@ include('../../includes/sidebar.php');
                     <div class="row">
                         <div class="card-body col form-group">
                             <label for="">Upload File</label>
-                            <input type="file" name="file" id="file" required=""/> <!--accept ="image/png, image/gif, image/jpeg,video/mp4,video/avi"-->
+                            <input type="file" name="file" id="file" required="" accept ="image/*,video/*"/> <!--accept ="image/png, image/gif, image/jpeg,video/mp4,video/avi"-->
+                            <div class="image-timeout-div mt-2" style="display:none;">
+                                <label for="">Image Timeout(in seconds)</label>
+                                <input type="number" name="image_timeout" id="image_timeout"/>
+                            </div>
                         </div>
                     </div>                         
                     <input class="btn btn-block btn-info mt-2 btn-lg" onclick="upload_3()" type="submit" name="submit" value="Submit" />                
@@ -132,36 +136,47 @@ include('../../includes/sidebar.php');
 
     var files;
     var duration=0;
+    var file_data_type;
     var isVideo = false;
     window.URL = window.URL || window.webkitURL;
     document.getElementById('file').onchange = setFileInfo;
-table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
-function setFileInfo() {
-    isVideo = false;
-    var file_data = $("#file").prop("files")[0];
+    table = $('#RecordsTable').DataTable({"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]], "aaSorting": []});
+    
+    function setFileInfo() {
+        isVideo = false;
+        var file_data = $("#file").prop("files")[0];
 
-    if (typeof file_data !== "undefined")
-    {
-        var file_name = file_data.name;
-        var extension = file_name.split('.').pop();
-        if(extension=="mp4"||extension=="avi" || extension=="MP4"||extension=="AVI" ||extension=="webm"||extension=="WEBM" )
+        if (typeof file_data !== "undefined")
         {
-            isVideo = true;
-            files = this.files;
-            var video = document.createElement('video');
-            video.preload = 'metadata';
+            var file_name = file_data.name;
+            //alert(file_data.type);
+            
+            var extension = file_name.split('.').pop();
+            if(extension=="mp4"||extension=="avi" || extension=="MP4"||extension=="AVI" ||extension=="webm"||extension=="WEBM" )
+            {
+                isVideo = true;
+                files = this.files;
+                var video = document.createElement('video');
+                video.preload = 'metadata';
 
-            video.onloadedmetadata = function() {
-              window.URL.revokeObjectURL(video.src);
-              duration = format_duration(video.duration);
-              files.duration = duration;  
-              //alert(duration);
+                video.onloadedmetadata = function() {
+                  window.URL.revokeObjectURL(video.src);
+                  duration = format_duration(video.duration);
+                  files.duration = duration;  
+                  //alert(duration);
+                }
+
+                video.src = URL.createObjectURL(files[0]);
             }
-
-            video.src = URL.createObjectURL(files[0]);
+            file_data_type=file_data.type.split('/')[0];
+            if(file_data_type==="image")
+            {
+                $(".image-timeout-div").show();
+                $("#image_timeout").prop('required', true);
+                //$('#image_timeout').show().find(':input').attr('required', true);
+            }
         }
     }
-}
 
 
 function format_duration(sec)
@@ -199,6 +214,8 @@ function loadTable()
 
 $(document).on("click", ".upload-media-btn", function ()
 {
+    $(".image-timeout-div").hide();
+    $("#image_timeout").prop('required', false);
     $("#file").val('');
     $("#upload_media_modal").modal('show');
     $("#error-upload").hide();
@@ -265,11 +282,17 @@ function getthumbnail(seekTo,filename) {
 
 function upload_3()
 {
-    
+    let isFormValid = $('#video_upload')[0].checkValidity();
+    if(!isFormValid)
+        return;
     if ($('#file').val()) {
         $(".progress").show();
         event.preventDefault();
         var file_data = $('input[name="file"]').get(0).files[0];
+        if(file_data_type==="image")
+        {
+            duration=$("#image_timeout").val();
+        }
         var formData = new FormData();
         formData.append('file', file_data);
         

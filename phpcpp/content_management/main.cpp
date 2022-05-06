@@ -650,7 +650,8 @@ Php::Value uploadMedia(Php::Value data)
     int error = data["error"];
     string type = toString(data["type"]);
     string duration = data["duration"];
-    string result = "";
+    string image_timeout="0",result = "";
+    writeLog("uploadMedia","**********************************");
     writeLog("uploadMedia","filename:"+filename_new);
     writeLog("uploadMedia","size:"+to_string(size/ (1024 * 1024))+" MB");
     writeLog("uploadMedia","duration:"+duration);
@@ -676,15 +677,23 @@ Php::Value uploadMedia(Php::Value data)
                     {
                         system(("sudo chmod 777 "+dest).c_str());
                         result ="Success" ;
-
+                        
                         writeLog("uploadMedia",result);
                         sql::Connection *con;
-                        sql::Statement *stmt;            
+                        sql::Statement *stmt;  
+                        if (type.find("image") != std::string::npos) {
+                            image_timeout = duration;
+                            duration = "00:00:00";
+                        }
+                        else
+                        {
+                            image_timeout ="0";
+                        }
                         try
                         { 
                             con= General.mysqlConnect(ServerDB); 
                             stmt=con->createStatement();
-                            n = stmt->executeUpdate("Insert into media_library(media_name,media_label,media_type,media_duration,media_size) values ('"+filename_new+"','"+filename+"','"+type+"','"+duration+"',"+to_string(size/(1024*1024))+")");
+                            n = stmt->executeUpdate("Insert into media_library(media_name,media_label,media_type,media_duration,media_size,image_timeout) values ('"+filename_new+"','"+filename+"','"+type+"','"+duration+"',"+to_string(size/(1024*1024))+","+image_timeout+")");
 
                             delete stmt;
                             delete con;
@@ -713,7 +722,7 @@ Php::Value uploadMedia(Php::Value data)
             else 
             {
                 //writeLog("uploadMedia","Invalid Extension");
-                result ="Invalid Extension" ;
+                result ="Invalid File Extension" ;
             }
         }
         writeLog("uploadMedia",result);
@@ -804,8 +813,13 @@ void showMediaLibraryList(Php::Value data)
             }
             Php::out<<"<td>"+res->getString("media_label")+"</td>"<<endl;
             Php::out<<"<td>"+res->getString("media_type")+"</td>"<<endl; 
-
-            Php::out<<"<td>"+res->getString("media_duration")+"</td>"<<endl;  
+            if (res->getString("media_type").find("image") != std::string::npos) {
+                 Php::out<<"<td>"+res->getString("image_timeout")+"</td>"<<endl;
+            }
+            else
+            {
+                Php::out<<"<td>"+res->getString("media_duration")+"</td>"<<endl;
+            }
             Php::out<<"<td>"+res->getString("media_size")+" MB</td>"<<endl;  
             Php::out << "<td>"<< std::endl;
             Php::out << "<button type='button' class='btn btn-info play-video' title='View Video' data-text='View Video' data-path='"+string(MediaPath)+"/"+res->getString("media_name")+"' data-type='"+res->getString("media_type")+"'><i class='fas fa-eye'></i></button>"<< std::endl;  
@@ -1029,7 +1043,7 @@ void manageScreenPlaylist(Php::Value data)
             html_data += "<label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
             html_data +="</div>";
             html_data +="<div class='row center'>";
-            html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range'></p>";
+            html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range' required /></p>";
             html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime timepicker' autocomplete='off' placeholder='Choose Start Time' value='' data-id="+id+"><input type='text' id='end-time"+id+"' class='form-control scheduleendtime timepicker' autocomplete='off' placeholder='Choose End Time' value=''  data-id="+id+"></div>";
             //html_data+="<input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time' value = '"+res->getString("start_time")+"'> <input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value = '"+res->getString("end_time")+"'>";
             html_data+="<p><span class='float-left mt-1'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p></fieldset>";

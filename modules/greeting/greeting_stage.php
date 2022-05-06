@@ -401,9 +401,9 @@ include('../../includes/sidebar.php');
         data["known_customer"] = known_customer;
         data["task"] = 3;
         var jsondata = JSON.stringify(data);
-console.log(jsondata);            
+//console.log(jsondata);            
         $.post("ajax/greeting_screen.php", jsondata, function (result) { 
-console.log(result);       
+//console.log(result);       
             var json = JSON.parse(result);
             $("#title").val(json.title);
             $("#description").val(json.description);
@@ -637,9 +637,9 @@ console.log(result);
             data["expiry_date"]=$("#expiry_date"+id).val();
             data["task"] = 6;
             var jsondata = JSON.stringify(data);
-            console.log(jsondata); 
+            //console.log(jsondata); 
             $.post("ajax/greeting_screen.php", jsondata, function (result) {
-                console.log(result);
+                //console.log(result);
                 if (result === "Success")
                     {
                     loadAdVideos();
@@ -664,9 +664,9 @@ console.log(result);
         data["expiry_date"]=$("#expiry_date").val();
         data["task"] = 6;
         var jsondata = JSON.stringify(data);
-        console.log(jsondata); 
+        //console.log(jsondata); 
         $.post("ajax/greeting_screen.php", jsondata, function (result) {
-            console.log(result);
+            //console.log(result);
             if (result === "Success")
                 {
                 loadAdVideos();
@@ -723,7 +723,7 @@ console.log(result);
             processData: false,
             success: function (response) {
                 try {
-                    console.log("upload response: "+response);
+                    //console.log("upload response: "+response);
                     var json = JSON.parse(response);
                     if (json.status == 200) 
                         {
@@ -821,7 +821,7 @@ console.log(result);
         data["bg_opacity"] = $("#bg_opacity").val();
         data["task"] = 2;
         var jsondata = JSON.stringify(data);
-        console.log(jsondata);
+        //console.log(jsondata);
         $.post("ajax/greeting_screen.php", jsondata, function (result) {
            // console.log(result);
             if (result === "Success")
@@ -897,7 +897,7 @@ console.log(result);
         data["task"] = "12";
         data["customer_type"]=known_customer;
         var jsondata = JSON.stringify(data);
-        console.log(jsondata);
+        //console.log(jsondata);
         $.post("ajax/greeting_screen.php", jsondata, function (result) {
             if (result === "Successfull")
             { 
