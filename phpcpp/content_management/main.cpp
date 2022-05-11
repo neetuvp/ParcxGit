@@ -264,22 +264,29 @@ void getPlaylistVideos(Php::Value data)
                         }
                         else if (res->getString("media_type").find("video") != std::string::npos) 
                         {
-                            if(res->getString("media_type")=="video/mp4")
+                            if(type==1) //for view
                             {
-                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video>"<<endl;
+                                if(res->getString("media_type")=="video/mp4")
+                                {
+                                    Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video>"<<endl;
+                                }
+                                else if(res->getString("media_type")=="video/webm")
+                                {
+                                    Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/webm'></video>"<<endl;
+                                }
+                                else if(res->getString("media_type")=="video/ogg")
+                                {
+                                    Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/ogg'></video>"<<endl;
+                                }
+                                else if(res->getString("media_type")=="video/x-msvideo")
+                                {
+                                    Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/avi'></video>"<<endl;
+
+                                }
                             }
-                            else if(res->getString("media_type")=="video/webm")
+                            else
                             {
-                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/webm'></video>"<<endl;
-                            }
-                            else if(res->getString("media_type")=="video/ogg")
-                            {
-                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/ogg'></video>"<<endl;
-                            }
-                            else if(res->getString("media_type")=="video/x-msvideo")
-                            {
-                                Php::out<<"<video width='"+width+"' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/avi'></video>"<<endl;
-                               // Php::out<<"<td><object data='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'> <param name='src' value='"+string(MediaPath)+"/"+res->getString("media_name")+"' /> <embed type='video/x-ms-wm' src='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'></embed> </object></td>"<<endl;
+                                Php::out<<"<img src='"+string(ThumbnailPath)+"/"+res->getString("media_name")+".png'  style='width:100px'>"<<endl;
                             }
 
                         }
@@ -366,7 +373,7 @@ void getVideoslibrary(Php::Value data)
                 }
                 else if (res->getString("media_type").find("video") != std::string::npos) 
                 {
-                    if(res->getString("media_type")=="video/mp4")
+                    /*if(res->getString("media_type")=="video/mp4")
                     {
                         Php::out<<"<video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/mp4'></video>"<<endl;
                     }
@@ -381,8 +388,9 @@ void getVideoslibrary(Php::Value data)
                     else if(res->getString("media_type")=="video/x-msvideo")
                     {
                         Php::out<<"<video width='100' controls='controls' preload='metadata'><source src='"+string(MediaPath)+"/"+res->getString("media_name")+"#t=0.5' type='video/avi'></video>"<<endl;
-                       // Php::out<<"<td><object data='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'> <param name='src' value='"+string(MediaPath)+"/"+res->getString("media_name")+"' /> <embed type='video/x-ms-wm' src='"+string(MediaPath)+"/"+res->getString("media_name")+"' width='100' height='250'></embed> </object></td>"<<endl;
-                    }
+                       
+                    }*/
+                    Php::out<<"<img src='"+string(ThumbnailPath)+"/"+res->getString("media_name")+".png'  style='width:100px'>"<<endl;
 
                 }
                 else if (res->getString("media_type").find("audio") != std::string::npos) 
@@ -1043,7 +1051,7 @@ void manageScreenPlaylist(Php::Value data)
             html_data += "<label id = 'l"+id+"'>"+res->getString("playlist_name")+"</label></fieldset>";
             html_data +="</div>";
             html_data +="<div class='row center'>";
-            html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range' required /></p>";
+            html_data +="<fieldset class='pl-options mt-2' id='pl-options-"+id+"'><p><input type='text' id='date-p"+id+"' class='form-control scheduledate' autocomplete='off' placeholder='Choose Date Range'></p>";
             html_data +="<div class='input-group'><input type='text' id='start-time"+id+"' class='form-control schedulestarttime timepicker' autocomplete='off' placeholder='Choose Start Time' value='' data-id="+id+"><input type='text' id='end-time"+id+"' class='form-control scheduleendtime timepicker' autocomplete='off' placeholder='Choose End Time' value=''  data-id="+id+"></div>";
             //html_data+="<input type='text' id='start-time"+id+"' class='form-control schedulestarttime' autocomplete='off' placeholder='Choose Start Time' value = '"+res->getString("start_time")+"'> <input type='text' id='end-time"+id+"' class='form-control scheduleendtime' autocomplete='off' placeholder='Choose End Time' value = '"+res->getString("end_time")+"'>";
             html_data+="<p><span class='float-left mt-1'><input type='checkbox' id='repeat-p"+id+"'><label for=''>Repeat</label></span></p></br><p class='mt-2'><span class='text-center'><button class='btn btn-success add-playlist' value='add"+id+"' data-id='"+id+"'><i class='fas fa-plus'></i></button></span></p></fieldset>";

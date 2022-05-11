@@ -103,7 +103,7 @@ body {
 <!-- Modal -->
 <div class="modal fade" id="add-edit-playlist-modal"  tabindex="-1" aria-labelledby="exampleModalLabel"
      aria-hidden="true" style="z-index: 1999;">
-    <div class="modal-dialog modal-xl" style="width:1000px;">
+    <div class="modal-dialog modal-xl" style="width:1200px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Add/Edit Playlist</h5>
@@ -132,11 +132,11 @@ body {
 
                         <div class="row  mb-3">
                             <div class="col h5">
-                                <label for="">Drag the videos in sequence to create the playlist</label>
+                                <label for="">Drag the media file in sequence to create the playlist</label>
                             </div>
                         </div>
                         <div class="row  mb-1">
-                            <div class="col"><h4>VIDEO LIBRARY</h4></div>
+                            <div class="col"><h4>MEDIA LIBRARY</h4></div>
                             <div class="col p-2"></h4></div>
                             <div class="col"><h4>PLAYLIST</h4></div>
                         </div>
@@ -355,7 +355,7 @@ $('#add-edit-playlist-modal').on('hidden.bs.modal', function () {
    
 
 
-    /* === enable disable product === */
+    /* === enable disable playlist === */
     var status;
     $(document).on("click", ".playlist-enable-disable-btn", function ()
     {

@@ -181,7 +181,7 @@ Php::Value updateStage(Php::Value data)
         {
         string query_string="";     
         con= General.mysqlConnect(ServerDB); 
-        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_file=?,animation_file=?,stage_title=?,animation_type=?,bg_type=?,bg_color=?,bg_opacity=?,last_updated_date_time=NOW() where stage_id=? and schedule=? and known_customer=?";          
+        query_string = "Update greeting_screen set message_line1=?,m1_font_family=?,m1_font_size=?,m1_font_color=?,message_line2=?,m2_font_family=?,m2_font_size=?,m2_font_color=?,message_line3=?,m3_font_family=?,m3_font_size=?,m3_font_color=?,description=?,bg_file=?,animation_file=?,title=?,animation_type=?,bg_type=?,bg_color=?,bg_opacity=?,last_updated_date_time=NOW() where stage_id=? and schedule=? and known_customer=?";          
             
         prep_stmt = con->prepareStatement(query_string);
         prep_stmt->setString(1,toString(data["message_line1"]));
@@ -248,7 +248,7 @@ Php::Value getStageDetails(Php::Value data) {
     sql::ResultSet *res;
     try {      
         con = General.mysqlConnect(ServerDB);
-        prep_stmt = con->prepareStatement("select a.*,b.title from greeting_screen as a join greeting_stages as b on a.stage_id = b.stage_id where a.stage_id =? and a.schedule=? and a.known_customer=?");
+        prep_stmt = con->prepareStatement("select a.*,b.stage_title from greeting_screen as a join greeting_stages as b on a.stage_id = b.stage_id where a.stage_id =? and a.schedule=? and a.known_customer=?");
         prep_stmt->setString(1, toString(data["stage_id"]));
         prep_stmt->setString(2, toString(data["schedule"]));
         prep_stmt->setInt(3, data["known_customer"]);
@@ -497,12 +497,12 @@ void getStagesDropdown()
     try 
     {
         con = General.mysqlConnect(ServerDB);
-        string query = "select distinct title,stage_id from greeting_stages";
+        string query = "select distinct stage_title,stage_id from greeting_stages";
         prep_stmt = con->prepareStatement(query);
         res = prep_stmt->executeQuery();
         while(res->next())
         {
-            Php::out << "<option value="<<res->getInt("stage_id")<<">"<<res->getString("title")<<"</option>" << std::endl; 
+            Php::out << "<option value="<<res->getInt("stage_id")<<">"<<res->getString("stage_title")<<"</option>" << std::endl; 
         }
         delete res;
         delete prep_stmt;
@@ -570,9 +570,9 @@ void getStagesList(Php::Value data)
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
             if(res->getInt(status_column)==1)
-                Php::out<<"<div class='timeline-label "+res->getString("bg_color")+"'><h4 class='timeline-title' id='title-"+res->getString("stage_id")+"'>"+res->getString("title")+"</h4>"<<endl;
+                Php::out<<"<div class='timeline-label "+res->getString("bg_color")+"'><h4 class='timeline-title' id='title-"+res->getString("stage_id")+"'>"+res->getString("stage_title")+"</h4>"<<endl;
             else
-                Php::out<<"<div class='timeline-label gray'><h4 class='timeline-title' id='title-"+res->getString("stage_id")+"'>"+res->getString("title")+"</h4>"<<endl;
+                Php::out<<"<div class='timeline-label gray'><h4 class='timeline-title' id='title-"+res->getString("stage_id")+"'>"+res->getString("stage_title")+"</h4>"<<endl;
             Php::out<<"</div>"<<endl;
             Php::out<<"</div>"<<endl;
             Php::out<<"</article>"<<endl;
@@ -610,6 +610,20 @@ Php::Value enabledisableStage(Php::Value json) {
         prep_stmt->setInt(1,status);
         prep_stmt->setInt(2,stage_id);
         int n = prep_stmt->executeUpdate();
+
+
+        if(customer_type==0)
+        {
+            query = "update greeting_screen set status=? where stage_id=? and known_customer=0";
+        }
+        else
+        {
+            query = "update greeting_screen set status=? where stage_id=? and known_customer=1";
+        }
+        prep_stmt = con->prepareStatement(query);
+        prep_stmt->setInt(1,status);
+        prep_stmt->setInt(2,stage_id);
+        prep_stmt->executeUpdate();
         if(n>0)
         {
             msg = "Successfull";
@@ -628,24 +642,51 @@ Php::Value enabledisableStage(Php::Value json) {
 
 Php::Value contentService()
 {
-    Php::Value response,row;
+    Php::Value response,row,greeting,ads;
     sql::Connection *con=NULL;
     sql::PreparedStatement *prep_stmt;
     sql::ResultSet *res;
+    sql::ResultSetMetaData *res_meta;
+    int i=0,columns=0,j;
+    string columname;
     try {      
         con = General.mysqlConnect(ServerDB);
         prep_stmt = con->prepareStatement("select * from greeting_screen");
         
         res = prep_stmt->executeQuery();
-        int i=0;
         while (res->next()) {
-            sql::ResultSetMetaData *res_meta = res -> getMetaData();
+            res_meta = res -> getMetaData();
             int columns = res_meta -> getColumnCount();
-            for (int i = 1; i <= columns; i++)
-                row[res_meta -> getColumnLabel(i)] = string(res->getString(i));
-                response[i] = row;
+            for (j = 1; j<= columns; j++){
+                columname=res_meta->getColumnTypeName(j);
+                if(columname.find("INT")!=std::string::npos)
+                    row[res_meta -> getColumnLabel(j)] = res->getInt(j);
+                else
+                    row[res_meta -> getColumnLabel(j)] = string(res->getString(j));
+                }
+                greeting[i] = row;
                 i++;
         }
+        response["greeting"] = greeting;
+
+        row="";
+        prep_stmt = con->prepareStatement("select * from greeting_screen_advertisement");        
+        res = prep_stmt->executeQuery();
+        i=0;
+        while (res->next()) {
+            res_meta = res -> getMetaData();
+            columns = res_meta -> getColumnCount();
+            for (j = 1; j<= columns; j++){
+                columname=res_meta->getColumnTypeName(j);
+                if(columname.find("INT")!=std::string::npos)
+                    row[res_meta -> getColumnLabel(j)] = res->getInt(j);
+                else
+                    row[res_meta -> getColumnLabel(j)] = string(res->getString(j));
+                }
+                ads[i] = row;
+                i++;
+        }
+        response["ads"] = ads;
         delete res;
         delete prep_stmt;
         delete con;

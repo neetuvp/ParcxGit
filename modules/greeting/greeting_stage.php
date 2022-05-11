@@ -405,7 +405,7 @@ include('../../includes/sidebar.php');
         $.post("ajax/greeting_screen.php", jsondata, function (result) { 
 //console.log(result);       
             var json = JSON.parse(result);
-            $("#title").val(json.title);
+            $("#title").val(json.stage_title);
             $("#description").val(json.description);
             
             $("#message_line1").val(json.message_line1);

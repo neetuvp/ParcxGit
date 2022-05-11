@@ -33,7 +33,7 @@ include('../../includes/sidebar.php');
 <!-- Modal -->
 <div class="modal fade" id="view_playlist_modal"  role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true" style="z-index: 1999;">
-    <div class="modal-dialog modal-xl" role="document" style="width:1000px;">
+    <div class="modal-dialog modal-xl" role="document" style="width:1200px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Manage Playlist</h5>
@@ -266,68 +266,25 @@ function loadTable()
     });*/
     
     $('#view_playlist_modal').on('shown.bs.modal', function (ev) {
-        $('.scheduledate').daterangepicker(
+        initializeDateRangePicker(".scheduledate");
+        initializeTimePicker(".timepicker");
+        /*$('.scheduledate').daterangepicker(
         {
             timePicker: false,
             timePickerIncrement: 1,
             format: 'YYYY-MM-DD'
-        }).end().on('keypress paste', function (e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        
-        $('.timepicker').timepicker({
-            scrollDefault: '00:00',
-            timeFormat: 'H:i',
-            step: 15,
-        });
-        
-        /*$('.schedulestarttime').daterangepicker({
-            timePicker : true,
-            singleDatePicker:true,
-            timePicker24Hour : true,
-            timePickerIncrement : 1,
-            timePickerSeconds : false,
-            autoApply: false,
-            locale : {
-                format : 'HH:mm:ss'
-            }
-        }).on('show.daterangepicker', function(ev, picker) {
-            picker.container.find(".calendar-date").hide();
-        }).on('showCalendar.daterangepicker', function(ev, picker){
-           picker.container.find('.calendar-date').remove();
-        }).on('apply.daterangepicker', function (e, picker) {
-            var starttime = picker.startDate.format('HH:mm:ss');
-            var id = $(this).attr("data-id")
-            $('#start-time'+id).val(starttime);
-        }).end().on('keypress paste', function (e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        $('.scheduleendtime').daterangepicker({
-            timePicker : true,
-            singleDatePicker:true,
-            timePicker24Hour : true,
-            timePickerIncrement : 1,
-            timePickerSeconds : false,
-            autoApply: false,
-            locale : {
-                format : 'HH:mm:ss'
-            }
-        }).on('show.daterangepicker', function(ev, picker) {
-            picker.container.find(".calendar-date").hide();
-        }).on('showCalendar.daterangepicker', function(ev, picker){
-           picker.container.find('.calendar-date').remove();
-        }).on('apply.daterangepicker', function (e, picker) {
-            var endtime = picker.endDate.format('HH:mm:ss');
-            var id = $(this).attr("data-id")
-            $('#end-time'+id).val(endtime);
-        }).end().on('keypress paste', function (e) {
+        });*//*.end().on('keypress paste', function (e) {
             e.preventDefault();
             return false;
         });*/
+        
+        
+        /*$('.timepicker').timepicker({
+            scrollDefault: '00:00',
+            timeFormat: 'H:i',
+            step: 15,
+        });*/
+        
         
         
         
@@ -384,6 +341,19 @@ function loadTable()
             element.addClass("playlist-right")
             $("#v"+id).remove();
             $("#right").append(element);
+            var element = $("#v"+id).find(".scheduledate");
+            initializeDateRangePicker(element);
+            
+            element = $("#v"+id).find('.schedulestarttime');
+            initializeTimePicker(element);
+
+            element = $("#v"+id).find('.scheduleendtime');
+            initializeTimePicker(element);
+            /*$("#v"+id).find(".scheduledate").daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 1,
+            format: 'YYYY-MM-DD'
+        });*/
         }
         edit=false;
     }
@@ -391,7 +361,27 @@ function loadTable()
     $(document).on("click", ".add-playlist", function (e)
     {
         var id = $(this).attr("data-id");
-        addeditplaylist(id,e);
+        var daterange_playlist = $('#playlist-modal-body').find('#date-p'+id).val();
+            console.log(daterange_playlist);
+            if(daterange_playlist!=""){
+                from_date = daterange_playlist.substring(0, 10);
+                to_date = daterange_playlist.substring(13, 23);
+                console.log(from_date);
+                console.log(to_date);
+                if(!isValidDate(from_date) || !isValidDate(to_date))
+                {
+                    alert("Invalid Date");
+                }
+                else
+                {
+                    addeditplaylist(id,e);
+                }
+            }
+            else
+            {
+                alert("Invalid Date");
+            }
+        
     });
     
    
@@ -405,13 +395,21 @@ function loadTable()
         
         $("#v"+id).remove();
         $("#left").append(element);
-        $("#v"+id).find(".scheduledate").daterangepicker({
+        var element = $("#v"+id).find(".scheduledate");
+        initializeDateRangePicker(element);
+        
+        element = $("#v"+id).find('.schedulestarttime');
+        initializeTimePicker(element);
+        
+        element = $("#v"+id).find('.scheduleendtime');
+        initializeTimePicker(element);
+        /*$("#v"+id).find(".scheduledate").daterangepicker({
             timePicker: false,
             timePickerIncrement: 1,
             format: 'YYYY-MM-DD'
-        });
+        });*/
         
-        $("#v"+id).find('.schedulestarttime').timepicker({
+        /*$("#v"+id).find('.schedulestarttime').timepicker({
             //scrollDefault: '00:00',
             timeFormat: 'H:i',
             step: 15,
@@ -423,55 +421,8 @@ function loadTable()
             timeFormat: 'H:i',
             step: 15,
             
-        });
-        /*$("#v"+id).find('.schedulestarttime').daterangepicker({
-            timePicker : true,
-            singleDatePicker:true,
-            timePicker24Hour : true,
-            timePickerIncrement : 1,
-            timePickerSeconds : false,
-            autoApply: false,
-            locale : {
-                format : 'HH:mm:ss'
-            }
-        }).on('show.daterangepicker', function(ev, picker) {
-            picker.container.find(".calendar-date").hide();
-            picker.container.find('.hourselect').val("5");
-        }).on('showCalendar.daterangepicker', function(ev, picker){
-           picker.container.find('.calendar-date').remove();
-        }).on('apply.daterangepicker', function (e, picker) {
-            var hh = picker.container.find('.hourselect').val();
-            var mm = picker.container.find('.minuteselect').val();
-            var ampm = picker.container.find('.ampmselect').val();
-            const timeformat = moment(hh+":"+mm+" "+ampm, ["h:mm A"]).format("HH:mm");
-            $('#start-time'+id).val(timeformat+":00");
-        });
-        
-        $("#v"+id).find('.scheduleendtime').daterangepicker({
-            timePicker : true,
-            singleDatePicker:true,
-            timePicker24Hour : true,
-            timePickerIncrement : 1,
-            timePickerSeconds : false,
-            autoApply: false,
-            locale : {
-                format : 'HH:mm:ss'
-            }
-        }).on('show.daterangepicker', function(ev, picker) {
-            picker.container.find(".calendar-date").hide();
-        }).on('showCalendar.daterangepicker', function(ev, picker){
-           picker.container.find('.calendar-date').remove();
-        }).on('apply.daterangepicker', function (e, picker) {
-            var hh = picker.container.find('.hourselect').val();
-            var mm = picker.container.find('.minuteselect').val();
-            var ampm = picker.container.find('.ampmselect').val();
-            const timeformat = moment(hh+":"+mm+" "+ampm, ["h:mm A"]).format("HH:mm");
-            $('#end-time'+id).val(timeformat+":00");
-	    if(mm!="0")
-	    {
-		$('#end-time'+id).val(timeformat+":59");
-            }
         });*/
+        
         
         $("#pl-options-"+id).removeClass("hidden");
         //$('#playlist-modal-body').find("#c"+id).removeClass("hidden");//.remove();
@@ -497,6 +448,14 @@ function loadTable()
         });
     });
     
+    function isValidDate(dateString) {
+        var regEx = /^\d{4}-\d{2}-\d{2}$/;
+        if(!dateString.match(regEx)) return false;  // Invalid format
+        var d = new Date(dateString);
+        var dNum = d.getTime();
+        if(!dNum && dNum !== 0) return false; // NaN value, Invalid date
+        return d.toISOString().slice(0,10) === dateString;
+      }
     
     $(document).on("click", "#save-screen-playlist", function (e)
     {
@@ -509,6 +468,7 @@ function loadTable()
         var from_date;
         var to_date;
         var name;
+        var save = true;
         screen_id = $(this).attr("data-screen");
         $('.playlist-right').each(function(){
             repeat_playlist=0;
@@ -521,15 +481,22 @@ function loadTable()
             }
             
             daterange_playlist = $('#playlist-modal-body').find('#date-p'+id).val();
-            from_date = daterange_playlist.substring(0, 10);
-            to_date = daterange_playlist.substring(13, 23);
+            console.log(daterange_playlist);
+            if(daterange_playlist!=""){
+                from_date = daterange_playlist.substring(0, 10);
+                to_date = daterange_playlist.substring(13, 23);
+            }
+            else{
+                from_date="";
+                to_date = "";
+            }
             if(from_date=="")
             {
-                from_date="00-00-00";
+                from_date="0000-00-00";
             }
             if(to_date=="")
             {
-                to_date="00-00-00";
+                to_date="0000-00-00";
             }
             start_time = $('#playlist-modal-body').find('#start-time'+id).val();
             if(start_time=="")
@@ -541,27 +508,38 @@ function loadTable()
             {
                 end_time="00:00:00";
             }
+            if(!isValidDate(from_date) || !isValidDate(to_date))
+            {
+                alert("Invalid Date");
+                e.preventDefault();
+                save = false;
+            }
+            else
+            {
+                playlist.push({
+                    id: id, 
+                    repeat:repeat_playlist,
+                    start_date:from_date,
+                    end_date:to_date,
+                    start_time:start_time,
+                    end_time:end_time,
+                    name:name
+                });
+            }
             
-            playlist.push({
-                id: id, 
-                repeat:repeat_playlist,
-                start_date:from_date,
-                end_date:to_date,
-                start_time:start_time,
-                end_time:end_time,
-                name:name
-            });
          });
-        var data = {};
-        data["device_id"] = screen_id;
-        data["task"] = "8";
-        data["playlists"]=playlist;
-        var jsondata = JSON.stringify(data);
-        console.log(jsondata);
-        $.post("../../modules/ajax/cms.php", jsondata, function (result) {
-             location.reload();
-            
-        });
+         if(save){
+            var data = {};
+            data["device_id"] = screen_id;
+            data["task"] = "8";
+            data["playlists"]=playlist;
+            var jsondata = JSON.stringify(data);
+            console.log(jsondata);
+            $.post("../../modules/ajax/cms.php", jsondata, function (result) {
+                 location.reload();
+
+            });
+        }
     });
     
     $(document).on("click", ".edit-playlist", function (e)
@@ -582,10 +560,34 @@ function loadTable()
         
     });
     
-  /*  $("#view_playlist_modal" ).scroll(function() {
+    /*$("#view_playlist_modal" ).scroll(function() {
         $('.scheduledate').daterangepicker('place')
     });*/
     
+    function initializeDateRangePicker(element)
+    {
+        $(element).daterangepicker({
+            timePicker: false,
+            timePickerIncrement: 1,
+            format: 'YYYY-MM-DD'
+        });
+    }
     
+    function initializeTimePicker(element)
+    {
+        $(element).timepicker({
+            scrollDefault: '00:00',
+            timeFormat: 'H:i',
+            step: 15
+        });
+    }
+   
+    /*$("#right").scroll(function () {
+        
+       var txtestimatestartdate = $('.scheduledate').daterangepicker();
+    txtestimatestartdate.daterangepicker('hide');
+    $(".scheduledate").blur();             
+});*/
+
 
 </script>
