@@ -729,6 +729,8 @@ Php::Value parcxGreetingScreen(Php::Parameters &params) {
             break;
         case 13: response = contentService();
             break;
+        case 14:getControllerDropdown();
+            break;
     }
     return response;
 }

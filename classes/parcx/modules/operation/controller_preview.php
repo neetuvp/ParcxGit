@@ -39,7 +39,7 @@ include('../../includes/header.php');
 <?php
 include('../../includes/navbar-end.php');
 include('../../includes/sidebar.php');
-include('classes/dashboard.php');
+include('../../classes/adnoc_dashboard.php');
 $obj=new dashboard();
 ?>
 
@@ -109,8 +109,6 @@ $(document).ready(function() {
         	$(".thumbnail-container").css("height", 850)
                 var src = "http://"+$("#controller").val();
                 src+="/PGEGreeting/";
-               // alert(src);
-                src = "http://192.168.1.72/PGEGreeting/"
         	$("#preview-webpage_card").attr("src",src); 
                // $("#preview-modal").modal("show");
                // $("#preview-webpage").attr("src",src); 
