@@ -1,0 +1,438 @@
+#include "PX_GeneralOperations.h"
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <phpcpp.h>
+#include <iostream>
+#include <sstream>
+#include <cppconn/prepared_statement.h>
+#include "validation.h"
+#include<vector>
+#include <algorithm>
+#include <string>
+#define ServerDB "parcx_server"
+#define ReportingDB "parcx_reporting"
+#define DashboardDB "parcx_dashboard"
+#define dateFormat "%Y-%m-%d"
+
+#define MANDATORY "Mandatory"
+#define MAXLENGTH "Maximum Length Exceeded"
+#define CONSTRAINT "Invalid Character"
+#define MediaPath "/opt/lampp/htdocs/parcx/modules/greeting/Media"
+#define DisplayMediaPath "/parcx/modules/greeting/Media"
+using namespace std;
+GeneralOperations General;
+Validation validation;
+string validation_failed = "Validation Failed\n";
+void writeLog(string function, string message) {
+    General.writeLog("WebApplication/ApplicationLogs/PX-StationConfig-" + General.currentDateTime(dateFormat), function, message);
+}
+
+void writeException(string function, string message) {
+    General.writeLog("WebApplication/ExceptionLogs/PX-StationConfig-" + General.currentDateTime(dateFormat), function, message);
+    writeLog(function, "Exception: " + message);
+}
+
+
+string toString(Php::Value param) {
+    string value = param;
+    return value;
+}
+
+std::vector<std::string> splitstring(const std::string& s, char delimiter) {
+    std::vector<std::string> splits;
+    std::string split;
+    std::istringstream ss(s);
+    while (std::getline(ss, split, delimiter)) {
+        splits.push_back(split);
+    }
+    return splits;
+}
+
+int generateUniqueId()
+{    							    		    
+   struct tm tm;
+    string startDate = "2020-01-01 00:00:00";
+
+    strptime(startDate.c_str(), "%Y-%m-%d %H:%M:%S", &tm);
+    time_t t = mktime(&tm);
+
+    time_t now = time(NULL);
+    long seconds = difftime(now, t);
+    return seconds;
+}
+
+std::string random_string( size_t length )
+{
+    auto randchar = []() -> char
+    {
+        const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+        const size_t max_index = (sizeof(charset) - 1);
+        return charset[ rand() % max_index ];
+    };
+    std::string str(length,0);
+    std::generate_n( str.begin(), length, randchar );
+    return str;
+}
+
+string arrayToString(Php::Value json) {
+
+    stringstream ss;
+    ss << "{";
+    for (auto &iter : json)
+        ss << "\"" << iter.first << "\":\"" << iter.second << "\",";
+    string response = ss.str();
+    response = response.substr(0, response.size() - 1) + "}";
+    return response;
+}
+
+
+string removeSpecialCharactersfromText(string str)
+{
+    for(int i=0;i<(signed)str.length();i++)
+    {
+         if (!(str[i]==32))
+          {
+            continue;
+          }
+      else
+      {
+        char c = str[i];
+        std::replace(str.begin(), str.end(), c, '_');
+      }
+    }
+    return str;
+}
+
+
+void getControllerDropdown()
+{
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;  
+    try 
+    {
+        con = General.mysqlConnect(ServerDB);
+        string query = "select * from system_devices where device_category=13";
+        prep_stmt = con->prepareStatement(query);
+        res = prep_stmt->executeQuery();
+        while(res->next())
+        {
+            Php::out << "<option value="<<res->getInt("device_number")<<">"<<res->getString("device_name")<<"</option>" << std::endl; 
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    
+    }    
+    catch (const std::exception& e) {
+        writeException("getControllerDropdown", e.what());
+        delete con;
+    }
+}
+
+void getCameraDropdown()
+{
+    sql::Connection *con=NULL;
+    sql::PreparedStatement *prep_stmt;
+    sql::ResultSet *res;  
+    try 
+    {
+        con = General.mysqlConnect(ServerDB);
+        string query = "select * from system_devices where device_category=8";
+        prep_stmt = con->prepareStatement(query);
+        res = prep_stmt->executeQuery();
+        while(res->next())
+        {
+            Php::out << "<option value="<<res->getInt("device_number")<<">"<<res->getString("device_name")<<"</option>" << std::endl; 
+        }
+        delete res;
+        delete prep_stmt;
+        delete con;
+    
+    }    
+    catch (const std::exception& e) {
+        writeException("getCameraDropdown", e.what());
+        delete con;
+    }
+}
+
+void showPumpSettings()
+    {
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    sql::ResultSet *res;  
+    try
+        {
+        Php::Value role;
+        con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        
+        res=stmt->executeQuery("select * from fueling_station_pump_settings");
+        if(res->rowsCount()>0)
+            {
+            //Php::out<<"<table class='table table-blue'>"<<endl;
+            Php::out << "<thead>" << std::endl;
+            Php::out<<"<tr>"<<endl;
+            Php::out<<"<th>Pump Number</th>"<<endl;
+            Php::out<<"<th>Pump Name</th>"<<endl; 
+            Php::out<<"<th>Pump Monitor Port</th>"<<endl;
+            Php::out<<"<th>Controller Id</th>"<<endl;       
+            Php::out<<"<th></th>"<<endl;
+            Php::out<<"<th></th>"<<endl;
+            Php::out<<"</tr>"<<endl;	
+            Php::out << "</thead>" << std::endl;		
+            }
+        while(res->next())
+            {
+            Php::out<<"<tr data-id='"<<res->getString("id")<<"'>"<<endl;                       
+            Php::out<<"<td>"+res->getString("pump_number")+"</td>"<<endl;
+            Php::out<<"<td>"+res->getString("pump_name")+"</td>"<<endl;            
+            Php::out<<"<td>"+res->getString("pump_monitor_port")+"</td>"<<endl;
+            Php::out<<"<td>"+res->getString("controller_id")+"</td>"<<endl;
+                        
+            Php::out << "<td>"<< std::endl;
+            if(res->getInt("status")==1)
+                Php::out << "<button type='button' class='col btn btn-danger pump-enable-disable-btn'>Disable</button>"<< std::endl;
+            else
+                Php::out << "<button type='button' class='col btn btn-success pump-enable-disable-btn'>Enable</button>"<< std::endl;
+            Php::out << "</td>"<< std::endl;
+
+            Php::out << "<td>"<< std::endl;
+            Php::out << "<button type='button' class='col btn btn-info pump-edit' ><i class='fas fa-edit'></i>Edit</button>"<< std::endl;            
+            Php::out << "</td>"<< std::endl;
+            Php::out<<"</tr>"<<endl;	
+            }
+        //Php::out<<"</table>"<<endl;	
+        delete res;    
+        delete stmt;
+		delete con;  
+        }
+    catch(const std::exception& e)
+        {
+        writeException("showPumpSettings",e.what());
+        }
+    
+    }
+
+
+Php::Value getpumpDetails(Php::Value json)
+    {
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    Php::Value response;  
+    string query;
+    try
+        {
+        string id=json["id"];        
+        con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        query="select * from fueling_station_pump_settings where id="+id;
+        res=stmt->executeQuery(query);
+        if(res->next())
+            {
+            sql::ResultSetMetaData *res_meta = res -> getMetaData();
+            int columns = res_meta -> getColumnCount();   
+            for (int i = 1; i <= columns; i++) 							
+                    response[res_meta -> getColumnLabel(i)]=string(res->getString(i));				
+            }
+        delete res;    
+        delete stmt;
+        delete con;
+        }
+    catch(const std::exception& e)
+        {
+        writeException("getpumpDetails",e.what());
+        } 
+    return response;       
+    }
+
+Php::Value insertUpdatePump(Php::Value json)
+{
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    string query="",msg = "Failed";    
+    try
+        {
+        string id=json["id"];
+        string pump_number=json["pump_number"];
+        string pump_name=json["pump_name"];
+        string waiting_delay=json["waiting_delay"];
+        string waiting_timeout=json["waiting_timeout"];
+        string monitor_pin=json["monitor_pin"];
+        string pump_monitor_port=json["pump_monitor_port"];
+        string camera_1=json["camera_1"];
+        string camera_2=json["camera_2"];
+        string cms_id=json["cms_id"];
+        string controller_id=json["controller_id"];
+        string call_vehicle_found_camera=json["call_vehicle_found_camera"];
+        
+        
+        con = General.mysqlConnect(ServerDB);
+        stmt = con->createStatement();                
+        if(id=="")
+            {
+            query="select pump_number from fueling_station_pump_settings where pump_number='"+pump_number+"'";
+            res=stmt->executeQuery(query);
+            if(res->next())
+                {
+                msg="Pump number already exists.Try with another pump number";
+                delete res;
+                delete stmt;
+                delete con;
+                return msg;
+                }
+            }
+        
+        if(id=="")
+            query="insert into fueling_station_pump_settings (pump_number,pump_name,waiting_delay,monitor_pin,call_vehicle_found_camera,waiting_timeout,cms_id,camera_1,camera_2,pump_monitor_port,controller_id,status)values("+pump_number+",'"+pump_name+"',"+waiting_delay+","+monitor_pin+","+call_vehicle_found_camera+","+waiting_timeout+","+cms_id+","+camera_1+","+camera_2+","+pump_monitor_port+","+controller_id+",1)";
+        else
+            query="update fueling_station_pump_settings set pump_number="+pump_number+",pump_name='"+pump_name+"',waiting_delay="+waiting_delay+",monitor_pin="+monitor_pin+",call_vehicle_found_camera="+call_vehicle_found_camera+",waiting_timeout="+waiting_timeout+",cms_id="+cms_id+",camera_1="+camera_1+",camera_2="+camera_2+",pump_monitor_port="+pump_monitor_port+",controller_id="+controller_id+",last_updated_datetime=NOW() where id="+id;
+        stmt->executeUpdate(query);
+        
+        delete stmt;
+        delete con;
+        msg = "Successfull";
+        }
+    catch(const std::exception& e)
+        {
+        writeException("insertUpdatePump",query);
+        writeException("insertUpdatePump",e.what());
+        Php::out<<query<<endl;
+        } 
+    return msg;
+}
+
+Php::Value enableDisablePump(Php::Value json)
+    {
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    string query="";
+    string msg = "Failed";    
+    try
+        {
+        string status=json["status"];
+        string id=json["id"];
+        con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        query="update fueling_station_pump_settings set status="+status+" where id="+id;
+        stmt->executeUpdate(query);        
+        delete stmt;
+        delete con;       
+        msg = "Successfull";	
+        }
+    catch(const std::exception& e)
+        {
+        writeException("enableDisablePump",e.what());
+        }
+    return msg;
+    }
+
+
+void showFuelStationSettings() {
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    try {       
+        con = General.mysqlConnect(ServerDB);
+        stmt = con->createStatement();
+        res = stmt->executeQuery("select * from fueling_station_settings  order by id");
+        if (res->rowsCount() > 0) {
+            Php::out << "<thead class='thead-light'>" << std::endl;
+            Php::out << "<tr>" << endl;           
+            Php::out << "<th>Setting Name</th>" << endl;
+            Php::out << "<th>Setting Value</th>" << endl;
+            Php::out << "<th></th>" << endl;
+            Php::out << "</tr>" << endl;
+            Php::out << "</thead>" << std::endl;
+        }
+        while (res->next()) {
+            Php::out << "<tr data-id='" << res->getString("id") << "' data-name='" << res->getString("setting_name") << "'>" << endl;            
+            Php::out << "<td>" + res->getString("setting_label") + "</td>" << endl;
+
+            Php::out << "<td>" + res->getString("setting_value") + "</td>" << endl;
+
+            Php::out << "<td>" << std::endl;
+
+            if (res->getInt("status") == 1)
+                Php::out << "<button type='button' class='btn btn-danger setting-enable-disable-btn' data-text='Disable' title='Disable'><i class='fas fa-stop-circle'></i></button>" << std::endl;
+            else
+                Php::out << "<button type='button' class='btn btn-success setting-enable-disable-btn' data-text='Enable' title='Enable'><i class='fas fa-play-circle'></i></button>" << std::endl;
+                
+            Php::out << "<button type='button' class='btn btn-info setting-edit' data-text='Edit' title='Edit'><i class='fas fa-edit'></i></button>" << std::endl;
+            Php::out << "</td>" << std::endl;
+            Php::out << "</tr>" << endl;
+        }       
+        delete res;
+        delete stmt;
+        delete con;
+    } catch (const std::exception& e) {
+        writeException("showFuelStationSettings", e.what());
+    }
+}
+
+
+Php::Value enableDisableSetting(Php::Value json)
+    {
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    string query,msg = "Failed";   
+ 
+    try
+        {
+        string status=json["status"];
+        string id=json["id"];
+        con= General.mysqlConnect(ServerDB); 
+        stmt=con->createStatement();
+        query="update fueling_station_settings set status="+status+" where id="+id;
+        stmt->executeUpdate(query);        
+        delete stmt;
+        delete con;       
+        msg = "Successfull";	
+        }
+    catch(const std::exception& e)
+        {
+        writeException("enableDisableSetting",e.what());
+        }
+    return msg;
+    }
+
+Php::Value parcxStationConfiguration(Php::Parameters &params) {
+    Php::Value data = params[0];
+    int task = data["task"];
+    Php::Value response;
+    switch (task) {
+        case 1:getControllerDropdown();
+            break;
+        case 2:getCameraDropdown();
+            break;
+        case 3:showPumpSettings();
+            break;
+        case 4:response=getpumpDetails(data);
+            break; 
+        case 5:response=insertUpdatePump(data);
+            break;
+        case 6:response=enableDisablePump(data);
+            break;
+        case 7: showFuelStationSettings();
+            break;
+        case 8:response=enableDisableSetting(data);
+            break;
+
+    }
+    return response;
+}
+
+
+extern "C" {
+
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension extension("PX_StationConfiguration", "1.0");
+        extension.add<parcxStationConfiguration>("parcxStationConfiguration");
+        return extension;
+    }
+}
