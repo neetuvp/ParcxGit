@@ -270,7 +270,18 @@ Php::Value insertUpdatePump(Php::Value json)
         string cms_id=json["cms_id"];
         string controller_id=json["controller_id"];
         string call_vehicle_found_camera=json["call_vehicle_found_camera"];
-        
+        if(cms_id=="")
+        {
+            cms_id = "0";
+        }
+        if(camera_1 == "")
+        {
+            camera_1 = "0";
+        }
+        if(camera_2 == "")
+        {
+            camera_2 = "0";
+        }
         
         con = General.mysqlConnect(ServerDB);
         stmt = con->createStatement();                
@@ -302,7 +313,7 @@ Php::Value insertUpdatePump(Php::Value json)
         {
         writeException("insertUpdatePump",query);
         writeException("insertUpdatePump",e.what());
-        Php::out<<query<<endl;
+       // Php::out<<query<<endl;
         } 
     return msg;
 }
@@ -336,7 +347,7 @@ Php::Value enableDisablePump(Php::Value json)
 void showFuelStationSettings() {
     sql::Connection *con=NULL;
     sql::Statement *stmt;
-    sql::ResultSet *res;
+    sql::ResultSet *res,*res1;
     try {       
         con = General.mysqlConnect(ServerDB);
         stmt = con->createStatement();
@@ -353,8 +364,24 @@ void showFuelStationSettings() {
         while (res->next()) {
             Php::out << "<tr data-id='" << res->getString("id") << "' data-name='" << res->getString("setting_name") << "'>" << endl;            
             Php::out << "<td>" + res->getString("setting_label") + "</td>" << endl;
+            if(res->getInt("setting_type")==0)
+                Php::out << "<td data-val="+ res->getString("setting_value")+">" + res->getString("setting_value") + "</td>" << endl;
+            else if(res->getInt("setting_type")==1)
+            {
+                if(res->getString("setting_value")=="1")
+                    Php::out << "<td data-val='1'>Yes</td>" << endl;
+                else
+                    Php::out << "<td data-val='0'>No</td>" << endl;
+            }
+            else if(res->getInt("setting_type")==2)
+            {
+                res1 = stmt->executeQuery("Select interface_name from interface_settings where id = "+res->getString("setting_value"));
+                
+                if(res1->next())
+                    Php::out << "<td data-val="+ res->getString("setting_value")+">" +res1->getString("interface_name")+"</td>" << endl;
 
-            Php::out << "<td>" + res->getString("setting_value") + "</td>" << endl;
+                delete res1;
+            }
 
             Php::out << "<td>" << std::endl;
 
@@ -401,6 +428,107 @@ Php::Value enableDisableSetting(Php::Value json)
     return msg;
     }
 
+void getSettingsInputBox(Php::Value json)
+{
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    sql::ResultSet *res;
+    string id=json["id"];  
+    string setting_value = json["setting_value"];  
+    string setting_name = json["setting_name"];
+    string selected= "",yes_selected="",no_selected="";
+    string option_val = "";
+    string option_name = "";
+    try{
+        
+        con = General.mysqlConnect(ServerDB);
+        stmt=con->createStatement();
+        res=stmt->executeQuery("Select setting_type,setting_name from fueling_station_settings where setting_name = '"+setting_name+"'");
+        int n = res->rowsCount();
+        res->next();
+        if(n>0)
+        {
+            if(res->getString("setting_type")=="0")
+            {
+                Php::out<<"<input type = 'text' id = 'setting"+id+"'  value = '"+setting_value+"'>"<<endl;                   
+            }
+            else if(res->getString("setting_type")=="1")
+            {
+                selected="";
+                Php::out<<"<select name='"+setting_name+"' id='setting"+id+"' value = '"+setting_value+"'>"<<endl;
+                if(setting_value=="1")
+                {
+                    yes_selected = "selected";
+                    no_selected = "";
+                }
+                else if(setting_value=="0")
+                {
+                    yes_selected = "";
+                    no_selected = "selected";
+                }
+                Php::out<<"<option value='1' "+yes_selected+">Yes</option>"<<endl;               
+                Php::out<<"<option value='0' "+no_selected+">No</option>"<<endl;               
+                Php::out<<"</select>"<<endl;                      
+            }
+            else if(res->getString("setting_type")=="2")
+            {
+                res=stmt->executeQuery("Select id,interface_name from interface_settings");
+                Php::out<<"<select name='"+setting_name+"' id='setting"+id+"' value = '"+setting_value+"'>"<<endl;
+                while(res->next())
+                {
+                    selected="";
+                    if(setting_value==res->getString("id"))
+                    {
+                       selected = "selected"; 
+                    }
+                    Php::out<<"<option value='"+res->getString("id")+"' "+selected+">"+res->getString("interface_name")+"</option>"<<endl;    
+                }
+                Php::out<<"</select>"<<endl;  
+            }
+        }
+        
+        delete res;    
+        delete stmt;
+        delete con; 
+        
+    }
+    catch(const std::exception& e)
+    {
+        writeException("getSettingsInputBox",e.what());
+    }
+
+}
+
+Php::Value UpdateFuelSettings(Php::Value json)
+{
+    sql::Connection *con=NULL;
+    sql::Statement *stmt;
+    //sql::ResultSet *res;
+    string query="",msg = "Failed";    
+    try
+        {
+            string id=json["id"];
+            string setting_value=json["setting_value"];
+
+            con = General.mysqlConnect(ServerDB);
+            stmt = con->createStatement();                
+
+            query="update fueling_station_settings set setting_value='"+setting_value+"' where id="+id;
+            stmt->executeUpdate(query);
+
+            delete stmt;
+            delete con;
+            msg = "Successfull";
+        }
+    catch(const std::exception& e)
+        {
+        writeException("UpdateFuelSettings",query);
+        writeException("UpdateFuelSettings",e.what());
+        Php::out<<query<<endl;
+        } 
+    return msg;
+}
+
 Php::Value parcxStationConfiguration(Php::Parameters &params) {
     Php::Value data = params[0];
     int task = data["task"];
@@ -422,7 +550,10 @@ Php::Value parcxStationConfiguration(Php::Parameters &params) {
             break;
         case 8:response=enableDisableSetting(data);
             break;
-
+        case 9:getSettingsInputBox(data);
+            break;
+        case 10:response = UpdateFuelSettings(data);
+            break;
     }
     return response;
 }

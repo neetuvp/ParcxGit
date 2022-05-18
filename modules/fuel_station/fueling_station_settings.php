@@ -127,18 +127,18 @@ include('../../includes/sidebar.php');
             var data = {};
             data["id"] = id;
             data["status"] = status;
-            data["activity_message"]=status_text+" system seettings "+system_setting_name;
-            data["task"] = "19";
+            data["activity_message"]=status_text+" system settings "+system_setting_name;
+            data["task"] = "8";
             var jsondata = JSON.stringify(data);
-            $.post("../../modules/ajax/settings.php", jsondata, function (result) {
+            $.post("ajax/station_config.php", jsondata, function (result) {
                 if (result == "Successfull")
-                    loadSettings(17, "system_settings");
+                    loadSettings(7, "system_settings");
                 else
                     alert(result);
             });
         } else
         {
-            loadSettings(17, "system_settings");
+            loadSettings(7, "system_settings");
         }
     });
 
@@ -151,7 +151,8 @@ include('../../includes/sidebar.php');
     $(document).on("click", ".setting-edit", function ()
     {
         id = $(this).parent('td').parent('tr').data('id');
-        setting_value = $(this).parent('td').siblings(":eq( 1 )").text();
+        //setting_value = $(this).parent('td').siblings(":eq( 1 )").text();
+        setting_value = $(this).parent('td').siblings(":eq( 1 )").data('val');
         system_setting_name=$(this).parent('td').siblings(":eq( 0 )").text();
         if ($(this).attr("data-text") === "Edit")
         {            
@@ -162,9 +163,10 @@ include('../../includes/sidebar.php');
             data["id"] = id;
             data["setting_value"] = setting_value;
             data["setting_name"] = setting_name;
-            data["task"] = "56";
-            var jsondata = JSON.stringify(data);              
-            $.post("../../modules/ajax/settings.php", jsondata, function (result)
+            data["task"] = "9";
+            var jsondata = JSON.stringify(data);
+            //alert(jsondata);
+            $.post("ajax/station_config.php", jsondata, function (result)
             {
                td.html(result);
             }); 
@@ -191,12 +193,13 @@ include('../../includes/sidebar.php');
             data["setting_name"] = setting_name;
             
             data["activity_message"]="Edit system setting "+system_setting_name;
-            data["task"] = "18";
-            var jsondata = JSON.stringify(data);            
-            $.post("../../modules/ajax/settings.php", jsondata, function (result)
+            data["task"] = "10";
+            var jsondata = JSON.stringify(data); 
+            //console.log(jsondata);
+            $.post("ajax/station_config.php", jsondata, function (result)
             {
                 if (result == "Successfull")
-                    loadSettings(17, "system_settings");
+                    loadSettings(7, "system_settings");
                 else
                     alert(result);
             });                    

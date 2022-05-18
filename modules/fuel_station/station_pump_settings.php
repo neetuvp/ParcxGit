@@ -247,7 +247,11 @@ include('../../includes/sidebar.php');
                     data["camera_2"] = $("#camera_2").val();
                 else 
                     data["camera_2"] = "0";
-                data["cms_id"] = $("#cms_id").val();
+                
+                if($("#cms_id").val()=="")
+                    data["cms_id"] = "0";
+                else
+                    data["cms_id"] = $("#cms_id").val();
                 
                 if($("#controller_id").val()=="")
                     data["controller_id"] = "0";
