@@ -291,7 +291,8 @@ include('../../includes/sidebar.php');
     $(document).on("click", ".pump-enable-disable-btn", function ()
     {
         id = $(this).parent('td').parent('tr').data('id');
-        var status_text = $(this).text();
+        //var status_text = $(this).text();
+        var status_text = $(this).attr("data-text");
         if (status_text == "Disable")
             status = 0;
         else
@@ -302,6 +303,7 @@ include('../../includes/sidebar.php');
         data["status"] = status;
         data["task"] = "6";
         var jsondata = JSON.stringify(data);
+        alert(jsondata)
         $.post("ajax/station_config.php", jsondata, function (result) {
             if (result == "Successfull"){
                 $("#info-message").html("Update Successful");
