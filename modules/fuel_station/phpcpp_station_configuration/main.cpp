@@ -165,7 +165,7 @@ void showPumpSettings()
     sql::Statement *stmt;
     sql::ResultSet *res;  
     try
-        {
+    {
         Php::Value role;
         con= General.mysqlConnect(ServerDB); 
         stmt=con->createStatement();
@@ -195,12 +195,13 @@ void showPumpSettings()
                         
             Php::out << "<td>"<< std::endl;
             if(res->getInt("status")==1)
-                Php::out << "<button type='button' class='col btn btn-danger pump-enable-disable-btn' data-text='Disable' title='Disable'><i class='fas fa-stop-circle'></i></button>" << std::endl;
+                Php::out << "<button type='button' class='btn btn-danger pump-enable-disable-btn' data-text='Disable' title='Disable'><i class='fas fa-stop-circle'></i></button>" << std::endl;
                 //Php::out << "<button type='button' class='col btn btn-danger pump-enable-disable-btn'>Disable</button>"<< std::endl;
             else
                 Php::out << "<button type='button' class='btn btn-success pump-enable-disable-btn' data-text='Enable' title='Enable'><i class='fas fa-play-circle'></i></button>" << std::endl;
                 //Php::out << "<button type='button' class='col btn btn-success pump-enable-disable-btn'>Enable</button>"<< std::endl;
             Php::out << "</td>"<< std::endl;
+
 
             Php::out << "<td>"<< std::endl;
             Php::out << "<button type='button' class='btn btn-info pump-edit' data-text='Edit' title='Edit'><i class='fas fa-edit'></i></button>" << std::endl;
@@ -212,11 +213,11 @@ void showPumpSettings()
         delete res;    
         delete stmt;
 		delete con;  
-        }
+    }
     catch(const std::exception& e)
-        {
+    {
         writeException("showPumpSettings",e.what());
-        }
+    }
     
     }
 

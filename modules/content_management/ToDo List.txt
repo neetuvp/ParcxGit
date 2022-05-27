@@ -9,3 +9,4 @@
 9.DateRangePicker does not scroll with the input box
 10.Alert Popups should be in modal
 11.Editing the Image Timeout for media upload
+12.Dragging and dropping does not scroll the div for long playlist
